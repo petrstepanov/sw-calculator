@@ -1,0 +1,274 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
+
+Copyright (c) 2009, 2016 Oracle and/or its affiliates. All rights reserved.
+
+Oracle and Java are registered trademarks of Oracle and/or its affiliates.
+Other names may be trademarks of their respective owners.
+
+The contents of this file are subject to the terms of either the GNU
+General Public License Version 2 only ("GPL") or the Common
+Development and Distribution License("CDDL") (collectively, the
+"License"). You may not use this file except in compliance with the
+License. You can obtain a copy of the License at
+http://www.netbeans.org/cddl-gplv2.html
+or nbbuild/licenses/CDDL-GPL-2-CP. See the License for the
+specific language governing permissions and limitations under the
+License.  When distributing the software, include this License Header
+Notice in each file and include the License file at
+nbbuild/licenses/CDDL-GPL-2-CP.  Oracle designates this
+particular file as subject to the "Classpath" exception as provided
+by Oracle in the GPL Version 2 section of the License file that
+accompanied this code. If applicable, add the following below the
+License Header, with the fields enclosed by brackets [] replaced by
+your own identifying information:
+"Portions Copyrighted [year] [name of copyright owner]"
+
+If you wish your version of this file to be governed by only the CDDL
+or only the GPL Version 2, indicate your decision by adding
+"[Contributor] elects to include this software in this distribution
+under the [CDDL or GPL Version 2] license." If you do not indicate a
+single choice of license, a recipient has the option to distribute
+your version of this file under either the CDDL, the GPL Version 2 or
+to extend the choice of license to its licensees as provided above.
+However, if you add GPL Version 2 code and therefore, elected the GPL
+Version 2 license, then the option applies only if the new code is
+made subject to such option by the copyright holder.
+
+Contributor(s):
+-->
+<configurationDescriptor version="100">
+  <logicalFolder name="root" displayName="root" projectFiles="true" kind="ROOT">
+    <logicalFolder name="HeaderFiles"
+                   displayName="Header Files"
+                   projectFiles="true">
+      <itemPath>AbstractModelProvider.h</itemPath>
+      <itemPath>FileUtils.h</itemPath>
+      <itemPath>GraphicsHelper.h</itemPath>
+      <itemPath>HistProcessor.h</itemPath>
+      <itemPath>ParabolaGaussModelProvider.h</itemPath>
+      <itemPath>SWCalculatorFrame.h</itemPath>
+      <itemPath>SWCalculatorFrameLinkDef.h</itemPath>
+      <itemPath>SimpleParabolaPdf.h</itemPath>
+      <itemPath>StringUtils.h</itemPath>
+    </logicalFolder>
+    <logicalFolder name="ResourceFiles"
+                   displayName="Resource Files"
+                   projectFiles="true">
+    </logicalFolder>
+    <logicalFolder name="SourceFiles"
+                   displayName="Source Files"
+                   projectFiles="true">
+      <itemPath>AbstractModelProvider.cpp</itemPath>
+      <itemPath>FileUtils.cpp</itemPath>
+      <itemPath>GraphicsHelper.cpp</itemPath>
+      <itemPath>HistProcessor.cpp</itemPath>
+      <itemPath>ParabolaGaussModelProvider.cpp</itemPath>
+      <itemPath>SWCalculatorFrame.cpp</itemPath>
+      <itemPath>SimpleParabolaPdf.cpp</itemPath>
+      <itemPath>StringUtils.cpp</itemPath>
+      <itemPath>main.cc</itemPath>
+    </logicalFolder>
+    <logicalFolder name="ExternalFiles"
+                   displayName="Important Files"
+                   projectFiles="false">
+      <itemPath>Makefile</itemPath>
+    </logicalFolder>
+  </logicalFolder>
+  <projectmakefile>Makefile</projectmakefile>
+  <confs>
+    <conf name="Debug" type="1">
+      <toolsSet>
+        <compilerSet>default</compilerSet>
+        <dependencyChecking>false</dependencyChecking>
+        <rebuildPropChanged>false</rebuildPropChanged>
+      </toolsSet>
+      <compileType>
+        <ccTool>
+          <commandlineTool>g++</commandlineTool>
+          <incDir>
+            <pElem>/Applications/root_v6.06.02/include</pElem>
+          </incDir>
+          <commandLine>-pthread -stdlib=libc++ -std=c++11 -m64</commandLine>
+        </ccTool>
+        <linkerTool>
+          <linkerAddLib>
+            <pElem>/Applications/root_v6.06.02/lib</pElem>
+            <pElem>.</pElem>
+          </linkerAddLib>
+          <linkerDynSerch>
+            <pElem>.</pElem>
+            <pElem>.</pElem>
+            <pElem>.</pElem>
+            <pElem>.</pElem>
+            <pElem>.</pElem>
+            <pElem>.</pElem>
+            <pElem>.</pElem>
+            <pElem>.</pElem>
+            <pElem>.</pElem>
+            <pElem>.</pElem>
+            <pElem>.</pElem>
+            <pElem>.</pElem>
+            <pElem>.</pElem>
+          </linkerDynSerch>
+          <linkerDepDynSerchKind>2</linkerDepDynSerchKind>
+          <linkerCopySharedLibs>false</linkerCopySharedLibs>
+          <commandlineTool>g++</commandlineTool>
+          <linkerLibItems>
+            <linkerLibFileItem>sw-calculator.so</linkerLibFileItem>
+          </linkerLibItems>
+          <commandLine>-lGui -lCore -lRIO -lNet -lHist -lGraf -lGraf3d -lGpad -lTree -lRint -lPostscript -lMatrix -lPhysics -lMathCore -lThread -lMultiProc -lpthread -stdlib=libc++ -lm -ldl -lRooFit -lRooFitCore -lHtml -lMinuit -lFumili</commandLine>
+        </linkerTool>
+      </compileType>
+      <packaging>
+        <packType>Tar</packType>
+        <packFileList>
+          <packFileListElem type="File"
+                            to="${PACKAGE_TOP_DIR}bin/SWCalculatorFrameLib.so"
+                            from="${CND_DISTDIR}/${CND_CONF}/${CND_PLATFORM}/SWCalculatorFrameLib.so"
+                            perm="755"
+                            owner="root"
+                            group="bin"/>
+          <packFileListElem type="File"
+                            to="${PACKAGE_TOP_DIR}bin/${OUTPUT_BASENAME}"
+                            from="${OUTPUT_PATH}"
+                            perm="755"
+                            owner="root"
+                            group="bin"/>
+          <packFileListElem type="File"
+                            to="${PACKAGE_TOP_DIR}bin/${OUTPUT_BASENAME}"
+                            from="${OUTPUT_PATH}"
+                            perm="755"
+                            owner="root"
+                            group="bin"/>
+          <packFileListElem type="File"
+                            to="${PACKAGE_TOP_DIR}bin/${OUTPUT_BASENAME}"
+                            from="${OUTPUT_PATH}"
+                            perm="755"
+                            owner="root"
+                            group="bin"/>
+          <packFileListElem type="File"
+                            to="${PACKAGE_TOP_DIR}bin/${OUTPUT_BASENAME}"
+                            from="${OUTPUT_PATH}"
+                            perm="755"
+                            owner="root"
+                            group="bin"/>
+        </packFileList>
+      </packaging>
+      <item path="AbstractModelProvider.cpp" ex="false" tool="1" flavor2="0">
+      </item>
+      <item path="AbstractModelProvider.h" ex="false" tool="3" flavor2="0">
+      </item>
+      <item path="FileUtils.cpp" ex="false" tool="1" flavor2="0">
+      </item>
+      <item path="FileUtils.h" ex="false" tool="3" flavor2="0">
+      </item>
+      <item path="GraphicsHelper.cpp" ex="false" tool="1" flavor2="0">
+      </item>
+      <item path="GraphicsHelper.h" ex="false" tool="3" flavor2="0">
+      </item>
+      <item path="HistProcessor.cpp" ex="false" tool="1" flavor2="0">
+      </item>
+      <item path="HistProcessor.h" ex="false" tool="3" flavor2="0">
+      </item>
+      <item path="ParabolaGaussModelProvider.cpp" ex="false" tool="1" flavor2="0">
+      </item>
+      <item path="ParabolaGaussModelProvider.h" ex="false" tool="3" flavor2="0">
+      </item>
+      <item path="SWCalculatorFrame.cpp" ex="false" tool="1" flavor2="0">
+      </item>
+      <item path="SWCalculatorFrame.h" ex="false" tool="1" flavor2="0">
+      </item>
+      <item path="SWCalculatorFrameLinkDef.h" ex="false" tool="1" flavor2="0">
+      </item>
+      <item path="SimpleParabolaPdf.cpp" ex="false" tool="1" flavor2="0">
+      </item>
+      <item path="SimpleParabolaPdf.h" ex="false" tool="3" flavor2="0">
+      </item>
+      <item path="StringUtils.cpp" ex="false" tool="1" flavor2="0">
+      </item>
+      <item path="StringUtils.h" ex="false" tool="3" flavor2="0">
+      </item>
+      <item path="main.cc" ex="false" tool="1" flavor2="0">
+        <ccTool>
+          <additionalDep></additionalDep>
+        </ccTool>
+      </item>
+    </conf>
+    <conf name="Release" type="1">
+      <toolsSet>
+        <compilerSet>default</compilerSet>
+        <dependencyChecking>true</dependencyChecking>
+        <rebuildPropChanged>false</rebuildPropChanged>
+      </toolsSet>
+      <compileType>
+        <cTool>
+          <developmentMode>5</developmentMode>
+        </cTool>
+        <ccTool>
+          <developmentMode>5</developmentMode>
+        </ccTool>
+        <fortranCompilerTool>
+          <developmentMode>5</developmentMode>
+        </fortranCompilerTool>
+        <asmTool>
+          <developmentMode>5</developmentMode>
+        </asmTool>
+        <linkerTool>
+          <linkerDynSerch>
+            <pElem>.</pElem>
+            <pElem>.</pElem>
+            <pElem>.</pElem>
+            <pElem>.</pElem>
+            <pElem>.</pElem>
+            <pElem>.</pElem>
+            <pElem>.</pElem>
+            <pElem>.</pElem>
+            <pElem>.</pElem>
+            <pElem>.</pElem>
+            <pElem>.</pElem>
+            <pElem>.</pElem>
+            <pElem>.</pElem>
+          </linkerDynSerch>
+        </linkerTool>
+      </compileType>
+      <item path="AbstractModelProvider.cpp" ex="false" tool="1" flavor2="0">
+      </item>
+      <item path="AbstractModelProvider.h" ex="false" tool="3" flavor2="0">
+      </item>
+      <item path="FileUtils.cpp" ex="false" tool="1" flavor2="0">
+      </item>
+      <item path="FileUtils.h" ex="false" tool="3" flavor2="0">
+      </item>
+      <item path="GraphicsHelper.cpp" ex="false" tool="1" flavor2="0">
+      </item>
+      <item path="GraphicsHelper.h" ex="false" tool="3" flavor2="0">
+      </item>
+      <item path="HistProcessor.cpp" ex="false" tool="1" flavor2="0">
+      </item>
+      <item path="HistProcessor.h" ex="false" tool="3" flavor2="0">
+      </item>
+      <item path="ParabolaGaussModelProvider.cpp" ex="false" tool="1" flavor2="0">
+      </item>
+      <item path="ParabolaGaussModelProvider.h" ex="false" tool="3" flavor2="0">
+      </item>
+      <item path="SWCalculatorFrame.cpp" ex="false" tool="1" flavor2="0">
+      </item>
+      <item path="SWCalculatorFrame.h" ex="false" tool="3" flavor2="0">
+      </item>
+      <item path="SWCalculatorFrameLinkDef.h" ex="false" tool="3" flavor2="0">
+      </item>
+      <item path="SimpleParabolaPdf.cpp" ex="false" tool="1" flavor2="0">
+      </item>
+      <item path="SimpleParabolaPdf.h" ex="false" tool="3" flavor2="0">
+      </item>
+      <item path="StringUtils.cpp" ex="false" tool="1" flavor2="0">
+      </item>
+      <item path="StringUtils.h" ex="false" tool="3" flavor2="0">
+      </item>
+      <item path="main.cc" ex="false" tool="1" flavor2="0">
+      </item>
+    </conf>
+  </confs>
+</configurationDescriptor>
