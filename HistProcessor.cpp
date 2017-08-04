@@ -13,6 +13,8 @@
 
 #include "HistProcessor.h"
 #include <iostream>
+#include <TF1.h>
+#include <RooAbsPdf.h>
 
 HistProcessor::HistProcessor(){};
 
@@ -109,6 +111,15 @@ TH1F* HistProcessor::getChi2Hist(TH1I* hist, RooCurve* curve){
 	return chiHist;
 }
 
+Int_t HistProcessor::getTotalCounts(TH1I* hist){
+    Int_t counts = 0;
+    Double_t nBins = hist->GetXaxis()->GetNbins();
+    for (int i = 1; i <= nBins; i++){
+        counts += hist->GetBinContent(i);
+    }
+    return counts;
+}
+
 Bool_t HistProcessor::hasAtan(TH1I* hist){
 	const Int_t wingBins = 10;
 	Double_t leftWingMeanValue, rightWingMeanValue;
@@ -173,4 +184,9 @@ std::pair<Double_t, Double_t> HistProcessor::calcIntegral(TH1F* hist, Double_t m
 Bool_t HistProcessor::isTwoDetetor(TH1I* hist){
 	TAxis* x = hist->GetXaxis();
 	return !((x->GetXmin() < 511) && (x->GetXmax() > 511));
+}
+
+Double_t HistProcessor::getPdfMaximumX(RooAbsPdf* pdf, const RooArgList& args){
+    TF1* tf1 = pdf->asTF(args);
+    return tf1->GetMaximumX();
 }

@@ -16,6 +16,8 @@
 
 #include <TH1.h>
 #include <RooCurve.h>
+#include <RooAbsPdf.h>
+#include <RooArgList.h>
 
 class HistProcessor {
 public:
@@ -24,12 +26,14 @@ public:
 	RooCurve* subtractCurves(RooCurve*, RooCurve*);
 	TH1F* subtractCurve(TH1I*, RooCurve*);
 	TH1F* getChi2Hist(TH1I*, RooCurve*);
+        Int_t getTotalCounts(TH1I*);
 	Bool_t hasBackground(TH1I*);
 	Bool_t hasAtan(TH1I*);
 	Double_t calcBackgroundFraction(TH1I*);
 	std::pair<Double_t, Int_t> getChi2(TH1I*, RooCurve*, Int_t);
 	std::pair<Double_t, Double_t> calcIntegral(TH1F*, Double_t, Double_t);
 	Bool_t isTwoDetetor(TH1I*);
+        Double_t getPdfMaximumX (RooAbsPdf*, const RooArgList&);
 
 private:
 	HistProcessor();                                      // Private so that it can  not be called

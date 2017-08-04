@@ -497,9 +497,9 @@ void SWCalculatorFrame::importSpectrum(void){
 		Int_t limitWidth = std::min(peakCenter - eMin, eMax - peakCenter);
 		if (numPeakPosition->GetIntNumber() != peakCenter){
 			numPeakPosition->SetIntNumber(peakCenter);
-			numDisplayMin->SetIntNumber(peakCenter - std::min(limitWidth, 15));
-			numDisplayMax->SetIntNumber(peakCenter + std::min(limitWidth, 15));
-			numFitMin->SetIntNumber(peakCenter - std::min(limitWidth, 15));
+			numDisplayMin->SetIntNumber(peakCenter - std::min(limitWidth, 35));
+			numDisplayMax->SetIntNumber(peakCenter + std::min(limitWidth, 35));
+			numFitMin->SetIntNumber(peakCenter - std::min(limitWidth, 35));
 		}
 		numFitMin->SetLimitValues(peakCenter - limitWidth, peakCenter - 1);
 		numFitMax->SetLimitValues(peakCenter + 1, peakCenter + limitWidth);
@@ -547,6 +547,8 @@ void SWCalculatorFrame::fitSpectrum(void){
 	HistProcessor* histProcessor = HistProcessor::getInstance();
 	peakHist = histProcessor->cutHist(fullHist, eFitMin, eFitMax);
 
+        Int_t totalFitCounts = histProcessor->getTotalCounts(peakHist);
+        
 	RooRealVar* x = new RooRealVar("x", "Energy", peakHist->GetXaxis()->GetXmin(), peakHist->GetXaxis()->GetXmax(), "keV");
 	Double_t dE_0 = 2;
 	RooRealVar* E_0 = new RooRealVar("E_0", "Peak Center", numPeakPosition->GetNumber(), numPeakPosition->GetNumber() - dE_0, numPeakPosition->GetNumber() + dE_0, "keV");
@@ -597,7 +599,9 @@ void SWCalculatorFrame::fitSpectrum(void){
 	RooFitResult* fitResult = m->save();
 
 	GraphicsHelper* graphicsHelper = GraphicsHelper::getInstance();
-
+        Double_t convolutedModelMaxX = histProcessor->getPdfMaximumX(convolutedModel, RooArgList(*x));
+        std::cout << "convolutedModelMaxX: " << convolutedModelMaxX << std::endl;
+        
 	// Plotting top RooPlot
 	fitFrame = x->frame(); 	// Set Empty Graph Title
 	fitFrame->GetXaxis()->SetRangeUser(numFitMin->GetNumber(), numFitMax->GetNumber());
@@ -622,25 +626,25 @@ void SWCalculatorFrame::fitSpectrum(void){
 	Double_t wOffset = isTwoDetector ? numWShift->GetNumber()*2 : numWShift->GetNumber();
 	Double_t e0 = E_0->getVal();
 
-  std::cout << "E_0: " << e0 << std::endl;
+        std::cout << "E_0: " << e0 << std::endl;
 
-	std::cout << "S integration region (" << e0 - ds / 2. << "; " << e0 + ds / 2. << ")" << std::endl;
+	std::cout << "S integration region (" << convolutedModelMaxX - ds / 2. << "; " << convolutedModelMaxX + ds / 2. << ")" << std::endl;
 	// TColor *color = new TColor(1756, 0.97, 0.97, 0.97);
-	TBox* sBox = new TBox(e0 - ds / 2., yAxisMin, e0 + ds / 2., yAxisMax*0.96);
+	TBox* sBox = new TBox(convolutedModelMaxX - ds / 2., yAxisMin, convolutedModelMaxX + ds / 2., yAxisMax*0.96);
 	sBox->SetLineWidth(0);
 	sBox->SetFillColor(19);
 	// sBox->SetFillStyle(3002);
 	fitFrame->addObject(sBox);
 
-	std::cout << "W1 integration region (" << e0 - wOffset - dw << "; " << e0 - wOffset << ")" << std::endl;
-	TBox* w1Box = new TBox(e0 - wOffset - dw, yAxisMin, e0 - wOffset, yAxisMax*0.96);
+	std::cout << "W1 integration region (" << convolutedModelMaxX - wOffset - dw << "; " << convolutedModelMaxX - wOffset << ")" << std::endl;
+	TBox* w1Box = new TBox(convolutedModelMaxX - wOffset - dw, yAxisMin, convolutedModelMaxX - wOffset, yAxisMax*0.96);
 	w1Box->SetLineWidth(0);
 	w1Box->SetFillColor(19);
 	// w1Box->SetFillStyle(3002);
 	fitFrame->addObject(w1Box);
 
-	std::cout << "W2 integration region (" << e0 + wOffset << "; " << e0 + wOffset + dw << ")" << std::endl;
-	TBox* w2Box = new TBox(e0 + wOffset, yAxisMin, e0 + wOffset + dw, yAxisMax*0.96);
+	std::cout << "W2 integration region (" << convolutedModelMaxX + wOffset << "; " << convolutedModelMaxX + wOffset + dw << ")" << std::endl;
+	TBox* w2Box = new TBox(convolutedModelMaxX + wOffset, yAxisMin, convolutedModelMaxX + wOffset + dw, yAxisMax*0.96);
 	w2Box->SetLineWidth(0);
 	w2Box->SetFillColor(19);
 	// w2Box->SetFillStyle(3002);
@@ -650,15 +654,17 @@ void SWCalculatorFrame::fitSpectrum(void){
 	data->plotOn(fitFrame, Invisible()); //MarkerSize(0.5),
 
 	// Plot Convoluted Model
+        // https://root-forum.cern.ch/t/roofit-normailzations/7040/2
+        // Normalization(totalFitCounts, RooAbsReal::NumEvent)
 	convolutedModel->plotOn(fitFrame, LineColor(kOrange + 6), LineWidth(2), Name("fit"));
 
 	// Plot Convoluted Model background (its added after convolution graph because otherwise it changes backgroud)
 	convolutedModel->plotOn(fitFrame, Components(*(modelProvider->getBgComponents())), LineStyle(kDashed), LineColor(kViolet + 6), LineWidth(1), Name("bg"));
 
 	// Plot Non-convoluted model
-	//    model->plotOn(fitFrame, Invisible());
+//	model->plotOn(fitFrame, LineColor(kOrange + 6), LineWidth(1), LineStyle(kDashed));
 
-	//    // Plot Non-convoluted model components (parabola and gauss)
+	// Plot Non-convoluted model components (parabola and gauss)
 	RooArgSet* components = modelProvider->getComponents();
 	TIterator* it = components->createIterator();
 	TObject* tempObj = 0;
@@ -676,7 +682,7 @@ void SWCalculatorFrame::fitSpectrum(void){
 	// Plot Resolution Function
 	RooAbsPdf* resolutionFunction = modelProvider->getResolutionFuncton();
 	if (resolutionFunction != NULL){
-		resolutionFunction->plotOn(fitFrame, LineStyle(kDashed), LineColor(kGray), LineWidth(1));
+		resolutionFunction->plotOn(fitFrame, LineStyle(kDashed), LineColor(kGray), LineWidth(1),  Normalization(totalFitCounts, RooAbsReal::NumEvent));
 	}
 
 	curveBg = fitFrame->getCurve("bg");
@@ -718,9 +724,9 @@ void SWCalculatorFrame::fitSpectrum(void){
 	fullInt.first = peakHistNoBg->IntegralAndError(1, peakHistNoBg->GetXaxis()->GetNbins(), fullInt.second, "width");//calculateHistIntegral(peakHistNoBg, histEMin, histEMax - 0.001);
 	//std::cout << "Full Integral: " << fullInt.first << " ± " << fullInt.second << std::endl;
 
-	std::pair<Double_t, Double_t> sInt = histProcessor->calcIntegral(peakHistNoBg, e0 - ds / 2., e0 + ds / 2.);
-	std::pair<Double_t, Double_t> w1Int = histProcessor->calcIntegral(peakHistNoBg, e0 - wOffset - dw, e0 - wOffset);
-	std::pair<Double_t, Double_t> w2Int = histProcessor->calcIntegral(peakHistNoBg, e0 + wOffset, e0 + wOffset + dw);
+	std::pair<Double_t, Double_t> sInt = histProcessor->calcIntegral(peakHistNoBg, convolutedModelMaxX - ds / 2., convolutedModelMaxX + ds / 2.);
+	std::pair<Double_t, Double_t> w1Int = histProcessor->calcIntegral(peakHistNoBg, convolutedModelMaxX - wOffset - dw, convolutedModelMaxX - wOffset);
+	std::pair<Double_t, Double_t> w2Int = histProcessor->calcIntegral(peakHistNoBg, convolutedModelMaxX + wOffset, convolutedModelMaxX + wOffset + dw);
 	std::cout << "S Integral: " << sInt.first << " ± " << sInt.second << std::endl;
 	std::cout << "W1 Integral: " << w1Int.first << " ± " << w1Int.second << std::endl;
 	std::cout << "W2 Integral: " << w2Int.first << " ± " << w2Int.second << std::endl;

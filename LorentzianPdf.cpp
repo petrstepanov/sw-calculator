@@ -52,9 +52,10 @@ Double_t LorentzianPdf::analyticalIntegral(Int_t code, const char* rangeName) co
             Double_t x1 = x.min(rangeName) - mean;
             Double_t x2 = x.max(rangeName) - mean;
             Double_t integral = 0;
+            // ﻿((5*epsilon^4*x)/8 + (3*epsilon^2*x^3)/8)/(epsilon^4 + 2*epsilon^2*x^2 + x^4) + (3*epsilon*atan(x/epsilon))/8
             integral += ((5*pow(epsilon,4)*x2)/8 + (3*pow(epsilon,2)*pow(x2,3))/8)/(pow(epsilon,4) + 2*pow(epsilon*x2,2) + pow(x2,4)) + 3*epsilon*atan(x2/epsilon)/8;
-            integral -= ((5*pow(epsilon,4)*x1)/8 + (3*pow(epsilon,2)*pow(x1,3))/8)/(pow(epsilon,4) + 2*pow(epsilon*x1,2) + pow(x2,4)) + 3*epsilon*atan(x1/epsilon)/8;
-            integral *= 3 * epsilon * TMath::Pi() / 8;
+            integral -= ((5*pow(epsilon,4)*x1)/8 + (3*pow(epsilon,2)*pow(x1,3))/8)/(pow(epsilon,4) + 2*pow(epsilon*x1,2) + pow(x1,4)) + 3*epsilon*atan(x1/epsilon)/8;
+//            integral *= 3 * epsilon * TMath::Pi() / 8;
             return integral;
         }
     }

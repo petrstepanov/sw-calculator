@@ -76,9 +76,9 @@ ParabolaLorentzianModelProvider::ParabolaLorentzianModelProvider(RooRealVar* x, 
 
 	// Constant Background
 	//	RooPolynomial* constBg = new RooPolynomial("constBg", "y=1", *x, RooArgSet());
-	RooGenericPdf* constBg = new RooGenericPdf("constBg", "1", *x);
-	RooRealVar* I_const = new RooRealVar("IConst", "Constant background", constBgFraction, 0, constBgFraction*2);
-	bgComponents->add(*constBg);
+//	RooGenericPdf* constBg = new RooGenericPdf("constBg", "1", *x);
+//	RooRealVar* I_const = new RooRealVar("IConst", "Constant background", constBgFraction, 0, constBgFraction*2);
+//	bgComponents->add(*constBg);
 
 	// Atan background
 	if (hasAtan){
@@ -87,10 +87,12 @@ ParabolaLorentzianModelProvider::ParabolaLorentzianModelProvider(RooRealVar* x, 
 		atanBg = new RooGenericPdf("atanBg", "@2/2 + (-1)*atan((@0 - @1))", RooArgList(*x, *x0, *pi));
 		I_atan = new RooRealVar("IAtan", "Atan Intensity", 0.002, 0.0, 0.1);
 		bgComponents->add(*atanBg);
-		this->convolutedModel = new RooAddPdf("model_atan", "Model with Convolution and Atan Background", RooArgList(*constBg, *atanBg, *sumModelConvoluted), RooArgList(*I_const, *I_atan));
+//		this->convolutedModel = new RooAddPdf("model_atan", "Model with Convolution and Atan Background", RooArgList(*constBg, *atanBg, *sumModelConvoluted), RooArgList(*I_const, *I_atan));
+		this->convolutedModel = new RooAddPdf("model_atan", "Model with Convolution and Atan Background", RooArgList(*atanBg, *sumModelConvoluted), RooArgList(*I_atan));
 	}
 	else {
-		this->convolutedModel = new RooAddPdf("model_const", "Model with Convolution and Const Background", RooArgList(*constBg, *sumModelConvoluted), RooArgList(*I_const));
+		this->convolutedModel = sumModelConvoluted;
+//		this->convolutedModel = new RooAddPdf("model_const", "Model with Convolution and Const Background", RooArgList(*constBg, *sumModelConvoluted), RooArgList(*I_const));
 	}
 }
 
