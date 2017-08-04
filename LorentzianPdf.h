@@ -5,42 +5,41 @@
  */
 
 /* 
- * File:   SimpleParabolaPdf.h
+ * File:   LorentzianPdf.h
  * Author: petrstepanov
  *
- * Created on August 2, 2017, 5:34 AM
+ * Created on August 2, 2017, 11:24 PM
  */
 
-#ifndef SIMPLEPARABOLAPDF_H
-#define SIMPLEPARABOLAPDF_H
+#ifndef LORENTZIANPDF_H
+#define LORENTZIANPDF_H
 
 #include <RooAbsPdf.h>
 #include <RooAbsReal.h>
 #include <RooRealProxy.h>
 
-class SimpleParabolaPdf : public RooAbsPdf {
+class LorentzianPdf : public RooAbsPdf {
 public:
-	SimpleParabolaPdf() {};
-	SimpleParabolaPdf(const char *name, const char *title,
+	LorentzianPdf() {};
+	LorentzianPdf(const char *name, const char *title,
 		RooAbsReal& _x,
 		RooAbsReal& _mean,
-		RooAbsReal& _r);
-	SimpleParabolaPdf(const SimpleParabolaPdf& other, const char* name = 0);
-	virtual TObject* clone(const char* newname) const { return new SimpleParabolaPdf(*this, newname); }
-	inline virtual ~SimpleParabolaPdf() { }
+		RooAbsReal& _epsilon);
+	LorentzianPdf(const LorentzianPdf& other, const char* name = 0);
+	virtual TObject* clone(const char* newname) const { return new LorentzianPdf(*this, newname); }
+	inline virtual ~LorentzianPdf() { }
 	Int_t getAnalyticalIntegral(RooArgSet& allVars, RooArgSet& analVars, const char* rangeName = 0) const;
 	Double_t analyticalIntegral(Int_t code, const char* rangeName = 0) const;
 
 protected:
 	RooRealProxy x;
 	RooRealProxy mean;
-	RooRealProxy r;
+	RooRealProxy epsilon;
 
 	Double_t evaluate() const;
 
 private:
-	//ClassDef(SimpleParabolaPdf, 1) // Your description goes here...
+	//ClassDef(LorentzianPdf, 1) // Your description goes here...
 };
 
-#endif /* SIMPLEPARABOLAPDF_H */
-
+#endif /* LORENTZIANPDF_H */

@@ -39,9 +39,11 @@ OBJECTFILES= \
 	${OBJECTDIR}/FileUtils.o \
 	${OBJECTDIR}/GraphicsHelper.o \
 	${OBJECTDIR}/HistProcessor.o \
+	${OBJECTDIR}/LorentzianPdf.o \
 	${OBJECTDIR}/ParabolaGaussModelProvider.o \
+	${OBJECTDIR}/ParabolaLorentzianModelProvider.o \
+	${OBJECTDIR}/ParabolaPdf.o \
 	${OBJECTDIR}/SWCalculatorFrame.o \
-	${OBJECTDIR}/SimpleParabolaPdf.o \
 	${OBJECTDIR}/StringUtils.o \
 	${OBJECTDIR}/main.o
 
@@ -88,9 +90,21 @@ ${OBJECTDIR}/HistProcessor.o: HistProcessor.cpp
 	${MKDIR} -p ${OBJECTDIR}
 	$(COMPILE.cc) -g -I/Applications/root_v6.06.02/include -o ${OBJECTDIR}/HistProcessor.o HistProcessor.cpp
 
+${OBJECTDIR}/LorentzianPdf.o: LorentzianPdf.cpp
+	${MKDIR} -p ${OBJECTDIR}
+	$(COMPILE.cc) -g -I/Applications/root_v6.06.02/include -o ${OBJECTDIR}/LorentzianPdf.o LorentzianPdf.cpp
+
 ${OBJECTDIR}/ParabolaGaussModelProvider.o: ParabolaGaussModelProvider.cpp
 	${MKDIR} -p ${OBJECTDIR}
 	$(COMPILE.cc) -g -I/Applications/root_v6.06.02/include -o ${OBJECTDIR}/ParabolaGaussModelProvider.o ParabolaGaussModelProvider.cpp
+
+${OBJECTDIR}/ParabolaLorentzianModelProvider.o: ParabolaLorentzianModelProvider.cpp
+	${MKDIR} -p ${OBJECTDIR}
+	$(COMPILE.cc) -g -I/Applications/root_v6.06.02/include -o ${OBJECTDIR}/ParabolaLorentzianModelProvider.o ParabolaLorentzianModelProvider.cpp
+
+${OBJECTDIR}/ParabolaPdf.o: ParabolaPdf.cpp
+	${MKDIR} -p ${OBJECTDIR}
+	$(COMPILE.cc) -g -I/Applications/root_v6.06.02/include -o ${OBJECTDIR}/ParabolaPdf.o ParabolaPdf.cpp
 
 ${OBJECTDIR}/SWCalculatorFrame.o: SWCalculatorFrame.cpp
 	${MKDIR} -p ${OBJECTDIR}
@@ -103,10 +117,6 @@ ${OBJECTDIR}/SWCalculatorFrame.h.gch: SWCalculatorFrame.h
 ${OBJECTDIR}/SWCalculatorFrameLinkDef.h.gch: SWCalculatorFrameLinkDef.h
 	${MKDIR} -p ${OBJECTDIR}
 	$(COMPILE.cc) -g -I/Applications/root_v6.06.02/include -o "$@" SWCalculatorFrameLinkDef.h
-
-${OBJECTDIR}/SimpleParabolaPdf.o: SimpleParabolaPdf.cpp
-	${MKDIR} -p ${OBJECTDIR}
-	$(COMPILE.cc) -g -I/Applications/root_v6.06.02/include -o ${OBJECTDIR}/SimpleParabolaPdf.o SimpleParabolaPdf.cpp
 
 ${OBJECTDIR}/StringUtils.o: StringUtils.cpp
 	${MKDIR} -p ${OBJECTDIR}

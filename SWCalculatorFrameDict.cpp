@@ -42,9 +42,11 @@ namespace std {} using namespace std;
 #include "FileUtils.h"
 #include "GraphicsHelper.h"
 #include "HistProcessor.h"
+#include "LorentzianPdf.h"
 #include "ParabolaGaussModelProvider.h"
+#include "ParabolaLorentzianModelProvider.h"
 #include "SWCalculatorFrame.h"
-#include "SimpleParabolaPdf.h"
+#include "ParabolaPdf.h"
 #include "StringUtils.h"
 
 // Header files passed via #pragma extra_include
@@ -62,7 +64,7 @@ namespace ROOT {
       ::SWCalculatorFrame *ptr = 0;
       static ::TVirtualIsAProxy* isa_proxy = new ::TIsAProxy(typeid(::SWCalculatorFrame));
       static ::ROOT::TGenericClassInfo 
-         instance("SWCalculatorFrame", "SWCalculatorFrame.h", 31,
+         instance("SWCalculatorFrame", "SWCalculatorFrame.h", 32,
                   typeid(::SWCalculatorFrame), ::ROOT::Internal::DefineBehavior(ptr, ptr),
                   &SWCalculatorFrame_Dictionary, isa_proxy, 0,
                   sizeof(::SWCalculatorFrame) );
@@ -111,9 +113,11 @@ namespace {
 "FileUtils.h",
 "GraphicsHelper.h",
 "HistProcessor.h",
+"LorentzianPdf.h",
 "ParabolaGaussModelProvider.h",
+"ParabolaLorentzianModelProvider.h",
 "SWCalculatorFrame.h",
-"SimpleParabolaPdf.h",
+"ParabolaPdf.h",
 "StringUtils.h",
 0
     };
@@ -143,9 +147,11 @@ class __attribute__((annotate("$clingAutoload$SWCalculatorFrame.h")))  SWCalcula
 #include "FileUtils.h"
 #include "GraphicsHelper.h"
 #include "HistProcessor.h"
+#include "LorentzianPdf.h"
 #include "ParabolaGaussModelProvider.h"
+#include "ParabolaLorentzianModelProvider.h"
 #include "SWCalculatorFrame.h"
-#include "SimpleParabolaPdf.h"
+#include "ParabolaPdf.h"
 #include "StringUtils.h"
 
 #undef  _BACKWARD_BACKWARD_WARNING_H

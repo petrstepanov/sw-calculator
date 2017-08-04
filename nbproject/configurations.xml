@@ -47,10 +47,12 @@ Contributor(s):
       <itemPath>FileUtils.h</itemPath>
       <itemPath>GraphicsHelper.h</itemPath>
       <itemPath>HistProcessor.h</itemPath>
+      <itemPath>LorentzianPdf.h</itemPath>
       <itemPath>ParabolaGaussModelProvider.h</itemPath>
+      <itemPath>ParabolaLorentzianModelProvider.h</itemPath>
+      <itemPath>ParabolaPdf.h</itemPath>
       <itemPath>SWCalculatorFrame.h</itemPath>
       <itemPath>SWCalculatorFrameLinkDef.h</itemPath>
-      <itemPath>SimpleParabolaPdf.h</itemPath>
       <itemPath>StringUtils.h</itemPath>
     </logicalFolder>
     <logicalFolder name="ResourceFiles"
@@ -64,9 +66,11 @@ Contributor(s):
       <itemPath>FileUtils.cpp</itemPath>
       <itemPath>GraphicsHelper.cpp</itemPath>
       <itemPath>HistProcessor.cpp</itemPath>
+      <itemPath>LorentzianPdf.cpp</itemPath>
       <itemPath>ParabolaGaussModelProvider.cpp</itemPath>
+      <itemPath>ParabolaLorentzianModelProvider.cpp</itemPath>
+      <itemPath>ParabolaPdf.cpp</itemPath>
       <itemPath>SWCalculatorFrame.cpp</itemPath>
-      <itemPath>SimpleParabolaPdf.cpp</itemPath>
       <itemPath>StringUtils.cpp</itemPath>
       <itemPath>main.cc</itemPath>
     </logicalFolder>
@@ -98,6 +102,7 @@ Contributor(s):
             <pElem>.</pElem>
           </linkerAddLib>
           <linkerDynSerch>
+            <pElem>.</pElem>
             <pElem>.</pElem>
             <pElem>.</pElem>
             <pElem>.</pElem>
@@ -154,6 +159,12 @@ Contributor(s):
                             perm="755"
                             owner="root"
                             group="bin"/>
+          <packFileListElem type="File"
+                            to="${PACKAGE_TOP_DIR}bin/${OUTPUT_BASENAME}"
+                            from="${OUTPUT_PATH}"
+                            perm="755"
+                            owner="root"
+                            group="bin"/>
         </packFileList>
       </packaging>
       <item path="AbstractModelProvider.cpp" ex="false" tool="1" flavor2="0">
@@ -172,19 +183,30 @@ Contributor(s):
       </item>
       <item path="HistProcessor.h" ex="false" tool="3" flavor2="0">
       </item>
+      <item path="LorentzianPdf.cpp" ex="false" tool="1" flavor2="0">
+      </item>
+      <item path="LorentzianPdf.h" ex="false" tool="3" flavor2="0">
+      </item>
       <item path="ParabolaGaussModelProvider.cpp" ex="false" tool="1" flavor2="0">
       </item>
       <item path="ParabolaGaussModelProvider.h" ex="false" tool="3" flavor2="0">
+      </item>
+      <item path="ParabolaLorentzianModelProvider.cpp"
+            ex="false"
+            tool="1"
+            flavor2="0">
+      </item>
+      <item path="ParabolaLorentzianModelProvider.h" ex="false" tool="3" flavor2="0">
+      </item>
+      <item path="ParabolaPdf.cpp" ex="false" tool="1" flavor2="0">
+      </item>
+      <item path="ParabolaPdf.h" ex="false" tool="3" flavor2="0">
       </item>
       <item path="SWCalculatorFrame.cpp" ex="false" tool="1" flavor2="0">
       </item>
       <item path="SWCalculatorFrame.h" ex="false" tool="1" flavor2="0">
       </item>
       <item path="SWCalculatorFrameLinkDef.h" ex="false" tool="1" flavor2="0">
-      </item>
-      <item path="SimpleParabolaPdf.cpp" ex="false" tool="1" flavor2="0">
-      </item>
-      <item path="SimpleParabolaPdf.h" ex="false" tool="3" flavor2="0">
       </item>
       <item path="StringUtils.cpp" ex="false" tool="1" flavor2="0">
       </item>
@@ -230,6 +252,7 @@ Contributor(s):
             <pElem>.</pElem>
             <pElem>.</pElem>
             <pElem>.</pElem>
+            <pElem>.</pElem>
           </linkerDynSerch>
         </linkerTool>
       </compileType>
@@ -249,19 +272,30 @@ Contributor(s):
       </item>
       <item path="HistProcessor.h" ex="false" tool="3" flavor2="0">
       </item>
+      <item path="LorentzianPdf.cpp" ex="false" tool="1" flavor2="0">
+      </item>
+      <item path="LorentzianPdf.h" ex="false" tool="3" flavor2="0">
+      </item>
       <item path="ParabolaGaussModelProvider.cpp" ex="false" tool="1" flavor2="0">
       </item>
       <item path="ParabolaGaussModelProvider.h" ex="false" tool="3" flavor2="0">
+      </item>
+      <item path="ParabolaLorentzianModelProvider.cpp"
+            ex="false"
+            tool="1"
+            flavor2="0">
+      </item>
+      <item path="ParabolaLorentzianModelProvider.h" ex="false" tool="3" flavor2="0">
+      </item>
+      <item path="ParabolaPdf.cpp" ex="false" tool="1" flavor2="0">
+      </item>
+      <item path="ParabolaPdf.h" ex="false" tool="3" flavor2="0">
       </item>
       <item path="SWCalculatorFrame.cpp" ex="false" tool="1" flavor2="0">
       </item>
       <item path="SWCalculatorFrame.h" ex="false" tool="3" flavor2="0">
       </item>
       <item path="SWCalculatorFrameLinkDef.h" ex="false" tool="3" flavor2="0">
-      </item>
-      <item path="SimpleParabolaPdf.cpp" ex="false" tool="1" flavor2="0">
-      </item>
-      <item path="SimpleParabolaPdf.h" ex="false" tool="3" flavor2="0">
       </item>
       <item path="StringUtils.cpp" ex="false" tool="1" flavor2="0">
       </item>

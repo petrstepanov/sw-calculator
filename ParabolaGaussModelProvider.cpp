@@ -12,7 +12,7 @@
  */
 
 #include "ParabolaGaussModelProvider.h"
-#include "SimpleParabolaPdf.h"
+#include "ParabolaPdf.h"
 #include <RooGaussian.h>
 #include <RooFormulaVar.h>
 #include <RooAddPdf.h>
@@ -27,7 +27,7 @@ ParabolaGaussModelProvider::ParabolaGaussModelProvider(RooRealVar* x, RooRealVar
 	parabolaRoot=NULL;
 	if (hasParabola){
 		parabolaRoot = new RooRealVar("parabola_root", "Coefficient at -x^2 + r*2", 2, 0.1, 10);
-		SimpleParabolaPdf* parabola = new SimpleParabolaPdf("parabola", "parabola", *x, *x0, *parabolaRoot);
+		ParabolaPdf* parabola = new ParabolaPdf("parabola", "parabola", *x, *x0, *parabolaRoot);
 		RooRealVar* I_parabola = new RooRealVar("parabola_coeff", "Parabola intensity", 0.9, 0.0, 1.0);
 		pdfList->add(*parabola);
 		coeffList->add(*I_parabola);
@@ -45,7 +45,7 @@ ParabolaGaussModelProvider::ParabolaGaussModelProvider(RooRealVar* x, RooRealVar
 	Double_t fwhmMax = 30.; // [KeV]
 	Double_t fwhmStep = (fwhmMax - fwhmMin) / (numGauss + 1);
 	for (int i = 0; i < numGauss; i++){
-		FWHM[i] = new RooRealVar(TString::Format("gauss%d_FWHM", i + 1), TString::Format("Gauss%d FWHM", i + 1), fwhmMin + (i + 1)*fwhmStep, fwhmMin, fwhmMax, "KeV"); // 5 0.5 10
+		FWHM[i] = new RooRealVar(TString::Format("gauss%d_FWHM", i + 1), TString::Format("Gauss%d FWHM", i + 1), fwhmMin + (i + 1)*fwhmStep, fwhmMin, fwhmMax, "keV"); // 5 0.5 10
 		sigma[i] = new RooFormulaVar(TString::Format("gauss%d_sigma", i + 1), "@0*@1", RooArgList(*FWHM[i], *fwhm2sigma));
 		gauss[i] = new RooGaussian(TString::Format("gauss%d", i + 1), TString::Format("Gauss%d PDF", i + 1), *x, *x0, *sigma[i]);
 		// For non-recursive sum
@@ -70,7 +70,7 @@ ParabolaGaussModelProvider::ParabolaGaussModelProvider(RooRealVar* x, RooRealVar
 	resolutionFunction = new RooGaussian("resFunct", "Resolution Function", *x, *zero, *resFunct_dispersion);
 
 	// Convolution
-	x->setBins(500, "cache");
+	x->setBins(convolutionPoints, "cache");
 	RooFFTConvPdf* sumModelConvoluted = new RooFFTConvPdf("sumModelConvoluted", "Convoluted Model", *x, *sumModel, *resolutionFunction);
 	sumModelConvoluted->setBufferFraction(1);
 

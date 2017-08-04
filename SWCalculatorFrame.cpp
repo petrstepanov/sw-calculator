@@ -30,6 +30,7 @@
 #include "GraphicsHelper.h"
 #include "AbstractModelProvider.h"
 #include "ParabolaGaussModelProvider.h"
+#include "ParabolaLorentzianModelProvider.h"
 #include "HistProcessor.h"
 #include "StringUtils.h"
 #include "FileUtils.h"
@@ -231,9 +232,18 @@ SWCalculatorFrame::SWCalculatorFrame(const TGWindow* p, UInt_t w, UInt_t h){
 		TGNumberFormat::kNEANonNegative,
 		TGNumberFormat::kNELLimitMinMax,
 		1, 4);
+        
+	// Draw Option
+	fitFunctionType = new TGComboBox(modelParamsFrame, 0);
+	fitFunctionType->AddEntry("Gauss",1);
+	fitFunctionType->AddEntry("Lorentz",2);
+	fitFunctionType->Select(2);
+	fitFunctionType->Resize(130, 20);
+        
 	modelParamsFrame->AddFrame(hasParabola, new TGLayoutHints(kLHintsNormal, 0, 20, 4, 0));
 	modelParamsFrame->AddFrame(numGauss, new TGLayoutHints(kLHintsNormal, 0, 5, 2, 0));
-	modelParamsFrame->AddFrame(new TGLabel(modelParamsFrame, "Gauss"), new TGLayoutHints(kLHintsNormal, 0, 0, 5, 0));
+//	modelParamsFrame->AddFrame(new TGLabel(modelParamsFrame, "Gauss"), new TGLayoutHints(kLHintsNormal, 0, 0, 5, 0));
+	modelParamsFrame->AddFrame(fitFunctionType, new TGLayoutHints(kLHintsNormal, 0, 0, 2, 0));
 	tabFit->AddFrame(modelParamsFrame, new TGLayoutHints(kLHintsExpandX, dx, dx, dy, dy));
 
 	// Fit Button
@@ -560,7 +570,14 @@ void SWCalculatorFrame::fitSpectrum(void){
 
 	// Obtain Fit Model
 	//AbstractModelProvider* modelProvider = new GaussModelProvider(x, E_0, hasAtan, bgFraction);
-	AbstractModelProvider* modelProvider = new ParabolaGaussModelProvider(x, E_0, hasAtan, bgFraction, (Int_t)numGauss->GetNumber(), hasParabola->IsOn());
+	AbstractModelProvider* modelProvider;
+        if (fitFunctionType->GetSelected()==1) {
+            modelProvider = new ParabolaGaussModelProvider(x, E_0, hasAtan, bgFraction, (Int_t)numGauss->GetNumber(), hasParabola->IsOn());
+        }
+        else {
+            modelProvider = new ParabolaLorentzianModelProvider(x, E_0, hasAtan, bgFraction, (Int_t)numGauss->GetNumber(), hasParabola->IsOn());            
+        }
+            
 	RooAbsPdf* model = modelProvider->getModel();
 	RooAbsPdf* convolutedModel = modelProvider->getConvolutedModel();
 
@@ -584,7 +601,7 @@ void SWCalculatorFrame::fitSpectrum(void){
 	// Plotting top RooPlot
 	fitFrame = x->frame(); 	// Set Empty Graph Title
 	fitFrame->GetXaxis()->SetRangeUser(numFitMin->GetNumber(), numFitMax->GetNumber());
-	graphicsHelper->setupPlotAxis(fitFrame, "Energy, keV", 2.5, 0.02, "Counts", 2.1, 0.01);
+	graphicsHelper->setupPlotAxis(fitFrame, "E1-E2, keV", 2.5, 0.02, "Counts", 2.1, 0.01);
 
 	// Calculate Y Axis Maximum and Minimum
 	Double_t yAxisMax = 0.1;
@@ -649,6 +666,7 @@ void SWCalculatorFrame::fitSpectrum(void){
 		RooAbsPdf* pdf = dynamic_cast<RooAbsPdf*>(tempObj);
 		if (pdf){
 			RooArgSet* argSet = new RooArgSet();
+                        std::cout << pdf->GetName() << std::endl;
 			argSet->add(*pdf);
 			// pdf->plotOn(fitFrame, LineStyle(kDashed), LineColor(kGray), LineWidth(1));
 			model->plotOn(fitFrame, Components(*argSet), LineStyle(kDashed), LineColor(kViolet + 6), LineWidth(1), Name("component"));
@@ -731,24 +749,18 @@ void SWCalculatorFrame::fitSpectrum(void){
 	}
 
 	// Output Fermi Energy if we use parabola model
-	ParabolaGaussModelProvider* parabolaModel = dynamic_cast<ParabolaGaussModelProvider*>(modelProvider);
-	if (parabolaModel){
-		std::cout << "parModel" << std::endl;
-		RooRealVar* parabolaRoot = parabolaModel->getParabolaRoot();
-		if (parabolaRoot != NULL){
-			// Ref to literature fuckin!
-			std::cout << "parRoot" << std::endl;
-			Double_t Delta = parabolaRoot->getVal();
-			Double_t dDelta = parabolaRoot->getError();
-			Double_t mc2 = 0.5109989461E6;
-			Double_t Ef = isTwoDetector ? Delta*Delta*1E6 / (2 * mc2) : 2 * Delta*Delta*1E6 / mc2;
-			Double_t dEf = isTwoDetector ? 2*Delta*dDelta : 4E6*Delta/mc2*dDelta;
-			txtFitResult->AddLineFast("  ------------------------------------------------");
-			TString fermiString = Form("%*s = %1.4e +/- %1.2e", 22, "Fermi Energy", Ef, dEf);
-			txtFitResult->AddLineFast(fermiString);
-		}
+        // TODO: refactor?
+	ParabolaGaussModelProvider* parabolaGaussModel = dynamic_cast<ParabolaGaussModelProvider*>(modelProvider);
+	if (parabolaGaussModel){
+            printParabolaInfo(parabolaGaussModel->getParabolaRoot(), isTwoDetector);
 	}
 
+	ParabolaLorentzianModelProvider* parabolaLorentzModel = dynamic_cast<ParabolaLorentzianModelProvider*>(modelProvider);
+	if (parabolaLorentzModel){
+		printParabolaInfo(parabolaLorentzModel->getParabolaRoot(), isTwoDetector);
+		printLorentzInfo(parabolaLorentzModel->getLorentzianCoefficients(), (Int_t)numGauss->GetNumber(), isTwoDetector);
+	}
+        
 	// Output Integral Chi^2
 	txtFitResult->AddLineFast("  ------------------------------------------------");
 	RooArgSet* params = model->getVariables();
@@ -776,6 +788,37 @@ void SWCalculatorFrame::fitSpectrum(void){
 
 	btnSaveData->SetEnabled(true);
 	btnSaveImage->SetEnabled(true);
+}
+
+void SWCalculatorFrame::printParabolaInfo(RooRealVar* parabolaRoot, Bool_t isTwoDetector){
+    if (parabolaRoot != NULL){
+            // _PAS.pdf, (63)
+            std::cout << "parRoot" << std::endl;
+            Double_t Delta = parabolaRoot->getVal();
+            Double_t DDelta = parabolaRoot->getError();
+            Double_t mc2 = 0.5109989461E6;
+            Double_t Ef = isTwoDetector ? Delta*Delta*1E6 / (2*mc2) : 2 * Delta*Delta*1E6 / mc2;
+            Double_t dEf = isTwoDetector ? 2*Delta / (2*mc2) * DDelta : 2 * Delta*1E6 / mc2 * DDelta;
+            txtFitResult->AddLineFast("  ------------------------------------------------");
+            TString fermiString = Form("%*s = %1.4e +/- %1.2e", 22, "Fermi Energy", Ef, dEf);
+            txtFitResult->AddLineFast(fermiString);
+    }
+}
+
+void SWCalculatorFrame::printLorentzInfo(RooRealVar** eps, Int_t coeffNumber, Bool_t isTwoDetector) {
+    txtFitResult->AddLineFast("  ------------------------------------------------");
+    for (int i=0; i< coeffNumber; i++){
+        Double_t epsilon = eps[i]->getVal() * 1e3; // [eV]
+        Double_t DEpsilon = eps[i]->getError() * 1e3; // [eV]       
+//        Double_t Ry = 13.6; // [eV]
+        Double_t mc2 = 511*1e3; // [keV]
+        // TODO: check for single detector
+        Double_t E_b = isTwoDetector ? pow(epsilon,2) / (2*mc2) : pow(epsilon,2) / (2*mc2);
+        Double_t DE_b = isTwoDetector ? 2 * epsilon / (2*mc2) * DEpsilon : 2 * epsilon / (2*mc2) * DEpsilon;
+
+        TString coeffString = Form("%*s %d = %1.4e +/- %1.2e", 20, "Energy", i, E_b, DE_b);
+        txtFitResult->AddLineFast(coeffString);                    
+    }
 }
 
 SWCalculatorFrame::~SWCalculatorFrame() {

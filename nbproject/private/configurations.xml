@@ -70,9 +70,13 @@ Contributor(s):
         <rundir></rundir>
         <buildfirst>true</buildfirst>
         <console-type>1</console-type>
-        <terminal-type>1</terminal-type>
+        <terminal-type>0</terminal-type>
         <remove-instrumentation>0</remove-instrumentation>
         <environment>
+          <variable name="ROOTSYS" value="/Applications/root_v6.06.02"/>
+          <variable name="LD_LIBRARY_PATH"
+                    value="$ROOTSYS/lib:QTDIR/lib:$LD_LIBRARY_PATH"/>
+          <variable name="DYLD_LIBRARY_PATH" value="$ROOTSYS/lib:$DYLD_LIBRARY_PATH"/>
         </environment>
       </runprofile>
     </conf>

@@ -39,9 +39,11 @@ OBJECTFILES= \
 	${OBJECTDIR}/FileUtils.o \
 	${OBJECTDIR}/GraphicsHelper.o \
 	${OBJECTDIR}/HistProcessor.o \
+	${OBJECTDIR}/LorentzianPdf.o \
 	${OBJECTDIR}/ParabolaGaussModelProvider.o \
+	${OBJECTDIR}/ParabolaLorentzianModelProvider.o \
+	${OBJECTDIR}/ParabolaPdf.o \
 	${OBJECTDIR}/SWCalculatorFrame.o \
-	${OBJECTDIR}/SimpleParabolaPdf.o \
 	${OBJECTDIR}/StringUtils.o \
 	${OBJECTDIR}/main.o
 
@@ -90,20 +92,30 @@ ${OBJECTDIR}/HistProcessor.o: HistProcessor.cpp
 	${RM} "$@.d"
 	$(COMPILE.cc) -O2 -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/HistProcessor.o HistProcessor.cpp
 
+${OBJECTDIR}/LorentzianPdf.o: LorentzianPdf.cpp
+	${MKDIR} -p ${OBJECTDIR}
+	${RM} "$@.d"
+	$(COMPILE.cc) -O2 -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/LorentzianPdf.o LorentzianPdf.cpp
+
 ${OBJECTDIR}/ParabolaGaussModelProvider.o: ParabolaGaussModelProvider.cpp
 	${MKDIR} -p ${OBJECTDIR}
 	${RM} "$@.d"
 	$(COMPILE.cc) -O2 -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/ParabolaGaussModelProvider.o ParabolaGaussModelProvider.cpp
 
+${OBJECTDIR}/ParabolaLorentzianModelProvider.o: ParabolaLorentzianModelProvider.cpp
+	${MKDIR} -p ${OBJECTDIR}
+	${RM} "$@.d"
+	$(COMPILE.cc) -O2 -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/ParabolaLorentzianModelProvider.o ParabolaLorentzianModelProvider.cpp
+
+${OBJECTDIR}/ParabolaPdf.o: ParabolaPdf.cpp
+	${MKDIR} -p ${OBJECTDIR}
+	${RM} "$@.d"
+	$(COMPILE.cc) -O2 -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/ParabolaPdf.o ParabolaPdf.cpp
+
 ${OBJECTDIR}/SWCalculatorFrame.o: SWCalculatorFrame.cpp
 	${MKDIR} -p ${OBJECTDIR}
 	${RM} "$@.d"
 	$(COMPILE.cc) -O2 -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/SWCalculatorFrame.o SWCalculatorFrame.cpp
-
-${OBJECTDIR}/SimpleParabolaPdf.o: SimpleParabolaPdf.cpp
-	${MKDIR} -p ${OBJECTDIR}
-	${RM} "$@.d"
-	$(COMPILE.cc) -O2 -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/SimpleParabolaPdf.o SimpleParabolaPdf.cpp
 
 ${OBJECTDIR}/StringUtils.o: StringUtils.cpp
 	${MKDIR} -p ${OBJECTDIR}

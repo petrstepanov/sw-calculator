@@ -29,6 +29,7 @@ protected:
 	RooConstVar* pi;
 	RooArgSet* components;
 	RooArgSet* bgComponents;
+        Int_t convolutionPoints;
 public:
 	AbstractModelProvider(RooRealVar*);
 	virtual ~AbstractModelProvider(){};

@@ -20,6 +20,7 @@
 #include <TGTab.h>
 #include <TGTextEdit.h>
 #include <TGNumberEntry.h>
+#include <TGComboBox.h>
 #include <TGButton.h>
 #include <TCanvas.h>
 #include <TImage.h>
@@ -54,6 +55,7 @@ private:
 	TGCheckButton* hasParabola;
 	TGTextButton*  btnApplyZoom;
 	TGTextButton*  btnResetZoom;
+        TGComboBox* fitFunctionType;
 	TGNumberEntry* numSWidth;
 	TGNumberEntry* numWWidth;
 	TGNumberEntry* numWShift;
@@ -95,6 +97,8 @@ public:
 	void setToolbarEnabled(Bool_t);
 	// void prepareCanvas();
 	void drawMainCanvas();
+        void printParabolaInfo(RooRealVar*, Bool_t);
+        void printLorentzInfo(RooRealVar**, Int_t, Bool_t);        
 	virtual ~SWCalculatorFrame();
         
 //        #if defined(__ROOTCLING__)
