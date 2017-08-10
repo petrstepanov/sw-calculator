@@ -67,6 +67,11 @@ cd "${TOP}"
 makeDirectory "${NBTMPDIR}/sw-calculator/bin"
 copyFileToTmpDir "${OUTPUT_PATH}" "${NBTMPDIR}/${PACKAGE_TOP_DIR}bin/${OUTPUT_BASENAME}" 0755
 
+cd "${TOP}"
+makeDirectory "${NBTMPDIR}/sw-calculator/bin"
+copyFileToTmpDir "${OUTPUT_PATH}" "${NBTMPDIR}/${PACKAGE_TOP_DIR}bin/${OUTPUT_BASENAME}" 0755
+
+
 # Generate tar file
 cd "${TOP}"
 rm -f ${CND_DISTDIR}/${CND_CONF}/${CND_PLATFORM}/package/sw-calculator.tar
