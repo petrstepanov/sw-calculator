@@ -42,7 +42,7 @@ ParabolaLorentzianModelProvider::ParabolaLorentzianModelProvider(RooRealVar* x, 
 	RooRealVar** I_lorentz = new RooRealVar*[numLorentz];
 
 	Double_t epsilonMin = 0.2; // [KeV]
-	Double_t epsilonMax = 20; // [KeV]
+	Double_t epsilonMax = 50; // [KeV]
 	Double_t epsilonStep = (epsilonMax - epsilonMin) / (numLorentz + 1);
 	for (int i = 0; i < numLorentz; i++){
 		epsilon[i] = new RooRealVar(TString::Format("l%dStretch", i + 1), TString::Format("Lorentz%d stretch", i + 1), epsilonMin + (i + 1)*epsilonStep, epsilonMin, epsilonMax, "1/keV"); // 5 0.5 10

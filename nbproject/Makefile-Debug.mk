@@ -76,55 +76,68 @@ ${CND_DISTDIR}/${CND_CONF}/${CND_PLATFORM}/sw-calculator: ${OBJECTFILES}
 
 ${OBJECTDIR}/AbstractModelProvider.o: AbstractModelProvider.cpp
 	${MKDIR} -p ${OBJECTDIR}
-	$(COMPILE.cc) -g -I/Applications/root_v6.06.02/include -o ${OBJECTDIR}/AbstractModelProvider.o AbstractModelProvider.cpp
+	${RM} "$@.d"
+	$(COMPILE.cc) -g -I/Applications/root_v6.06.02/include -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/AbstractModelProvider.o AbstractModelProvider.cpp
 
 ${OBJECTDIR}/FileUtils.o: FileUtils.cpp
 	${MKDIR} -p ${OBJECTDIR}
-	$(COMPILE.cc) -g -I/Applications/root_v6.06.02/include -o ${OBJECTDIR}/FileUtils.o FileUtils.cpp
+	${RM} "$@.d"
+	$(COMPILE.cc) -g -I/Applications/root_v6.06.02/include -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/FileUtils.o FileUtils.cpp
 
 ${OBJECTDIR}/GraphicsHelper.o: GraphicsHelper.cpp
 	${MKDIR} -p ${OBJECTDIR}
-	$(COMPILE.cc) -g -I/Applications/root_v6.06.02/include -o ${OBJECTDIR}/GraphicsHelper.o GraphicsHelper.cpp
+	${RM} "$@.d"
+	$(COMPILE.cc) -g -I/Applications/root_v6.06.02/include -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/GraphicsHelper.o GraphicsHelper.cpp
 
 ${OBJECTDIR}/HistProcessor.o: HistProcessor.cpp
 	${MKDIR} -p ${OBJECTDIR}
-	$(COMPILE.cc) -g -I/Applications/root_v6.06.02/include -o ${OBJECTDIR}/HistProcessor.o HistProcessor.cpp
+	${RM} "$@.d"
+	$(COMPILE.cc) -g -I/Applications/root_v6.06.02/include -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/HistProcessor.o HistProcessor.cpp
 
 ${OBJECTDIR}/LorentzianPdf.o: LorentzianPdf.cpp
 	${MKDIR} -p ${OBJECTDIR}
-	$(COMPILE.cc) -g -I/Applications/root_v6.06.02/include -o ${OBJECTDIR}/LorentzianPdf.o LorentzianPdf.cpp
+	${RM} "$@.d"
+	$(COMPILE.cc) -g -I/Applications/root_v6.06.02/include -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/LorentzianPdf.o LorentzianPdf.cpp
 
 ${OBJECTDIR}/ParabolaGaussModelProvider.o: ParabolaGaussModelProvider.cpp
 	${MKDIR} -p ${OBJECTDIR}
-	$(COMPILE.cc) -g -I/Applications/root_v6.06.02/include -o ${OBJECTDIR}/ParabolaGaussModelProvider.o ParabolaGaussModelProvider.cpp
+	${RM} "$@.d"
+	$(COMPILE.cc) -g -I/Applications/root_v6.06.02/include -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/ParabolaGaussModelProvider.o ParabolaGaussModelProvider.cpp
 
 ${OBJECTDIR}/ParabolaLorentzianModelProvider.o: ParabolaLorentzianModelProvider.cpp
 	${MKDIR} -p ${OBJECTDIR}
-	$(COMPILE.cc) -g -I/Applications/root_v6.06.02/include -o ${OBJECTDIR}/ParabolaLorentzianModelProvider.o ParabolaLorentzianModelProvider.cpp
+	${RM} "$@.d"
+	$(COMPILE.cc) -g -I/Applications/root_v6.06.02/include -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/ParabolaLorentzianModelProvider.o ParabolaLorentzianModelProvider.cpp
 
 ${OBJECTDIR}/ParabolaPdf.o: ParabolaPdf.cpp
 	${MKDIR} -p ${OBJECTDIR}
-	$(COMPILE.cc) -g -I/Applications/root_v6.06.02/include -o ${OBJECTDIR}/ParabolaPdf.o ParabolaPdf.cpp
+	${RM} "$@.d"
+	$(COMPILE.cc) -g -I/Applications/root_v6.06.02/include -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/ParabolaPdf.o ParabolaPdf.cpp
 
 ${OBJECTDIR}/SWCalculatorFrame.o: SWCalculatorFrame.cpp
 	${MKDIR} -p ${OBJECTDIR}
-	$(COMPILE.cc) -g -I/Applications/root_v6.06.02/include -o ${OBJECTDIR}/SWCalculatorFrame.o SWCalculatorFrame.cpp
+	${RM} "$@.d"
+	$(COMPILE.cc) -g -I/Applications/root_v6.06.02/include -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/SWCalculatorFrame.o SWCalculatorFrame.cpp
 
 ${OBJECTDIR}/SWCalculatorFrame.h.gch: SWCalculatorFrame.h
 	${MKDIR} -p ${OBJECTDIR}
-	$(COMPILE.cc) -g -I/Applications/root_v6.06.02/include -o "$@" SWCalculatorFrame.h
+	${RM} "$@.d"
+	$(COMPILE.cc) -g -I/Applications/root_v6.06.02/include -MMD -MP -MF "$@.d" -o "$@" SWCalculatorFrame.h
 
 ${OBJECTDIR}/SWCalculatorFrameLinkDef.h.gch: SWCalculatorFrameLinkDef.h
 	${MKDIR} -p ${OBJECTDIR}
-	$(COMPILE.cc) -g -I/Applications/root_v6.06.02/include -o "$@" SWCalculatorFrameLinkDef.h
+	${RM} "$@.d"
+	$(COMPILE.cc) -g -I/Applications/root_v6.06.02/include -MMD -MP -MF "$@.d" -o "$@" SWCalculatorFrameLinkDef.h
 
 ${OBJECTDIR}/StringUtils.o: StringUtils.cpp
 	${MKDIR} -p ${OBJECTDIR}
-	$(COMPILE.cc) -g -I/Applications/root_v6.06.02/include -o ${OBJECTDIR}/StringUtils.o StringUtils.cpp
+	${RM} "$@.d"
+	$(COMPILE.cc) -g -I/Applications/root_v6.06.02/include -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/StringUtils.o StringUtils.cpp
 
 ${OBJECTDIR}/main.o: main.cc
 	${MKDIR} -p ${OBJECTDIR}
-	$(COMPILE.cc) -g -I/Applications/root_v6.06.02/include -o ${OBJECTDIR}/main.o main.cc
+	${RM} "$@.d"
+	$(COMPILE.cc) -g -I/Applications/root_v6.06.02/include -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/main.o main.cc
 
 # Subprojects
 .build-subprojects:
@@ -137,3 +150,8 @@ ${OBJECTDIR}/main.o: main.cc
 
 # Subprojects
 .clean-subprojects:
+
+# Enable dependency checking
+.dep.inc: .depcheck-impl
+
+include .dep.inc

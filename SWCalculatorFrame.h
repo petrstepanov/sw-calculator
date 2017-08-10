@@ -101,9 +101,9 @@ public:
         void printLorentzInfo(RooRealVar**, Int_t, Bool_t);        
 	virtual ~SWCalculatorFrame();
         
-//        #if defined(__ROOTCLING__)
-//	ClassDef(SWCalculatorFrame, 1);
-//        #endif
+//      #if defined(__ROOTCLING__)
+//	  ClassDef(SWCalculatorFrame, 1);
+//      #endif
 };
 
 #endif /* SWCALCULATORFRAME_H */

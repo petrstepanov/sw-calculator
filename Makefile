@@ -98,11 +98,10 @@ build: .build-post
 	@echo Generating shared library: sw-calculator.so
 	g++ -shared -o sw-calculator.so $(MYCFLAGS) $(MYLIBS) SWCalculatorFrameDict.cpp $(MYSOURCES)
 
-
 .build-post: .build-impl
-	$(CP) sw-calculator.so ./dist/Debug/GNU-MacOSX/sw-calculator.so
 # Add your post 'build' code here...	
-
+	$(CP) sw-calculator.so ./dist/Debug/GNU-MacOSX/sw-calculator.so
+	
 # clean
 clean: .clean-post
 

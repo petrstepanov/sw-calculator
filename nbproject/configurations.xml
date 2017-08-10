@@ -85,7 +85,7 @@ Contributor(s):
     <conf name="Debug" type="1">
       <toolsSet>
         <compilerSet>default</compilerSet>
-        <dependencyChecking>false</dependencyChecking>
+        <dependencyChecking>true</dependencyChecking>
         <rebuildPropChanged>false</rebuildPropChanged>
       </toolsSet>
       <compileType>
@@ -116,6 +116,8 @@ Contributor(s):
             <pElem>.</pElem>
             <pElem>.</pElem>
             <pElem>.</pElem>
+            <pElem>.</pElem>
+            <pElem>.</pElem>
           </linkerDynSerch>
           <linkerDepDynSerchKind>2</linkerDepDynSerchKind>
           <linkerCopySharedLibs>false</linkerCopySharedLibs>
@@ -132,30 +134,6 @@ Contributor(s):
           <packFileListElem type="File"
                             to="${PACKAGE_TOP_DIR}bin/SWCalculatorFrameLib.so"
                             from="${CND_DISTDIR}/${CND_CONF}/${CND_PLATFORM}/SWCalculatorFrameLib.so"
-                            perm="755"
-                            owner="root"
-                            group="bin"/>
-          <packFileListElem type="File"
-                            to="${PACKAGE_TOP_DIR}bin/${OUTPUT_BASENAME}"
-                            from="${OUTPUT_PATH}"
-                            perm="755"
-                            owner="root"
-                            group="bin"/>
-          <packFileListElem type="File"
-                            to="${PACKAGE_TOP_DIR}bin/${OUTPUT_BASENAME}"
-                            from="${OUTPUT_PATH}"
-                            perm="755"
-                            owner="root"
-                            group="bin"/>
-          <packFileListElem type="File"
-                            to="${PACKAGE_TOP_DIR}bin/${OUTPUT_BASENAME}"
-                            from="${OUTPUT_PATH}"
-                            perm="755"
-                            owner="root"
-                            group="bin"/>
-          <packFileListElem type="File"
-                            to="${PACKAGE_TOP_DIR}bin/${OUTPUT_BASENAME}"
-                            from="${OUTPUT_PATH}"
                             perm="755"
                             owner="root"
                             group="bin"/>
@@ -239,6 +217,8 @@ Contributor(s):
         </asmTool>
         <linkerTool>
           <linkerDynSerch>
+            <pElem>.</pElem>
+            <pElem>.</pElem>
             <pElem>.</pElem>
             <pElem>.</pElem>
             <pElem>.</pElem>
