@@ -37,6 +37,8 @@ OBJECTDIR=${CND_BUILDDIR}/${CND_CONF}/${CND_PLATFORM}
 OBJECTFILES= \
 	${OBJECTDIR}/AbstractModelProvider.o \
 	${OBJECTDIR}/CompositeModelProvider.o \
+	${OBJECTDIR}/Constants.o \
+	${OBJECTDIR}/DampLorentzPdf.o \
 	${OBJECTDIR}/FileUtils.o \
 	${OBJECTDIR}/GaussianPdf.o \
 	${OBJECTDIR}/GraphicsHelper.o \
@@ -48,6 +50,7 @@ OBJECTFILES= \
 	${OBJECTDIR}/ParabolaPdf.o \
 	${OBJECTDIR}/SWCalculatorFrame.o \
 	${OBJECTDIR}/StringUtils.o \
+	${OBJECTDIR}/Variable.o \
 	${OBJECTDIR}/main.o
 
 
@@ -84,6 +87,16 @@ ${OBJECTDIR}/CompositeModelProvider.o: CompositeModelProvider.cpp
 	${MKDIR} -p ${OBJECTDIR}
 	${RM} "$@.d"
 	$(COMPILE.cc) -O2 -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/CompositeModelProvider.o CompositeModelProvider.cpp
+
+${OBJECTDIR}/Constants.o: Constants.cpp
+	${MKDIR} -p ${OBJECTDIR}
+	${RM} "$@.d"
+	$(COMPILE.cc) -O2 -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/Constants.o Constants.cpp
+
+${OBJECTDIR}/DampLorentzPdf.o: DampLorentzPdf.cpp
+	${MKDIR} -p ${OBJECTDIR}
+	${RM} "$@.d"
+	$(COMPILE.cc) -O2 -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/DampLorentzPdf.o DampLorentzPdf.cpp
 
 ${OBJECTDIR}/FileUtils.o: FileUtils.cpp
 	${MKDIR} -p ${OBJECTDIR}
@@ -139,6 +152,11 @@ ${OBJECTDIR}/StringUtils.o: StringUtils.cpp
 	${MKDIR} -p ${OBJECTDIR}
 	${RM} "$@.d"
 	$(COMPILE.cc) -O2 -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/StringUtils.o StringUtils.cpp
+
+${OBJECTDIR}/Variable.o: Variable.cpp
+	${MKDIR} -p ${OBJECTDIR}
+	${RM} "$@.d"
+	$(COMPILE.cc) -O2 -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/Variable.o Variable.cpp
 
 ${OBJECTDIR}/main.o: main.cc
 	${MKDIR} -p ${OBJECTDIR}

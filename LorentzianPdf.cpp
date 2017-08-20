@@ -12,8 +12,9 @@
  */
 
 #include "LorentzianPdf.h"
-#include "TMath.h"
+#include "Constants.h"
 #include <RooRealVar.h>
+#include <TMath.h>
 
 LorentzianPdf::LorentzianPdf(const char *name, const char *title,
 	RooAbsReal& _x,
@@ -62,17 +63,17 @@ Double_t LorentzianPdf::analyticalIntegral(Int_t code, const char* rangeName) co
     return 0;    
 }
 
-std::pair<Double_t, Double_t> LorentzianPdf::getParameterValue(Bool_t isTwoDetector){
-    Double_t _eps = getParameter()->getVal() * 1e3; // [eV]
-    Double_t _Deps = 0; // getParameter()->getError() * 1e3; // [eV]       
-//    Double_t Ry = 13.6; // [eV]
-    Double_t mc2 = 511*1e3; // [eV]
-    // TODO: check for single detector
-    Double_t e = isTwoDetector ? pow(_eps,2) / (2*mc2) : pow(_eps,2) / (2*mc2);
-    Double_t de = isTwoDetector ? 2 * _eps / (2*mc2) * _Deps : 2 * _eps / (2*mc2) * _Deps;
-    return std::make_pair(e,de);
-}
-
-TString LorentzianPdf::getParameterName(){
-    return TString("e- binding energy L");
+std::list<Variable*> LorentzianPdf::getParameters(Bool_t isTwoDetector){
+    Double_t sigma = getParameter()->getVal() * 1e3; // eV
+    Double_t Ry = Constants::Ry; // eV
+    Double_t a = Constants::chbar / sigma; // A
+    Double_t a_B = Constants::a_B; // A
+    Double_t e = isTwoDetector ? Ry*pow(a_B/a, 2) : Ry*pow(a_B/a, 2);
+    Double_t de = isTwoDetector ? 0 : 0;
+    Variable* v1 = new Variable(e, de, "Binding E (exp wf)", "eV");
+    Variable* v2 = new Variable(a, 0, "a (exp wf)", "A");
+    std::list<Variable*> list;
+    list.push_back(v1);
+    list.push_back(v2);
+    return list;    
 }

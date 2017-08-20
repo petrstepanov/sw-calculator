@@ -19,6 +19,7 @@
 #include <RooRealProxy.h>
 #include <TString.h>
 #include "IndirectParamPdf.h"
+#include "Variable.h"
 
 class GaussianPdf : public RooGaussian, public IndirectParamPdf {
 public:
@@ -31,8 +32,7 @@ public:
 	virtual TObject* clone(const char* newname) const { return new GaussianPdf(*this, newname); }
 	inline virtual ~GaussianPdf() { }        
 
-        std::pair<Double_t, Double_t> getParameterValue(Bool_t isTwoDetector);        
-        TString getParameterName(); 
+        std::list<Variable*> getParameters(Bool_t isTwoDetector);        
         
 private:
 

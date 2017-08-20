@@ -16,18 +16,17 @@
 
 #include "AbstractModelProvider.h"
 #include <RooRealVar.h>
-
-typedef std::list<std::pair<TString, std::pair<Double_t, Double_t>>> IndirectParameters;
+#include "Variable.h"
 
 class CompositeModelProvider : public AbstractModelProvider {
 public:
     CompositeModelProvider();
     CompositeModelProvider(const CompositeModelProvider& orig);
     
-    CompositeModelProvider(RooRealVar* x, RooRealVar* x0, Bool_t hasParabola = kTRUE, const Int_t numGauss = 1, const Int_t numLorentz = 1, Bool_t hasAtan = kFALSE, Double_t constBgFraction = 0, Bool_t isTwoDetector = kTRUE);
+    CompositeModelProvider(RooRealVar* x, RooRealVar* x0, Bool_t hasParabola = kTRUE, const Int_t numGauss = 1, const Int_t numLorentz = 1, const Int_t numLorentzSum = 1, Bool_t hasAtan = kFALSE, Double_t constBgFraction = 0, Bool_t isTwoDetector = kTRUE);
 //    virtual ~CompositeModelProvider();
 
-    IndirectParameters getIndirectParameters();
+    std::list<Variable*> getIndirectParameters();
 
 private:
     RooArgList* pdfList;

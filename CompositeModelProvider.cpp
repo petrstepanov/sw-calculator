@@ -13,15 +13,16 @@
 
 #include "CompositeModelProvider.h"
 #include "ParabolaPdf.h"
-#include "LorentzianPdf.h"
 #include "GaussianPdf.h"
+#include "LorentzianPdf.h"
+#include "DampLorentzPdf.h"
 #include <RooFormulaVar.h>
 #include <RooAddPdf.h>
 #include <RooFFTConvPdf.h>
 #include <RooGenericPdf.h>
 #include <TIterator.h>
 
-CompositeModelProvider::CompositeModelProvider(RooRealVar* x, RooRealVar* x0, Bool_t hasParabola, const Int_t numGauss, const Int_t numLorentz, Bool_t hasAtan, Double_t constBgFraction, Bool_t isTwoDetector) : AbstractModelProvider(x0){
+CompositeModelProvider::CompositeModelProvider(RooRealVar* x, RooRealVar* x0, Bool_t hasParabola, const Int_t numGauss, const Int_t numLorentz, const Int_t numLorentzSum, Bool_t hasAtan, Double_t constBgFraction, Bool_t isTwoDetector) : AbstractModelProvider(x0){
 	pdfList = new RooArgList();
 	coeffList = new RooArgList();
         this->isTwoDetector = isTwoDetector;
@@ -80,10 +81,26 @@ CompositeModelProvider::CompositeModelProvider(RooRealVar* x, RooRealVar* x0, Bo
 		components->add(*lorentz[i]);
                 coeffList->add(*I_lorentz[i]);
 	}
-//	for (int i = 0; i < numLorentz - 1; i++){
-//		
-//	}
         
+	// Complex Lorentz PDFs
+	RooRealVar** epsilon2 = new RooRealVar*[numLorentzSum];
+	DampLorentzPdf** lorentz2 = new DampLorentzPdf*[numLorentzSum];
+	RooRealVar** I_lorentz2 = new RooRealVar*[numLorentzSum];
+
+	Double_t epsilon2Min = 0.2; // [KeV]
+	Double_t epsilon2Max = 50; // [KeV]
+	Double_t epsilon2Step = (epsilonMax - epsilonMin) / (numLorentzSum + 1);
+	for (int i = 0; i < numLorentzSum; i++){
+		epsilon2[i] = new RooRealVar(TString::Format("sl%dStretch", i + 1), TString::Format("Sum Lorentz%d stretch", i + 1), epsilon2Min + (i + 1)*epsilon2Step, epsilon2Min, epsilon2Max, "1/keV"); // 5 0.5 10
+		lorentz2[i] = new DampLorentzPdf(TString::Format("slorentz%d", i + 1), TString::Format("Sum Lorentz%d PDF", i + 1), *x, *x0, *epsilon2[i]);
+		// For non-recursive sum
+		//            I_lorentz[i] = new RooRealVar(TString::Format("lorentz%d_coeff", i + 1), TString::Format("Gauss%d intensity", i + 1), 0.1/numLorentz, 0.0, 1.0);
+		// For recursive sum
+		I_lorentz2[i] = new RooRealVar(TString::Format("sl1%dInt", i + 1), TString::Format("Sum Lorentz%d intensity", i + 1), 0.5, 0.0, 1.0);
+		pdfList->add(*lorentz2[i]);
+		components->add(*lorentz2[i]);
+                coeffList->add(*I_lorentz2[i]);
+	}
         
         // Remove last coefficient for a recursive sum
         TIterator* coeffIter = coeffList->createIterator();
@@ -135,8 +152,8 @@ CompositeModelProvider::CompositeModelProvider(RooRealVar* x, RooRealVar* x0, Bo
 	}
 }
 
-IndirectParameters CompositeModelProvider::getIndirectParameters(){
-    IndirectParameters parameters;
+std::list<Variable*> CompositeModelProvider::getIndirectParameters(){
+    std::list<Variable*> parameters;
     TIterator* it = pdfList->createIterator();
     TObject* tempObj=0;
     std::cout << "getIndirectParameters: Iterating PDFs" << std::endl;
@@ -144,11 +161,13 @@ IndirectParameters CompositeModelProvider::getIndirectParameters(){
         tempObj->Print();
         IndirectParamPdf* paramPdf = dynamic_cast<IndirectParamPdf*>(tempObj);
         if(paramPdf != NULL){
-            std::pair<Double_t, Double_t> valueErr = paramPdf->getParameterValue(isTwoDetector);
-            TString paramName = paramPdf->getParameterName();
-            std::cout << "getIndirectParameters: " << paramName.Data() << " " << valueErr.first << " " << valueErr.first << std::endl;
-            std::pair<TString, std::pair<Double_t, Double_t>> paramNameValueErr (paramName, valueErr);
-            parameters.push_back(paramNameValueErr);
+            std::list<Variable*> list = paramPdf->getParameters(isTwoDetector);
+            std::list<Variable*>::iterator iter;
+            for (iter = list.begin(); iter != list.end(); iter++) {
+                Variable* v = *iter;
+                v->print();
+                parameters.push_back(v);
+            }
         }
     }
     return parameters;

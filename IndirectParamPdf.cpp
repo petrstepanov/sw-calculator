@@ -22,9 +22,9 @@ IndirectParamPdf::IndirectParamPdf(RooRealVar* param) {
 }
 
 IndirectParamPdf::IndirectParamPdf(RooAbsReal& param) {
-    std::cout << "IndirectParamPdf: saving RooAbsReal parameter" << std::endl;
+//    std::cout << "IndirectParamPdf: saving RooAbsReal parameter" << std::endl;
     this->param = &param;
-    param.Print();
+//    param.Print();
     //    RooRealVar* paramRooRealVar = dynamic_cast<RooRealVar*>(&param);
 //    if (paramRooRealVar != NULL){
 //        this->param->Print();

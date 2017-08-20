@@ -19,6 +19,7 @@
 #include <RooRealProxy.h>
 #include <TString.h>
 #include "IndirectParamPdf.h"
+#include "Variable.h"
 
 class LorentzianPdf : public RooAbsPdf, public IndirectParamPdf {
 public:
@@ -33,8 +34,7 @@ public:
 	Int_t getAnalyticalIntegral(RooArgSet& allVars, RooArgSet& analVars, const char* rangeName = 0) const;
 	Double_t analyticalIntegral(Int_t code, const char* rangeName = 0) const;
 
-        std::pair<Double_t, Double_t> getParameterValue(Bool_t isTwoDetector);
-        TString getParameterName();
+        std::list<Variable*> getParameters(Bool_t isTwoDetector);
         
 protected:
 	RooRealProxy x;

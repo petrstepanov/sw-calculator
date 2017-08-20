@@ -5,30 +5,32 @@
  */
 
 /* 
- * File:   SimpleParabolaPdf.h
+ * File:   DampLorentzPdf.h
  * Author: petrstepanov
  *
- * Created on August 2, 2017, 5:34 AM
+ * Created on August 19, 2017, 10:15 PM
  */
 
-#ifndef PARABOLAPDF_H
-#define PARABOLAPDF_H
+#ifndef DAMPLORENTZPDF_H
+#define DAMPLORENTZPDF_H
 
 #include <RooAbsPdf.h>
 #include <RooAbsReal.h>
 #include <RooRealProxy.h>
+#include <TString.h>
 #include "IndirectParamPdf.h"
+#include "Variable.h"
 
-class ParabolaPdf : public RooAbsPdf, public IndirectParamPdf {
+class DampLorentzPdf : public RooAbsPdf, public IndirectParamPdf {
 public:
-	ParabolaPdf() {};
-	ParabolaPdf(const char *name, const char *title,
+	DampLorentzPdf() {};
+	DampLorentzPdf(const char *name, const char *title,
 		RooAbsReal& _x,
 		RooAbsReal& _mean,
-		RooAbsReal& _r);
-	ParabolaPdf(const ParabolaPdf& other, const char* name = 0);
-	virtual TObject* clone(const char* newname) const { return new ParabolaPdf(*this, newname); }
-	inline virtual ~ParabolaPdf() { }
+		RooAbsReal& _epsilon);
+	DampLorentzPdf(const DampLorentzPdf& other, const char* name = 0);
+	virtual TObject* clone(const char* newname) const { return new DampLorentzPdf(*this, newname); }
+	inline virtual ~DampLorentzPdf() { }
 	Int_t getAnalyticalIntegral(RooArgSet& allVars, RooArgSet& analVars, const char* rangeName = 0) const;
 	Double_t analyticalIntegral(Int_t code, const char* rangeName = 0) const;
 
@@ -37,13 +39,13 @@ public:
 protected:
 	RooRealProxy x;
 	RooRealProxy mean;
-	RooRealProxy r;      
-        
+	RooRealProxy epsilon;
+
 	Double_t evaluate() const;
 
 private:
-	//ClassDef(SimpleParabolaPdf, 1) // Your description goes here...
+	//ClassDef(DampLorentzPdf, 1) // Your description goes here...
 };
 
-#endif /* PARABOLAPDF_H */
+#endif /* DAMPLORENTZPDF_H */
 

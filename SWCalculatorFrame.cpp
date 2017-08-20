@@ -35,6 +35,7 @@
 #include "HistProcessor.h"
 #include "StringUtils.h"
 #include "FileUtils.h"
+#include "Variable.h"
 
 using namespace RooFit;
 
@@ -244,6 +245,13 @@ SWCalculatorFrame::SWCalculatorFrame(const TGWindow* p, UInt_t w, UInt_t h){
 		0, 4);
 	modelParamsFrame->AddFrame(numLorentz, new TGLayoutHints(kLHintsNormal, 0, 5, 2, 0));
 	modelParamsFrame->AddFrame(new TGLabel(modelParamsFrame, "Lorentz"), new TGLayoutHints(kLHintsNormal, 0, 30, 5, 0));
+
+	numLorentzComplex = new TGNumberEntry(modelParamsFrame, 1, 1, -1, TGNumberFormat::kNESInteger,
+		TGNumberFormat::kNEANonNegative,
+		TGNumberFormat::kNELLimitMinMax,
+		0, 4);
+	modelParamsFrame->AddFrame(numLorentzComplex, new TGLayoutHints(kLHintsNormal, 0, 5, 2, 0));
+	modelParamsFrame->AddFrame(new TGLabel(modelParamsFrame, "Lorentz Sum"), new TGLayoutHints(kLHintsNormal, 0, 30, 5, 0));
 
         
 	// Draw Option
@@ -585,13 +593,7 @@ void SWCalculatorFrame::fitSpectrum(void){
 	//AbstractModelProvider* modelProvider = new GaussModelProvider(x, E_0, hasAtan, bgFraction);
         Bool_t isTwoDetector = histProcessor->isTwoDetetor(fullHist);
 	CompositeModelProvider* modelProvider;
-        modelProvider = new CompositeModelProvider(x, E_0, hasParabola->IsOn(), (Int_t)numGauss->GetNumber(), (Int_t)numLorentz->GetNumber(), hasAtan, bgFraction, isTwoDetector);
-//        if (fitFunctionType->GetSelected()==1) {
-//            modelProvider = new ParabolaGaussModelProvider(x, E_0, hasAtan, bgFraction, (Int_t)numGauss->GetNumber(), hasParabola->IsOn());
-//        }
-//        else {
-//            modelProvider = new ParabolaLorentzianModelProvider(x, E_0, hasAtan, bgFraction, (Int_t)numGauss->GetNumber(), hasParabola->IsOn());            
-//        }
+        modelProvider = new CompositeModelProvider(x, E_0, hasParabola->IsOn(), (Int_t)numGauss->GetNumber(), (Int_t)numLorentz->GetNumber(), (Int_t)numLorentzComplex->GetNumber(), hasAtan, bgFraction, isTwoDetector);
             
 	RooAbsPdf* model = modelProvider->getModel();
 	RooAbsPdf* convolutedModel = modelProvider->getConvolutedModel();
@@ -768,16 +770,14 @@ void SWCalculatorFrame::fitSpectrum(void){
 
 	// Output Fermi Energy if we use parabola model
         // TODO: refactor?
-        IndirectParameters indirectParameters = modelProvider->getIndirectParameters();
-        std::list<std::pair<TString, std::pair<Double_t, Double_t>>>::iterator iter;
+        std::list<Variable*> indirectParameters = modelProvider->getIndirectParameters();
+        std::list<Variable*>::iterator iter;
         txtFitResult->AddLineFast("  ------------------------------------------------");
         for (iter = indirectParameters.begin(); iter != indirectParameters.end(); ++iter) {
-            TString name = (*iter).first;
-            std::pair<Double_t, Double_t> valueError = (*iter).second;
-            Double_t value = valueError.first;
-//            Double_t error = valueError.second;
-//            TString str = Form("%*s = %1.4e +/- %1.2e", 22, name.Data(), value, error);
-            TString str = Form("%*s    %1.4e eV", 22, name.Data(), value);
+            Variable* v = (*iter);
+            TString str = (v->getError() == 0) ? 
+                Form("%*s    %1.4e %s", 22, v->getDescription(), v->getValue(), v->getUnit()) : 
+                Form("%*s    %1.4e (%1.4e) %s", 22, v->getDescription(), v->getValue(), v->getError(), v->getUnit());
             txtFitResult->AddLineFast(str);
         }
 

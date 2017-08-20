@@ -40,17 +40,20 @@ namespace std {} using namespace std;
 // Header files passed as explicit arguments
 #include "AbstractModelProvider.h"
 #include "CompositeModelProvider.h"
+#include "Constants.h"
+#include "DampLorentzPdf.h"
 #include "FileUtils.h"
 #include "GaussianPdf.h"
 #include "GraphicsHelper.h"
-#include "IndirectParamPdf.h"
 #include "HistProcessor.h"
+#include "IndirectParamPdf.h"
 #include "LorentzianPdf.h"
 #include "ParabolaGaussModelProvider.h"
 #include "ParabolaLorentzianModelProvider.h"
 #include "SWCalculatorFrame.h"
 #include "ParabolaPdf.h"
 #include "StringUtils.h"
+#include "Variable.h"
 
 // Header files passed via #pragma extra_include
 
@@ -114,17 +117,20 @@ namespace {
     static const char* headers[] = {
 "AbstractModelProvider.h",
 "CompositeModelProvider.h",
+"Constants.h",
+"DampLorentzPdf.h",
 "FileUtils.h",
 "GaussianPdf.h",
 "GraphicsHelper.h",
-"IndirectParamPdf.h",
 "HistProcessor.h",
+"IndirectParamPdf.h",
 "LorentzianPdf.h",
 "ParabolaGaussModelProvider.h",
 "ParabolaLorentzianModelProvider.h",
 "SWCalculatorFrame.h",
 "ParabolaPdf.h",
 "StringUtils.h",
+"Variable.h",
 0
     };
     static const char* includePaths[] = {
@@ -151,17 +157,20 @@ class __attribute__((annotate("$clingAutoload$SWCalculatorFrame.h")))  SWCalcula
 #define _BACKWARD_BACKWARD_WARNING_H
 #include "AbstractModelProvider.h"
 #include "CompositeModelProvider.h"
+#include "Constants.h"
+#include "DampLorentzPdf.h"
 #include "FileUtils.h"
 #include "GaussianPdf.h"
 #include "GraphicsHelper.h"
-#include "IndirectParamPdf.h"
 #include "HistProcessor.h"
+#include "IndirectParamPdf.h"
 #include "LorentzianPdf.h"
 #include "ParabolaGaussModelProvider.h"
 #include "ParabolaLorentzianModelProvider.h"
 #include "SWCalculatorFrame.h"
 #include "ParabolaPdf.h"
 #include "StringUtils.h"
+#include "Variable.h"
 
 #undef  _BACKWARD_BACKWARD_WARNING_H
 )DICTPAYLOAD";

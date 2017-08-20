@@ -12,6 +12,7 @@
  */
 
 #include "GaussianPdf.h"
+#include "Constants.h"
 
 GaussianPdf::GaussianPdf(const char *name, const char *title,
         RooAbsReal& _x, RooAbsReal& _mean,
@@ -23,18 +24,17 @@ GaussianPdf::GaussianPdf(const GaussianPdf& other, const char* name) :
         RooGaussian(other, name){
 }
 
-std::pair<Double_t, Double_t> GaussianPdf::getParameterValue(Bool_t isTwoDetector){
-    Double_t s = getParameter()->getVal() * 1e3; // [eV]
-    Double_t c_hbar = 0.197 * 1E4; // [eV * A]
-    Double_t a = c_hbar / s; // [nm]
-    Double_t Ry = 13.6; // [eV]
-    Double_t a_B = 0.529; // [A] 
-    // TODO: check for single detector
+std::list<Variable*> GaussianPdf::getParameters(Bool_t isTwoDetector){
+    Double_t sigma = getParameter()->getVal() * 1e3; // eV
+    Double_t Ry = Constants::Ry; // eV
+    Double_t a = Constants::chbar / sigma; // A
+    Double_t a_B = Constants::a_B; // A
     Double_t e = isTwoDetector ? 3*Ry*pow(a_B/a, 2) : 3*Ry*pow(a_B/a, 2);
     Double_t de = isTwoDetector ? 0 : 0;
-    return std::make_pair(e, de);
-}
-
-TString GaussianPdf::getParameterName(){
-    return TString("e- binding energy G");
+    Variable* v1 = new Variable(e, de, "Binding E (gauss wf)", "eV");
+    Variable* v2 = new Variable(a, 0, "a (gauss wf)", "A");
+    std::list<Variable*> list;
+    list.push_back(v1);
+    list.push_back(v2);
+    return list;
 }

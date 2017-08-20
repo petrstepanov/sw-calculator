@@ -53,6 +53,7 @@ private:
 	TGNumberEntry* numDisplayMax;
 	TGNumberEntry* numGauss;
 	TGNumberEntry* numLorentz;
+	TGNumberEntry* numLorentzComplex;
 	TGCheckButton* hasParabola;
 	TGTextButton*  btnApplyZoom;
 	TGTextButton*  btnResetZoom;

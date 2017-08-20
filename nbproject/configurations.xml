@@ -45,6 +45,8 @@ Contributor(s):
                    projectFiles="true">
       <itemPath>AbstractModelProvider.h</itemPath>
       <itemPath>CompositeModelProvider.h</itemPath>
+      <itemPath>Constants.h</itemPath>
+      <itemPath>DampLorentzPdf.h</itemPath>
       <itemPath>FileUtils.h</itemPath>
       <itemPath>GaussianPdf.h</itemPath>
       <itemPath>GraphicsHelper.h</itemPath>
@@ -57,6 +59,7 @@ Contributor(s):
       <itemPath>SWCalculatorFrame.h</itemPath>
       <itemPath>SWCalculatorFrameLinkDef.h</itemPath>
       <itemPath>StringUtils.h</itemPath>
+      <itemPath>Variable.h</itemPath>
     </logicalFolder>
     <logicalFolder name="ResourceFiles"
                    displayName="Resource Files"
@@ -67,6 +70,8 @@ Contributor(s):
                    projectFiles="true">
       <itemPath>AbstractModelProvider.cpp</itemPath>
       <itemPath>CompositeModelProvider.cpp</itemPath>
+      <itemPath>Constants.cpp</itemPath>
+      <itemPath>DampLorentzPdf.cpp</itemPath>
       <itemPath>FileUtils.cpp</itemPath>
       <itemPath>GaussianPdf.cpp</itemPath>
       <itemPath>GraphicsHelper.cpp</itemPath>
@@ -78,6 +83,7 @@ Contributor(s):
       <itemPath>ParabolaPdf.cpp</itemPath>
       <itemPath>SWCalculatorFrame.cpp</itemPath>
       <itemPath>StringUtils.cpp</itemPath>
+      <itemPath>Variable.cpp</itemPath>
       <itemPath>main.cc</itemPath>
     </logicalFolder>
     <logicalFolder name="ExternalFiles"
@@ -161,6 +167,12 @@ Contributor(s):
                             perm="755"
                             owner="root"
                             group="bin"/>
+          <packFileListElem type="File"
+                            to="${PACKAGE_TOP_DIR}bin/${OUTPUT_BASENAME}"
+                            from="${OUTPUT_PATH}"
+                            perm="755"
+                            owner="root"
+                            group="bin"/>
         </packFileList>
       </packaging>
       <item path="AbstractModelProvider.cpp" ex="false" tool="1" flavor2="0">
@@ -170,6 +182,14 @@ Contributor(s):
       <item path="CompositeModelProvider.cpp" ex="false" tool="1" flavor2="0">
       </item>
       <item path="CompositeModelProvider.h" ex="false" tool="3" flavor2="0">
+      </item>
+      <item path="Constants.cpp" ex="false" tool="1" flavor2="0">
+      </item>
+      <item path="Constants.h" ex="false" tool="3" flavor2="0">
+      </item>
+      <item path="DampLorentzPdf.cpp" ex="false" tool="1" flavor2="0">
+      </item>
+      <item path="DampLorentzPdf.h" ex="false" tool="3" flavor2="0">
       </item>
       <item path="FileUtils.cpp" ex="false" tool="1" flavor2="0">
       </item>
@@ -219,6 +239,10 @@ Contributor(s):
       <item path="StringUtils.cpp" ex="false" tool="1" flavor2="0">
       </item>
       <item path="StringUtils.h" ex="false" tool="3" flavor2="0">
+      </item>
+      <item path="Variable.cpp" ex="false" tool="1" flavor2="0">
+      </item>
+      <item path="Variable.h" ex="false" tool="3" flavor2="0">
       </item>
       <item path="main.cc" ex="false" tool="1" flavor2="0">
         <ccTool>
@@ -274,6 +298,14 @@ Contributor(s):
       </item>
       <item path="CompositeModelProvider.h" ex="false" tool="3" flavor2="0">
       </item>
+      <item path="Constants.cpp" ex="false" tool="1" flavor2="0">
+      </item>
+      <item path="Constants.h" ex="false" tool="3" flavor2="0">
+      </item>
+      <item path="DampLorentzPdf.cpp" ex="false" tool="1" flavor2="0">
+      </item>
+      <item path="DampLorentzPdf.h" ex="false" tool="3" flavor2="0">
+      </item>
       <item path="FileUtils.cpp" ex="false" tool="1" flavor2="0">
       </item>
       <item path="FileUtils.h" ex="false" tool="3" flavor2="0">
@@ -322,6 +354,10 @@ Contributor(s):
       <item path="StringUtils.cpp" ex="false" tool="1" flavor2="0">
       </item>
       <item path="StringUtils.h" ex="false" tool="3" flavor2="0">
+      </item>
+      <item path="Variable.cpp" ex="false" tool="1" flavor2="0">
+      </item>
+      <item path="Variable.h" ex="false" tool="3" flavor2="0">
       </item>
       <item path="main.cc" ex="false" tool="1" flavor2="0">
       </item>

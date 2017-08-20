@@ -17,6 +17,7 @@
 #include <TROOT.h>
 #include <RooRealVar.h>
 #include <utility>
+#include "Variable.h"
 
 class IndirectParamPdf {
 public:
@@ -27,8 +28,7 @@ public:
     virtual ~IndirectParamPdf();
     
 //    void setParameter(RooRealVar*);
-    virtual std::pair<Double_t, Double_t> getParameterValue(Bool_t isTwoDetector = kTRUE) = 0;
-    virtual TString getParameterName() = 0;
+    virtual std::list<Variable*> getParameters(Bool_t isTwoDetector = kTRUE) = 0;
     RooAbsReal* getParameter();
     
 private:
