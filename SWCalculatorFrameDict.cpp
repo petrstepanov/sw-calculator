@@ -39,8 +39,11 @@ namespace std {} using namespace std;
 
 // Header files passed as explicit arguments
 #include "AbstractModelProvider.h"
+#include "CompositeModelProvider.h"
 #include "FileUtils.h"
+#include "GaussianPdf.h"
 #include "GraphicsHelper.h"
+#include "IndirectParamPdf.h"
 #include "HistProcessor.h"
 #include "LorentzianPdf.h"
 #include "ParabolaGaussModelProvider.h"
@@ -110,8 +113,11 @@ namespace {
   void TriggerDictionaryInitialization_SWCalculatorFrameDict_Impl() {
     static const char* headers[] = {
 "AbstractModelProvider.h",
+"CompositeModelProvider.h",
 "FileUtils.h",
+"GaussianPdf.h",
 "GraphicsHelper.h",
+"IndirectParamPdf.h",
 "HistProcessor.h",
 "LorentzianPdf.h",
 "ParabolaGaussModelProvider.h",
@@ -144,8 +150,11 @@ class __attribute__((annotate("$clingAutoload$SWCalculatorFrame.h")))  SWCalcula
 
 #define _BACKWARD_BACKWARD_WARNING_H
 #include "AbstractModelProvider.h"
+#include "CompositeModelProvider.h"
 #include "FileUtils.h"
+#include "GaussianPdf.h"
 #include "GraphicsHelper.h"
+#include "IndirectParamPdf.h"
 #include "HistProcessor.h"
 #include "LorentzianPdf.h"
 #include "ParabolaGaussModelProvider.h"

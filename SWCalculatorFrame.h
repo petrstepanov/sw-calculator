@@ -52,10 +52,11 @@ private:
 	TGNumberEntry* numDisplayMin;
 	TGNumberEntry* numDisplayMax;
 	TGNumberEntry* numGauss;
+	TGNumberEntry* numLorentz;
 	TGCheckButton* hasParabola;
 	TGTextButton*  btnApplyZoom;
 	TGTextButton*  btnResetZoom;
-        TGComboBox* fitFunctionType;
+//        TGComboBox* fitFunctionType;
 	TGNumberEntry* numSWidth;
 	TGNumberEntry* numWWidth;
 	TGNumberEntry* numWShift;

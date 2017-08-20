@@ -17,8 +17,9 @@
 #include <RooAbsPdf.h>
 #include <RooAbsReal.h>
 #include <RooRealProxy.h>
+#include "IndirectParamPdf.h"
 
-class ParabolaPdf : public RooAbsPdf {
+class ParabolaPdf : public RooAbsPdf, public IndirectParamPdf {
 public:
 	ParabolaPdf() {};
 	ParabolaPdf(const char *name, const char *title,
@@ -31,6 +32,9 @@ public:
 	Int_t getAnalyticalIntegral(RooArgSet& allVars, RooArgSet& analVars, const char* rangeName = 0) const;
 	Double_t analyticalIntegral(Int_t code, const char* rangeName = 0) const;
 
+        std::pair<Double_t, Double_t> getParameterValue(Bool_t isTwoDetector);
+        TString getParameterName();
+        
 protected:
 	RooRealProxy x;
 	RooRealProxy mean;

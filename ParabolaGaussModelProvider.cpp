@@ -19,7 +19,7 @@
 #include <RooFFTConvPdf.h>
 #include <RooGenericPdf.h>
 
-ParabolaGaussModelProvider::ParabolaGaussModelProvider(RooRealVar* x, RooRealVar* x0, Bool_t hasAtan = kTRUE, Double_t constBgFraction = 0, const Int_t numGauss = 1, Bool_t hasParabola = kFALSE) : AbstractModelProvider(E_0){
+ParabolaGaussModelProvider::ParabolaGaussModelProvider(RooRealVar* x, RooRealVar* x0, Bool_t hasAtan = kTRUE, Double_t constBgFraction = 0, const Int_t numGauss = 1, Bool_t hasParabola = kFALSE) : AbstractModelProvider(x0){
 	RooArgList* pdfList = new RooArgList();
 	RooArgList* coeffList = new RooArgList();
 
@@ -35,7 +35,6 @@ ParabolaGaussModelProvider::ParabolaGaussModelProvider(RooRealVar* x, RooRealVar
 	}
 
 	// Gauss PDFs
-	// RooRealVar** E_0 = new RooRealVar*[numGauss];
 	RooRealVar** FWHM = new RooRealVar*[numGauss];
 	RooFormulaVar** sigma = new RooFormulaVar*[numGauss];
 	RooGaussian** gauss = new RooGaussian*[numGauss];

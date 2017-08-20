@@ -104,7 +104,7 @@ TH1F* HistProcessor::getChi2Hist(TH1I* hist, RooCurve* curve){
 		Double_t fit = curve->Eval(hist->GetXaxis()->GetBinCenter(i));
 		if (value != 0 && error != 0){
 			// std::cout << "value: " << value << " fit: " << fit << "  error: " << error << "  chi^2: " << (value - fit) * (value - fit) / (error * error) << std::endl;
-			Double_t chi2 = (value - fit) * std::abs(value - fit) / pow(error, 2); // We want the chi^2 to be nagative
+			Double_t chi2 = (value - fit) * std::abs(value - fit) / value; //pow(error, 2); // We want the chi^2 to be nagative
 			chiHist->SetBinContent(i, chi2);
 		}
 	}

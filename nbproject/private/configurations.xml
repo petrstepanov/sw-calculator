@@ -52,6 +52,8 @@ Contributor(s):
         <gdb_interceptlist>
           <gdbinterceptoptions gdb_all="false" gdb_unhandled="true" gdb_unexpected="true"/>
         </gdb_interceptlist>
+        <gdb_signals>
+        </gdb_signals>
         <gdb_options>
           <DebugOptions>
           </DebugOptions>
@@ -70,7 +72,7 @@ Contributor(s):
         <rundir></rundir>
         <buildfirst>true</buildfirst>
         <console-type>1</console-type>
-        <terminal-type>0</terminal-type>
+        <terminal-type>1</terminal-type>
         <remove-instrumentation>0</remove-instrumentation>
         <environment>
           <variable name="ROOTSYS" value="/Applications/root_v6.06.02"/>

@@ -31,6 +31,7 @@
 #include "AbstractModelProvider.h"
 #include "ParabolaGaussModelProvider.h"
 #include "ParabolaLorentzianModelProvider.h"
+#include "CompositeModelProvider.h"
 #include "HistProcessor.h"
 #include "StringUtils.h"
 #include "FileUtils.h"
@@ -226,24 +227,34 @@ SWCalculatorFrame::SWCalculatorFrame(const TGWindow* p, UInt_t w, UInt_t h){
 
 	// Model parameters
 	TGHorizontalFrame* modelParamsFrame = new TGHorizontalFrame(tabFit);
-	modelParamsFrame->AddFrame(new TGLabel(modelParamsFrame, "Model details:"), new TGLayoutHints(kLHintsNormal, 0, 30, 5, 0));
+//	modelParamsFrame->AddFrame(new TGLabel(modelParamsFrame, "Model details:"), new TGLayoutHints(kLHintsNormal, 0, 30, 5, 0));
 	hasParabola = new TGCheckButton(modelParamsFrame, "Parabola", -1);
-	numGauss = new TGNumberEntry(modelParamsFrame, 3, 1, -1, TGNumberFormat::kNESInteger,
+	modelParamsFrame->AddFrame(hasParabola, new TGLayoutHints(kLHintsNormal, 0, 20, 4, 0));
+
+	numGauss = new TGNumberEntry(modelParamsFrame, 1, 1, -1, TGNumberFormat::kNESInteger,
 		TGNumberFormat::kNEANonNegative,
 		TGNumberFormat::kNELLimitMinMax,
-		1, 4);
+		0, 4);
+	modelParamsFrame->AddFrame(numGauss, new TGLayoutHints(kLHintsNormal, 0, 5, 2, 0));        
+	modelParamsFrame->AddFrame(new TGLabel(modelParamsFrame, "Gauss"), new TGLayoutHints(kLHintsNormal, 0, 30, 5, 0));
+
+	numLorentz = new TGNumberEntry(modelParamsFrame, 1, 1, -1, TGNumberFormat::kNESInteger,
+		TGNumberFormat::kNEANonNegative,
+		TGNumberFormat::kNELLimitMinMax,
+		0, 4);
+	modelParamsFrame->AddFrame(numLorentz, new TGLayoutHints(kLHintsNormal, 0, 5, 2, 0));
+	modelParamsFrame->AddFrame(new TGLabel(modelParamsFrame, "Lorentz"), new TGLayoutHints(kLHintsNormal, 0, 30, 5, 0));
+
         
 	// Draw Option
-	fitFunctionType = new TGComboBox(modelParamsFrame, 0);
-	fitFunctionType->AddEntry("Gauss",1);
-	fitFunctionType->AddEntry("Lorentz",2);
-	fitFunctionType->Select(2);
-	fitFunctionType->Resize(130, 20);
+//	fitFunctionType = new TGComboBox(modelParamsFrame, 0);
+//	fitFunctionType->AddEntry("Gauss",1);
+//	fitFunctionType->AddEntry("Lorentz",2);
+//	fitFunctionType->Select(2);
+//	fitFunctionType->Resize(130, 20);
         
-	modelParamsFrame->AddFrame(hasParabola, new TGLayoutHints(kLHintsNormal, 0, 20, 4, 0));
-	modelParamsFrame->AddFrame(numGauss, new TGLayoutHints(kLHintsNormal, 0, 5, 2, 0));
 //	modelParamsFrame->AddFrame(new TGLabel(modelParamsFrame, "Gauss"), new TGLayoutHints(kLHintsNormal, 0, 0, 5, 0));
-	modelParamsFrame->AddFrame(fitFunctionType, new TGLayoutHints(kLHintsNormal, 0, 0, 2, 0));
+//	modelParamsFrame->AddFrame(fitFunctionType, new TGLayoutHints(kLHintsNormal, 0, 0, 2, 0));
 	tabFit->AddFrame(modelParamsFrame, new TGLayoutHints(kLHintsExpandX, dx, dx, dy, dy));
 
 	// Fit Button
@@ -572,13 +583,15 @@ void SWCalculatorFrame::fitSpectrum(void){
 
 	// Obtain Fit Model
 	//AbstractModelProvider* modelProvider = new GaussModelProvider(x, E_0, hasAtan, bgFraction);
-	AbstractModelProvider* modelProvider;
-        if (fitFunctionType->GetSelected()==1) {
-            modelProvider = new ParabolaGaussModelProvider(x, E_0, hasAtan, bgFraction, (Int_t)numGauss->GetNumber(), hasParabola->IsOn());
-        }
-        else {
-            modelProvider = new ParabolaLorentzianModelProvider(x, E_0, hasAtan, bgFraction, (Int_t)numGauss->GetNumber(), hasParabola->IsOn());            
-        }
+        Bool_t isTwoDetector = histProcessor->isTwoDetetor(fullHist);
+	CompositeModelProvider* modelProvider;
+        modelProvider = new CompositeModelProvider(x, E_0, hasParabola->IsOn(), (Int_t)numGauss->GetNumber(), (Int_t)numLorentz->GetNumber(), hasAtan, bgFraction, isTwoDetector);
+//        if (fitFunctionType->GetSelected()==1) {
+//            modelProvider = new ParabolaGaussModelProvider(x, E_0, hasAtan, bgFraction, (Int_t)numGauss->GetNumber(), hasParabola->IsOn());
+//        }
+//        else {
+//            modelProvider = new ParabolaLorentzianModelProvider(x, E_0, hasAtan, bgFraction, (Int_t)numGauss->GetNumber(), hasParabola->IsOn());            
+//        }
             
 	RooAbsPdf* model = modelProvider->getModel();
 	RooAbsPdf* convolutedModel = modelProvider->getConvolutedModel();
@@ -618,7 +631,6 @@ void SWCalculatorFrame::fitSpectrum(void){
 	}
 
 	// Draw S and W ranges
-	Bool_t isTwoDetector = histProcessor->isTwoDetetor(fullHist);
 	std::cout << "isTwoDetector: " << isTwoDetector << std::endl;
 
 	Double_t ds = isTwoDetector ? numSWidth->GetNumber() * 2 : numSWidth->GetNumber();
@@ -756,16 +768,29 @@ void SWCalculatorFrame::fitSpectrum(void){
 
 	// Output Fermi Energy if we use parabola model
         // TODO: refactor?
-	ParabolaGaussModelProvider* parabolaGaussModel = dynamic_cast<ParabolaGaussModelProvider*>(modelProvider);
-	if (parabolaGaussModel){
-            printParabolaInfo(parabolaGaussModel->getParabolaRoot(), isTwoDetector);
-	}
+        IndirectParameters indirectParameters = modelProvider->getIndirectParameters();
+        std::list<std::pair<TString, std::pair<Double_t, Double_t>>>::iterator iter;
+        txtFitResult->AddLineFast("  ------------------------------------------------");
+        for (iter = indirectParameters.begin(); iter != indirectParameters.end(); ++iter) {
+            TString name = (*iter).first;
+            std::pair<Double_t, Double_t> valueError = (*iter).second;
+            Double_t value = valueError.first;
+//            Double_t error = valueError.second;
+//            TString str = Form("%*s = %1.4e +/- %1.2e", 22, name.Data(), value, error);
+            TString str = Form("%*s    %1.4e eV", 22, name.Data(), value);
+            txtFitResult->AddLineFast(str);
+        }
 
-	ParabolaLorentzianModelProvider* parabolaLorentzModel = dynamic_cast<ParabolaLorentzianModelProvider*>(modelProvider);
-	if (parabolaLorentzModel){
-		printParabolaInfo(parabolaLorentzModel->getParabolaRoot(), isTwoDetector);
-		printLorentzInfo(parabolaLorentzModel->getLorentzianCoefficients(), (Int_t)numGauss->GetNumber(), isTwoDetector);
-	}
+        //	ParabolaGaussModelProvider* parabolaGaussModel = dynamic_cast<ParabolaGaussModelProvider*>(modelProvider);
+//	if (parabolaGaussModel){
+//            printParabolaInfo(parabolaGaussModel->getParabolaRoot(), isTwoDetector);
+//	}
+//
+//	ParabolaLorentzianModelProvider* parabolaLorentzModel = dynamic_cast<ParabolaLorentzianModelProvider*>(modelProvider);
+//	if (parabolaLorentzModel){
+//		printParabolaInfo(parabolaLorentzModel->getParabolaRoot(), isTwoDetector);
+//		printLorentzInfo(parabolaLorentzModel->getLorentzianCoefficients(), (Int_t)numGauss->GetNumber(), isTwoDetector);
+//	}
         
 	// Output Integral Chi^2
 	txtFitResult->AddLineFast("  ------------------------------------------------");
@@ -777,14 +802,14 @@ void SWCalculatorFrame::fitSpectrum(void){
 	Int_t freeParameters = sumChi2AndFreePars.second;
 	Double_t chi2ByFreePars = sumChi2 / (Double_t)(freeParameters);
 	Double_t chi2Err = sqrt((double)2 * freeParameters) / freeParameters;
-	TString strChiInt = Form("%*s = %2.1f/%d = %1.2f +/- %1.2f", 22, "chi^2/N", sumChi2, freeParameters, chi2ByFreePars, chi2Err); //13
+	TString strChiInt = Form("%*s   %2.1f/%d = %1.2f +/- %1.2f", 22, "chi^2/N", sumChi2, freeParameters, chi2ByFreePars, chi2Err); //13
 	txtFitResult->AddLineFast(strChiInt);
 
 	// Output S and W parameters
 	txtFitResult->AddLineFast("  ------------------------------------------------");
-	TString strS = Form("%*s = %1.4e +/- %1.2e", 22, "S Parameter", sValue, dsValue);
+	TString strS = Form("%*s    %1.4e +/-  %1.2e", 22, "S Parameter", sValue, dsValue);
 	txtFitResult->AddLineFast(strS);
-	TString strW = Form("%*s = %1.4e +/- %1.2e", 22, "W Parameter", wValue, dwValue);
+	TString strW = Form("%*s    %1.4e +/-  %1.2e", 22, "W Parameter", wValue, dwValue);
 	txtFitResult->AddLineFast(strW);
 	txtFitResult->AddLineFast("  ------------------------------------------------");
 

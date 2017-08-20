@@ -44,9 +44,12 @@ Contributor(s):
                    displayName="Header Files"
                    projectFiles="true">
       <itemPath>AbstractModelProvider.h</itemPath>
+      <itemPath>CompositeModelProvider.h</itemPath>
       <itemPath>FileUtils.h</itemPath>
+      <itemPath>GaussianPdf.h</itemPath>
       <itemPath>GraphicsHelper.h</itemPath>
       <itemPath>HistProcessor.h</itemPath>
+      <itemPath>IndirectParamPdf.h</itemPath>
       <itemPath>LorentzianPdf.h</itemPath>
       <itemPath>ParabolaGaussModelProvider.h</itemPath>
       <itemPath>ParabolaLorentzianModelProvider.h</itemPath>
@@ -63,9 +66,12 @@ Contributor(s):
                    displayName="Source Files"
                    projectFiles="true">
       <itemPath>AbstractModelProvider.cpp</itemPath>
+      <itemPath>CompositeModelProvider.cpp</itemPath>
       <itemPath>FileUtils.cpp</itemPath>
+      <itemPath>GaussianPdf.cpp</itemPath>
       <itemPath>GraphicsHelper.cpp</itemPath>
       <itemPath>HistProcessor.cpp</itemPath>
+      <itemPath>IndirectParamPdf.cpp</itemPath>
       <itemPath>LorentzianPdf.cpp</itemPath>
       <itemPath>ParabolaGaussModelProvider.cpp</itemPath>
       <itemPath>ParabolaLorentzianModelProvider.cpp</itemPath>
@@ -119,7 +125,7 @@ Contributor(s):
             <pElem>.</pElem>
             <pElem>.</pElem>
           </linkerDynSerch>
-          <linkerDepDynSerchKind>2</linkerDepDynSerchKind>
+          <linkerDepDynSerchKind>0</linkerDepDynSerchKind>
           <linkerCopySharedLibs>false</linkerCopySharedLibs>
           <commandlineTool>g++</commandlineTool>
           <linkerLibItems>
@@ -143,15 +149,35 @@ Contributor(s):
                             perm="755"
                             owner="root"
                             group="bin"/>
+          <packFileListElem type="File"
+                            to="${PACKAGE_TOP_DIR}bin/${OUTPUT_BASENAME}"
+                            from="${OUTPUT_PATH}"
+                            perm="755"
+                            owner="root"
+                            group="bin"/>
+          <packFileListElem type="File"
+                            to="${PACKAGE_TOP_DIR}bin/${OUTPUT_BASENAME}"
+                            from="${OUTPUT_PATH}"
+                            perm="755"
+                            owner="root"
+                            group="bin"/>
         </packFileList>
       </packaging>
       <item path="AbstractModelProvider.cpp" ex="false" tool="1" flavor2="0">
       </item>
       <item path="AbstractModelProvider.h" ex="false" tool="3" flavor2="0">
       </item>
+      <item path="CompositeModelProvider.cpp" ex="false" tool="1" flavor2="0">
+      </item>
+      <item path="CompositeModelProvider.h" ex="false" tool="3" flavor2="0">
+      </item>
       <item path="FileUtils.cpp" ex="false" tool="1" flavor2="0">
       </item>
       <item path="FileUtils.h" ex="false" tool="3" flavor2="0">
+      </item>
+      <item path="GaussianPdf.cpp" ex="false" tool="1" flavor2="0">
+      </item>
+      <item path="GaussianPdf.h" ex="false" tool="3" flavor2="0">
       </item>
       <item path="GraphicsHelper.cpp" ex="false" tool="1" flavor2="0">
       </item>
@@ -160,6 +186,10 @@ Contributor(s):
       <item path="HistProcessor.cpp" ex="false" tool="1" flavor2="0">
       </item>
       <item path="HistProcessor.h" ex="false" tool="3" flavor2="0">
+      </item>
+      <item path="IndirectParamPdf.cpp" ex="false" tool="1" flavor2="0">
+      </item>
+      <item path="IndirectParamPdf.h" ex="false" tool="3" flavor2="0">
       </item>
       <item path="LorentzianPdf.cpp" ex="false" tool="1" flavor2="0">
       </item>
@@ -240,9 +270,17 @@ Contributor(s):
       </item>
       <item path="AbstractModelProvider.h" ex="false" tool="3" flavor2="0">
       </item>
+      <item path="CompositeModelProvider.cpp" ex="false" tool="1" flavor2="0">
+      </item>
+      <item path="CompositeModelProvider.h" ex="false" tool="3" flavor2="0">
+      </item>
       <item path="FileUtils.cpp" ex="false" tool="1" flavor2="0">
       </item>
       <item path="FileUtils.h" ex="false" tool="3" flavor2="0">
+      </item>
+      <item path="GaussianPdf.cpp" ex="false" tool="1" flavor2="0">
+      </item>
+      <item path="GaussianPdf.h" ex="false" tool="3" flavor2="0">
       </item>
       <item path="GraphicsHelper.cpp" ex="false" tool="1" flavor2="0">
       </item>
@@ -251,6 +289,10 @@ Contributor(s):
       <item path="HistProcessor.cpp" ex="false" tool="1" flavor2="0">
       </item>
       <item path="HistProcessor.h" ex="false" tool="3" flavor2="0">
+      </item>
+      <item path="IndirectParamPdf.cpp" ex="false" tool="1" flavor2="0">
+      </item>
+      <item path="IndirectParamPdf.h" ex="false" tool="3" flavor2="0">
       </item>
       <item path="LorentzianPdf.cpp" ex="false" tool="1" flavor2="0">
       </item>

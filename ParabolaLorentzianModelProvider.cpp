@@ -20,7 +20,7 @@
 #include <RooFFTConvPdf.h>
 #include <RooGenericPdf.h>
 
-ParabolaLorentzianModelProvider::ParabolaLorentzianModelProvider(RooRealVar* x, RooRealVar* x0, Bool_t hasAtan = kTRUE, Double_t constBgFraction = 0, const Int_t numLorentz = 1, Bool_t hasParabola = kFALSE) : AbstractModelProvider(E_0){
+ParabolaLorentzianModelProvider::ParabolaLorentzianModelProvider(RooRealVar* x, RooRealVar* x0, Bool_t hasAtan = kTRUE, Double_t constBgFraction = 0, const Int_t numLorentz = 1, Bool_t hasParabola = kFALSE) : AbstractModelProvider(x0){
 	RooArgList* pdfList = new RooArgList();
 	RooArgList* coeffList = new RooArgList();
 

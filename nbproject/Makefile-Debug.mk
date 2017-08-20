@@ -36,9 +36,12 @@ OBJECTDIR=${CND_BUILDDIR}/${CND_CONF}/${CND_PLATFORM}
 # Object Files
 OBJECTFILES= \
 	${OBJECTDIR}/AbstractModelProvider.o \
+	${OBJECTDIR}/CompositeModelProvider.o \
 	${OBJECTDIR}/FileUtils.o \
+	${OBJECTDIR}/GaussianPdf.o \
 	${OBJECTDIR}/GraphicsHelper.o \
 	${OBJECTDIR}/HistProcessor.o \
+	${OBJECTDIR}/IndirectParamPdf.o \
 	${OBJECTDIR}/LorentzianPdf.o \
 	${OBJECTDIR}/ParabolaGaussModelProvider.o \
 	${OBJECTDIR}/ParabolaLorentzianModelProvider.o \
@@ -79,10 +82,20 @@ ${OBJECTDIR}/AbstractModelProvider.o: AbstractModelProvider.cpp
 	${RM} "$@.d"
 	$(COMPILE.cc) -g -I/Applications/root_v6.06.02/include -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/AbstractModelProvider.o AbstractModelProvider.cpp
 
+${OBJECTDIR}/CompositeModelProvider.o: CompositeModelProvider.cpp
+	${MKDIR} -p ${OBJECTDIR}
+	${RM} "$@.d"
+	$(COMPILE.cc) -g -I/Applications/root_v6.06.02/include -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/CompositeModelProvider.o CompositeModelProvider.cpp
+
 ${OBJECTDIR}/FileUtils.o: FileUtils.cpp
 	${MKDIR} -p ${OBJECTDIR}
 	${RM} "$@.d"
 	$(COMPILE.cc) -g -I/Applications/root_v6.06.02/include -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/FileUtils.o FileUtils.cpp
+
+${OBJECTDIR}/GaussianPdf.o: GaussianPdf.cpp
+	${MKDIR} -p ${OBJECTDIR}
+	${RM} "$@.d"
+	$(COMPILE.cc) -g -I/Applications/root_v6.06.02/include -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/GaussianPdf.o GaussianPdf.cpp
 
 ${OBJECTDIR}/GraphicsHelper.o: GraphicsHelper.cpp
 	${MKDIR} -p ${OBJECTDIR}
@@ -93,6 +106,11 @@ ${OBJECTDIR}/HistProcessor.o: HistProcessor.cpp
 	${MKDIR} -p ${OBJECTDIR}
 	${RM} "$@.d"
 	$(COMPILE.cc) -g -I/Applications/root_v6.06.02/include -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/HistProcessor.o HistProcessor.cpp
+
+${OBJECTDIR}/IndirectParamPdf.o: IndirectParamPdf.cpp
+	${MKDIR} -p ${OBJECTDIR}
+	${RM} "$@.d"
+	$(COMPILE.cc) -g -I/Applications/root_v6.06.02/include -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/IndirectParamPdf.o IndirectParamPdf.cpp
 
 ${OBJECTDIR}/LorentzianPdf.o: LorentzianPdf.cpp
 	${MKDIR} -p ${OBJECTDIR}

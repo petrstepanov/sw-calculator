@@ -17,7 +17,7 @@ ParabolaPdf::ParabolaPdf(const char *name, const char *title,
 	RooAbsReal& _x,
 	RooAbsReal& _mean,
 	RooAbsReal& _r) :
-	RooAbsPdf(name, title),
+	RooAbsPdf(name, title), IndirectParamPdf(_r),
 	x("x", "x", this, _x),
 	mean("mean", "Parabola mean", this, _mean),
 	r("r", "Parabola root", this, _r)
@@ -65,3 +65,18 @@ Double_t ParabolaPdf::analyticalIntegral(Int_t code, const char* rangeName) cons
     return 0;
 }
 
+std::pair<Double_t, Double_t> ParabolaPdf::getParameterValue(Bool_t isTwoDetector){
+    // _PAS.pdf, (63)
+    // Here parameter should be the parabola root
+    Double_t Delta = getParameter()->getVal();
+    Double_t DDelta = 0; // getParameter()->getError();
+    Double_t mc2 = 511*1e3; // [eV]
+    Double_t e = isTwoDetector ? Delta*Delta*1E6 / (2*mc2) : 2 * Delta*Delta*1E6 / mc2;
+    Double_t de = isTwoDetector ? 2*Delta / (2*mc2) * DDelta : 2 * Delta*1E6 / mc2 * DDelta;
+    std::pair<Double_t, Double_t> p(e,de);
+    return p;
+}
+
+TString ParabolaPdf::getParameterName(){
+    return TString("Fermi energy");
+}
