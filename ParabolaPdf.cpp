@@ -53,13 +53,11 @@ Double_t ParabolaPdf::analyticalIntegral(Int_t code, const char* rangeName) cons
 //          syms r
 //          int(r*r-x*x, 'x')
 //          int(r*r-x*x, 'x', -r, r)            
-            if (x.max(rangeName) < mean - r || x.min(rangeName) > mean + r) return 0.;
+            if (x.max(rangeName) - mean < - r || x.min(rangeName) - mean > r) return 0.;
             Double_t x1 = TMath::Max(-r, x.min(rangeName) - mean);
             Double_t x2 = TMath::Min(r, x.max(rangeName) - mean);
             // ﻿r^2*x - x^3/3
-            Double_t integral = (pow(r,2)*x2 - pow(x2,3)/3) - (pow(r,2)*x1 - pow(x1,3)/3);
-//          integral *= 4*pow(r,3)/3;﻿r^2*x - x^3/3
-            return integral;
+            return (pow(r,2)*x2 - pow(x2,3)/3) - (pow(r,2)*x1 - pow(x1,3)/3);
         }
     }
     assert(0);

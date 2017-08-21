@@ -253,7 +253,8 @@ SWCalculatorFrame::SWCalculatorFrame(const TGWindow* p, UInt_t w, UInt_t h){
 	modelParamsFrame->AddFrame(numLorentzComplex, new TGLayoutHints(kLHintsNormal, 0, 5, 2, 0));
 	modelParamsFrame->AddFrame(new TGLabel(modelParamsFrame, "Lorentz Sum"), new TGLayoutHints(kLHintsNormal, 0, 30, 5, 0));
 
-        
+	hasOrtho = new TGCheckButton(modelParamsFrame, "Ortho Exps", -1);
+	modelParamsFrame->AddFrame(hasOrtho, new TGLayoutHints(kLHintsNormal, 0, 20, 4, 0));        
 	// Draw Option
 //	fitFunctionType = new TGComboBox(modelParamsFrame, 0);
 //	fitFunctionType->AddEntry("Gauss",1);
@@ -593,7 +594,7 @@ void SWCalculatorFrame::fitSpectrum(void){
 	//AbstractModelProvider* modelProvider = new GaussModelProvider(x, E_0, hasAtan, bgFraction);
         Bool_t isTwoDetector = histProcessor->isTwoDetetor(fullHist);
 	CompositeModelProvider* modelProvider;
-        modelProvider = new CompositeModelProvider(x, E_0, hasParabola->IsOn(), (Int_t)numGauss->GetNumber(), (Int_t)numLorentz->GetNumber(), (Int_t)numLorentzComplex->GetNumber(), hasAtan, bgFraction, isTwoDetector);
+        modelProvider = new CompositeModelProvider(x, E_0, hasParabola->IsOn(), (Int_t)numGauss->GetNumber(), (Int_t)numLorentz->GetNumber(), (Int_t)numLorentzComplex->GetNumber(), hasOrtho->IsOn(), hasAtan, bgFraction, isTwoDetector);
             
 	RooAbsPdf* model = modelProvider->getModel();
 	RooAbsPdf* convolutedModel = modelProvider->getConvolutedModel();

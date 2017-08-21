@@ -53,6 +53,7 @@ Contributor(s):
       <itemPath>HistProcessor.h</itemPath>
       <itemPath>IndirectParamPdf.h</itemPath>
       <itemPath>LorentzianPdf.h</itemPath>
+      <itemPath>OrthogonalPdf.h</itemPath>
       <itemPath>ParabolaGaussModelProvider.h</itemPath>
       <itemPath>ParabolaLorentzianModelProvider.h</itemPath>
       <itemPath>ParabolaPdf.h</itemPath>
@@ -78,6 +79,7 @@ Contributor(s):
       <itemPath>HistProcessor.cpp</itemPath>
       <itemPath>IndirectParamPdf.cpp</itemPath>
       <itemPath>LorentzianPdf.cpp</itemPath>
+      <itemPath>OrthogonalPdf.cpp</itemPath>
       <itemPath>ParabolaGaussModelProvider.cpp</itemPath>
       <itemPath>ParabolaLorentzianModelProvider.cpp</itemPath>
       <itemPath>ParabolaPdf.cpp</itemPath>
@@ -173,6 +175,12 @@ Contributor(s):
                             perm="755"
                             owner="root"
                             group="bin"/>
+          <packFileListElem type="File"
+                            to="${PACKAGE_TOP_DIR}bin/${OUTPUT_BASENAME}"
+                            from="${OUTPUT_PATH}"
+                            perm="755"
+                            owner="root"
+                            group="bin"/>
         </packFileList>
       </packaging>
       <item path="AbstractModelProvider.cpp" ex="false" tool="1" flavor2="0">
@@ -214,6 +222,10 @@ Contributor(s):
       <item path="LorentzianPdf.cpp" ex="false" tool="1" flavor2="0">
       </item>
       <item path="LorentzianPdf.h" ex="false" tool="3" flavor2="0">
+      </item>
+      <item path="OrthogonalPdf.cpp" ex="false" tool="1" flavor2="0">
+      </item>
+      <item path="OrthogonalPdf.h" ex="false" tool="3" flavor2="0">
       </item>
       <item path="ParabolaGaussModelProvider.cpp" ex="false" tool="1" flavor2="0">
       </item>
@@ -329,6 +341,10 @@ Contributor(s):
       <item path="LorentzianPdf.cpp" ex="false" tool="1" flavor2="0">
       </item>
       <item path="LorentzianPdf.h" ex="false" tool="3" flavor2="0">
+      </item>
+      <item path="OrthogonalPdf.cpp" ex="false" tool="1" flavor2="0">
+      </item>
+      <item path="OrthogonalPdf.h" ex="false" tool="3" flavor2="0">
       </item>
       <item path="ParabolaGaussModelProvider.cpp" ex="false" tool="1" flavor2="0">
       </item>

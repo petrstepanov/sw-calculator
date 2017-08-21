@@ -23,7 +23,7 @@ public:
     CompositeModelProvider();
     CompositeModelProvider(const CompositeModelProvider& orig);
     
-    CompositeModelProvider(RooRealVar* x, RooRealVar* x0, Bool_t hasParabola = kTRUE, const Int_t numGauss = 1, const Int_t numLorentz = 1, const Int_t numLorentzSum = 1, Bool_t hasAtan = kFALSE, Double_t constBgFraction = 0, Bool_t isTwoDetector = kTRUE);
+    CompositeModelProvider(RooRealVar* x, RooRealVar* x0, Bool_t hasParabola = kTRUE, const Int_t numGauss = 1, const Int_t numLorentz = 1, const Int_t numLorentzSum = 1, Bool_t hasOrthogonal = kFALSE, Bool_t hasAtan = kFALSE, Double_t constBgFraction = 0, Bool_t isTwoDetector = kTRUE);
 //    virtual ~CompositeModelProvider();
 
     std::list<Variable*> getIndirectParameters();

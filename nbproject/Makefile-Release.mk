@@ -45,6 +45,7 @@ OBJECTFILES= \
 	${OBJECTDIR}/HistProcessor.o \
 	${OBJECTDIR}/IndirectParamPdf.o \
 	${OBJECTDIR}/LorentzianPdf.o \
+	${OBJECTDIR}/OrthogonalPdf.o \
 	${OBJECTDIR}/ParabolaGaussModelProvider.o \
 	${OBJECTDIR}/ParabolaLorentzianModelProvider.o \
 	${OBJECTDIR}/ParabolaPdf.o \
@@ -127,6 +128,11 @@ ${OBJECTDIR}/LorentzianPdf.o: LorentzianPdf.cpp
 	${MKDIR} -p ${OBJECTDIR}
 	${RM} "$@.d"
 	$(COMPILE.cc) -O2 -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/LorentzianPdf.o LorentzianPdf.cpp
+
+${OBJECTDIR}/OrthogonalPdf.o: OrthogonalPdf.cpp
+	${MKDIR} -p ${OBJECTDIR}
+	${RM} "$@.d"
+	$(COMPILE.cc) -O2 -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/OrthogonalPdf.o OrthogonalPdf.cpp
 
 ${OBJECTDIR}/ParabolaGaussModelProvider.o: ParabolaGaussModelProvider.cpp
 	${MKDIR} -p ${OBJECTDIR}

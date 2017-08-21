@@ -16,13 +16,14 @@
 #include "GaussianPdf.h"
 #include "LorentzianPdf.h"
 #include "DampLorentzPdf.h"
+#include "OrthogonalPdf.h"
 #include <RooFormulaVar.h>
 #include <RooAddPdf.h>
 #include <RooFFTConvPdf.h>
 #include <RooGenericPdf.h>
 #include <TIterator.h>
 
-CompositeModelProvider::CompositeModelProvider(RooRealVar* x, RooRealVar* x0, Bool_t hasParabola, const Int_t numGauss, const Int_t numLorentz, const Int_t numLorentzSum, Bool_t hasAtan, Double_t constBgFraction, Bool_t isTwoDetector) : AbstractModelProvider(x0){
+CompositeModelProvider::CompositeModelProvider(RooRealVar* x, RooRealVar* x0, Bool_t hasParabola, const Int_t numGauss, const Int_t numLorentz, const Int_t numLorentzSum, Bool_t hasOrthogonal, Bool_t hasAtan, Double_t constBgFraction, Bool_t isTwoDetector) : AbstractModelProvider(x0){
 	pdfList = new RooArgList();
 	coeffList = new RooArgList();
         this->isTwoDetector = isTwoDetector;
@@ -31,7 +32,7 @@ CompositeModelProvider::CompositeModelProvider(RooRealVar* x, RooRealVar* x0, Bo
 	if (hasParabola){
 		RooRealVar* parabolaRoot = new RooRealVar("parabolaRoot", "Coefficient at -x^2 + r*2", 2, 0.1, 10);
 		ParabolaPdf* parabola = new ParabolaPdf("parabola", "parabola", *x, *x0, *parabolaRoot);
-		RooRealVar* I_parabola = new RooRealVar("parabolaCoeff", "Parabola intensity", 0.9, 0.0, 1.0);
+		RooRealVar* I_parabola = new RooRealVar("parabolaCoeff", "Parabola intensity", 0.5, 0.0, 1.0);
 		pdfList->add(*parabola);
 		coeffList->add(*I_parabola);
 		components->add(*parabola);
@@ -42,8 +43,8 @@ CompositeModelProvider::CompositeModelProvider(RooRealVar* x, RooRealVar* x0, Bo
 	RooFormulaVar** sigma = new RooFormulaVar*[numGauss];
 	GaussianPdf** gauss = new GaussianPdf*[numGauss];
 	RooRealVar** I_gauss = new RooRealVar*[numGauss];
-	Double_t fwhmMin = 1.; // [KeV]
-	Double_t fwhmMax = 40.; // [KeV]
+	Double_t fwhmMin = 10.; // [KeV]
+	Double_t fwhmMax = 50; // [KeV]
 	Double_t fwhmStep = (fwhmMax - fwhmMin) / (numGauss + 1);
 	for (int i = 0; i < numGauss; i++){
 		FWHM[i] = new RooRealVar(TString::Format("gauss%d_FWHM", i + 1), TString::Format("Gauss%d FWHM", i + 1), fwhmMin + (i + 1)*fwhmStep, fwhmMin, fwhmMax, "keV"); // 5 0.5 10
@@ -53,7 +54,7 @@ CompositeModelProvider::CompositeModelProvider(RooRealVar* x, RooRealVar* x0, Bo
                 // For non-recursive sum
 		//            I_gauss[i] = new RooRealVar(TString::Format("gauss%d_coeff", i + 1), TString::Format("Gauss%d intensity", i + 1), 0.1/numGauss, 0.0, 1.0);
 		// For recursive sum
-		I_gauss[i] = new RooRealVar(TString::Format("gauss%d_coeff", i + 1), TString::Format("Gauss%d intensity", i + 1), 0.9, 0.0, 1.0);
+		I_gauss[i] = new RooRealVar(TString::Format("gauss%d_coeff", i + 1), TString::Format("Gauss%d intensity", i + 1), 0.3, 0.0, 1.0);
 		pdfList->add(*gauss[i]);
 		components->add(*gauss[i]);
                 coeffList->add(*I_gauss[i]);
@@ -67,7 +68,7 @@ CompositeModelProvider::CompositeModelProvider(RooRealVar* x, RooRealVar* x0, Bo
 	LorentzianPdf** lorentz = new LorentzianPdf*[numLorentz];
 	RooRealVar** I_lorentz = new RooRealVar*[numLorentz];
 
-	Double_t epsilonMin = 0.2; // [KeV]
+	Double_t epsilonMin = 2; // [KeV]
 	Double_t epsilonMax = 50; // [KeV]
 	Double_t epsilonStep = (epsilonMax - epsilonMin) / (numLorentz + 1);
 	for (int i = 0; i < numLorentz; i++){
@@ -76,7 +77,7 @@ CompositeModelProvider::CompositeModelProvider(RooRealVar* x, RooRealVar* x0, Bo
 		// For non-recursive sum
 		//            I_lorentz[i] = new RooRealVar(TString::Format("lorentz%d_coeff", i + 1), TString::Format("Gauss%d intensity", i + 1), 0.1/numLorentz, 0.0, 1.0);
 		// For recursive sum
-		I_lorentz[i] = new RooRealVar(TString::Format("l1%dInt", i + 1), TString::Format("Lorentz%d intensity", i + 1), 0.5, 0.0, 1.0);
+		I_lorentz[i] = new RooRealVar(TString::Format("l1%dInt", i + 1), TString::Format("Lorentz%d intensity", i + 1), 0.3, 0.0, 1.0);
 		pdfList->add(*lorentz[i]);
 		components->add(*lorentz[i]);
                 coeffList->add(*I_lorentz[i]);
@@ -96,11 +97,23 @@ CompositeModelProvider::CompositeModelProvider(RooRealVar* x, RooRealVar* x0, Bo
 		// For non-recursive sum
 		//            I_lorentz[i] = new RooRealVar(TString::Format("lorentz%d_coeff", i + 1), TString::Format("Gauss%d intensity", i + 1), 0.1/numLorentz, 0.0, 1.0);
 		// For recursive sum
-		I_lorentz2[i] = new RooRealVar(TString::Format("sl1%dInt", i + 1), TString::Format("Sum Lorentz%d intensity", i + 1), 0.5, 0.0, 1.0);
+		I_lorentz2[i] = new RooRealVar(TString::Format("sl1%dInt", i + 1), TString::Format("Sum Lorentz%d intensity", i + 1), 0.3, 0.0, 1.0);
 		pdfList->add(*lorentz2[i]);
 		components->add(*lorentz2[i]);
                 coeffList->add(*I_lorentz2[i]);
 	}
+        
+        // Orthogonal PDF
+        if (hasOrthogonal){
+            RooRealVar* a1 = new RooRealVar("a1", "a1 coeff", 1, 1E-2, 1E2, "A");
+            RooRealVar* a2 = new RooRealVar("a2", "a2 coeff", 1, 1E-2, 1E2, "A");
+            RooRealVar* eps = new RooRealVar("oStretch", "Orthogonal stretch", 1, 0.2, 50, "1/keV"); // 5 0.5 10
+            OrthogonalPdf* orthogonalPdf = new OrthogonalPdf("orthogonal", "Orthogonal Pdf", *x, *x0, *a1, *a2, *eps);
+            RooRealVar* I_ortho = new RooRealVar("oInt", "Orthogonal intensity", 0.3, 0.0, 1.0);
+            pdfList->add(*orthogonalPdf);
+            components->add(*orthogonalPdf);
+            coeffList->add(*I_ortho);
+        }
         
         // Remove last coefficient for a recursive sum
         TIterator* coeffIter = coeffList->createIterator();
@@ -121,7 +134,7 @@ CompositeModelProvider::CompositeModelProvider(RooRealVar* x, RooRealVar* x0, Bo
 	// Resolution Function
 	RooRealVar* zero = new RooRealVar("zero", "zero", 0);
 //	RooRealVar* resFunct_FWHM = new RooRealVar("resFunctFWHM", "Resolution function FWHM", 1.5, 1E-3, 3, "keV");
-	RooRealVar* resFunct_FWHM = new RooRealVar("resFunctFWHM", "Resolution function FWHM", 3, 1, 5, "keV");
+	RooRealVar* resFunct_FWHM = new RooRealVar("resFunctFWHM", "Resolution function FWHM", 3, 1, 3.5, "keV");
 	RooFormulaVar* resFunct_dispersion = new RooFormulaVar("resFunctDispersion", "@0*@1", RooArgList(*resFunct_FWHM, *fwhm2sigma));
 	resolutionFunction = new RooGaussian("resFunct", "Resolution Function", *x, *zero, *resFunct_dispersion);
 

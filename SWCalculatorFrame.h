@@ -55,6 +55,7 @@ private:
 	TGNumberEntry* numLorentz;
 	TGNumberEntry* numLorentzComplex;
 	TGCheckButton* hasParabola;
+	TGCheckButton* hasOrtho;
 	TGTextButton*  btnApplyZoom;
 	TGTextButton*  btnResetZoom;
 //        TGComboBox* fitFunctionType;
