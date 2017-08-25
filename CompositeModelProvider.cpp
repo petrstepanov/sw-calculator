@@ -18,12 +18,14 @@
 #include "DampLorentzPdf.h"
 #include "OrthogonalPdf.h"
 #include "RootHelper.h"
+#include "Constants.h"
 #include <RooFormulaVar.h>
 #include <RooGaussian.h>
 #include <RooAddPdf.h>
 #include <RooFFTConvPdf.h>
 #include <RooGenericPdf.h>
 #include <TIterator.h>
+#include <TMath.h>
 
 CompositeModelProvider::CompositeModelProvider(RooRealVar* x, RooRealVar* x0, Bool_t hasParabola, const Int_t numGauss, const Int_t numLorentz, const Int_t numLorentzSum, Bool_t hasOrthogonal, Bool_t hasAtan, Double_t constBgFraction, Bool_t isTwoDetector) : AbstractModelProvider(x0){
 	pdfList = new RooArgList();
@@ -86,6 +88,7 @@ CompositeModelProvider::CompositeModelProvider(RooRealVar* x, RooRealVar* x0, Bo
 	for (int i = 0; i < numLorentzSum; i++){
                 RootHelper::deleteObject(TString::Format("sl%dA", i + 1));         
 		a2[i] = new RooRealVar(TString::Format("sl%dA", i + 1), TString::Format("Sum Lorentz%d a", i + 1), getDefaultLorentzAs(numLorentzSum)[i], aMin, aMax, "A"); // 5 0.5 10
+//                a2[i] = new RooRealVar(TString::Format("sl%dA", i + 1), TString::Format("Sum Lorentz%d a", i + 1), getDefaultLorentzAs(numLorentzSum)[i], getDefaultLorentzAs(numLorentzSum)[i], getDefaultLorentzAs(numLorentzSum)[i], "A");
                 RootHelper::deleteObject(TString::Format("slorentz%d", i + 1)); 
 		lorentz2[i] = new DampLorentzPdf(TString::Format("slorentz%d", i + 1), TString::Format("Sum Lorentz%d PDF", i + 1), *x, *x0, *a2[i]);
                 RootHelper::deleteObject(TString::Format("sl1%dInt", i + 1)); 
@@ -210,17 +213,19 @@ Double_t* CompositeModelProvider::getDefaultLorentzAs(const Int_t numLorentz){
     Double_t* As;
     switch ( numLorentz ) {
         case 1:
-            As = (Double_t[1]){0.05};
+            As = (Double_t[1]){0.2};
             break;
         case 2:
             As = (Double_t[2]){0.05, 0.2};
+//            As = (Double_t[2]){Constants::a_B*TMath::Sqrt(Constants::Ry/73), Constants::a_B*TMath::Sqrt(Constants::Ry/117)};
             break;
         case 3:
             As = (Double_t[3]){0.05, 0.1, 0.5};
+//            As = (Double_t[3]){Constants::a_B*TMath::Sqrt(Constants::Ry/73), Constants::a_B*TMath::Sqrt(Constants::Ry/117), Constants::a_B*TMath::Sqrt(Constants::Ry/1559)};
             break;
         default:
             As = (Double_t[4]){0.05, 0.1, 0.5, 1};
             break;
     }
     return As;
-}
+};

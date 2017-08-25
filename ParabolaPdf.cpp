@@ -72,7 +72,8 @@ std::list<Variable*> ParabolaPdf::getParameters(Bool_t isTwoDetector){
     Double_t e = isTwoDetector ? _r*_r/(2*mc2) : 2*_r*_r/mc2;
     // Energy error
     Double_t de = 0;
-    RooRealVar* rReal = dynamic_cast<RooRealVar*>(&r);
+    RooAbsArg* rAbsArg = r.absArg();
+    RooRealVar* rReal = dynamic_cast<RooRealVar*>(rAbsArg);
     if (rReal){
         Double_t dr = rReal->getError();
         de = isTwoDetector ? _r/(mc2)*dr : 4*_r/mc2*dr;

@@ -778,7 +778,7 @@ void SWCalculatorFrame::fitSpectrum(void){
             Variable* v = (*iter);
             TString str = (v->getError() == 0) ? 
                 Form("%*s    %1.4e %s", 22, v->getDescription(), v->getValue(), v->getUnit()) : 
-                Form("%*s    %1.4e (%1.4e) %s", 22, v->getDescription(), v->getValue(), v->getError(), v->getUnit());
+                Form("%*s    %1.4e (%1.2e) %s", 22, v->getDescription(), v->getValue(), v->getError(), v->getUnit());
             txtFitResult->AddLineFast(str);
         }
 

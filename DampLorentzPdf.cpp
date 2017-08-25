@@ -36,8 +36,8 @@ a("a", this, other.a){
 Double_t DampLorentzPdf::evaluate() const {
     Double_t chbar = Constants::chbar/1E3; // because x is in keVs
     Double_t _x = (x - mean)/chbar;
-//    return (23-20*pow(a*_x,2)+5*pow(a*_x,2))/(30*pow(a,6)*pow(1+pow(a*_x,2),5)); // check ^4 vs^2
     return (23-20*pow(a*_x,2)+5*pow(a*_x,4))/(30*pow(a,2)*pow(1+pow(a*_x,2),5));
+//    return pow(a,6)*(23-20*pow(a*_x,2)+5*pow(a*_x,4))/(30*pow(1+pow(a*_x,2),5));
 }
 
 Int_t DampLorentzPdf::getAnalyticalIntegral(RooArgSet& allVars, RooArgSet& analVars, const char* /*rangeName*/) const {
@@ -59,9 +59,9 @@ Double_t DampLorentzPdf::analyticalIntegral(Int_t code, const char* rangeName) c
 }
 
 Double_t DampLorentzPdf::indefiniteIntegral(Double_t _x) const {
-    // check sum region
-    // return a*_x*(139+211*pow(a*_x,2)+165*pow(a*_x,4)+45*pow(a*_x,6))+45*pow(1+pow(a*_x,2),4)*atan(a*_x)/(270*pow(a,7)*pow(1+pow(a*_x,2),4)); 
+    // With Dropped Constant parameter -- works good here
     return (a*_x*(139+211*pow(a*_x,2)+165*pow(a*_x,4)+45*pow(a*_x,6))+45*pow(1+pow(a*_x,2),4)*atan(a*_x))/(8*a*pow(1+pow(a*_x,2),4));
+//    return pow(a,5)*(a*_x*(139+211*pow(a*_x,2)+165*pow(a*_x,4)+45*pow(a*_x,6))+45*pow(1+pow(a*_x,2),4)*atan(a*_x))/(240*pow(1+pow(a*_x,2),4));
 }
 
 std::list<Variable*> DampLorentzPdf::getParameters(Bool_t isTwoDetector){
@@ -71,10 +71,12 @@ std::list<Variable*> DampLorentzPdf::getParameters(Bool_t isTwoDetector){
     Double_t e = isTwoDetector ? Ry*pow(a_B/a,2) : Ry*pow(a_B/a,2);
     // Energy error
     Double_t de = 0;
-    RooRealVar* aReal = dynamic_cast<RooRealVar*>(&a);
+    RooAbsArg* aAbsArg = a.absArg();
+    RooRealVar* aReal = dynamic_cast<RooRealVar*>(aAbsArg);
     if (aReal){
+        aReal->Print();
         Double_t dA = aReal->getError();
-        de = isTwoDetector ? Ry*pow(a_B/a,2) : Ry*pow(a_B/a,2);
+        de = isTwoDetector ? Ry*pow(a_B/dA,2) : Ry*pow(a_B/dA,2);
     }
     // Build list and return vars    
     Variable* v1 = new Variable(e, de, "Binding E (exp*r wf)", "eV");

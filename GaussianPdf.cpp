@@ -35,7 +35,7 @@ GaussianPdf::GaussianPdf(const GaussianPdf& other, const char* name) :
 Double_t GaussianPdf::evaluate() const {
     Double_t chbar = Constants::chbar/1E3; // because x is in keVs
     Double_t _x = (x - mean)/chbar;
-    return exp(-0.5*_x*_x*a*a) ;
+    return pow(a,4)*exp(-0.5*_x*_x*a*a) ;
 }
 
 Int_t GaussianPdf::getAnalyticalIntegral(RooArgSet& allVars, RooArgSet& analVars, const char* /*rangeName*/) const {
@@ -59,7 +59,7 @@ Double_t GaussianPdf::analyticalIntegral(Int_t code, const char* rangeName) cons
 Double_t GaussianPdf::indefiniteIntegral(Double_t _x) const {
     Double_t piOver2 = TMath::PiOver2();
     Double_t sqrt2 = TMath::Sqrt2();
-    return TMath::Sqrt(piOver2)*RooMath::erf(a*_x/sqrt2)/a;
+    return pow(a,3)*TMath::Sqrt(piOver2)*RooMath::erf(a*_x/sqrt2);
 }
 
 std::list<Variable*> GaussianPdf::getParameters(Bool_t isTwoDetector){
@@ -69,7 +69,8 @@ std::list<Variable*> GaussianPdf::getParameters(Bool_t isTwoDetector){
     Double_t e = isTwoDetector ? 3*Ry*pow(a_B/a, 2) : 3*Ry*pow(a_B/a/2, 2);
     // Energy error
     Double_t de = 0;
-    RooRealVar* aReal = dynamic_cast<RooRealVar*>(&a);
+    RooAbsArg* aAbsArg = a.absArg();
+    RooRealVar* aReal = dynamic_cast<RooRealVar*>(aAbsArg);
     if (aReal){
         Double_t da = aReal->getError();
         de = isTwoDetector ? 2*3*Ry*a_B*a_B/a/a/a*da : 3/2*Ry*a_B*a_B/a/a/a*da;
