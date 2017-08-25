@@ -23,77 +23,68 @@ OrthogonalPdf::OrthogonalPdf(const char *name, const char *title,
 	RooAbsReal& _x,
 	RooAbsReal& _mean,
 	RooAbsReal& _a1,
-	RooAbsReal& _a2,        
-	RooAbsReal& _epsilon) :
-	RooAbsPdf(name, title), IndirectParamPdf(_epsilon),
+	RooAbsReal& _a2) :
+	RooAbsPdf(name, title),
 	x("x", "x", this, _x),
-	mean("mean", "Lorentzian mean", this, _mean),
+	mean("mean", "Orthogonal mean", this, _mean),
 	a1("a1", "a1", this, _a1),
-	a2("a2", "a2", this, _a2),
-	epsilon("s", "Horizontal stretch", this, _epsilon){
+	a2("a2", "a2", this, _a2){
 }
 
 OrthogonalPdf::OrthogonalPdf(const OrthogonalPdf& other, const char* name) :
 RooAbsPdf(other, name),
 x("x", this, other.x),
 mean("mean", this, other.mean),
-a1("mean", this, other.a1),
-a2("mean", this, other.a2),
-epsilon("epsilon", this, other.epsilon){
+a1("a1", this, other.a1),
+a2("a2", this, other.a2){
 }
 
 Double_t OrthogonalPdf::evaluate() const {
-	Double_t arg = x - mean;
-        Double_t a = 3*a1*a1/(a1+a2)+a2*(a2+3*a1*a1/(a1+a2))*arg*arg;
-        Double_t b = 3*a1*a1/(a1+a2)+a2*a2*(a2+3*a1*a1/(a1+a2))*arg*arg;
-        return (23+5*a*b/(a2*a2))/pow(1+pow(a2*arg,2),5);
+    Double_t _x = (x - mean)/(Constants::chbar/1E3); // We need keV*A cause x is in keVs, length is A. chbar is eV*A
+    Double_t b = 3*a1*a2/(a1+a2); 
+//    return pow(a2,4)*(48*a2*a2 - 30*a2*(a2+b)*(1+pow(a2*_x,2)) + 5*pow(a2+b,2)*pow(1+pow(a2*_x,2),2))/(30*pow(1+pow(a2*_x,2),5)); // where a2 in znamenatel?
+    return (48*a2*a2 - 30*a2*(a2+b)*(1+pow(a2*_x,2)) + 5*pow(a2+b,2)*pow(1+pow(a2*_x,2),2))/(pow(1+pow(a2*_x,2),5));
 }
 
 Int_t OrthogonalPdf::getAnalyticalIntegral(RooArgSet& allVars, RooArgSet& analVars, const char* /*rangeName*/) const {
-	if (matchArgs(allVars, analVars, x)) return 1;
-	return 0;
+    if (matchArgs(allVars, analVars, x)) return 1;
+    return 0;
 }
 
 Double_t OrthogonalPdf::analyticalIntegral(Int_t code, const char* rangeName) const {
     switch (code) {
         case 1: {
-            Double_t x1 = x.min(rangeName) - mean;
-            Double_t x2 = x.max(rangeName) - mean;
-            Double_t e = epsilon;
-            Double_t b = 3*a1*a2/(a1+a2);
-
-            Double_t m1 = 48*a2*a2*(23*a2*a2-5*a2*(-1+b)+5*b)*x2*pow(e,7)/pow(a2*a2*x2*x2+e*e,4);
-            Double_t m2 = 8*a2*(161*pow(a2,3) + 5*a2*a2*(-9+b)-40*b*b+5*a2*b*(-17+8*b))*x2*pow(e,5)/pow(a2*a2*x2*x2+e*e,3);
-            Double_t m3 = 10*a2*(161*pow(a2,3)+8*b*b+a2*a2*(3+5*b)+a2*b*(11+40*b))*x2*pow(e,3)/pow(a2*a2*x2*x2+e*e,2);
-            Double_t m4 = 15*a2*(161*pow(a2,3)+8*b*b+a2*a2*(3+5*b)+a2*b*(11+40*b))*x2*e/(a2*a2*x2*x2+e*e);
-            Double_t m5 = 15*(161*pow(a2,3)+8*b*b+a2*a2*(3+5*b)+a2*b*(11+40*b))*atan(a2*x2/2);
-            Double_t ix2 = e*(m1+m2+m3+m4+m5)/(384*pow(a2,4));
-            
-            Double_t n1 = 48*a2*a2*(23*a2*a2-5*a2*(-1+b)+5*b)*x1*pow(e,7)/pow(a2*a2*x1*x1+e*e,4);
-            Double_t n2 = 8*a2*(161*pow(a2,3) + 5*a2*a2*(-9+b)-40*b*b+5*a2*b*(-17+8*b))*x1*pow(e,5)/pow(a2*a2*x1*x1+e*e,3);
-            Double_t n3 = 10*a2*(161*pow(a2,3)+8*b*b+a2*a2*(3+5*b)+a2*b*(11+40*b))*x1*pow(e,3)/pow(a2*a2*x1*x1+e*e,2);
-            Double_t n4 = 15*a2*(161*pow(a2,3)+8*b*b+a2*a2*(3+5*b)+a2*b*(11+40*b))*x1*e/(a2*a2*x1*x1+e*e);
-            Double_t n5 = 15*(161*pow(a2,3)+8*b*b+a2*a2*(3+5*b)+a2*b*(11+40*b))*atan(a2*x1/2);
-            Double_t ix1 = e*(n1+n2+n3+n4+n5)/(384*pow(a2,4));
-            
-            return ix2-ix1;
+            Double_t chbar = Constants::chbar/1E3;
+            Double_t x1 = (x.min(rangeName) - mean)/chbar;
+            Double_t x2 = (x.max(rangeName) - mean)/chbar;                       
+            return indefiniteIntegral(x2) - indefiniteIntegral(x1);
         }
     }
     assert(0);
     return 0;    
 }
 
+Double_t OrthogonalPdf::indefiniteIntegral(Double_t _x) const {
+    Double_t b = 3*a1*a2/(a1+a2);
+
+    Double_t s1 = 6*pow(a2,2)*_x/pow(1+pow(a2*_x,2),4);
+    Double_t s2 = a2*(2*a2-5*b)*_x/pow(1+pow(a2*_x,2),3);
+    Double_t s3 = 5*(3*a2*a2-3*a2*b+b*b)*_x/(4*pow(1+pow(a2*_x,2),2));
+    Double_t s4 = 15*(3*a2*a2-3*a2*b+b*b)*_x/(8+8*pow(a2*_x,2));
+    Double_t s5 = 15*(3*a2*a2-3*a2*b+b*b)*atan(a2*_x)/(8*a2);
+//    return pow(a2,4)*(s1+s2+s3+s4+s5)/30;
+    return s1+s2+s3+s4+s5;
+}
+
 std::list<Variable*> OrthogonalPdf::getParameters(Bool_t isTwoDetector){
-    Double_t sigma = getParameter()->getVal() * 1e3; // eV
     Double_t Ry = Constants::Ry; // eV
-    Double_t a = Constants::chbar / sigma; // A
     Double_t a_B = Constants::a_B; // A
-    Double_t e = isTwoDetector ? Ry*pow(a_B/a, 2) : Ry*pow(a_B/a, 2);
-    Double_t de = isTwoDetector ? 0 : 0;
-    Variable* v1 = new Variable(e, de, "Binding E (exp wf)", "eV");
-    Variable* v2 = new Variable(a, 0, "a (exp wf)", "A");
+    Double_t e1 = isTwoDetector ? Ry*pow(a_B/a1, 2) : Ry*pow(a_B/a1, 2);
+    Double_t de1 = isTwoDetector ? 0 : 0;
+    Variable* v1 = new Variable(e1, de1, "Binding E (ort wf)", "eV");
+//    Variable* v2 = new Variable(a1, 0, "a1 (ort wf)", "A");
     std::list<Variable*> list;
-//    list.push_back(v1);
+    list.push_back(v1);
 //    list.push_back(v2);
     return list;    
 }

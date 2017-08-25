@@ -51,6 +51,7 @@ namespace std {} using namespace std;
 #include "OrthogonalPdf.h"
 #include "ParabolaGaussModelProvider.h"
 #include "ParabolaLorentzianModelProvider.h"
+#include "RootHelper.h"
 #include "SWCalculatorFrame.h"
 #include "ParabolaPdf.h"
 #include "StringUtils.h"
@@ -129,6 +130,7 @@ namespace {
 "OrthogonalPdf.h",
 "ParabolaGaussModelProvider.h",
 "ParabolaLorentzianModelProvider.h",
+"RootHelper.h",
 "SWCalculatorFrame.h",
 "ParabolaPdf.h",
 "StringUtils.h",
@@ -170,6 +172,7 @@ class __attribute__((annotate("$clingAutoload$SWCalculatorFrame.h")))  SWCalcula
 #include "OrthogonalPdf.h"
 #include "ParabolaGaussModelProvider.h"
 #include "ParabolaLorentzianModelProvider.h"
+#include "RootHelper.h"
 #include "SWCalculatorFrame.h"
 #include "ParabolaPdf.h"
 #include "StringUtils.h"

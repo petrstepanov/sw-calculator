@@ -647,21 +647,21 @@ void SWCalculatorFrame::fitSpectrum(void){
 	// TColor *color = new TColor(1756, 0.97, 0.97, 0.97);
 	TBox* sBox = new TBox(convolutedModelMaxX - ds / 2., yAxisMin, convolutedModelMaxX + ds / 2., yAxisMax*0.96);
 	sBox->SetLineWidth(0);
-	sBox->SetFillColor(19);
+	sBox->SetFillColorAlpha(19, 0.6);
 	// sBox->SetFillStyle(3002);
 	fitFrame->addObject(sBox);
 
 	std::cout << "W1 integration region (" << convolutedModelMaxX - wOffset - dw << "; " << convolutedModelMaxX - wOffset << ")" << std::endl;
 	TBox* w1Box = new TBox(convolutedModelMaxX - wOffset - dw, yAxisMin, convolutedModelMaxX - wOffset, yAxisMax*0.96);
 	w1Box->SetLineWidth(0);
-	w1Box->SetFillColor(19);
+	w1Box->SetFillColorAlpha(19, 0.6);
 	// w1Box->SetFillStyle(3002);
 	fitFrame->addObject(w1Box);
 
 	std::cout << "W2 integration region (" << convolutedModelMaxX + wOffset << "; " << convolutedModelMaxX + wOffset + dw << ")" << std::endl;
 	TBox* w2Box = new TBox(convolutedModelMaxX + wOffset, yAxisMin, convolutedModelMaxX + wOffset + dw, yAxisMax*0.96);
 	w2Box->SetLineWidth(0);
-	w2Box->SetFillColor(19);
+	w1Box->SetFillColorAlpha(19, 0.6);
 	// w2Box->SetFillStyle(3002);
 	fitFrame->addObject(w2Box);
 
@@ -677,7 +677,7 @@ void SWCalculatorFrame::fitSpectrum(void){
 	convolutedModel->plotOn(fitFrame, Components(*(modelProvider->getBgComponents())), LineStyle(kDashed), LineColor(kViolet + 6), LineWidth(1), Name("bg"));
 
 	// Plot Non-convoluted model
-//	model->plotOn(fitFrame, LineColor(kOrange + 6), LineWidth(1), LineStyle(kDashed));
+	model->plotOn(fitFrame, LineColor(kOrange + 6), LineWidth(1), LineStyle(kDashed));
 
 	// Plot Non-convoluted model components (parabola and gauss)
 	RooArgSet* components = modelProvider->getComponents();
@@ -697,7 +697,7 @@ void SWCalculatorFrame::fitSpectrum(void){
 	// Plot Resolution Function
 	RooAbsPdf* resolutionFunction = modelProvider->getResolutionFuncton();
 	if (resolutionFunction != NULL){
-		resolutionFunction->plotOn(fitFrame, LineStyle(kDashed), LineColor(kGray), LineWidth(1),  Normalization(totalFitCounts, RooAbsReal::NumEvent));
+            resolutionFunction->plotOn(fitFrame, LineStyle(kDashed), LineColor(kGray), LineWidth(1),  Normalization(totalFitCounts, RooAbsReal::NumEvent));
 	}
 
 	curveBg = fitFrame->getCurve("bg");

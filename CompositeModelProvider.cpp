@@ -17,7 +17,9 @@
 #include "LorentzianPdf.h"
 #include "DampLorentzPdf.h"
 #include "OrthogonalPdf.h"
+#include "RootHelper.h"
 #include <RooFormulaVar.h>
+#include <RooGaussian.h>
 #include <RooAddPdf.h>
 #include <RooFFTConvPdf.h>
 #include <RooGenericPdf.h>
@@ -30,8 +32,11 @@ CompositeModelProvider::CompositeModelProvider(RooRealVar* x, RooRealVar* x0, Bo
         
 	// Define parabola
 	if (hasParabola){
-		RooRealVar* parabolaRoot = new RooRealVar("parabolaRoot", "Coefficient at -x^2 + r*2", 2, 0.1, 10);
+                RootHelper::deleteObject("parabolaRoot");
+                RooRealVar* parabolaRoot = new RooRealVar("parabolaRoot", "Coefficient at -x^2 + r*2", 2, 0.1, 10);
+                RootHelper::deleteObject("parabola");
 		ParabolaPdf* parabola = new ParabolaPdf("parabola", "parabola", *x, *x0, *parabolaRoot);
+                RootHelper::deleteObject("parabolaCoeff");
 		RooRealVar* I_parabola = new RooRealVar("parabolaCoeff", "Parabola intensity", 0.5, 0.0, 1.0);
 		pdfList->add(*parabola);
 		coeffList->add(*I_parabola);
@@ -39,64 +44,51 @@ CompositeModelProvider::CompositeModelProvider(RooRealVar* x, RooRealVar* x0, Bo
 	}
 
 	// Gauss PDFs
-	RooRealVar** FWHM = new RooRealVar*[numGauss];
-	RooFormulaVar** sigma = new RooFormulaVar*[numGauss];
+//	RooRealVar** FWHM = new RooRealVar*[numGauss];
+//	RooFormulaVar** sigma = new RooFormulaVar*[numGauss];
+	RooRealVar** gaussA = new RooRealVar*[numGauss];
 	GaussianPdf** gauss = new GaussianPdf*[numGauss];
 	RooRealVar** I_gauss = new RooRealVar*[numGauss];
-	Double_t fwhmMin = 10.; // [KeV]
-	Double_t fwhmMax = 50; // [KeV]
-	Double_t fwhmStep = (fwhmMax - fwhmMin) / (numGauss + 1);
+	Double_t aMin = 0.01; // [KeV]
+	Double_t aMax = 2; // [KeV]
 	for (int i = 0; i < numGauss; i++){
-		FWHM[i] = new RooRealVar(TString::Format("gauss%d_FWHM", i + 1), TString::Format("Gauss%d FWHM", i + 1), fwhmMin + (i + 1)*fwhmStep, fwhmMin, fwhmMax, "keV"); // 5 0.5 10
-		sigma[i] = new RooFormulaVar(TString::Format("gauss%d_sigma", i + 1), "@0*@1", RooArgList(*FWHM[i], *fwhm2sigma));
-		gauss[i] = new GaussianPdf(TString::Format("gauss%d", i + 1), TString::Format("Gauss%d PDF", i + 1), *x, *x0, *sigma[i]);
-//		gauss[i]->setParameter(sigma[i]);
-                // For non-recursive sum
-		//            I_gauss[i] = new RooRealVar(TString::Format("gauss%d_coeff", i + 1), TString::Format("Gauss%d intensity", i + 1), 0.1/numGauss, 0.0, 1.0);
-		// For recursive sum
-		I_gauss[i] = new RooRealVar(TString::Format("gauss%d_coeff", i + 1), TString::Format("Gauss%d intensity", i + 1), 0.3, 0.0, 1.0);
-		pdfList->add(*gauss[i]);
-		components->add(*gauss[i]);
-                coeffList->add(*I_gauss[i]);
-	}
-//	for (int i = 0; i < numGauss - 1; i++){
-//		coeffList->add(*I_gauss[i]);
-//	}       
+            RootHelper::deleteObject(TString::Format("gauss%d_A", i + 1));
+            gaussA[i] = new RooRealVar(TString::Format("gauss%d_A", i + 1), TString::Format("Gauss%d A", i + 1), getDefaultGaussAs(numGauss)[i], aMin, aMax, "A"); // 5 0.5 10
+            RootHelper::deleteObject(TString::Format("gauss%d", i + 1));
+            gauss[i] = new GaussianPdf(TString::Format("gauss%d", i + 1), TString::Format("Gauss%d PDF", i + 1), *x, *x0, *gaussA[i]);
+            RootHelper::deleteObject(TString::Format("gauss%d_coeff", i + 1));
+            I_gauss[i] = new RooRealVar(TString::Format("gauss%d_coeff", i + 1), TString::Format("Gauss%d intensity", i + 1), 0.3, 0.0, 1.0);
+            pdfList->add(*gauss[i]);
+            components->add(*gauss[i]);
+            coeffList->add(*I_gauss[i]);
+	}  
         
 	// Lorentz PDFs
-	RooRealVar** epsilon = new RooRealVar*[numLorentz];
+	RooRealVar** a = new RooRealVar*[numLorentz];
 	LorentzianPdf** lorentz = new LorentzianPdf*[numLorentz];
 	RooRealVar** I_lorentz = new RooRealVar*[numLorentz];
-
-	Double_t epsilonMin = 2; // [KeV]
-	Double_t epsilonMax = 50; // [KeV]
-	Double_t epsilonStep = (epsilonMax - epsilonMin) / (numLorentz + 1);
 	for (int i = 0; i < numLorentz; i++){
-		epsilon[i] = new RooRealVar(TString::Format("l%dStretch", i + 1), TString::Format("Lorentz%d stretch", i + 1), epsilonMin + (i + 1)*epsilonStep, epsilonMin, epsilonMax, "1/keV"); // 5 0.5 10
-		lorentz[i] = new LorentzianPdf(TString::Format("lorentz%d", i + 1), TString::Format("Lorentz%d PDF", i + 1), *x, *x0, *epsilon[i]);
-		// For non-recursive sum
-		//            I_lorentz[i] = new RooRealVar(TString::Format("lorentz%d_coeff", i + 1), TString::Format("Gauss%d intensity", i + 1), 0.1/numLorentz, 0.0, 1.0);
-		// For recursive sum
-		I_lorentz[i] = new RooRealVar(TString::Format("l1%dInt", i + 1), TString::Format("Lorentz%d intensity", i + 1), 0.3, 0.0, 1.0);
-		pdfList->add(*lorentz[i]);
-		components->add(*lorentz[i]);
-                coeffList->add(*I_lorentz[i]);
-	}
+            RootHelper::deleteObject(TString::Format("l%dA", i + 1));           
+            a[i] = new RooRealVar(TString::Format("l%dA", i + 1), TString::Format("Lorentz%d a", i + 1), getDefaultLorentzAs(numGauss)[i], aMin, aMax, "A"); // 5 0.5 10
+            RootHelper::deleteObject(TString::Format("lorentz%d", i + 1));           
+            lorentz[i] = new LorentzianPdf(TString::Format("lorentz%d", i + 1), TString::Format("Lorentz%d PDF", i + 1), *x, *x0, *a[i]);
+            RootHelper::deleteObject(TString::Format("l1%dInt", i + 1));           
+            I_lorentz[i] = new RooRealVar(TString::Format("l1%dInt", i + 1), TString::Format("Lorentz%d intensity", i + 1), 0.3, 0.0, 1.0);
+            pdfList->add(*lorentz[i]);
+            components->add(*lorentz[i]);
+            coeffList->add(*I_lorentz[i]);
+        }
         
-	// Complex Lorentz PDFs
-	RooRealVar** epsilon2 = new RooRealVar*[numLorentzSum];
+	// Composite Lorentz PDFs
+	RooRealVar** a2 = new RooRealVar*[numLorentzSum];
 	DampLorentzPdf** lorentz2 = new DampLorentzPdf*[numLorentzSum];
 	RooRealVar** I_lorentz2 = new RooRealVar*[numLorentzSum];
-
-	Double_t epsilon2Min = 0.2; // [KeV]
-	Double_t epsilon2Max = 50; // [KeV]
-	Double_t epsilon2Step = (epsilonMax - epsilonMin) / (numLorentzSum + 1);
 	for (int i = 0; i < numLorentzSum; i++){
-		epsilon2[i] = new RooRealVar(TString::Format("sl%dStretch", i + 1), TString::Format("Sum Lorentz%d stretch", i + 1), epsilon2Min + (i + 1)*epsilon2Step, epsilon2Min, epsilon2Max, "1/keV"); // 5 0.5 10
-		lorentz2[i] = new DampLorentzPdf(TString::Format("slorentz%d", i + 1), TString::Format("Sum Lorentz%d PDF", i + 1), *x, *x0, *epsilon2[i]);
-		// For non-recursive sum
-		//            I_lorentz[i] = new RooRealVar(TString::Format("lorentz%d_coeff", i + 1), TString::Format("Gauss%d intensity", i + 1), 0.1/numLorentz, 0.0, 1.0);
-		// For recursive sum
+                RootHelper::deleteObject(TString::Format("sl%dA", i + 1));         
+		a2[i] = new RooRealVar(TString::Format("sl%dA", i + 1), TString::Format("Sum Lorentz%d a", i + 1), getDefaultLorentzAs(numLorentzSum)[i], aMin, aMax, "A"); // 5 0.5 10
+                RootHelper::deleteObject(TString::Format("slorentz%d", i + 1)); 
+		lorentz2[i] = new DampLorentzPdf(TString::Format("slorentz%d", i + 1), TString::Format("Sum Lorentz%d PDF", i + 1), *x, *x0, *a2[i]);
+                RootHelper::deleteObject(TString::Format("sl1%dInt", i + 1)); 
 		I_lorentz2[i] = new RooRealVar(TString::Format("sl1%dInt", i + 1), TString::Format("Sum Lorentz%d intensity", i + 1), 0.3, 0.0, 1.0);
 		pdfList->add(*lorentz2[i]);
 		components->add(*lorentz2[i]);
@@ -105,10 +97,13 @@ CompositeModelProvider::CompositeModelProvider(RooRealVar* x, RooRealVar* x0, Bo
         
         // Orthogonal PDF
         if (hasOrthogonal){
+            RootHelper::deleteObject("a1");            
             RooRealVar* a1 = new RooRealVar("a1", "a1 coeff", 1, 1E-2, 1E2, "A");
+            RootHelper::deleteObject("a2");            
             RooRealVar* a2 = new RooRealVar("a2", "a2 coeff", 1, 1E-2, 1E2, "A");
-            RooRealVar* eps = new RooRealVar("oStretch", "Orthogonal stretch", 1, 0.2, 50, "1/keV"); // 5 0.5 10
-            OrthogonalPdf* orthogonalPdf = new OrthogonalPdf("orthogonal", "Orthogonal Pdf", *x, *x0, *a1, *a2, *eps);
+            RootHelper::deleteObject("orthogonal");            
+            OrthogonalPdf* orthogonalPdf = new OrthogonalPdf("orthogonal", "Orthogonal Pdf", *x, *x0, *a1, *a2);
+            RootHelper::deleteObject("oInt"); 
             RooRealVar* I_ortho = new RooRealVar("oInt", "Orthogonal intensity", 0.3, 0.0, 1.0);
             pdfList->add(*orthogonalPdf);
             components->add(*orthogonalPdf);
@@ -128,20 +123,26 @@ CompositeModelProvider::CompositeModelProvider(RooRealVar* x, RooRealVar* x0, Bo
         }
         
 	// If we sum values recursively than bg~1E-5, parabola~0.9, lorentz coefficients~0.9 (needs kTRUE)
+        RootHelper::deleteObject("sumModel");
 	RooAddPdf* sumModel = new RooAddPdf("sumModel", "Sum of components", *pdfList, *coeffList, kTRUE);
 	this->model = sumModel;
 
 	// Resolution Function
+        RootHelper::deleteObject("zero");        
 	RooRealVar* zero = new RooRealVar("zero", "zero", 0);
-//	RooRealVar* resFunct_FWHM = new RooRealVar("resFunctFWHM", "Resolution function FWHM", 1.5, 1E-3, 3, "keV");
-	RooRealVar* resFunct_FWHM = new RooRealVar("resFunctFWHM", "Resolution function FWHM", 3, 1, 3.5, "keV");
+        RootHelper::deleteObject("resFunctFWHM");       
+	RooRealVar* resFunct_FWHM = new RooRealVar("resFunctFWHM", "Resolution function FWHM", 3, 1.5, 4, "keV");
+        RootHelper::deleteObject("resFunctDispersion");
 	RooFormulaVar* resFunct_dispersion = new RooFormulaVar("resFunctDispersion", "@0*@1", RooArgList(*resFunct_FWHM, *fwhm2sigma));
+        RootHelper::deleteObject("resFunct");
 	resolutionFunction = new RooGaussian("resFunct", "Resolution Function", *x, *zero, *resFunct_dispersion);
 
 	// Convolution
 	x->setBins(convolutionPoints, "cache");
+        RootHelper::deleteObject("sumModelConvoluted");
 	RooFFTConvPdf* sumModelConvoluted = new RooFFTConvPdf("sumModelConvoluted", "Convoluted Model", *x, *sumModel, *resolutionFunction);
-	sumModelConvoluted->setBufferFraction(1);
+        sumModelConvoluted->setBufferFraction(0) ;
+//	sumModelConvoluted->setBufferFraction(1);
 
 	// Constant Background
 	//	RooPolynomial* constBg = new RooPolynomial("constBg", "y=1", *x, RooArgSet());
@@ -184,4 +185,42 @@ std::list<Variable*> CompositeModelProvider::getIndirectParameters(){
         }
     }
     return parameters;
+}
+
+Double_t* CompositeModelProvider::getDefaultGaussAs(const Int_t numGauss){
+    Double_t* As;
+    switch ( numGauss ) {
+        case 1:
+            As = (Double_t[1]){1};
+            break;
+        case 2:
+            As = (Double_t[2]){0.5, 1};
+            break;
+        case 3:
+            As = (Double_t[3]){1.0, 0.5, 0.1};
+            break;
+        default:
+            As = (Double_t[4]){1.0, 0.5, 0.2, 0.05};
+            break;
+    }
+    return As;
+}
+
+Double_t* CompositeModelProvider::getDefaultLorentzAs(const Int_t numLorentz){
+    Double_t* As;
+    switch ( numLorentz ) {
+        case 1:
+            As = (Double_t[1]){0.05};
+            break;
+        case 2:
+            As = (Double_t[2]){0.05, 0.2};
+            break;
+        case 3:
+            As = (Double_t[3]){0.05, 0.1, 0.5};
+            break;
+        default:
+            As = (Double_t[4]){0.05, 0.1, 0.5, 1};
+            break;
+    }
+    return As;
 }

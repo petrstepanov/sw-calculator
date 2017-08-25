@@ -49,6 +49,7 @@ OBJECTFILES= \
 	${OBJECTDIR}/ParabolaGaussModelProvider.o \
 	${OBJECTDIR}/ParabolaLorentzianModelProvider.o \
 	${OBJECTDIR}/ParabolaPdf.o \
+	${OBJECTDIR}/RootHelper.o \
 	${OBJECTDIR}/SWCalculatorFrame.o \
 	${OBJECTDIR}/StringUtils.o \
 	${OBJECTDIR}/Variable.o \
@@ -148,6 +149,11 @@ ${OBJECTDIR}/ParabolaPdf.o: ParabolaPdf.cpp
 	${MKDIR} -p ${OBJECTDIR}
 	${RM} "$@.d"
 	$(COMPILE.cc) -O2 -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/ParabolaPdf.o ParabolaPdf.cpp
+
+${OBJECTDIR}/RootHelper.o: RootHelper.cpp
+	${MKDIR} -p ${OBJECTDIR}
+	${RM} "$@.d"
+	$(COMPILE.cc) -O2 -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/RootHelper.o RootHelper.cpp
 
 ${OBJECTDIR}/SWCalculatorFrame.o: SWCalculatorFrame.cpp
 	${MKDIR} -p ${OBJECTDIR}

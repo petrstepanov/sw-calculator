@@ -18,7 +18,7 @@ ParabolaPdf::ParabolaPdf(const char *name, const char *title,
 	RooAbsReal& _x,
 	RooAbsReal& _mean,
 	RooAbsReal& _r) :
-	RooAbsPdf(name, title), IndirectParamPdf(_r),
+	RooAbsPdf(name, title),
 	x("x", "x", this, _x),
 	mean("mean", "Parabola mean", this, _mean),
 	r("r", "Parabola root", this, _r)
@@ -67,11 +67,17 @@ Double_t ParabolaPdf::analyticalIntegral(Int_t code, const char* rangeName) cons
 std::list<Variable*> ParabolaPdf::getParameters(Bool_t isTwoDetector){
     // _PAS.pdf, (63)
     // Here parameter should be the parabola root
-    Double_t Delta = getParameter()->getVal()*1E3;
-    Double_t DDelta = 0; // getParameter()->getError();
+    Double_t _r = r*1E3; // eV
     Double_t mc2 = Constants::mc2; // [eV]
-    Double_t e = isTwoDetector ? Delta*Delta / (2*mc2) : 2 * Delta*Delta / mc2;
-    Double_t de = isTwoDetector ? 2*Delta / (2*mc2) * DDelta : 2 * Delta / mc2 * DDelta;
+    Double_t e = isTwoDetector ? _r*_r/(2*mc2) : 2*_r*_r/mc2;
+    // Energy error
+    Double_t de = 0;
+    RooRealVar* rReal = dynamic_cast<RooRealVar*>(&r);
+    if (rReal){
+        Double_t dr = rReal->getError();
+        de = isTwoDetector ? _r/(mc2)*dr : 4*_r/mc2*dr;
+    }
+    // Build list and return vars
     Variable* v1 = new Variable(e, de, "Fermi energy", "eV");
     std::list<Variable*> list;
     list.push_back(v1);

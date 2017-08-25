@@ -32,6 +32,11 @@ private:
     RooArgList* pdfList;
     RooArgList* coeffList;
     Bool_t isTwoDetector;
+    
+    Double_t* getDefaultGaussAs(Int_t numGauss);
+    Double_t* getDefaultLorentzAs(Int_t numGauss);
+    
+    void deleteObject();
 };
 
 #endif /* COMPOSITEMODELPROVIDER_H */

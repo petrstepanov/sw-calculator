@@ -23,11 +23,11 @@
 
 class DampLorentzPdf : public RooAbsPdf, public IndirectParamPdf {
 public:
-	DampLorentzPdf() {};
+	DampLorentzPdf();;
 	DampLorentzPdf(const char *name, const char *title,
 		RooAbsReal& _x,
 		RooAbsReal& _mean,
-		RooAbsReal& _epsilon);
+		RooAbsReal& _a);
 	DampLorentzPdf(const DampLorentzPdf& other, const char* name = 0);
 	virtual TObject* clone(const char* newname) const { return new DampLorentzPdf(*this, newname); }
 	inline virtual ~DampLorentzPdf() { }
@@ -36,12 +36,14 @@ public:
 
         std::list<Variable*> getParameters(Bool_t isTwoDetector);
         
-protected:
-	RooRealProxy x;
-	RooRealProxy mean;
-	RooRealProxy epsilon;
+//protected:
+    RooRealProxy x;
+    RooRealProxy mean;
+    RooRealProxy a;
 
-	Double_t evaluate() const;
+protected:
+    Double_t indefiniteIntegral(Double_t _x) const;
+    Double_t evaluate() const;
 
 private:
 	//ClassDef(DampLorentzPdf, 1) // Your description goes here...

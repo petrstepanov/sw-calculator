@@ -22,17 +22,17 @@
 class IndirectParamPdf {
 public:
     IndirectParamPdf();
-    IndirectParamPdf(RooRealVar* param);
-    IndirectParamPdf(RooAbsReal& param);
+//    IndirectParamPdf(RooRealVar* param);
+//    IndirectParamPdf(RooAbsReal& param);
     IndirectParamPdf(const IndirectParamPdf& orig);
     virtual ~IndirectParamPdf();
     
 //    void setParameter(RooRealVar*);
     virtual std::list<Variable*> getParameters(Bool_t isTwoDetector = kTRUE) = 0;
-    RooAbsReal* getParameter();
+//    RooAbsReal* getParameter();
     
-private:
-    RooAbsReal* param;
+//private:
+//    RooAbsReal* param;
 };
 
 #endif /* HASENERGYPDF_H */
