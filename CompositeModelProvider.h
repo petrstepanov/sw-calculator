@@ -27,15 +27,18 @@ public:
 //    virtual ~CompositeModelProvider();
 
     std::list<Variable*> getIndirectParameters();
-
+    std::list<std::pair<const char*, Double_t>> getIntensities();
+    
 private:
     RooArgList* pdfList;
     RooArgList* coeffList;
     Bool_t isTwoDetector;
+    RooRealVar* observable;
     
     Double_t* getDefaultGaussAs(Int_t numGauss);
     Double_t* getDefaultLorentzAs(Int_t numGauss);
-    
+    Double_t* getDefaultDampLorentzAs(Int_t numGauss);
+
     void deleteObject();
 };
 

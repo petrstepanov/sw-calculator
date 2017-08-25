@@ -35,7 +35,11 @@ GaussianPdf::GaussianPdf(const GaussianPdf& other, const char* name) :
 Double_t GaussianPdf::evaluate() const {
     Double_t chbar = Constants::chbar/1E3; // because x is in keVs
     Double_t _x = (x - mean)/chbar;
-    return pow(a,4)*exp(-0.5*_x*_x*a*a) ;
+    // Without normalization
+    return exp(-0.5*_x*_x*a*a);
+
+    // With normalization
+    //    return pow(a,4)*exp(-0.5*_x*_x*a*a) ;
 }
 
 Int_t GaussianPdf::getAnalyticalIntegral(RooArgSet& allVars, RooArgSet& analVars, const char* /*rangeName*/) const {
@@ -59,7 +63,7 @@ Double_t GaussianPdf::analyticalIntegral(Int_t code, const char* rangeName) cons
 Double_t GaussianPdf::indefiniteIntegral(Double_t _x) const {
     Double_t piOver2 = TMath::PiOver2();
     Double_t sqrt2 = TMath::Sqrt2();
-    return pow(a,3)*TMath::Sqrt(piOver2)*RooMath::erf(a*_x/sqrt2);
+    return TMath::Sqrt(piOver2)*RooMath::erf(a*_x/sqrt2)/a;
 }
 
 std::list<Variable*> GaussianPdf::getParameters(Bool_t isTwoDetector){
@@ -76,7 +80,8 @@ std::list<Variable*> GaussianPdf::getParameters(Bool_t isTwoDetector){
         de = isTwoDetector ? 2*3*Ry*a_B*a_B/a/a/a*da : 3/2*Ry*a_B*a_B/a/a/a*da;
     }
     // Build list and return vars    
-    Variable* v1 = new Variable(e, de, "Binding E (gauss wf)", "eV");
+    TString str = TString::Format("Binding E (%s)", this->GetName());
+    Variable* v1 = new Variable(e, de, str.Data(), "eV");
     std::list<Variable*> list;
     list.push_back(v1);
     return list;

@@ -31,13 +31,14 @@ CompositeModelProvider::CompositeModelProvider(RooRealVar* x, RooRealVar* x0, Bo
 	pdfList = new RooArgList();
 	coeffList = new RooArgList();
         this->isTwoDetector = isTwoDetector;
+        observable = x;
         
 	// Define parabola
 	if (hasParabola){
                 RootHelper::deleteObject("parabolaRoot");
                 RooRealVar* parabolaRoot = new RooRealVar("parabolaRoot", "Coefficient at -x^2 + r*2", 2, 0.1, 10);
                 RootHelper::deleteObject("parabola");
-		ParabolaPdf* parabola = new ParabolaPdf("parabola", "parabola", *x, *x0, *parabolaRoot);
+		ParabolaPdf* parabola = new ParabolaPdf("parabola", "Fermi gas", *x, *x0, *parabolaRoot);
                 RootHelper::deleteObject("parabolaCoeff");
 		RooRealVar* I_parabola = new RooRealVar("parabolaCoeff", "Parabola intensity", 0.5, 0.0, 1.0);
 		pdfList->add(*parabola);
@@ -87,10 +88,10 @@ CompositeModelProvider::CompositeModelProvider(RooRealVar* x, RooRealVar* x0, Bo
 	RooRealVar** I_lorentz2 = new RooRealVar*[numLorentzSum];
 	for (int i = 0; i < numLorentzSum; i++){
                 RootHelper::deleteObject(TString::Format("sl%dA", i + 1));         
-		a2[i] = new RooRealVar(TString::Format("sl%dA", i + 1), TString::Format("Sum Lorentz%d a", i + 1), getDefaultLorentzAs(numLorentzSum)[i], aMin, aMax, "A"); // 5 0.5 10
+		a2[i] = new RooRealVar(TString::Format("sl%dA", i + 1), TString::Format("Sum Lorentz%d a", i + 1), getDefaultDampLorentzAs(numLorentzSum)[i], aMin, aMax, "A"); // 5 0.5 10
 //                a2[i] = new RooRealVar(TString::Format("sl%dA", i + 1), TString::Format("Sum Lorentz%d a", i + 1), getDefaultLorentzAs(numLorentzSum)[i], getDefaultLorentzAs(numLorentzSum)[i], getDefaultLorentzAs(numLorentzSum)[i], "A");
-                RootHelper::deleteObject(TString::Format("slorentz%d", i + 1)); 
-		lorentz2[i] = new DampLorentzPdf(TString::Format("slorentz%d", i + 1), TString::Format("Sum Lorentz%d PDF", i + 1), *x, *x0, *a2[i]);
+                RootHelper::deleteObject(TString::Format("sumlorentz%d", i + 1)); 
+		lorentz2[i] = new DampLorentzPdf(TString::Format("sumlorentz%d", i + 1), TString::Format("Sum Lorentz%d PDF", i + 1), *x, *x0, *a2[i]);
                 RootHelper::deleteObject(TString::Format("sl1%dInt", i + 1)); 
 		I_lorentz2[i] = new RooRealVar(TString::Format("sl1%dInt", i + 1), TString::Format("Sum Lorentz%d intensity", i + 1), 0.3, 0.0, 1.0);
 		pdfList->add(*lorentz2[i]);
@@ -173,21 +174,53 @@ std::list<Variable*> CompositeModelProvider::getIndirectParameters(){
     std::list<Variable*> parameters;
     TIterator* it = pdfList->createIterator();
     TObject* tempObj=0;
-    std::cout << "getIndirectParameters: Iterating PDFs" << std::endl;
+//    std::cout << "getIndirectParameters: Iterating PDFs" << std::endl;
     while((tempObj=it->Next())){
-        tempObj->Print();
+//        tempObj->Print();
         IndirectParamPdf* paramPdf = dynamic_cast<IndirectParamPdf*>(tempObj);
         if(paramPdf != NULL){
             std::list<Variable*> list = paramPdf->getParameters(isTwoDetector);
             std::list<Variable*>::iterator iter;
             for (iter = list.begin(); iter != list.end(); iter++) {
                 Variable* v = *iter;
-                v->print();
+//                v->print();
                 parameters.push_back(v);
             }
         }
     }
     return parameters;
+}
+
+std::list<std::pair<const char*, Double_t>> CompositeModelProvider::getIntensities(){
+    std::list<std::pair<const char*, Double_t>> intensities;
+    TIterator* it = pdfList->createIterator();
+    TObject* tempObj=0;
+//    std::cout << "getIntensities: Iterating PDFs" << std::endl;
+//    RooAbsReal* fullInt = getModel()->createIntegral(*observable);
+    Double_t previousCoeff = 1;  
+    while((tempObj=it->Next())){
+        RooAbsPdf* absPdf = dynamic_cast<RooAbsPdf*>(tempObj);
+        if(absPdf != NULL){
+            Int_t componentIndex = pdfList->index(absPdf);
+            RooAbsArg* arg = coeffList->at(componentIndex);
+            RooAbsReal* absReal = dynamic_cast<RooAbsReal*>(arg);
+            Double_t actualCoeff;
+            if (absReal!=0){
+                Double_t pdfCoeff = absReal->getVal();
+                actualCoeff = previousCoeff*pdfCoeff;
+                previousCoeff *= (1-pdfCoeff);
+            }
+            else {
+                actualCoeff = previousCoeff;
+            } 
+//            RooAbsReal* pdfInt = absPdf->createIntegral(*observable);
+//            Double_t contribution = absPdf->getVal()/fullInt->getVal();
+            std::cout << absPdf->GetName() << " " << actualCoeff << std::endl;
+            std::pair<const char*, Double_t> p = std::make_pair(absPdf->GetTitle(), actualCoeff);
+            intensities.push_back(p);
+        }
+    }
+    return intensities;
 }
 
 Double_t* CompositeModelProvider::getDefaultGaussAs(const Int_t numGauss){
@@ -213,7 +246,7 @@ Double_t* CompositeModelProvider::getDefaultLorentzAs(const Int_t numLorentz){
     Double_t* As;
     switch ( numLorentz ) {
         case 1:
-            As = (Double_t[1]){0.2};
+            As = (Double_t[1]){0.02};
             break;
         case 2:
             As = (Double_t[2]){0.05, 0.2};
@@ -222,6 +255,25 @@ Double_t* CompositeModelProvider::getDefaultLorentzAs(const Int_t numLorentz){
         case 3:
             As = (Double_t[3]){0.05, 0.1, 0.5};
 //            As = (Double_t[3]){Constants::a_B*TMath::Sqrt(Constants::Ry/73), Constants::a_B*TMath::Sqrt(Constants::Ry/117), Constants::a_B*TMath::Sqrt(Constants::Ry/1559)};
+            break;
+        default:
+            As = (Double_t[4]){0.05, 0.1, 0.5, 1};
+            break;
+    }
+    return As;
+};
+
+Double_t* CompositeModelProvider::getDefaultDampLorentzAs(const Int_t numLorentz){
+    Double_t* As;
+    switch ( numLorentz ) {
+        case 1:
+            As = (Double_t[1]){0.1};
+            break;
+        case 2:
+            As = (Double_t[2]){0.05, 0.2};
+            break;
+        case 3:
+            As = (Double_t[3]){0.05, 0.1, 0.5};
             break;
         default:
             As = (Double_t[4]){0.05, 0.1, 0.5, 1};

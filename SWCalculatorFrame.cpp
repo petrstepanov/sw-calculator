@@ -253,8 +253,9 @@ SWCalculatorFrame::SWCalculatorFrame(const TGWindow* p, UInt_t w, UInt_t h){
 	modelParamsFrame->AddFrame(numLorentzComplex, new TGLayoutHints(kLHintsNormal, 0, 5, 2, 0));
 	modelParamsFrame->AddFrame(new TGLabel(modelParamsFrame, "Lorentz Sum"), new TGLayoutHints(kLHintsNormal, 0, 30, 5, 0));
 
-	hasOrtho = new TGCheckButton(modelParamsFrame, "Ortho Exps", -1);
-	modelParamsFrame->AddFrame(hasOrtho, new TGLayoutHints(kLHintsNormal, 0, 20, 4, 0));        
+//	hasOrtho = new TGCheckButton(modelParamsFrame, "Ortho Exps", -1);
+//	modelParamsFrame->AddFrame(hasOrtho, new TGLayoutHints(kLHintsNormal, 0, 20, 4, 0));        
+
 	// Draw Option
 //	fitFunctionType = new TGComboBox(modelParamsFrame, 0);
 //	fitFunctionType->AddEntry("Gauss",1);
@@ -594,7 +595,7 @@ void SWCalculatorFrame::fitSpectrum(void){
 	//AbstractModelProvider* modelProvider = new GaussModelProvider(x, E_0, hasAtan, bgFraction);
         Bool_t isTwoDetector = histProcessor->isTwoDetetor(fullHist);
 	CompositeModelProvider* modelProvider;
-        modelProvider = new CompositeModelProvider(x, E_0, hasParabola->IsOn(), (Int_t)numGauss->GetNumber(), (Int_t)numLorentz->GetNumber(), (Int_t)numLorentzComplex->GetNumber(), hasOrtho->IsOn(), hasAtan, bgFraction, isTwoDetector);
+        modelProvider = new CompositeModelProvider(x, E_0, hasParabola->IsOn(), (Int_t)numGauss->GetNumber(), (Int_t)numLorentz->GetNumber(), (Int_t)numLorentzComplex->GetNumber(), kFALSE /*hasOrtho->IsOn()*/, hasAtan, bgFraction, isTwoDetector);
             
 	RooAbsPdf* model = modelProvider->getModel();
 	RooAbsPdf* convolutedModel = modelProvider->getConvolutedModel();
@@ -770,7 +771,6 @@ void SWCalculatorFrame::fitSpectrum(void){
 	}
 
 	// Output Fermi Energy if we use parabola model
-        // TODO: refactor?
         std::list<Variable*> indirectParameters = modelProvider->getIndirectParameters();
         std::list<Variable*>::iterator iter;
         txtFitResult->AddLineFast("  ------------------------------------------------");
@@ -782,6 +782,16 @@ void SWCalculatorFrame::fitSpectrum(void){
             txtFitResult->AddLineFast(str);
         }
 
+        // Output intensities
+        std::list<std::pair<const char*, Double_t>> intensities = modelProvider->getIntensities();
+        std::list<std::pair<const char*, Double_t>>::iterator iiter;
+        txtFitResult->AddLineFast("  ------------------------------------------------");
+        for (iiter = intensities.begin(); iiter != intensities.end(); ++iiter) {
+            std::pair<const char*, Double_t> p = (*iiter);
+            TString str = Form("%*s    %f %c", 22, p.first, p.second*100, '%');
+            txtFitResult->AddLineFast(str);
+        }        
+        
         //	ParabolaGaussModelProvider* parabolaGaussModel = dynamic_cast<ParabolaGaussModelProvider*>(modelProvider);
 //	if (parabolaGaussModel){
 //            printParabolaInfo(parabolaGaussModel->getParabolaRoot(), isTwoDetector);

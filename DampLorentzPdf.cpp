@@ -36,7 +36,7 @@ a("a", this, other.a){
 Double_t DampLorentzPdf::evaluate() const {
     Double_t chbar = Constants::chbar/1E3; // because x is in keVs
     Double_t _x = (x - mean)/chbar;
-    return (23-20*pow(a*_x,2)+5*pow(a*_x,4))/(30*pow(a,2)*pow(1+pow(a*_x,2),5));
+    return (23-20*pow(a*_x,2)+5*pow(a*_x,4))/pow(1+pow(a*_x,2),5);
 //    return pow(a,6)*(23-20*pow(a*_x,2)+5*pow(a*_x,4))/(30*pow(1+pow(a*_x,2),5));
 }
 
@@ -79,7 +79,8 @@ std::list<Variable*> DampLorentzPdf::getParameters(Bool_t isTwoDetector){
         de = isTwoDetector ? Ry*pow(a_B/dA,2) : Ry*pow(a_B/dA,2);
     }
     // Build list and return vars    
-    Variable* v1 = new Variable(e, de, "Binding E (exp*r wf)", "eV");
+    TString str = TString::Format("Binding E (%s)", this->GetName());
+    Variable* v1 = new Variable(e, de, str.Data(), "eV");
     std::list<Variable*> list;
     list.push_back(v1);
     return list;    

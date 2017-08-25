@@ -36,7 +36,8 @@ LorentzianPdf::LorentzianPdf(const LorentzianPdf& other, const char* name) :
 Double_t LorentzianPdf::evaluate() const {
     Double_t chbar = Constants::chbar/1E3; // because x is in keVs
     Double_t _x = (x - mean)/chbar;
-    return pow(a,4)/(6*pow(1+pow(a*_x,2),3));
+    return 1/pow(1+pow(a*_x,2),3);
+    //    return pow(a,4)/(6*pow(1+pow(a*_x,2),3));
 }
 
 Int_t LorentzianPdf::getAnalyticalIntegral(RooArgSet& allVars, RooArgSet& analVars, const char* /*rangeName*/) const {
@@ -60,7 +61,8 @@ Double_t LorentzianPdf::analyticalIntegral(Int_t code, const char* rangeName) co
 Double_t LorentzianPdf::indefiniteIntegral(Double_t _x) const {
     Double_t s1 = _x*(5+3*a*a*_x*_x)/pow(1+a*a*_x*_x,2);
     Double_t s2 = 3*atan(a*_x)/a;
-    return pow(a,4)*(s1+s2)/48;
+    return (s1+s2)/8;
+//    return pow(a,4)*(s1+s2)/48;
 
 }
 
@@ -78,7 +80,8 @@ std::list<Variable*> LorentzianPdf::getParameters(Bool_t isTwoDetector){
         de = isTwoDetector ? 2*3*Ry*a_B*a_B/a/a/a*da : 3/2*Ry*a_B*a_B/a/a/a*da;
     }
     // Build list and return vars
-    Variable* v1 = new Variable(e, de, "Binding E (exp wf)", "eV");
+    TString str = TString::Format("Binding E (%s)", this->GetName());
+    Variable* v1 = new Variable(e, de, str.Data(), "eV");
     std::list<Variable*> list;
     list.push_back(v1);
     return list;    
