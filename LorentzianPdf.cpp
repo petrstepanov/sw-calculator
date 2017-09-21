@@ -80,7 +80,7 @@ std::list<Variable*> LorentzianPdf::getParameters(Bool_t isTwoDetector){
         de = isTwoDetector ? 2*3*Ry*a_B*a_B/a/a/a*da : 3/2*Ry*a_B*a_B/a/a/a*da;
     }
     // Build list and return vars
-    TString str = TString::Format("Binding E (%s)", this->GetName());
+    TString str = TString::Format("Binding E %s", this->GetName());
     Variable* v1 = new Variable(e, de, str.Data(), "eV");
     std::list<Variable*> list;
     list.push_back(v1);

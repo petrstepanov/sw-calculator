@@ -68,7 +68,7 @@ std::list<Variable*> DampLorentzPdf::getParameters(Bool_t isTwoDetector){
     // Energy value
     Double_t Ry = Constants::Ry; // eV
     Double_t a_B = Constants::a_B; // A
-    Double_t e = isTwoDetector ? Ry*pow(a_B/a,2) : Ry*pow(a_B/a,2);
+    Double_t e = isTwoDetector ? Ry*pow(a_B/a,2)/3 : Ry*pow(a_B/a,2)/3;
     // Energy error
     Double_t de = 0;
     RooAbsArg* aAbsArg = a.absArg();
@@ -76,10 +76,10 @@ std::list<Variable*> DampLorentzPdf::getParameters(Bool_t isTwoDetector){
     if (aReal){
         aReal->Print();
         Double_t dA = aReal->getError();
-        de = isTwoDetector ? Ry*pow(a_B/dA,2) : Ry*pow(a_B/dA,2);
+        de = isTwoDetector ? Ry*pow(a_B/dA,2)/3 : Ry*pow(a_B/dA,2)/3;
     }
     // Build list and return vars    
-    TString str = TString::Format("Binding E (%s)", this->GetName());
+    TString str = TString::Format("Binding E %s", this->GetName());
     Variable* v1 = new Variable(e, de, str.Data(), "eV");
     std::list<Variable*> list;
     list.push_back(v1);

@@ -135,7 +135,7 @@ CompositeModelProvider::CompositeModelProvider(RooRealVar* x, RooRealVar* x0, Bo
         RootHelper::deleteObject("zero");        
 	RooRealVar* zero = new RooRealVar("zero", "zero", 0);
         RootHelper::deleteObject("resFunctFWHM");       
-	RooRealVar* resFunct_FWHM = new RooRealVar("resFunctFWHM", "Resolution function FWHM", 3, 1.5, 4, "keV");
+	RooRealVar* resFunct_FWHM = new RooRealVar("resFunctFWHM", "Resolution function FWHM", 3, 1.7, 3.4, "keV");
         RootHelper::deleteObject("resFunctDispersion");
 	RooFormulaVar* resFunct_dispersion = new RooFormulaVar("resFunctDispersion", "@0*@1", RooArgList(*resFunct_FWHM, *fwhm2sigma));
         RootHelper::deleteObject("resFunct");
