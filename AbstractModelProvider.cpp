@@ -22,7 +22,7 @@ AbstractModelProvider::AbstractModelProvider(RooRealVar* E_0){
 	this->convolutedModel = NULL;
 	this->components = new RooArgSet();
 	this->bgComponents = new RooArgSet();
-        this->convolutionPoints = 1500;
+        this->convolutionPoints = 3000;
 }
 
 RooAbsPdf* AbstractModelProvider::getModel(){
