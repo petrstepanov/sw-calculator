@@ -23,6 +23,7 @@
 #include <RooFitResult.h>
 #include <RooChi2Var.h>
 #include <RooMinuit.h>
+#include <RooAddPdf.h>
 #include <TGFileDialog.h>
 #include <TGMsgBox.h>
 #include <TG3DLine.h>
@@ -608,13 +609,18 @@ void SWCalculatorFrame::fitSpectrum(void){
 	// You should either use a binned likelihood fit or use the standard chi2 fit provided by ROOT. In this case bins with zero entries are excluded from the fit
 
 	// Chi2 fit
-	RooChi2Var* chi2 = new RooChi2Var("chi2", "chi2", *convolutedModel, *data);
-	RooMinuit* m = new RooMinuit(*chi2);
-	m->migrad();
-	m->hesse();
-	// m->optimizeConst(1);
-	RooFitResult* fitResult = m->save();
+//	RooChi2Var* chi2 = new RooChi2Var("chi2", "chi2", *convolutedModel, *data);
+//	RooMinuit* m = new RooMinuit(*chi2);
+//	m->migrad();
+//	m->hesse();
+//	// m->optimizeConst(1);
+//	RooFitResult* fitResult = m->save();
 
+//        data = static_cast<RooAddPdf*>(model)->generateBinned(*x,10000) ;
+        
+        // Simple Fit
+        RooFitResult* fitResult = convolutedModel->fitTo(*data, Save(kTRUE));
+        
 	GraphicsHelper* graphicsHelper = GraphicsHelper::getInstance();
         Double_t convolutedModelMaxX = histProcessor->getPdfMaximumX(convolutedModel, RooArgList(*x));
         std::cout << "convolutedModelMaxX: " << convolutedModelMaxX << std::endl;

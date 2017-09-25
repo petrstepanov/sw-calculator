@@ -34,10 +34,9 @@ a("a", this, other.a){
 }
 
 Double_t DampLorentzPdf::evaluate() const {
-    Double_t chbar = Constants::chbar/1E3; // because x is in keVs
-    Double_t _x = (x - mean)/chbar;
-    return (23-20*pow(a*_x,2)+5*pow(a*_x,4))/pow(1+pow(a*_x,2),5);
-//    return pow(a,6)*(23-20*pow(a*_x,2)+5*pow(a*_x,4))/(30*pow(1+pow(a*_x,2),5));
+    Double_t c = Constants::chbar/1E3; // because x is in keVs
+    Double_t _x = x - mean;
+    return (23-20*pow(a*_x/c,2)+5*pow(a*_x/c,4))/pow(1+pow(a*_x/c,2),5);
 }
 
 Int_t DampLorentzPdf::getAnalyticalIntegral(RooArgSet& allVars, RooArgSet& analVars, const char* /*rangeName*/) const {
@@ -48,9 +47,8 @@ Int_t DampLorentzPdf::getAnalyticalIntegral(RooArgSet& allVars, RooArgSet& analV
 Double_t DampLorentzPdf::analyticalIntegral(Int_t code, const char* rangeName) const {
     switch (code) {
         case 1: {
-            Double_t chbar = Constants::chbar/1E3;
-            Double_t x1 = (x.min(rangeName) - mean)/chbar;
-            Double_t x2 = (x.max(rangeName) - mean)/chbar;                       
+            Double_t x1 = (x.min(rangeName) - mean);
+            Double_t x2 = (x.max(rangeName) - mean);                       
             return indefiniteIntegral(x2) - indefiniteIntegral(x1);
         }
     }
@@ -60,8 +58,8 @@ Double_t DampLorentzPdf::analyticalIntegral(Int_t code, const char* rangeName) c
 
 Double_t DampLorentzPdf::indefiniteIntegral(Double_t _x) const {
     // With Dropped Constant parameter -- works good here
-    return (a*_x*(139+211*pow(a*_x,2)+165*pow(a*_x,4)+45*pow(a*_x,6))+45*pow(1+pow(a*_x,2),4)*atan(a*_x))/(8*a*pow(1+pow(a*_x,2),4));
-//    return pow(a,5)*(a*_x*(139+211*pow(a*_x,2)+165*pow(a*_x,4)+45*pow(a*_x,6))+45*pow(1+pow(a*_x,2),4)*atan(a*_x))/(240*pow(1+pow(a*_x,2),4));
+    Double_t k = a/(Constants::chbar/1E3); 
+    return (k*_x*(139+211*k*k*_x*_x+165*pow(k*_x,4)+45*pow(k*_x,6)) + 45*pow(1+k*k*_x*_x,4)*atan(k*_x))/(8*k*pow(1+k*k*_x*_x,4));
 }
 
 std::list<Variable*> DampLorentzPdf::getParameters(Bool_t isTwoDetector){

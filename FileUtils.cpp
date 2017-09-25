@@ -122,17 +122,17 @@ TH1I* FileUtils::importTH1(const char* fileName, int eColumn, int cColumn){
 	std::map<double, int>::iterator it;
 	for (it = spectrum.begin(); it != spectrum.end(); ++it){
 		Double_t count = it->second; // < 1 ? 1 : it->second;
-		Double_t error = sqrt(count);
+//		Double_t error = sqrt(count);
 
 		// Count can't be zero for chi2Fit
 		if (count < 1) {
-			count = 1;
-			error = 1;
+			count = 0;
+//			error = 1;
 		}
 
 		// Read spectrum data
 		hist->SetBinContent(++i, count);
-		hist->SetBinError(i, error);
+//		hist->SetBinError(i, error);
 		//std::cout << "Bin " << i << " error " << error << std::endl;
 	}
 	return hist;

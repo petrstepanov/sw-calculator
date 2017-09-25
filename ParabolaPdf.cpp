@@ -52,10 +52,12 @@ Double_t ParabolaPdf::analyticalIntegral(Int_t code, const char* rangeName) cons
 //          syms x
 //          syms r
 //          int(r*r-x*x, 'x')
-//          int(r*r-x*x, 'x', -r, r)            
-            if (x.max(rangeName) - mean < - r || x.min(rangeName) - mean > r) return 0.;
-            Double_t x1 = TMath::Max(-r, x.min(rangeName) - mean);
-            Double_t x2 = TMath::Min(r, x.max(rangeName) - mean);
+//          int(r*r-x*x, 'x', -r, r)  
+            Double_t xMin = x.min(rangeName) - mean;
+            Double_t xMax = x.max(rangeName) - mean;            
+            if (xMax < - r || xMin > r) return 0.;
+            Double_t x1 = TMath::Max(-r, xMin);
+            Double_t x2 = TMath::Min(r, xMax);
             // ﻿r^2*x - x^3/3
             return (pow(r,2)*x2 - pow(x2,3)/3) - (pow(r,2)*x1 - pow(x1,3)/3);
         }

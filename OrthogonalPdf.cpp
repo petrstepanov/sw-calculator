@@ -40,10 +40,11 @@ a2("a2", this, other.a2){
 }
 
 Double_t OrthogonalPdf::evaluate() const {
-    Double_t _x = (x - mean)/(Constants::chbar/1E3); // We need keV*A cause x is in keVs, length is A. chbar is eV*A
+    Double_t chbar = Constants::chbar/1E3;
+    Double_t _x = (x - mean)/chbar; // We need keV*A cause x is in keVs, length is A. chbar is eV*A
     Double_t b = 3*a1*a2/(a1+a2); 
     // Everything works better if we reduce fractions
-    return (48*a2*a2 - 30*a2*(a2+b)*(1+pow(a2*_x,2)) + 5*pow(a2+b,2)*pow(1+pow(a2*_x,2),2))/pow(1+pow(a2*_x,2),5); // where a2 in znamenatel?    
+    return chbar*(48*a2*a2 - 30*a2*(a2+b)*(1+pow(a2*_x,2)) + 5*pow(a2+b,2)*pow(1+pow(a2*_x,2),2))/pow(1+pow(a2*_x,2),5); // where a2 in znamenatel?    
     // Do not reduсe fractions
     //return pow(a2,4)*(48*a2*a2 - 30*a2*(a2+b)*(1+pow(a2*_x,2)) + 5*pow(a2+b,2)*pow(1+pow(a2*_x,2),2))/(30*pow(1+pow(a2*_x,2),5)); // where a2 in znamenatel?
 }

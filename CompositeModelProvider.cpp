@@ -23,6 +23,7 @@
 #include <RooGaussian.h>
 #include <RooAddPdf.h>
 #include <RooFFTConvPdf.h>
+#include <RooNumConvPdf.h>
 #include <RooGenericPdf.h>
 #include <TIterator.h>
 #include <TMath.h>
@@ -32,20 +33,20 @@ CompositeModelProvider::CompositeModelProvider(RooRealVar* x, RooRealVar* x0, Bo
 	coeffList = new RooArgList();
         this->isTwoDetector = isTwoDetector;
         observable = x;
-        
-	// Define parabola
+
+        // Define parabola
 	if (hasParabola){
                 RootHelper::deleteObject("parabolaRoot");
                 RooRealVar* parabolaRoot = new RooRealVar("parabolaRoot", "Coefficient at -x^2 + r*2", 2, 0.1, 10);
                 RootHelper::deleteObject("parabola");
 		ParabolaPdf* parabola = new ParabolaPdf("parabola", "Fermi gas", *x, *x0, *parabolaRoot);
                 RootHelper::deleteObject("parabolaCoeff");
-		RooRealVar* I_parabola = new RooRealVar("parabolaCoeff", "Parabola intensity", 0.5, 0.0, 1.0);
+		RooRealVar* parabolaCoeff = new RooRealVar("parabolaCoeff", "Parabola intensity", 0.5, 0.0, 1.0);
 		pdfList->add(*parabola);
-		coeffList->add(*I_parabola);
+		coeffList->add(*parabolaCoeff);
 		components->add(*parabola);
 	}
-
+        
 	// Gauss PDFs
 //	RooRealVar** FWHM = new RooRealVar*[numGauss];
 //	RooFormulaVar** sigma = new RooFormulaVar*[numGauss];
@@ -125,7 +126,9 @@ CompositeModelProvider::CompositeModelProvider(RooRealVar* x, RooRealVar* x0, Bo
         if (prevAbsArg != NULL){
             coeffList->remove(*prevAbsArg);
         }
-        
+        std::cout << "coeffList" << std::endl;
+        coeffList->Print();
+
 	// If we sum values recursively than bg~1E-5, parabola~0.9, lorentz coefficients~0.9 (needs kTRUE)
         RootHelper::deleteObject("sumModel");
 	RooAddPdf* sumModel = new RooAddPdf("sumModel", "Sum of components", *pdfList, *coeffList, kTRUE);
@@ -145,7 +148,11 @@ CompositeModelProvider::CompositeModelProvider(RooRealVar* x, RooRealVar* x0, Bo
 	x->setBins(convolutionPoints, "cache");
         RootHelper::deleteObject("sumModelConvoluted");
 	RooFFTConvPdf* sumModelConvoluted = new RooFFTConvPdf("sumModelConvoluted", "Convoluted Model", *x, *sumModel, *resolutionFunction);
-        sumModelConvoluted->setBufferFraction(0) ;
+//        RooNumConvPdf* sumModelConvoluted = new RooNumConvPdf("sumModelConvoluted", "Convoluted Model", *x, *sumModel, *resolutionFunction);
+//        sumModelConvoluted->setBufferStrategy(RooFFTConvPdf::Mirror);
+	this->convolutedModel = sumModelConvoluted;
+
+//	sumModelConvoluted->setBufferFraction(0) ;
 //	sumModelConvoluted->setBufferFraction(1);
 
 	// Constant Background
@@ -155,19 +162,15 @@ CompositeModelProvider::CompositeModelProvider(RooRealVar* x, RooRealVar* x0, Bo
 //	bgComponents->add(*constBg);
 
 	// Atan background
-	if (hasAtan){
-		RooGenericPdf* atanBg;
-		RooRealVar* I_atan;
-		atanBg = new RooGenericPdf("atanBg", "@2/2 + (-1)*atan((@0 - @1))", RooArgList(*x, *x0, *pi));
-		I_atan = new RooRealVar("IAtan", "Atan Intensity", 0.002, 0.0, 0.1);
-		bgComponents->add(*atanBg);
-//		this->convolutedModel = new RooAddPdf("model_atan", "Model with Convolution and Atan Background", RooArgList(*constBg, *atanBg, *sumModelConvoluted), RooArgList(*I_const, *I_atan));
-		this->convolutedModel = new RooAddPdf("model_atan", "Model with Convolution and Atan Background", RooArgList(*atanBg, *sumModelConvoluted), RooArgList(*I_atan));
-	}
-	else {
-		this->convolutedModel = sumModelConvoluted;
-//		this->convolutedModel = new RooAddPdf("model_const", "Model with Convolution and Const Background", RooArgList(*constBg, *sumModelConvoluted), RooArgList(*I_const));
-	}
+//	if (hasAtan){
+//		RooGenericPdf* atanBg;
+//		RooRealVar* I_atan;
+//		atanBg = new RooGenericPdf("atanBg", "@2/2 + (-1)*atan((@0 - @1))", RooArgList(*x, *x0, *pi));
+//		I_atan = new RooRealVar("IAtan", "Atan Intensity", 0.002, 0.0, 0.1);
+//		bgComponents->add(*atanBg);
+////		this->convolutedModel = new RooAddPdf("model_atan", "Model with Convolution and Atan Background", RooArgList(*constBg, *atanBg, *sumModelConvoluted), RooArgList(*I_const, *I_atan));
+//		this->convolutedModel = new RooAddPdf("model_atan", "Model with Convolution and Atan Background", RooArgList(*atanBg, *sumModelConvoluted), RooArgList(*I_atan));
+//	}
 }
 
 std::list<Variable*> CompositeModelProvider::getIndirectParameters(){
@@ -227,10 +230,10 @@ Double_t* CompositeModelProvider::getDefaultGaussAs(const Int_t numGauss){
     Double_t* As;
     switch ( numGauss ) {
         case 1:
-            As = (Double_t[1]){1};
+            As = (Double_t[1]){0.1};
             break;
         case 2:
-            As = (Double_t[2]){0.5, 1};
+            As = (Double_t[2]){0.5, 0.1};
             break;
         case 3:
             As = (Double_t[3]){1.0, 0.5, 0.1};
@@ -246,10 +249,10 @@ Double_t* CompositeModelProvider::getDefaultLorentzAs(const Int_t numLorentz){
     Double_t* As;
     switch ( numLorentz ) {
         case 1:
-            As = (Double_t[1]){0.02};
+            As = (Double_t[1]){0.16};
             break;
         case 2:
-            As = (Double_t[2]){0.05, 0.2};
+            As = (Double_t[2]){0.16, 0.5};
 //            As = (Double_t[2]){Constants::a_B*TMath::Sqrt(Constants::Ry/73), Constants::a_B*TMath::Sqrt(Constants::Ry/117)};
             break;
         case 3:

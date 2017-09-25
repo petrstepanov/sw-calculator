@@ -50,9 +50,8 @@ Int_t GaussianPdf::getAnalyticalIntegral(RooArgSet& allVars, RooArgSet& analVars
 Double_t GaussianPdf::analyticalIntegral(Int_t code, const char* rangeName) const {
     switch (code) {
         case 1: {
-            Double_t chbar = Constants::chbar/1E3;
-            Double_t x1 = (x.min(rangeName) - mean)/chbar;
-            Double_t x2 = (x.max(rangeName) - mean)/chbar;                       
+            Double_t x1 = (x.min(rangeName) - mean);
+            Double_t x2 = (x.max(rangeName) - mean);                       
             return indefiniteIntegral(x2) - indefiniteIntegral(x1);
         }
     }
@@ -61,9 +60,8 @@ Double_t GaussianPdf::analyticalIntegral(Int_t code, const char* rangeName) cons
 }
 
 Double_t GaussianPdf::indefiniteIntegral(Double_t _x) const {
-    Double_t piOver2 = TMath::PiOver2();
-    Double_t sqrt2 = TMath::Sqrt2();
-    return TMath::Sqrt(piOver2)*RooMath::erf(a*_x/sqrt2)/a;
+    Double_t k = a/(Constants::chbar/1E3);
+    return TMath::Sqrt(TMath::PiOver2())*RooMath::erf(k*_x/TMath::Sqrt2())/k;
 }
 
 std::list<Variable*> GaussianPdf::getParameters(Bool_t isTwoDetector){
