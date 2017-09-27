@@ -33,10 +33,10 @@ GaussianPdf::GaussianPdf(const GaussianPdf& other, const char* name) :
 }
 
 Double_t GaussianPdf::evaluate() const {
-    Double_t chbar = Constants::chbar/1E3; // because x is in keVs
-    Double_t _x = (x - mean)/chbar;
+    Double_t k = a/(Constants::chbar/1E3); // because x is in keVs
+    Double_t _x = (x - mean);
     // Without normalization
-    return exp(-0.5*_x*_x*a*a);
+    return exp(-0.5*_x*_x*k*k);
 
     // With normalization
     //    return pow(a,4)*exp(-0.5*_x*_x*a*a) ;

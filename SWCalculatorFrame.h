@@ -65,8 +65,8 @@ private:
 	Bool_t isSingleDetector;
 	TGTextEdit* txtFitResult;
 
-	TH1I* fullHist;
-	TH1I* peakHist;
+	TH1F* fullHist;
+	TH1F* peakHist;
 	RooCurve* curveBg;
 	RooCurve* curveFit;
 	TH1F* peakHistNoBg;

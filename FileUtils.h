@@ -20,8 +20,8 @@
 class FileUtils {
 public:
 	static FileUtils* getInstance();
-	TH1I* importTH1(const char*, int, int);
-	void saveData(TString*, TH1I*, RooCurve*, RooCurve*, TH1F*, TH1F*);
+	TH1F* importTH1(const char*, int, int);
+	void saveData(TString*, TH1F*, RooCurve*, RooCurve*, TH1F*, TH1F*);
 	static constexpr int prec = 6; // Output values precision
 
 private:

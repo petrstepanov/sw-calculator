@@ -19,6 +19,7 @@
 #include "OrthogonalPdf.h"
 #include "RootHelper.h"
 #include "Constants.h"
+#include "ChannelConvolutionPdf.h"
 #include <RooFormulaVar.h>
 #include <RooGaussian.h>
 #include <RooAddPdf.h>
@@ -37,11 +38,11 @@ CompositeModelProvider::CompositeModelProvider(RooRealVar* x, RooRealVar* x0, Bo
         // Define parabola
 	if (hasParabola){
                 RootHelper::deleteObject("parabolaRoot");
-                RooRealVar* parabolaRoot = new RooRealVar("parabolaRoot", "Coefficient at -x^2 + r*2", 2, 0.1, 10);
+                RooRealVar* parabolaRoot = new RooRealVar("parabolaRoot", "Coefficient at -x^2 + r*2", 3.5, 0.1, 10);
                 RootHelper::deleteObject("parabola");
 		ParabolaPdf* parabola = new ParabolaPdf("parabola", "Fermi gas", *x, *x0, *parabolaRoot);
                 RootHelper::deleteObject("parabolaCoeff");
-		RooRealVar* parabolaCoeff = new RooRealVar("parabolaCoeff", "Parabola intensity", 0.5, 0.0, 1.0);
+		RooRealVar* parabolaCoeff = new RooRealVar("parabolaCoeff", "Parabola intensity", 0.15, 0.0, 1.0);
 		pdfList->add(*parabola);
 		coeffList->add(*parabolaCoeff);
 		components->add(*parabola);
@@ -73,7 +74,7 @@ CompositeModelProvider::CompositeModelProvider(RooRealVar* x, RooRealVar* x0, Bo
 	RooRealVar** I_lorentz = new RooRealVar*[numLorentz];
 	for (int i = 0; i < numLorentz; i++){
             RootHelper::deleteObject(TString::Format("l%dA", i + 1));           
-            a[i] = new RooRealVar(TString::Format("l%dA", i + 1), TString::Format("Lorentz%d a", i + 1), getDefaultLorentzAs(numGauss)[i], aMin, aMax, "A"); // 5 0.5 10
+            a[i] = new RooRealVar(TString::Format("l%dA", i + 1), TString::Format("Lorentz%d a", i + 1), getDefaultLorentzAs(numLorentz)[i], aMin, aMax, "A"); // 5 0.5 10
             RootHelper::deleteObject(TString::Format("lorentz%d", i + 1));           
             lorentz[i] = new LorentzianPdf(TString::Format("lorentz%d", i + 1), TString::Format("Lorentz%d PDF", i + 1), *x, *x0, *a[i]);
             RootHelper::deleteObject(TString::Format("l1%dInt", i + 1));           
@@ -132,28 +133,40 @@ CompositeModelProvider::CompositeModelProvider(RooRealVar* x, RooRealVar* x0, Bo
 	// If we sum values recursively than bg~1E-5, parabola~0.9, lorentz coefficients~0.9 (needs kTRUE)
         RootHelper::deleteObject("sumModel");
 	RooAddPdf* sumModel = new RooAddPdf("sumModel", "Sum of components", *pdfList, *coeffList, kTRUE);
+//	RooAddPdf* sumModel = new RooAddPdf("sumModel", "Sum of components", *pdfList, *coeffList);
+
 	this->model = sumModel;
 
 	// Resolution Function
         RootHelper::deleteObject("zero");        
 	RooRealVar* zero = new RooRealVar("zero", "zero", 0);
         RootHelper::deleteObject("resFunctFWHM");       
-	RooRealVar* resFunct_FWHM = new RooRealVar("resFunctFWHM", "Resolution function FWHM", 3, 1.7, 3.4, "keV");
-        RootHelper::deleteObject("resFunctDispersion");
-	RooFormulaVar* resFunct_dispersion = new RooFormulaVar("resFunctDispersion", "@0*@1", RooArgList(*resFunct_FWHM, *fwhm2sigma));
+	RooRealVar* resFunctFWHM = new RooRealVar("resFunctFWHM", "Resolution function FWHM", 1.7, "keV");
+        RootHelper::deleteObject("resFunctSigma");
+	RooFormulaVar* resFunctSigma = new RooFormulaVar("resFunctSigma", "@0*@1", RooArgList(*resFunctFWHM, *fwhm2sigma));
         RootHelper::deleteObject("resFunct");
-	resolutionFunction = new RooGaussian("resFunct", "Resolution Function", *x, *zero, *resFunct_dispersion);
+	resolutionFunction = new RooGaussian("resFunct", "Resolution Function", *x, *zero, *resFunctSigma);
+//	resolutionFunction = new RooGaussian("resFunct", "Resolution Function", *(RooRealVar*)(x->Clone("x2")), *zero, *resFunctSigma);
 
 	// Convolution
-	x->setBins(convolutionPoints, "cache");
         RootHelper::deleteObject("sumModelConvoluted");
-	RooFFTConvPdf* sumModelConvoluted = new RooFFTConvPdf("sumModelConvoluted", "Convoluted Model", *x, *sumModel, *resolutionFunction);
-//        RooNumConvPdf* sumModelConvoluted = new RooNumConvPdf("sumModelConvoluted", "Convoluted Model", *x, *sumModel, *resolutionFunction);
-//        sumModelConvoluted->setBufferStrategy(RooFFTConvPdf::Mirror);
-	this->convolutedModel = sumModelConvoluted;
 
-//	sumModelConvoluted->setBufferFraction(0) ;
-//	sumModelConvoluted->setBufferFraction(1);
+        // FFT Convolution
+//	x->setBins(10000, "cache");
+//        RooFFTConvPdf* sumModelConvoluted = new RooFFTConvPdf("sumModelConvoluted", "Convoluted Model", *x, *sumModel, *resolutionFunction);
+//        sumModelConvoluted->setBufferFraction(0);
+//      sumModelConvoluted->setBufferStrategy(RooFFTConvPdf::Flat);
+
+        // Numerical Convolution
+//      RooNumConvPdf* sumModelConvoluted = new RooNumConvPdf("sumModelConvoluted", "Convoluted Model", *x, *sumModel, *resolutionFunction);
+//      sumModelConvoluted->setConvolutionWindow(*zero,*resFunctSigma,4);
+
+        // My Convolution
+        ChannelConvolutionPdf* sumModelConvoluted = new ChannelConvolutionPdf("sumModelConvoluted", "Convoluted Model", *x, *sumModel, *resolutionFunction);
+        sumModelConvoluted->setConvolutionWindow(*zero,*resFunctFWHM,2);
+        sumModelConvoluted->setConvolutionBins(40);
+
+        this->convolutedModel = sumModelConvoluted;
 
 	// Constant Background
 	//	RooPolynomial* constBg = new RooPolynomial("constBg", "y=1", *x, RooArgSet());
@@ -236,7 +249,7 @@ Double_t* CompositeModelProvider::getDefaultGaussAs(const Int_t numGauss){
             As = (Double_t[2]){0.5, 0.1};
             break;
         case 3:
-            As = (Double_t[3]){1.0, 0.5, 0.1};
+            As = (Double_t[3]){0.6, 0.4, 0.2};
             break;
         default:
             As = (Double_t[4]){1.0, 0.5, 0.2, 0.05};
@@ -249,7 +262,7 @@ Double_t* CompositeModelProvider::getDefaultLorentzAs(const Int_t numLorentz){
     Double_t* As;
     switch ( numLorentz ) {
         case 1:
-            As = (Double_t[1]){0.16};
+            As = (Double_t[1]){0.18};
             break;
         case 2:
             As = (Double_t[2]){0.16, 0.5};
@@ -273,7 +286,7 @@ Double_t* CompositeModelProvider::getDefaultDampLorentzAs(const Int_t numLorentz
             As = (Double_t[1]){0.1};
             break;
         case 2:
-            As = (Double_t[2]){0.05, 0.2};
+            As = (Double_t[2]){0.1, 0.4}; // 70, 6 eV
             break;
         case 3:
             As = (Double_t[3]){0.05, 0.1, 0.5};

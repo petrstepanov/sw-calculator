@@ -22,17 +22,17 @@
 class HistProcessor {
 public:
 	static HistProcessor* getInstance();
-	TH1I* cutHist(TH1I*, Int_t, Int_t);
+	TH1* cutHist(TH1*, Int_t, Int_t);
 	RooCurve* subtractCurves(RooCurve*, RooCurve*);
-	TH1F* subtractCurve(TH1I*, RooCurve*);
-	TH1F* getChi2Hist(TH1I*, RooCurve*);
-        Int_t getTotalCounts(TH1I*);
-	Bool_t hasBackground(TH1I*);
-	Bool_t hasAtan(TH1I*);
-	Double_t calcBackgroundFraction(TH1I*);
-	std::pair<Double_t, Int_t> getChi2(TH1I*, RooCurve*, Int_t);
-	std::pair<Double_t, Double_t> calcIntegral(TH1F*, Double_t, Double_t);
-	Bool_t isTwoDetetor(TH1I*);
+	TH1* subtractCurve(TH1*, RooCurve*);
+	TH1* getChi2Hist(TH1*, RooCurve*);
+        Double_t getTotalCounts(TH1*);
+	Bool_t hasBackground(TH1*);
+	Bool_t hasAtan(TH1*);
+	Double_t calcBackgroundFraction(TH1*);
+	std::pair<Double_t, Int_t> getChi2(TH1*, RooCurve*, Int_t);
+	std::pair<Double_t, Double_t> calcIntegral(TH1*, Double_t, Double_t);
+	Bool_t isTwoDetetor(TH1*);
         Double_t getPdfMaximumX (RooAbsPdf*, const RooArgList&);
 
 private:

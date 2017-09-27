@@ -40,6 +40,7 @@ namespace std {} using namespace std;
 // Header files passed as explicit arguments
 #include "AbstractModelProvider.h"
 #include "CompositeModelProvider.h"
+#include "ChannelConvolutionPdf.h"
 #include "Constants.h"
 #include "DampLorentzPdf.h"
 #include "FileUtils.h"
@@ -119,6 +120,7 @@ namespace {
     static const char* headers[] = {
 "AbstractModelProvider.h",
 "CompositeModelProvider.h",
+"ChannelConvolutionPdf.h",
 "Constants.h",
 "DampLorentzPdf.h",
 "FileUtils.h",
@@ -161,6 +163,7 @@ class __attribute__((annotate("$clingAutoload$SWCalculatorFrame.h")))  SWCalcula
 #define _BACKWARD_BACKWARD_WARNING_H
 #include "AbstractModelProvider.h"
 #include "CompositeModelProvider.h"
+#include "ChannelConvolutionPdf.h"
 #include "Constants.h"
 #include "DampLorentzPdf.h"
 #include "FileUtils.h"

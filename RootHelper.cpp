@@ -12,6 +12,8 @@
  */
 
 #include "RootHelper.h"
+#include <TUnixSystem.h>
+#include <iostream>
 
 RootHelper::RootHelper() {
 }
@@ -27,5 +29,14 @@ void RootHelper::deleteObject(const char* name){
     if (obj) {
         obj->Delete();
     }
+}
+
+Int_t RootHelper::getNumCpu(){
+    // Get number of CPUs
+    SysInfo_t sysInfo;
+    TSystem* tSystem = new TUnixSystem();
+    tSystem->GetSysInfo(&sysInfo);
+    std::cout << "NumCpu: " << sysInfo.fCpus << std::endl;
+    return (sysInfo.fCpus >= 0) ? sysInfo.fCpus : 1;
 }
 

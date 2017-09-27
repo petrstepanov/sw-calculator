@@ -16,13 +16,13 @@
 
 AbstractModelProvider::AbstractModelProvider(RooRealVar* E_0){
 	this->E_0 = E_0; //new RooRealVar("E_0", "Peak Center", 511, 507, 515, "KeV");
-	this->fwhm2sigma = new RooConstVar("fwhm2sigma", "Coefficient to convert FWHM to dispersion", 0.42466);
+	this->fwhm2sigma = new RooConstVar("fwhm2sigma", "Coefficient to convert FWHM to dispersion", 1/TMath::Sqrt(8*TMath::Log(2)));
 	this->pi = new RooConstVar("pi", "pi", TMath::Pi());
 	this->model = NULL;
 	this->convolutedModel = NULL;
 	this->components = new RooArgSet();
 	this->bgComponents = new RooArgSet();
-        this->convolutionPoints = 4000;
+        this->convolutionPoints = 10000;
 }
 
 RooAbsPdf* AbstractModelProvider::getModel(){

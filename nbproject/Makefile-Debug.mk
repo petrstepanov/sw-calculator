@@ -36,6 +36,7 @@ OBJECTDIR=${CND_BUILDDIR}/${CND_CONF}/${CND_PLATFORM}
 # Object Files
 OBJECTFILES= \
 	${OBJECTDIR}/AbstractModelProvider.o \
+	${OBJECTDIR}/ChannelConvolutionPdf.o \
 	${OBJECTDIR}/CompositeModelProvider.o \
 	${OBJECTDIR}/Constants.o \
 	${OBJECTDIR}/DampLorentzPdf.o \
@@ -86,6 +87,11 @@ ${OBJECTDIR}/AbstractModelProvider.o: AbstractModelProvider.cpp
 	${MKDIR} -p ${OBJECTDIR}
 	${RM} "$@.d"
 	$(COMPILE.cc) -g -I/Applications/root_v6.06.02/include -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/AbstractModelProvider.o AbstractModelProvider.cpp
+
+${OBJECTDIR}/ChannelConvolutionPdf.o: ChannelConvolutionPdf.cpp
+	${MKDIR} -p ${OBJECTDIR}
+	${RM} "$@.d"
+	$(COMPILE.cc) -g -I/Applications/root_v6.06.02/include -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/ChannelConvolutionPdf.o ChannelConvolutionPdf.cpp
 
 ${OBJECTDIR}/CompositeModelProvider.o: CompositeModelProvider.cpp
 	${MKDIR} -p ${OBJECTDIR}

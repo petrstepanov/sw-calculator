@@ -32,7 +32,7 @@ FileUtils* FileUtils::getInstance(){
 	return instance;
 }
 
-TH1I* FileUtils::importTH1(const char* fileName, int eColumn, int cColumn){
+TH1F* FileUtils::importTH1(const char* fileName, int eColumn, int cColumn){
 	std::ifstream ifs;
 	std::string str;
 
@@ -48,13 +48,13 @@ TH1I* FileUtils::importTH1(const char* fileName, int eColumn, int cColumn){
 		return NULL;
 	}
 
-	std::map<double, int> spectrum;
+	std::map<double, double> spectrum;
 	Int_t bins = 0;
 	Double_t energyMin, energyMax;
 	std::cout << "importTH1: energy column - " << eColumn << ", counts column - " << cColumn << std::endl;
 	while (getline(ifs, str)) {
 		Double_t energy;
-		Int_t count;
+		Double_t count;
 		Bool_t hasEnergy = false; // We write spectrum if read energy and count
 		Bool_t hasCount = false; // We write spectrum if read energy and count
 		std::stringstream ss(str);
@@ -112,23 +112,23 @@ TH1I* FileUtils::importTH1(const char* fileName, int eColumn, int cColumn){
 	Double_t binWidth = (energyMax - energyMin) / (bins - 1);
 
 	// Make Histogram
-	TH1I* hist = new TH1I("hist", "", bins, energyMin - binWidth / 2, energyMax + binWidth / 2);
+	TH1F* hist = new TH1F("hist", "", bins, energyMin - binWidth / 2, energyMax + binWidth / 2);
 	// TH1I (const char *name, const char *title, Int_t nbinsx, Double_t xlow, Double_t xup)
 	// bin = 0;       underflow bin
 	// bin = 1;       first bin with low-edge xlow INCLUDED
 	// bin = nbins;   last bin with upper-edge xup EXCLUDED
 	// bin = nbins+1; overflow bin
 	int i = 0;
-	std::map<double, int>::iterator it;
+	std::map<double, double>::iterator it;
 	for (it = spectrum.begin(); it != spectrum.end(); ++it){
-		Double_t count = it->second; // < 1 ? 1 : it->second;
+		Double_t count = it->second;
 //		Double_t error = sqrt(count);
 
 		// Count can't be zero for chi2Fit
-		if (count < 1) {
-			count = 0;
+//		if (count <= 0) {
+//			count = 0;
 //			error = 1;
-		}
+//		}
 
 		// Read spectrum data
 		hist->SetBinContent(++i, count);
@@ -138,7 +138,7 @@ TH1I* FileUtils::importTH1(const char* fileName, int eColumn, int cColumn){
 	return hist;
 }
 
-void FileUtils::saveData(TString* outFileName, TH1I* hist, RooCurve* bg, RooCurve* fit, TH1F* chi2, TH1F* peakHistNoBg){
+void FileUtils::saveData(TString* outFileName, TH1F* hist, RooCurve* bg, RooCurve* fit, TH1F* chi2, TH1F* peakHistNoBg){
 	std::ofstream outputFile;
 	outputFile.open(outFileName->Data());
 	outputFile.precision(prec);

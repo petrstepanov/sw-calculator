@@ -34,9 +34,11 @@ LorentzianPdf::LorentzianPdf(const LorentzianPdf& other, const char* name) :
 }
 
 Double_t LorentzianPdf::evaluate() const {
-    Double_t c = Constants::chbar/1E3; // because x is in keVs
+    Double_t k = a/(Constants::chbar/1E3); // because x is in keVs
     Double_t _x = x - mean;
-    return 1/pow(1+pow(a*_x/c,2),3);
+    return 1/pow(1+pow(k*_x,2),3);
+//    return 8*k/(3*TMath::Pi())/pow(1+pow(k*_x,2),3);
+//    return 1;
 }
 
 Int_t LorentzianPdf::getAnalyticalIntegral(RooArgSet& allVars, RooArgSet& analVars, const char* /*rangeName*/) const {
@@ -58,9 +60,10 @@ Double_t LorentzianPdf::analyticalIntegral(Int_t code, const char* rangeName) co
 
 Double_t LorentzianPdf::indefiniteIntegral(Double_t _x) const {
     Double_t k = a/(Constants::chbar/1E3); 
-    Double_t s1 = _x*(5+3*k*k*_x*_x)/pow(1+k*k*_x*_x,2);
+    Double_t s1 = _x*(5+3*pow(k*_x,2))/pow(1+k*k*_x*_x,2);
     Double_t s2 = 3*atan(k*_x)/k;
-    return (s1+s2)/8;
+    return (s1+s2)/8.;
+//    return _x;
 }
 
 std::list<Variable*> LorentzianPdf::getParameters(Bool_t isTwoDetector){

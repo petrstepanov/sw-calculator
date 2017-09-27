@@ -23,10 +23,12 @@
 #include <RooFitResult.h>
 #include <RooChi2Var.h>
 #include <RooMinuit.h>
+#include <RooMinimizer.h>
 #include <RooAddPdf.h>
 #include <TGFileDialog.h>
 #include <TGMsgBox.h>
 #include <TG3DLine.h>
+#include <TStopwatch.h>
 //#include <RQ_OBJECT.h>
 #include "GraphicsHelper.h"
 #include "AbstractModelProvider.h"
@@ -37,6 +39,7 @@
 #include "StringUtils.h"
 #include "FileUtils.h"
 #include "Variable.h"
+#include "RootHelper.h"
 
 using namespace RooFit;
 
@@ -498,7 +501,7 @@ void SWCalculatorFrame::importSpectrum(void){
 	// Cut spectrum (not necessary)
 	if (fullHist->GetXaxis()->GetXmin() < 511 - spectrumWidth / 2 && fullHist->GetXaxis()->GetXmax()> 511 + spectrumWidth / 2){
 		HistProcessor* histProcessor = HistProcessor::getInstance();
-		fullHist = histProcessor->cutHist(fullHist, 511 - spectrumWidth / 2, 511 + spectrumWidth / 2);
+		fullHist = (TH1F*) histProcessor->cutHist(fullHist, 511 - spectrumWidth / 2, 511 + spectrumWidth / 2);
 	}
 
 	if (fullHist){
@@ -555,7 +558,11 @@ void SWCalculatorFrame::setToolbarEnabled(Bool_t isEnabled){
 	numDisplayMax->SetState(isEnabled);
 }
 
-void SWCalculatorFrame::fitSpectrum(void){
+void SWCalculatorFrame::fitSpectrum(void){   
+    	// Start tracking time
+	TStopwatch watch;
+	watch.Start();
+        
 	Double_t eFitMin = numFitMin->GetNumber();
 	Double_t eFitMax = numFitMax->GetNumber();
 
@@ -567,16 +574,18 @@ void SWCalculatorFrame::fitSpectrum(void){
 	setToolbarEnabled(kTRUE);
 
 	HistProcessor* histProcessor = HistProcessor::getInstance();
-	peakHist = histProcessor->cutHist(fullHist, eFitMin, eFitMax);
+	peakHist = fullHist; // (TH1F*) histProcessor->cutHist(fullHist, eFitMin, eFitMax);
 
         Int_t totalFitCounts = histProcessor->getTotalCounts(peakHist);
         
 	RooRealVar* x = new RooRealVar("x", "Energy", peakHist->GetXaxis()->GetXmin(), peakHist->GetXaxis()->GetXmax(), "keV");
-	Double_t dE_0 = 2;
+        x->setRange("fitRange", eFitMin, eFitMax);
+//	x->setBins(peakHist->GetNbinsX());
+        Double_t dE_0 = 2;
 	RooRealVar* E_0 = new RooRealVar("E_0", "Peak Center", numPeakPosition->GetNumber(), numPeakPosition->GetNumber() - dE_0, numPeakPosition->GetNumber() + dE_0, "keV");
 
 	// Convert Histogram to RooDataHist for Fitting
-	RooDataHist* data = new RooDataHist("data", "Dataset with x", RooArgSet(*x), peakHist);
+	RooDataHist* data = new RooDataHist("data", "Dataset with x", RooArgSet(*x), Import(*peakHist));
 
 	Bool_t hasAtan = !(histProcessor->isTwoDetetor(peakHist));
 	std::cout << "hasAtan: " << hasAtan << std::endl;
@@ -601,25 +610,34 @@ void SWCalculatorFrame::fitSpectrum(void){
 	RooAbsPdf* model = modelProvider->getModel();
 	RooAbsPdf* convolutedModel = modelProvider->getConvolutedModel();
 
+//        data = static_cast<RooAddPdf*>(model)->generateBinned(*x,1000000) ;
+
+
+        
+        
 	// Fitting
 	// Default chi2FitTo used when we use non-standart errors.
-	// RooFitResult* fitResult = convolutedModel->chi2FitTo(*data, Save(), Extended());
+	// RooFitResult* fitResult = convolutedModel->chi2FitTo(*data, Save(kTRUE), Range("fitRange"), NumCPU(RootHelper::getNumCpu()));
 
 	// The RooFit chi2 fit does not work when the bins have zero entries. (Doppler-broadened spectra)
 	// You should either use a binned likelihood fit or use the standard chi2 fit provided by ROOT. In this case bins with zero entries are excluded from the fit
 
 	// Chi2 fit
-//	RooChi2Var* chi2 = new RooChi2Var("chi2", "chi2", *convolutedModel, *data);
+	RooChi2Var* chi2 = new RooChi2Var("chi2", "chi2", *convolutedModel, *data, Range("fitRange"), NumCPU(RootHelper::getNumCpu()));
 //	RooMinuit* m = new RooMinuit(*chi2);
-//	m->migrad();
-//	m->hesse();
-//	// m->optimizeConst(1);
-//	RooFitResult* fitResult = m->save();
-
-//        data = static_cast<RooAddPdf*>(model)->generateBinned(*x,10000) ;
+        RooMinimizer* m = new RooMinimizer(*chi2);
+        m->setStrategy(RooMinimizer::Speed);
+        m->setMinimizerType("Minuit");
+                
+	Int_t resultMigrad = m->migrad();
+	Int_t resultHesse = m->hesse();
         
+        std::cout << "minimizer: migrad=" << resultMigrad << " hesse=" << resultHesse << std::endl;
+	// m->optimizeConst(1);
+	RooFitResult* fitResult = m->save();
+       
         // Simple Fit
-        RooFitResult* fitResult = convolutedModel->fitTo(*data, Save(kTRUE));
+//        RooFitResult* fitResult = convolutedModel->fitTo(*data, Save(kTRUE), Range("fitRange"), NumCPU(RootHelper::getNumCpu()));
         
 	GraphicsHelper* graphicsHelper = GraphicsHelper::getInstance();
         Double_t convolutedModelMaxX = histProcessor->getPdfMaximumX(convolutedModel, RooArgList(*x));
@@ -668,12 +686,13 @@ void SWCalculatorFrame::fitSpectrum(void){
 	std::cout << "W2 integration region (" << convolutedModelMaxX + wOffset << "; " << convolutedModelMaxX + wOffset + dw << ")" << std::endl;
 	TBox* w2Box = new TBox(convolutedModelMaxX + wOffset, yAxisMin, convolutedModelMaxX + wOffset + dw, yAxisMax*0.96);
 	w2Box->SetLineWidth(0);
-	w1Box->SetFillColorAlpha(19, 0.6);
+	w2Box->SetFillColorAlpha(19, 0.6);
 	// w2Box->SetFillStyle(3002);
 	fitFrame->addObject(w2Box);
 
 	// Plot Data First (in white color - invisible). Otherwise roofit cant normalize model correctly
-	data->plotOn(fitFrame, Invisible()); //MarkerSize(0.5),
+//	data->plotOn(fitFrame, Invisible()); //MarkerSize(0.5),
+	data->plotOn(fitFrame, LineColor(kGray + 3), XErrorSize(0), MarkerSize(0.5), MarkerColor(kGray + 3), DataError(RooAbsData::SumW2)); // LineStyle(kSolid), LineWidth(2)
 
 	// Plot Convoluted Model
         // https://root-forum.cern.ch/t/roofit-normailzations/7040/2
@@ -681,7 +700,7 @@ void SWCalculatorFrame::fitSpectrum(void){
 	convolutedModel->plotOn(fitFrame, LineColor(kOrange + 6), LineWidth(2), Name("fit"));
 
 	// Plot Convoluted Model background (its added after convolution graph because otherwise it changes backgroud)
-	convolutedModel->plotOn(fitFrame, Components(*(modelProvider->getBgComponents())), LineStyle(kDashed), LineColor(kViolet + 6), LineWidth(1), Name("bg"));
+	// convolutedModel->plotOn(fitFrame, Components(*(modelProvider->getBgComponents())), LineStyle(kDashed), LineColor(kViolet + 6), LineWidth(1), Name("bg"));
 
 	// Plot Non-convoluted model
 	model->plotOn(fitFrame, LineColor(kOrange + 6), LineWidth(1), LineStyle(kDashed));
@@ -716,16 +735,16 @@ void SWCalculatorFrame::fitSpectrum(void){
 	curveFitNoBg->SetLineWidth(2);
 	fitFrame->addPlotable(curveFitNoBg, "L");
 	fitFrame->drawBefore("fit", "FitNoBg");
-	peakHistNoBg = histProcessor->subtractCurve(peakHist, curveBg);
+	peakHistNoBg = (TH1F*) histProcessor->subtractCurve(peakHist, curveBg);
 
 	//RooDataHist* dataNoBg = new RooDataHist("dataNoBg", "Dataset with x", RooArgSet(*x), peakHistNoBg);
-	data->plotOn(fitFrame, LineColor(kGray + 3), XErrorSize(0), MarkerSize(0.5), MarkerColor(kGray + 3), DataError(RooAbsData::SumW2)); // LineStyle(kSolid), LineWidth(2)
+//	data->plotOn(fitFrame, LineColor(kGray + 3), XErrorSize(0), MarkerSize(0.5), MarkerColor(kGray + 3), DataError(RooAbsData::SumW2)); // LineStyle(kSolid), LineWidth(2)
 
 	// Print Plot names
 	fitFrame->Print("v");
 
 	// Plot Bottom Frame with Fit Goodness
-	chiHist = histProcessor->getChi2Hist(peakHist, curveFit);
+	chiHist = (TH1F*) histProcessor->getChi2Hist(peakHist, curveFit);
 	RooDataHist* chi2DataHist = new RooDataHist("chi2DataHist", "Chi2", RooArgSet(*x), chiHist);
 
 	// Set Y Axis range after all (otherwise throws error?)
@@ -836,6 +855,9 @@ void SWCalculatorFrame::fitSpectrum(void){
 
 	btnSaveData->SetEnabled(true);
 	btnSaveImage->SetEnabled(true);
+        
+        watch.Stop();
+	watch.Print();
 }
 
 void SWCalculatorFrame::printParabolaInfo(RooRealVar* parabolaRoot, Bool_t isTwoDetector){

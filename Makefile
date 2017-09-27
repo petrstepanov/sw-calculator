@@ -84,8 +84,8 @@ MYLDFLAGS=-m64
 MYGLIBS=-L/Applications/root_v6.06.02/lib -lGui -lCore -lRIO -lNet -lHist -lGraf -lGraf3d -lGpad -lTree -lRint -lPostscript -lMatrix -lPhysics -lMathCore -lThread -lMultiProc -lpthread -stdlib=libc++ -lm -ldl
 MYLIBS=-L/Applications/root_v6.06.02/lib -lGui -lCore -lRIO -lNet -lHist -lGraf -lGraf3d -lGpad -lTree -lRint -lPostscript -lMatrix -lPhysics -lMathCore -lThread -lMultiProc -lpthread -stdlib=libc++ -lm -ldl -lRooFit -lRooFitCore -lHtml -lMinuit -lFumili
 MYROOTSYS=/Applications/root_v6.06.02
-MYHEADERS=AbstractModelProvider.h CompositeModelProvider.h Constants.h DampLorentzPdf.h FileUtils.h GaussianPdf.h GraphicsHelper.h HistProcessor.h IndirectParamPdf.h LorentzianPdf.h OrthogonalPdf.h ParabolaGaussModelProvider.h ParabolaLorentzianModelProvider.h RootHelper.h SWCalculatorFrame.h ParabolaPdf.h StringUtils.h Variable.h
-MYSOURCES=AbstractModelProvider.cpp CompositeModelProvider.cpp Constants.cpp DampLorentzPdf.cpp FileUtils.cpp GaussianPdf.cpp GraphicsHelper.cpp HistProcessor.cpp IndirectParamPdf.cpp LorentzianPdf.cpp OrthogonalPdf.cpp ParabolaGaussModelProvider.cpp ParabolaLorentzianModelProvider.cpp RootHelper.cpp SWCalculatorFrame.cpp ParabolaPdf.cpp StringUtils.cpp Variable.cpp main.cc
+MYHEADERS=AbstractModelProvider.h CompositeModelProvider.h ChannelConvolutionPdf.h Constants.h DampLorentzPdf.h FileUtils.h GaussianPdf.h GraphicsHelper.h HistProcessor.h IndirectParamPdf.h LorentzianPdf.h OrthogonalPdf.h ParabolaGaussModelProvider.h ParabolaLorentzianModelProvider.h RootHelper.h SWCalculatorFrame.h ParabolaPdf.h StringUtils.h Variable.h
+MYSOURCES=AbstractModelProvider.cpp CompositeModelProvider.cpp ChannelConvolutionPdf.cpp Constants.cpp DampLorentzPdf.cpp FileUtils.cpp GaussianPdf.cpp GraphicsHelper.cpp HistProcessor.cpp IndirectParamPdf.cpp LorentzianPdf.cpp OrthogonalPdf.cpp ParabolaGaussModelProvider.cpp ParabolaLorentzianModelProvider.cpp RootHelper.cpp SWCalculatorFrame.cpp ParabolaPdf.cpp StringUtils.cpp Variable.cpp main.cc
 
 # build
 build: .build-post

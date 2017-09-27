@@ -44,6 +44,7 @@ Contributor(s):
                    displayName="Header Files"
                    projectFiles="true">
       <itemPath>AbstractModelProvider.h</itemPath>
+      <itemPath>ChannelConvolutionPdf.h</itemPath>
       <itemPath>CompositeModelProvider.h</itemPath>
       <itemPath>Constants.h</itemPath>
       <itemPath>DampLorentzPdf.h</itemPath>
@@ -71,6 +72,7 @@ Contributor(s):
                    displayName="Source Files"
                    projectFiles="true">
       <itemPath>AbstractModelProvider.cpp</itemPath>
+      <itemPath>ChannelConvolutionPdf.cpp</itemPath>
       <itemPath>CompositeModelProvider.cpp</itemPath>
       <itemPath>Constants.cpp</itemPath>
       <itemPath>DampLorentzPdf.cpp</itemPath>
@@ -189,11 +191,21 @@ Contributor(s):
                             perm="755"
                             owner="root"
                             group="bin"/>
+          <packFileListElem type="File"
+                            to="${PACKAGE_TOP_DIR}bin/${OUTPUT_BASENAME}"
+                            from="${OUTPUT_PATH}"
+                            perm="755"
+                            owner="root"
+                            group="bin"/>
         </packFileList>
       </packaging>
       <item path="AbstractModelProvider.cpp" ex="false" tool="1" flavor2="0">
       </item>
       <item path="AbstractModelProvider.h" ex="false" tool="3" flavor2="0">
+      </item>
+      <item path="ChannelConvolutionPdf.cpp" ex="false" tool="1" flavor2="0">
+      </item>
+      <item path="ChannelConvolutionPdf.h" ex="false" tool="3" flavor2="0">
       </item>
       <item path="CompositeModelProvider.cpp" ex="false" tool="1" flavor2="0">
       </item>
@@ -317,6 +329,10 @@ Contributor(s):
       <item path="AbstractModelProvider.cpp" ex="false" tool="1" flavor2="0">
       </item>
       <item path="AbstractModelProvider.h" ex="false" tool="3" flavor2="0">
+      </item>
+      <item path="ChannelConvolutionPdf.cpp" ex="false" tool="1" flavor2="0">
+      </item>
+      <item path="ChannelConvolutionPdf.h" ex="false" tool="3" flavor2="0">
       </item>
       <item path="CompositeModelProvider.cpp" ex="false" tool="1" flavor2="0">
       </item>
