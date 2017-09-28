@@ -48,7 +48,6 @@ TH1* HistProcessor::cutHist(TH1* fullHist, Int_t xMin, Int_t xMax){
 		subHist->SetBinContent(j - minBin + 1, fullHist->GetBinContent(j));
 		subHist->SetBinError(j - minBin + 1, fullHist->GetBinError(j));
 	}
-
 	return subHist;
 }
 

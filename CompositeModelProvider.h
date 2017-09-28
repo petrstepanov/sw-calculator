@@ -23,23 +23,32 @@ public:
     CompositeModelProvider();
     CompositeModelProvider(const CompositeModelProvider& orig);
     
-    CompositeModelProvider(RooRealVar* x, RooRealVar* x0, Bool_t hasParabola = kTRUE, const Int_t numGauss = 1, const Int_t numLorentz = 1, const Int_t numLorentzSum = 1, Bool_t hasOrthogonal = kFALSE, Bool_t hasAtan = kFALSE, Double_t constBgFraction = 0, Bool_t isTwoDetector = kTRUE);
+    CompositeModelProvider(RooRealVar* x, RooRealVar* x0, Bool_t hasParabola = kTRUE, const Int_t numGauss = 1, const Int_t numLorentz = 1, const Int_t numLorentzSum = 1, Bool_t hasOrthogonal = kFALSE, Int_t convType = 0, Double_t convFWHM = 1.7, Bool_t isConvFixed = kFALSE, Bool_t hasAtan = kFALSE, Double_t constBgFraction = 0, Bool_t isTwoDetector = kTRUE);
 //    virtual ~CompositeModelProvider();
 
     std::list<Variable*> getIndirectParameters();
     std::list<std::pair<const char*, Double_t>> getIntensities();
+    
+    static std::map<Int_t, TString> getConvolutionTypes(void);
     
 private:
     RooArgList* pdfList;
     RooArgList* coeffList;
     Bool_t isTwoDetector;
     RooRealVar* observable;
+
+    static std::map<Int_t, TString> createConvolutionType(){
+        std::map<Int_t, TString> m = {{1, TString("None")}, {2, TString("FFT3")}, {3, TString("Numeric")}, {4, TString("Custom")}};
+        return m;
+    }; 
+    static std::map<Int_t, TString> convolutionType;
     
     Double_t* getDefaultGaussAs(Int_t numGauss);
     Double_t* getDefaultLorentzAs(Int_t numGauss);
     Double_t* getDefaultDampLorentzAs(Int_t numGauss);
 
     void deleteObject();
+    
 };
 
 #endif /* COMPOSITEMODELPROVIDER_H */

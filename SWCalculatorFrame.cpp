@@ -183,8 +183,7 @@ SWCalculatorFrame::SWCalculatorFrame(const TGWindow* p, UInt_t w, UInt_t h){
 	tabFit->AddFrame(frameFitRange, new TGLayoutHints(kLHintsExpandX, dx, dx, dx, dy));
 
 	// Separator
-	TGHorizontal3DLine* l1 = new TGHorizontal3DLine(tabFit);
-	tabFit->AddFrame(l1, new TGLayoutHints(kLHintsExpandX, dx, dx, dy, dy));
+	tabFit->AddFrame(new TGHorizontal3DLine(tabFit), new TGLayoutHints(kLHintsExpandX, dx, dx, dy, dy));
 
 	// Integration Parameters
 	TGHorizontalFrame *frameSWidth = new TGHorizontalFrame(tabFit);
@@ -227,9 +226,34 @@ SWCalculatorFrame::SWCalculatorFrame(const TGWindow* p, UInt_t w, UInt_t h){
 	tabFit->AddFrame(frameWShift, new TGLayoutHints(kLHintsExpandX, dx, dx, dy, dy));
 
 	// Separator
-	TGHorizontal3DLine* l2 = new TGHorizontal3DLine(tabFit);
-	tabFit->AddFrame(l2, new TGLayoutHints(kLHintsExpandX, dx, dx, dy, dy));
+	tabFit->AddFrame(new TGHorizontal3DLine(tabFit), new TGLayoutHints(kLHintsExpandX, dx, dx, dy, dy));
 
+        // Resolution Function Parameters
+	TGHorizontalFrame* convolutionParamsFrame = new TGHorizontalFrame(tabFit);
+	comboConvolutionType = new TGComboBox(convolutionParamsFrame, 0);
+        std::map<Int_t, TString> convTypes = CompositeModelProvider::getConvolutionTypes();
+        for (std::map<Int_t, TString>::iterator it=convTypes.begin(); it!=convTypes.end(); ++it){
+            comboConvolutionType->AddEntry((it->second).Data(), it->first);
+        }
+	comboConvolutionType->Select(2);
+	comboConvolutionType->Resize(75, 20);        
+        checkboxResFixed = new TGCheckButton(convolutionParamsFrame, "fixed");
+        numResolutionFWHM = new TGNumberEntry(convolutionParamsFrame, 1.7, 3, -1, TGNumberFormat::kNESRealOne,
+		TGNumberFormat::kNEANonNegative,
+		TGNumberFormat::kNELLimitMinMax,
+		0.5, 4.0);
+	convolutionParamsFrame->AddFrame(new TGLabel(convolutionParamsFrame, "Convolution"), 
+                                         new TGLayoutHints(kLHintsLeft | kLHintsTop, 0, dx, 4, 0));
+	convolutionParamsFrame->AddFrame(comboConvolutionType, new TGLayoutHints(kLHintsLeft | kLHintsTop, 0, 0, 1, 0));
+        convolutionParamsFrame->AddFrame(checkboxResFixed, new TGLayoutHints(kLHintsRight | kLHintsTop, 0, 0, 3, 0));
+        convolutionParamsFrame->AddFrame(numResolutionFWHM, new TGLayoutHints(kLHintsRight | kLHintsTop, 0, dx, 1, 0));
+	convolutionParamsFrame->AddFrame(new TGLabel(convolutionParamsFrame, "Resolution FWHM, keV"), 
+                                         new TGLayoutHints(kLHintsRight | kLHintsTop, 0, dx, 4, 0));
+	tabFit->AddFrame(convolutionParamsFrame, new TGLayoutHints(kLHintsExpandX, dx, dx, dy, dy));
+
+	// Separator
+	tabFit->AddFrame(new TGHorizontal3DLine(tabFit), new TGLayoutHints(kLHintsExpandX, dx, dx, dy, dy));
+        
 	// Model parameters
 	TGHorizontalFrame* modelParamsFrame = new TGHorizontalFrame(tabFit);
 //	modelParamsFrame->AddFrame(new TGLabel(modelParamsFrame, "Model details:"), new TGLayoutHints(kLHintsNormal, 0, 30, 5, 0));
@@ -574,12 +598,13 @@ void SWCalculatorFrame::fitSpectrum(void){
 	setToolbarEnabled(kTRUE);
 
 	HistProcessor* histProcessor = HistProcessor::getInstance();
-	peakHist = fullHist; // (TH1F*) histProcessor->cutHist(fullHist, eFitMin, eFitMax);
+//	peakHist = fullHist;
+        peakHist = (TH1F*) histProcessor->cutHist(fullHist, eFitMin, eFitMax);
 
         Int_t totalFitCounts = histProcessor->getTotalCounts(peakHist);
         
 	RooRealVar* x = new RooRealVar("x", "Energy", peakHist->GetXaxis()->GetXmin(), peakHist->GetXaxis()->GetXmax(), "keV");
-        x->setRange("fitRange", eFitMin, eFitMax);
+//      x->setRange("fitRange", eFitMin, eFitMax);
 //	x->setBins(peakHist->GetNbinsX());
         Double_t dE_0 = 2;
 	RooRealVar* E_0 = new RooRealVar("E_0", "Peak Center", numPeakPosition->GetNumber(), numPeakPosition->GetNumber() - dE_0, numPeakPosition->GetNumber() + dE_0, "keV");
@@ -605,16 +630,13 @@ void SWCalculatorFrame::fitSpectrum(void){
 	//AbstractModelProvider* modelProvider = new GaussModelProvider(x, E_0, hasAtan, bgFraction);
         Bool_t isTwoDetector = histProcessor->isTwoDetetor(fullHist);
 	CompositeModelProvider* modelProvider;
-        modelProvider = new CompositeModelProvider(x, E_0, hasParabola->IsOn(), (Int_t)numGauss->GetNumber(), (Int_t)numLorentz->GetNumber(), (Int_t)numLorentzComplex->GetNumber(), kFALSE /*hasOrtho->IsOn()*/, hasAtan, bgFraction, isTwoDetector);
+        modelProvider = new CompositeModelProvider(x, E_0, hasParabola->IsOn(), (Int_t)numGauss->GetNumber(), (Int_t)numLorentz->GetNumber(), (Int_t)numLorentzComplex->GetNumber(), kFALSE /*hasOrtho->IsOn()*/, comboConvolutionType->GetSelected() - 1, numResolutionFWHM->GetNumber(), checkboxResFixed->IsOn(), hasAtan, bgFraction, isTwoDetector);
             
 	RooAbsPdf* model = modelProvider->getModel();
 	RooAbsPdf* convolutedModel = modelProvider->getConvolutedModel();
 
-//        data = static_cast<RooAddPdf*>(model)->generateBinned(*x,1000000) ;
+//      data = static_cast<RooAddPdf*>(model)->generateBinned(*x,1000000) ;
 
-
-        
-        
 	// Fitting
 	// Default chi2FitTo used when we use non-standart errors.
 	// RooFitResult* fitResult = convolutedModel->chi2FitTo(*data, Save(kTRUE), Range("fitRange"), NumCPU(RootHelper::getNumCpu()));
@@ -623,21 +645,19 @@ void SWCalculatorFrame::fitSpectrum(void){
 	// You should either use a binned likelihood fit or use the standard chi2 fit provided by ROOT. In this case bins with zero entries are excluded from the fit
 
 	// Chi2 fit
-	RooChi2Var* chi2 = new RooChi2Var("chi2", "chi2", *convolutedModel, *data, Range("fitRange"), NumCPU(RootHelper::getNumCpu()));
-//	RooMinuit* m = new RooMinuit(*chi2);
+	RooChi2Var* chi2 = new RooChi2Var("chi2", "chi2", *convolutedModel, *data, NumCPU(RootHelper::getNumCpu())); // Range("fitRange")
         RooMinimizer* m = new RooMinimizer(*chi2);
-        m->setStrategy(RooMinimizer::Speed);
+//        m->setStrategy(RooMinimizer::Speed);
         m->setMinimizerType("Minuit");
                 
 	Int_t resultMigrad = m->migrad();
-	Int_t resultHesse = m->hesse();
-        
+	Int_t resultHesse = m->hesse();        
         std::cout << "minimizer: migrad=" << resultMigrad << " hesse=" << resultHesse << std::endl;
-	// m->optimizeConst(1);
+
 	RooFitResult* fitResult = m->save();
        
         // Simple Fit
-//        RooFitResult* fitResult = convolutedModel->fitTo(*data, Save(kTRUE), Range("fitRange"), NumCPU(RootHelper::getNumCpu()));
+//      RooFitResult* fitResult = convolutedModel->fitTo(*data, Save(kTRUE), Range("fitRange"), NumCPU(RootHelper::getNumCpu()));
         
 	GraphicsHelper* graphicsHelper = GraphicsHelper::getInstance();
         Double_t convolutedModelMaxX = histProcessor->getPdfMaximumX(convolutedModel, RooArgList(*x));

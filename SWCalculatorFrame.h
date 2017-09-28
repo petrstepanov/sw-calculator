@@ -65,6 +65,10 @@ private:
 	Bool_t isSingleDetector;
 	TGTextEdit* txtFitResult;
 
+        TGComboBox* comboConvolutionType;
+        TGNumberEntry* numResolutionFWHM;
+        TGCheckButton* checkboxResFixed;
+                
 	TH1F* fullHist;
 	TH1F* peakHist;
 	RooCurve* curveBg;
