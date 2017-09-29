@@ -26,6 +26,7 @@
 #include <RooFFTConvPdf.h>
 #include <RooNumConvPdf.h>
 #include <RooGenericPdf.h>
+#include <RooCachedPdf.h>
 #include <TIterator.h>
 #include <TMath.h>
 
@@ -153,6 +154,7 @@ CompositeModelProvider::CompositeModelProvider(RooRealVar* x, RooRealVar* x0, Bo
 	// Convolution
         RootHelper::deleteObject("sumModelConvoluted");
         RooAbsPdf* sumModelConvoluted = nullptr;
+        RooAbsPdf* sumModelConvolutedTemp = nullptr;
 
         // FFT Convolution
         switch(convType){
@@ -172,10 +174,20 @@ CompositeModelProvider::CompositeModelProvider(RooRealVar* x, RooRealVar* x0, Bo
                 this->convolutedModel = sumModelConvoluted;
                 break;
             case 3:         // Custom
+//                sumModelConvolutedTemp = new ChannelConvolutionPdf("sumModelConvolutedTemp", "Convoluted Model", *x, *sumModel, *resolutionFunction);
+//                ((ChannelConvolutionPdf*) sumModelConvolutedTemp)->setConvolutionWindow(*zero,*resFunctFWHM,2);
+////                ((ChannelConvolutionPdf*) sumModelConvoluted)->setConvolutionBins(40);
+////                RooArgSet* parameterSet = sumModelConvolutedTemp->getParameters(RooArgSet(*x));
+////                std::cout << "----- params -----" << std::endl;
+////                parameterSet->Print();
+//                sumModelConvoluted = new RooCachedPdf("sumModelConvoluted", "Convoluted Cached Model", *sumModelConvolutedTemp, *x);
+//                ((RooAbsCachedPdf*)sumModelConvoluted)->setInterpolationOrder(2);
+//                this->convolutedModel = sumModelConvoluted;
+
                 sumModelConvoluted = new ChannelConvolutionPdf("sumModelConvoluted", "Convoluted Model", *x, *sumModel, *resolutionFunction);
                 ((ChannelConvolutionPdf*) sumModelConvoluted)->setConvolutionWindow(*zero,*resFunctFWHM,2);
-                ((ChannelConvolutionPdf*) sumModelConvoluted)->setConvolutionBins(40);                
                 this->convolutedModel = sumModelConvoluted;
+
                 break;
         }
 

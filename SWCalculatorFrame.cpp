@@ -235,9 +235,10 @@ SWCalculatorFrame::SWCalculatorFrame(const TGWindow* p, UInt_t w, UInt_t h){
         for (std::map<Int_t, TString>::iterator it=convTypes.begin(); it!=convTypes.end(); ++it){
             comboConvolutionType->AddEntry((it->second).Data(), it->first);
         }
-	comboConvolutionType->Select(2);
+	comboConvolutionType->Select(4);
 	comboConvolutionType->Resize(75, 20);        
         checkboxResFixed = new TGCheckButton(convolutionParamsFrame, "fixed");
+        checkboxResFixed->SetOn();              
         numResolutionFWHM = new TGNumberEntry(convolutionParamsFrame, 1.7, 3, -1, TGNumberFormat::kNESRealOne,
 		TGNumberFormat::kNEANonNegative,
 		TGNumberFormat::kNELLimitMinMax,
@@ -263,26 +264,26 @@ SWCalculatorFrame::SWCalculatorFrame(const TGWindow* p, UInt_t w, UInt_t h){
 	numGauss = new TGNumberEntry(modelParamsFrame, 1, 1, -1, TGNumberFormat::kNESInteger,
 		TGNumberFormat::kNEANonNegative,
 		TGNumberFormat::kNELLimitMinMax,
-		0, 4);
+		0, 5);
 	modelParamsFrame->AddFrame(numGauss, new TGLayoutHints(kLHintsNormal, 0, 5, 2, 0));        
 	modelParamsFrame->AddFrame(new TGLabel(modelParamsFrame, "Gauss"), new TGLayoutHints(kLHintsNormal, 0, 30, 5, 0));
 
 	numLorentz = new TGNumberEntry(modelParamsFrame, 1, 1, -1, TGNumberFormat::kNESInteger,
 		TGNumberFormat::kNEANonNegative,
 		TGNumberFormat::kNELLimitMinMax,
-		0, 4);
+		0, 55);
 	modelParamsFrame->AddFrame(numLorentz, new TGLayoutHints(kLHintsNormal, 0, 5, 2, 0));
-	modelParamsFrame->AddFrame(new TGLabel(modelParamsFrame, "Lorentz"), new TGLayoutHints(kLHintsNormal, 0, 30, 5, 0));
+	modelParamsFrame->AddFrame(new TGLabel(modelParamsFrame, "Exp"), new TGLayoutHints(kLHintsNormal, 0, 30, 5, 0));
 
 	numLorentzComplex = new TGNumberEntry(modelParamsFrame, 1, 1, -1, TGNumberFormat::kNESInteger,
 		TGNumberFormat::kNEANonNegative,
 		TGNumberFormat::kNELLimitMinMax,
-		0, 4);
+		0, 5);
 	modelParamsFrame->AddFrame(numLorentzComplex, new TGLayoutHints(kLHintsNormal, 0, 5, 2, 0));
-	modelParamsFrame->AddFrame(new TGLabel(modelParamsFrame, "Lorentz Sum"), new TGLayoutHints(kLHintsNormal, 0, 30, 5, 0));
+	modelParamsFrame->AddFrame(new TGLabel(modelParamsFrame, "Damping Exp"), new TGLayoutHints(kLHintsNormal, 0, 30, 5, 0));
 
 //	hasOrtho = new TGCheckButton(modelParamsFrame, "Ortho Exps", -1);
-//	modelParamsFrame->AddFrame(hasOrtho, new TGLayoutHints(kLHintsNormal, 0, 20, 4, 0));        
+//	modelParamsFrme->AddFrame(hasOrtho, new TGLayoutHints(kLHintsNormal, 0, 20, 4, 0));        
 
 	// Draw Option
 //	fitFunctionType = new TGComboBox(modelParamsFrame, 0);
@@ -605,7 +606,8 @@ void SWCalculatorFrame::fitSpectrum(void){
         
 	RooRealVar* x = new RooRealVar("x", "Energy", peakHist->GetXaxis()->GetXmin(), peakHist->GetXaxis()->GetXmax(), "keV");
 //      x->setRange("fitRange", eFitMin, eFitMax);
-//	x->setBins(peakHist->GetNbinsX());
+	x->setBins(peakHist->GetNbinsX());
+        x->setBins(peakHist->GetNbinsX(), "cache");        
         Double_t dE_0 = 2;
 	RooRealVar* E_0 = new RooRealVar("E_0", "Peak Center", numPeakPosition->GetNumber(), numPeakPosition->GetNumber() - dE_0, numPeakPosition->GetNumber() + dE_0, "keV");
 

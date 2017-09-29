@@ -74,36 +74,59 @@ ChannelConvolutionPdf::ChannelConvolutionPdf(const ChannelConvolutionPdf&  other
 ChannelConvolutionPdf::~ChannelConvolutionPdf() {
 }
 
-void ChannelConvolutionPdf::setConvolutionBins(Int_t bins) {
-    _bins = bins;
-}
+//void ChannelConvolutionPdf::setConvolutionBins(Int_t bins) {
+//    _bins = bins;
+//}
 
 Double_t ChannelConvolutionPdf::evaluate() const {
     if (!_init) initialize() ;
 
     Double_t x = _origVar ;
-    Double_t min, max;
+//    Double_t min, max;
 
+//    if (_useWindow) {
+//        Double_t center = ((RooAbsReal*)_windowParam.at(0))->getVal() ;
+//        Double_t width = _windowScale * ((RooAbsReal*)_windowParam.at(1))->getVal() ;
+//        min = x-center-width;
+//        max = x-center+width;
+//    } else {
+//        Double_t bufferFraction = 0.2;
+//        min = (_cloneVar->getMin()) - bufferFraction*(_cloneVar->getMax()-_cloneVar->getMin());
+//        max = (_cloneVar->getMax()) + bufferFraction*(_cloneVar->getMax()-_cloneVar->getMin());
+//    }
+//
+//    Double_t step = (max-min)/_bins;    
+//    Double_t sum = 0;
+//    for (Double_t t = min; t <= max; t+=step){
+//        _cloneVar->setVal(t);
+//        Double_t pdfVal = _clonePdf->getVal(RooArgSet(*_cloneVar));
+//        _cloneVar->setVal(x-t);
+//        Double_t modelVal = _cloneModel->getVal(RooArgSet(*_cloneVar));
+//        sum += pdfVal*modelVal;
+//    }
+
+    Double_t minBin, maxBin;
+    const RooAbsBinning* xBinning = var().getBinningPtr("cache");
     if (_useWindow) {
         Double_t center = ((RooAbsReal*)_windowParam.at(0))->getVal() ;
         Double_t width = _windowScale * ((RooAbsReal*)_windowParam.at(1))->getVal() ;
-        min = x-center-width;
-        max = x-center+width;
+        minBin = xBinning->binNumber(x-center-width);
+        maxBin = xBinning->binNumber(x-center+width);
     } else {
-        Double_t bufferFraction = 0.2;
-        min = (_cloneVar->getMin()) - bufferFraction*(_cloneVar->getMax()-_cloneVar->getMin());
-        max = (_cloneVar->getMax()) + bufferFraction*(_cloneVar->getMax()-_cloneVar->getMin());
+        minBin = 0;
+        maxBin = xBinning->numBins();
     }
-
-    Double_t step = (max-min)/_bins;    
+   
     Double_t sum = 0;
-    for (Double_t t = min; t <= max; t+=step){
+    for (Double_t bin = minBin; bin < maxBin; bin++){
+        Double_t t = xBinning->binCenter(bin);
         _cloneVar->setVal(t);
         Double_t pdfVal = _clonePdf->getVal(RooArgSet(*_cloneVar));
         _cloneVar->setVal(x-t);
         Double_t modelVal = _cloneModel->getVal(RooArgSet(*_cloneVar));
         sum += pdfVal*modelVal;
     }
+    
     return sum;
 }
 
@@ -131,7 +154,8 @@ void ChannelConvolutionPdf::initialize() const {
     _cloneVar = new RooRealVar(Form("%s_prime",_origVar.arg().GetName()),"Convolution Variable",0) ;
     _cloneVar->setMin(var().getMin());
     _cloneVar->setMax(var().getMax());
-
+//    _cloneVar->setBins(var().getBins());
+    
     RooCustomizer mgr1(pdf(),"NumConv_PdfClone") ;
     mgr1.setCloneBranchSet(_ownedClonedPdfSet) ;
     mgr1.replaceArg(var(),*_cloneVar) ;

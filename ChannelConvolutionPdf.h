@@ -37,7 +37,7 @@ public:
 
     void clearConvolutionWindow() ;
     void setConvolutionWindow(RooAbsReal& centerParam, RooAbsReal& widthParam, Double_t widthScaleFactor=1) ;    
-    void setConvolutionBins(Int_t) ;
+//    void setConvolutionBins(Int_t) ;
     
 protected:
 
