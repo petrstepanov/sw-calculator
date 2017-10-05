@@ -144,7 +144,7 @@ CompositeModelProvider::CompositeModelProvider(RooRealVar* x, RooRealVar* x0, Bo
         RootHelper::deleteObject("resFunctFWHM");       
 	RooRealVar* resFunctFWHM = isConvFixed ? 
             new RooRealVar("resFunctFWHM", "Resolution function FWHM", convFWHM, "keV") :
-            new RooRealVar("resFunctFWHM", "Resolution function FWHM", convFWHM, convFWHM/2, convFWHM * 2, "keV");
+            new RooRealVar("resFunctFWHM", "Resolution function FWHM", convFWHM, convFWHM/4, convFWHM * 4, "keV");
         RootHelper::deleteObject("resFunctSigma");
 	RooFormulaVar* resFunctSigma = new RooFormulaVar("resFunctSigma", "@0*@1", RooArgList(*resFunctFWHM, *fwhm2sigma));
         RootHelper::deleteObject("resFunct");
