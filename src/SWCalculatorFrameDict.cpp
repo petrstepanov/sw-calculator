@@ -38,30 +38,30 @@
 namespace std {} using namespace std;
 
 // Header files passed as explicit arguments
-#include "src/model/Constants.h"
-#include "src/model/Model.h"
-#include "src/roofit/AbstractModelProvider.h"
-#include "src/roofit/ChannelConvolutionPdf.h"
-#include "src/roofit/CompositeModelProvider.h"
-#include "src/roofit/DampLorentzPdf.h"
-#include "src/roofit/GaussianPdf.h"
-#include "src/roofit/IndirectParamPdf.h"
-#include "src/roofit/LorentzianPdf.h"
-#include "src/roofit/OrthogonalPdf.h"
-#include "src/roofit/ParabolaGaussModelProvider.h"
-#include "src/roofit/ParabolaLorentzianModelProvider.h"
-#include "src/roofit/ParabolaPdf.h"
-#include "src/util/FileUtils.h"
-#include "src/util/GraphicsHelper.h"
-#include "src/util/HistProcessor.h"
-#include "src/util/RootHelper.h"
-#include "src/util/StringUtils.h"
-#include "src/util/Variable.h"
-#include "src/widgets/importSpectrumWidget/IImportSpectrumView.h"
-#include "src/widgets/importSpectrumWidget/ImportSpectrumPresenter.h"
-#include "src/widgets/importSpectrumWidget/ImportSpectrumView.h"
-#include "src/widgets/swCalculatorWidget/SWCalculatorFrame.h"
-#include "src/main.h"
+#include "model/Constants.h"
+#include "model/Model.h"
+#include "roofit/AbstractModelProvider.h"
+#include "roofit/ChannelConvolutionPdf.h"
+#include "roofit/CompositeModelProvider.h"
+#include "roofit/DampLorentzPdf.h"
+#include "roofit/GaussianPdf.h"
+#include "roofit/IndirectParamPdf.h"
+#include "roofit/LorentzianPdf.h"
+#include "roofit/OrthogonalPdf.h"
+#include "roofit/ParabolaGaussModelProvider.h"
+#include "roofit/ParabolaLorentzianModelProvider.h"
+#include "roofit/ParabolaPdf.h"
+#include "util/FileUtils.h"
+#include "util/GraphicsHelper.h"
+#include "util/HistProcessor.h"
+#include "util/RootHelper.h"
+#include "util/StringUtils.h"
+#include "util/Variable.h"
+#include "widgets/importSpectrumWidget/IImportSpectrumView.h"
+#include "widgets/importSpectrumWidget/ImportSpectrumPresenter.h"
+#include "widgets/importSpectrumWidget/ImportSpectrumView.h"
+#include "widgets/swCalculatorWidget/SWCalculatorFrame.h"
+#include "main.h"
 
 // Header files passed via #pragma extra_include
 
@@ -78,7 +78,7 @@ namespace ROOT {
       ::SWCalculatorFrame *ptr = 0;
       static ::TVirtualIsAProxy* isa_proxy = new ::TIsAProxy(typeid(::SWCalculatorFrame));
       static ::ROOT::TGenericClassInfo 
-         instance("SWCalculatorFrame", "src/widgets/swCalculatorWidget/SWCalculatorFrame.h", 32,
+         instance("SWCalculatorFrame", "widgets/swCalculatorWidget/SWCalculatorFrame.h", 32,
                   typeid(::SWCalculatorFrame), ::ROOT::Internal::DefineBehavior(ptr, ptr),
                   &SWCalculatorFrame_Dictionary, isa_proxy, 0,
                   sizeof(::SWCalculatorFrame) );
@@ -123,36 +123,36 @@ namespace ROOT {
 namespace {
   void TriggerDictionaryInitialization_SWCalculatorFrameDict_Impl() {
     static const char* headers[] = {
-"src/model/Constants.h",
-"src/model/Model.h",
-"src/roofit/AbstractModelProvider.h",
-"src/roofit/ChannelConvolutionPdf.h",
-"src/roofit/CompositeModelProvider.h",
-"src/roofit/DampLorentzPdf.h",
-"src/roofit/GaussianPdf.h",
-"src/roofit/IndirectParamPdf.h",
-"src/roofit/LorentzianPdf.h",
-"src/roofit/OrthogonalPdf.h",
-"src/roofit/ParabolaGaussModelProvider.h",
-"src/roofit/ParabolaLorentzianModelProvider.h",
-"src/roofit/ParabolaPdf.h",
-"src/util/FileUtils.h",
-"src/util/GraphicsHelper.h",
-"src/util/HistProcessor.h",
-"src/util/RootHelper.h",
-"src/util/StringUtils.h",
-"src/util/Variable.h",
-"src/widgets/importSpectrumWidget/IImportSpectrumView.h",
-"src/widgets/importSpectrumWidget/ImportSpectrumPresenter.h",
-"src/widgets/importSpectrumWidget/ImportSpectrumView.h",
-"src/widgets/swCalculatorWidget/SWCalculatorFrame.h",
-"src/main.h",
+"model/Constants.h",
+"model/Model.h",
+"roofit/AbstractModelProvider.h",
+"roofit/ChannelConvolutionPdf.h",
+"roofit/CompositeModelProvider.h",
+"roofit/DampLorentzPdf.h",
+"roofit/GaussianPdf.h",
+"roofit/IndirectParamPdf.h",
+"roofit/LorentzianPdf.h",
+"roofit/OrthogonalPdf.h",
+"roofit/ParabolaGaussModelProvider.h",
+"roofit/ParabolaLorentzianModelProvider.h",
+"roofit/ParabolaPdf.h",
+"util/FileUtils.h",
+"util/GraphicsHelper.h",
+"util/HistProcessor.h",
+"util/RootHelper.h",
+"util/StringUtils.h",
+"util/Variable.h",
+"widgets/importSpectrumWidget/IImportSpectrumView.h",
+"widgets/importSpectrumWidget/ImportSpectrumPresenter.h",
+"widgets/importSpectrumWidget/ImportSpectrumView.h",
+"widgets/swCalculatorWidget/SWCalculatorFrame.h",
+"main.h",
 0
     };
     static const char* includePaths[] = {
 "/Applications/root_v6.06.02/include",
 "/Applications/root_v6.06.02/include",
-"/Users/petrstepanov/Development/NetBeansProjects/sw-calculator/",
+"/Users/petrstepanov/Development/NetBeansProjects/sw-calculator/src/",
 0
     };
     static const char* fwdDeclCode = R"DICTFWDDCLS(
@@ -161,7 +161,7 @@ namespace {
 #pragma clang diagnostic ignored "-Wignored-attributes"
 #pragma clang diagnostic ignored "-Wreturn-type-c-linkage"
 extern int __Cling_Autoloading_Map;
-class __attribute__((annotate("$clingAutoload$src/widgets/swCalculatorWidget/SWCalculatorFrame.h")))  SWCalculatorFrame;
+class __attribute__((annotate("$clingAutoload$widgets/swCalculatorWidget/SWCalculatorFrame.h")))  SWCalculatorFrame;
 )DICTFWDDCLS";
     static const char* payloadCode = R"DICTPAYLOAD(
 #line 1 "SWCalculatorFrameDict dictionary payload"
@@ -171,30 +171,30 @@ class __attribute__((annotate("$clingAutoload$src/widgets/swCalculatorWidget/SWC
 #endif
 
 #define _BACKWARD_BACKWARD_WARNING_H
-#include "src/model/Constants.h"
-#include "src/model/Model.h"
-#include "src/roofit/AbstractModelProvider.h"
-#include "src/roofit/ChannelConvolutionPdf.h"
-#include "src/roofit/CompositeModelProvider.h"
-#include "src/roofit/DampLorentzPdf.h"
-#include "src/roofit/GaussianPdf.h"
-#include "src/roofit/IndirectParamPdf.h"
-#include "src/roofit/LorentzianPdf.h"
-#include "src/roofit/OrthogonalPdf.h"
-#include "src/roofit/ParabolaGaussModelProvider.h"
-#include "src/roofit/ParabolaLorentzianModelProvider.h"
-#include "src/roofit/ParabolaPdf.h"
-#include "src/util/FileUtils.h"
-#include "src/util/GraphicsHelper.h"
-#include "src/util/HistProcessor.h"
-#include "src/util/RootHelper.h"
-#include "src/util/StringUtils.h"
-#include "src/util/Variable.h"
-#include "src/widgets/importSpectrumWidget/IImportSpectrumView.h"
-#include "src/widgets/importSpectrumWidget/ImportSpectrumPresenter.h"
-#include "src/widgets/importSpectrumWidget/ImportSpectrumView.h"
-#include "src/widgets/swCalculatorWidget/SWCalculatorFrame.h"
-#include "src/main.h"
+#include "model/Constants.h"
+#include "model/Model.h"
+#include "roofit/AbstractModelProvider.h"
+#include "roofit/ChannelConvolutionPdf.h"
+#include "roofit/CompositeModelProvider.h"
+#include "roofit/DampLorentzPdf.h"
+#include "roofit/GaussianPdf.h"
+#include "roofit/IndirectParamPdf.h"
+#include "roofit/LorentzianPdf.h"
+#include "roofit/OrthogonalPdf.h"
+#include "roofit/ParabolaGaussModelProvider.h"
+#include "roofit/ParabolaLorentzianModelProvider.h"
+#include "roofit/ParabolaPdf.h"
+#include "util/FileUtils.h"
+#include "util/GraphicsHelper.h"
+#include "util/HistProcessor.h"
+#include "util/RootHelper.h"
+#include "util/StringUtils.h"
+#include "util/Variable.h"
+#include "widgets/importSpectrumWidget/IImportSpectrumView.h"
+#include "widgets/importSpectrumWidget/ImportSpectrumPresenter.h"
+#include "widgets/importSpectrumWidget/ImportSpectrumView.h"
+#include "widgets/swCalculatorWidget/SWCalculatorFrame.h"
+#include "main.h"
 
 #undef  _BACKWARD_BACKWARD_WARNING_H
 )DICTPAYLOAD";

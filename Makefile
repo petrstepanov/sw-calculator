@@ -84,53 +84,53 @@ MYLDFLAGS=-m64
 MYGLIBS=-L/Applications/root_v6.06.02/lib -lGui -lCore -lRIO -lNet -lHist -lGraf -lGraf3d -lGpad -lTree -lRint -lPostscript -lMatrix -lPhysics -lMathCore -lThread -lMultiProc -lpthread -stdlib=libc++ -lm -ldl
 MYLIBS=-L/Applications/root_v6.06.02/lib -lGui -lCore -lRIO -lNet -lHist -lGraf -lGraf3d -lGpad -lTree -lRint -lPostscript -lMatrix -lPhysics -lMathCore -lThread -lMultiProc -lpthread -stdlib=libc++ -lm -ldl -lRooFit -lRooFitCore -lHtml -lMinuit -lFumili
 MYROOTSYS=/Applications/root_v6.06.02
-MYHEADERS=src/model/Constants.h \
-          src/model/Model.h \
-          src/roofit/AbstractModelProvider.h \
-          src/roofit/ChannelConvolutionPdf.h \
-          src/roofit/CompositeModelProvider.h \
-          src/roofit/DampLorentzPdf.h \
-	  src/roofit/GaussianPdf.h \
-          src/roofit/IndirectParamPdf.h \
-          src/roofit/LorentzianPdf.h \
-          src/roofit/OrthogonalPdf.h \
-          src/roofit/ParabolaGaussModelProvider.h \
-          src/roofit/ParabolaLorentzianModelProvider.h \
-          src/roofit/ParabolaPdf.h \
-          src/util/FileUtils.h \
-          src/util/GraphicsHelper.h \
-          src/util/HistProcessor.h \
-          src/util/RootHelper.h \
-          src/util/StringUtils.h \
-          src/util/Variable.h \
-          src/widgets/importSpectrumWidget/IImportSpectrumView.h \
-          src/widgets/importSpectrumWidget/ImportSpectrumPresenter.h \
-          src/widgets/importSpectrumWidget/ImportSpectrumView.h \
-          src/widgets/swCalculatorWidget/SWCalculatorFrame.h \
-          src/main.h
-MYSOURCES=src/model/Constants.cpp \
-          src/model/Model.cpp \
-          src/roofit/AbstractModelProvider.cpp \
-          src/roofit/ChannelConvolutionPdf.cpp \
-          src/roofit/CompositeModelProvider.cpp \
-          src/roofit/DampLorentzPdf.cpp \
-	  src/roofit/GaussianPdf.cpp \
-          src/roofit/IndirectParamPdf.cpp \
-          src/roofit/LorentzianPdf.cpp \
-          src/roofit/OrthogonalPdf.cpp \
-          src/roofit/ParabolaGaussModelProvider.cpp \
-          src/roofit/ParabolaLorentzianModelProvider.cpp \
-          src/roofit/ParabolaPdf.cpp \
-          src/util/FileUtils.cpp \
-          src/util/GraphicsHelper.cpp \
-          src/util/HistProcessor.cpp \
-          src/util/RootHelper.cpp \
-          src/util/StringUtils.cpp \
-          src/util/Variable.cpp \
-          src/widgets/importSpectrumWidget/ImportSpectrumPresenter.cpp \
-          src/widgets/importSpectrumWidget/ImportSpectrumView.cpp \
-          src/widgets/swCalculatorWidget/SWCalculatorFrame.cpp \
-          src/main.cc
+MYHEADERS=model/Constants.h \
+          model/Model.h \
+          roofit/AbstractModelProvider.h \
+          roofit/ChannelConvolutionPdf.h \
+          roofit/CompositeModelProvider.h \
+          roofit/DampLorentzPdf.h \
+	  roofit/GaussianPdf.h \
+          roofit/IndirectParamPdf.h \
+          roofit/LorentzianPdf.h \
+          roofit/OrthogonalPdf.h \
+          roofit/ParabolaGaussModelProvider.h \
+          roofit/ParabolaLorentzianModelProvider.h \
+          roofit/ParabolaPdf.h \
+          util/FileUtils.h \
+          util/GraphicsHelper.h \
+          util/HistProcessor.h \
+          util/RootHelper.h \
+          util/StringUtils.h \
+          util/Variable.h \
+          widgets/importSpectrumWidget/IImportSpectrumView.h \
+          widgets/importSpectrumWidget/ImportSpectrumPresenter.h \
+          widgets/importSpectrumWidget/ImportSpectrumView.h \
+          widgets/swCalculatorWidget/SWCalculatorFrame.h \
+          main.h
+MYSOURCES=model/Constants.cpp \
+          model/Model.cpp \
+          roofit/AbstractModelProvider.cpp \
+          roofit/ChannelConvolutionPdf.cpp \
+          roofit/CompositeModelProvider.cpp \
+          roofit/DampLorentzPdf.cpp \
+	  roofit/GaussianPdf.cpp \
+          roofit/IndirectParamPdf.cpp \
+          roofit/LorentzianPdf.cpp \
+          roofit/OrthogonalPdf.cpp \
+          roofit/ParabolaGaussModelProvider.cpp \
+          roofit/ParabolaLorentzianModelProvider.cpp \
+          roofit/ParabolaPdf.cpp \
+          util/FileUtils.cpp \
+          util/GraphicsHelper.cpp \
+          util/HistProcessor.cpp \
+          util/RootHelper.cpp \
+          util/StringUtils.cpp \
+          util/Variable.cpp \
+          widgets/importSpectrumWidget/ImportSpectrumPresenter.cpp \
+          widgets/importSpectrumWidget/ImportSpectrumView.cpp \
+          widgets/swCalculatorWidget/SWCalculatorFrame.cpp \
+          main.cc
 
 # build
 build: .build-post
@@ -138,14 +138,22 @@ build: .build-post
 .build-pre:
 # Add your pre 'build' code here...
 	@echo Generating dictionary: SWCalculatorFrameDict.cpp
+	cd src; \
 	rootcling -f SWCalculatorFrameDict.cpp -c $(MYCFLAGS) -p $(MYHEADERS) SWCalculatorFrameLinkDef.h
 #https://root.cern.ch/interacting-shared-libraries-rootcint
 	@echo Generating shared library: sw-calculator.so
-	g++ -shared -o sw-calculator.so $(MYCFLAGS) $(MYLIBS) SWCalculatorFrameDict.cpp $(MYSOURCES)
+	cd src; \
+	g++ -shared -o ../lib/sw-calculator.so $(MYCFLAGS) $(MYLIBS) SWCalculatorFrameDict.cpp $(MYSOURCES)
 
 .build-post: .build-impl
-# Add your post 'build' code here...	
-	$(CP) sw-calculator.so ./dist/Debug/GNU-MacOSX/sw-calculator.so
+# Add your post 'build' code here...
+	@echo Copying shared library 'sw-calculator.so' to 
+	$(CP) ./lib/sw-calculator.so ./dist/Debug/GNU-MacOSX/sw-calculator.so
+
+#sw-calculator.so:
+#	@echo Generating shared library: sw-calculator.so
+#	cd src; \
+#	g++ -shared -o ../lib/sw-calculator.so $(MYCFLAGS) $(MYLIBS) SWCalculatorFrameDict.cpp $(MYSOURCES)
 	
 # clean
 clean: .clean-post

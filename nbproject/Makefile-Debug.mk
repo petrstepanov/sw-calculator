@@ -74,13 +74,13 @@ FFLAGS=
 ASFLAGS=
 
 # Link Libraries and Options
-LDLIBSOPTIONS=-L/Applications/root_v6.06.02/lib -L. sw-calculator.so
+LDLIBSOPTIONS=-L/Applications/root_v6.06.02/lib -Llib lib/sw-calculator.so
 
 # Build Targets
 .build-conf: ${BUILD_SUBPROJECTS}
 	"${MAKE}"  -f nbproject/Makefile-${CND_CONF}.mk ${CND_DISTDIR}/${CND_CONF}/${CND_PLATFORM}/sw-calculator
 
-${CND_DISTDIR}/${CND_CONF}/${CND_PLATFORM}/sw-calculator: sw-calculator.so
+${CND_DISTDIR}/${CND_CONF}/${CND_PLATFORM}/sw-calculator: lib/sw-calculator.so
 
 ${CND_DISTDIR}/${CND_CONF}/${CND_PLATFORM}/sw-calculator: ${OBJECTFILES}
 	${MKDIR} -p ${CND_DISTDIR}/${CND_CONF}/${CND_PLATFORM}

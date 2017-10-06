@@ -124,7 +124,7 @@ Contributor(s):
         <linkerTool>
           <linkerAddLib>
             <pElem>/Applications/root_v6.06.02/lib</pElem>
-            <pElem>.</pElem>
+            <pElem>lib</pElem>
           </linkerAddLib>
           <linkerDynSerch>
             <pElem>.</pElem>
@@ -148,7 +148,7 @@ Contributor(s):
           <linkerCopySharedLibs>false</linkerCopySharedLibs>
           <commandlineTool>g++</commandlineTool>
           <linkerLibItems>
-            <linkerLibFileItem>sw-calculator.so</linkerLibFileItem>
+            <linkerLibFileItem>lib/sw-calculator.so</linkerLibFileItem>
           </linkerLibItems>
           <commandLine>-lGui -lCore -lRIO -lNet -lHist -lGraf -lGraf3d -lGpad -lTree -lRint -lPostscript -lMatrix -lPhysics -lMathCore -lThread -lMultiProc -lpthread -stdlib=libc++ -lm -ldl -lRooFit -lRooFitCore -lHtml -lMinuit -lFumili</commandLine>
         </linkerTool>
@@ -159,6 +159,12 @@ Contributor(s):
           <packFileListElem type="File"
                             to="${PACKAGE_TOP_DIR}bin/SWCalculatorFrameLib.so"
                             from="${CND_DISTDIR}/${CND_CONF}/${CND_PLATFORM}/SWCalculatorFrameLib.so"
+                            perm="755"
+                            owner="root"
+                            group="bin"/>
+          <packFileListElem type="File"
+                            to="${PACKAGE_TOP_DIR}bin/${OUTPUT_BASENAME}"
+                            from="${OUTPUT_PATH}"
                             perm="755"
                             owner="root"
                             group="bin"/>

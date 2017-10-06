@@ -12,7 +12,7 @@
  */
 
 #include "SWCalculatorFrame.h"
-#include "../../../SWCalculatorFrameLinkDef.h"
+#include "../../SWCalculatorFrameLinkDef.h"
 
 #include <algorithm>  //min
 #include <functional>
