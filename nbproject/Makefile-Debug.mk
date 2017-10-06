@@ -74,7 +74,7 @@ FFLAGS=
 ASFLAGS=
 
 # Link Libraries and Options
-LDLIBSOPTIONS=-L/Applications/root_v6.06.02/lib -Llib lib/sw-calculator.so
+LDLIBSOPTIONS=-L/Applications/root_v6.06.02/lib lib/sw-calculator.so
 
 # Build Targets
 .build-conf: ${BUILD_SUBPROJECTS}

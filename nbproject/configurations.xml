@@ -40,7 +40,9 @@ Contributor(s):
 -->
 <configurationDescriptor version="100">
   <logicalFolder name="root" displayName="root" projectFiles="true" kind="ROOT">
-    <logicalFolder name="HeaderFiles" displayName="Header Files" projectFiles="true">
+    <logicalFolder name="HeaderFiles"
+                   displayName="Header Files"
+                   projectFiles="true">
       <itemPath>src/roofit/AbstractModelProvider.h</itemPath>
       <itemPath>src/roofit/ChannelConvolutionPdf.h</itemPath>
       <itemPath>src/roofit/CompositeModelProvider.h</itemPath>
@@ -122,7 +124,6 @@ Contributor(s):
         <linkerTool>
           <linkerAddLib>
             <pElem>/Applications/root_v6.06.02/lib</pElem>
-            <pElem>lib</pElem>
           </linkerAddLib>
           <linkerDynSerch>
             <pElem>.</pElem>
@@ -151,10 +152,14 @@ Contributor(s):
                             perm="755"
                             owner="root"
                             group="bin"/>
+          <packFileListElem type="File"
+                            to="${PACKAGE_TOP_DIR}bin/${OUTPUT_BASENAME}"
+                            from="${OUTPUT_PATH}"
+                            perm="755"
+                            owner="root"
+                            group="bin"/>
         </packFileList>
       </packaging>
-      <item path="src/roofit/ChannelConvolutionPdf.h" ex="false" tool="3" flavor2="0">
-      </item>
       <item path="SWCalculatorFrameLinkDef.h" ex="false" tool="1" flavor2="0">
       </item>
       <item path="src/main.cc" ex="false" tool="1" flavor2="0">
@@ -170,15 +175,29 @@ Contributor(s):
       </item>
       <item path="src/model/Model.h" ex="false" tool="3" flavor2="0">
       </item>
-      <item path="src/roofit/AbstractModelProvider.cpp" ex="false" tool="1" flavor2="0">
+      <item path="src/roofit/AbstractModelProvider.cpp"
+            ex="false"
+            tool="1"
+            flavor2="0">
       </item>
       <item path="src/roofit/AbstractModelProvider.h" ex="false" tool="3" flavor2="0">
       </item>
-      <item path="src/roofit/ChannelConvolutionPdf.cpp" ex="false" tool="1" flavor2="0">
+      <item path="src/roofit/ChannelConvolutionPdf.cpp"
+            ex="false"
+            tool="1"
+            flavor2="0">
       </item>
-      <item path="src/roofit/CompositeModelProvider.cpp" ex="false" tool="1" flavor2="0">
+      <item path="src/roofit/ChannelConvolutionPdf.h" ex="false" tool="3" flavor2="0">
       </item>
-      <item path="src/roofit/CompositeModelProvider.h" ex="false" tool="3" flavor2="0">
+      <item path="src/roofit/CompositeModelProvider.cpp"
+            ex="false"
+            tool="1"
+            flavor2="0">
+      </item>
+      <item path="src/roofit/CompositeModelProvider.h"
+            ex="false"
+            tool="3"
+            flavor2="0">
       </item>
       <item path="src/roofit/DampLorentzPdf.cpp" ex="false" tool="1" flavor2="0">
       </item>
@@ -200,13 +219,25 @@ Contributor(s):
       </item>
       <item path="src/roofit/OrthogonalPdf.h" ex="false" tool="3" flavor2="0">
       </item>
-      <item path="src/roofit/ParabolaGaussModelProvider.cpp" ex="false" tool="1" flavor2="0">
+      <item path="src/roofit/ParabolaGaussModelProvider.cpp"
+            ex="false"
+            tool="1"
+            flavor2="0">
       </item>
-      <item path="src/roofit/ParabolaGaussModelProvider.h" ex="false" tool="3" flavor2="0">
+      <item path="src/roofit/ParabolaGaussModelProvider.h"
+            ex="false"
+            tool="3"
+            flavor2="0">
       </item>
-      <item path="src/roofit/ParabolaLorentzianModelProvider.cpp" ex="false" tool="1" flavor2="0">
+      <item path="src/roofit/ParabolaLorentzianModelProvider.cpp"
+            ex="false"
+            tool="1"
+            flavor2="0">
       </item>
-      <item path="src/roofit/ParabolaLorentzianModelProvider.h" ex="false" tool="3" flavor2="0">
+      <item path="src/roofit/ParabolaLorentzianModelProvider.h"
+            ex="false"
+            tool="3"
+            flavor2="0">
       </item>
       <item path="src/roofit/ParabolaPdf.cpp" ex="false" tool="1" flavor2="0">
       </item>
@@ -236,19 +267,40 @@ Contributor(s):
       </item>
       <item path="src/util/Variable.h" ex="false" tool="3" flavor2="0">
       </item>
-      <item path="src/widgets/importSpectrumWidget/IImportSpectrumView.h" ex="false" tool="3" flavor2="0">
+      <item path="src/widgets/importSpectrumWidget/IImportSpectrumView.h"
+            ex="false"
+            tool="3"
+            flavor2="0">
       </item>
-      <item path="src/widgets/importSpectrumWidget/ImportSpectrumPresenter.cpp" ex="false" tool="1" flavor2="0">
+      <item path="src/widgets/importSpectrumWidget/ImportSpectrumPresenter.cpp"
+            ex="false"
+            tool="1"
+            flavor2="0">
       </item>
-      <item path="src/widgets/importSpectrumWidget/ImportSpectrumPresenter.h" ex="false" tool="3" flavor2="0">
+      <item path="src/widgets/importSpectrumWidget/ImportSpectrumPresenter.h"
+            ex="false"
+            tool="3"
+            flavor2="0">
       </item>
-      <item path="src/widgets/importSpectrumWidget/ImportSpectrumView.cpp" ex="false" tool="1" flavor2="0">
+      <item path="src/widgets/importSpectrumWidget/ImportSpectrumView.cpp"
+            ex="false"
+            tool="1"
+            flavor2="0">
       </item>
-      <item path="src/widgets/importSpectrumWidget/ImportSpectrumView.h" ex="false" tool="3" flavor2="0">
+      <item path="src/widgets/importSpectrumWidget/ImportSpectrumView.h"
+            ex="false"
+            tool="3"
+            flavor2="0">
       </item>
-      <item path="src/widgets/swCalculatorWidget/SWCalculatorFrame.cpp" ex="false" tool="1" flavor2="0">
+      <item path="src/widgets/swCalculatorWidget/SWCalculatorFrame.cpp"
+            ex="false"
+            tool="1"
+            flavor2="0">
       </item>
-      <item path="src/widgets/swCalculatorWidget/SWCalculatorFrame.h" ex="false" tool="1" flavor2="0">
+      <item path="src/widgets/swCalculatorWidget/SWCalculatorFrame.h"
+            ex="false"
+            tool="1"
+            flavor2="0">
       </item>
     </conf>
     <conf name="Release" type="1">
@@ -276,8 +328,6 @@ Contributor(s):
           </linkerDynSerch>
         </linkerTool>
       </compileType>
-      <item path="ChannelConvolutionPdf.h" ex="false" tool="3" flavor2="0">
-      </item>
       <item path="SWCalculatorFrameLinkDef.h" ex="false" tool="3" flavor2="0">
       </item>
       <item path="src/main.cc" ex="false" tool="1" flavor2="0">
@@ -290,15 +340,27 @@ Contributor(s):
       </item>
       <item path="src/model/Model.h" ex="false" tool="3" flavor2="0">
       </item>
-      <item path="src/roofit/AbstractModelProvider.cpp" ex="false" tool="1" flavor2="0">
+      <item path="src/roofit/AbstractModelProvider.cpp"
+            ex="false"
+            tool="1"
+            flavor2="0">
       </item>
       <item path="src/roofit/AbstractModelProvider.h" ex="false" tool="3" flavor2="0">
       </item>
-      <item path="src/roofit/ChannelConvolutionPdf.cpp" ex="false" tool="1" flavor2="0">
+      <item path="src/roofit/ChannelConvolutionPdf.cpp"
+            ex="false"
+            tool="1"
+            flavor2="0">
       </item>
-      <item path="src/roofit/CompositeModelProvider.cpp" ex="false" tool="1" flavor2="0">
+      <item path="src/roofit/CompositeModelProvider.cpp"
+            ex="false"
+            tool="1"
+            flavor2="0">
       </item>
-      <item path="src/roofit/CompositeModelProvider.h" ex="false" tool="3" flavor2="0">
+      <item path="src/roofit/CompositeModelProvider.h"
+            ex="false"
+            tool="3"
+            flavor2="0">
       </item>
       <item path="src/roofit/DampLorentzPdf.cpp" ex="false" tool="1" flavor2="0">
       </item>
@@ -320,13 +382,25 @@ Contributor(s):
       </item>
       <item path="src/roofit/OrthogonalPdf.h" ex="false" tool="3" flavor2="0">
       </item>
-      <item path="src/roofit/ParabolaGaussModelProvider.cpp" ex="false" tool="1" flavor2="0">
+      <item path="src/roofit/ParabolaGaussModelProvider.cpp"
+            ex="false"
+            tool="1"
+            flavor2="0">
       </item>
-      <item path="src/roofit/ParabolaGaussModelProvider.h" ex="false" tool="3" flavor2="0">
+      <item path="src/roofit/ParabolaGaussModelProvider.h"
+            ex="false"
+            tool="3"
+            flavor2="0">
       </item>
-      <item path="src/roofit/ParabolaLorentzianModelProvider.cpp" ex="false" tool="1" flavor2="0">
+      <item path="src/roofit/ParabolaLorentzianModelProvider.cpp"
+            ex="false"
+            tool="1"
+            flavor2="0">
       </item>
-      <item path="src/roofit/ParabolaLorentzianModelProvider.h" ex="false" tool="3" flavor2="0">
+      <item path="src/roofit/ParabolaLorentzianModelProvider.h"
+            ex="false"
+            tool="3"
+            flavor2="0">
       </item>
       <item path="src/roofit/ParabolaPdf.cpp" ex="false" tool="1" flavor2="0">
       </item>
@@ -356,19 +430,40 @@ Contributor(s):
       </item>
       <item path="src/util/Variable.h" ex="false" tool="3" flavor2="0">
       </item>
-      <item path="src/widgets/importSpectrumWidget/IImportSpectrumView.h" ex="false" tool="3" flavor2="0">
+      <item path="src/widgets/importSpectrumWidget/IImportSpectrumView.h"
+            ex="false"
+            tool="3"
+            flavor2="0">
       </item>
-      <item path="src/widgets/importSpectrumWidget/ImportSpectrumPresenter.cpp" ex="false" tool="1" flavor2="0">
+      <item path="src/widgets/importSpectrumWidget/ImportSpectrumPresenter.cpp"
+            ex="false"
+            tool="1"
+            flavor2="0">
       </item>
-      <item path="src/widgets/importSpectrumWidget/ImportSpectrumPresenter.h" ex="false" tool="3" flavor2="0">
+      <item path="src/widgets/importSpectrumWidget/ImportSpectrumPresenter.h"
+            ex="false"
+            tool="3"
+            flavor2="0">
       </item>
-      <item path="src/widgets/importSpectrumWidget/ImportSpectrumView.cpp" ex="false" tool="1" flavor2="0">
+      <item path="src/widgets/importSpectrumWidget/ImportSpectrumView.cpp"
+            ex="false"
+            tool="1"
+            flavor2="0">
       </item>
-      <item path="src/widgets/importSpectrumWidget/ImportSpectrumView.h" ex="false" tool="3" flavor2="0">
+      <item path="src/widgets/importSpectrumWidget/ImportSpectrumView.h"
+            ex="false"
+            tool="3"
+            flavor2="0">
       </item>
-      <item path="src/widgets/swCalculatorWidget/SWCalculatorFrame.cpp" ex="false" tool="1" flavor2="0">
+      <item path="src/widgets/swCalculatorWidget/SWCalculatorFrame.cpp"
+            ex="false"
+            tool="1"
+            flavor2="0">
       </item>
-      <item path="src/widgets/swCalculatorWidget/SWCalculatorFrame.h" ex="false" tool="3" flavor2="0">
+      <item path="src/widgets/swCalculatorWidget/SWCalculatorFrame.h"
+            ex="false"
+            tool="3"
+            flavor2="0">
       </item>
     </conf>
   </confs>
