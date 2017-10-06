@@ -16,7 +16,7 @@
 
 #include "AbstractModelProvider.h"
 #include <RooRealVar.h>
-#include "Variable.h"
+#include "../util/Variable.h"
 
 class CompositeModelProvider : public AbstractModelProvider {
 public:

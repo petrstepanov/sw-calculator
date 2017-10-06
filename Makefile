@@ -84,8 +84,53 @@ MYLDFLAGS=-m64
 MYGLIBS=-L/Applications/root_v6.06.02/lib -lGui -lCore -lRIO -lNet -lHist -lGraf -lGraf3d -lGpad -lTree -lRint -lPostscript -lMatrix -lPhysics -lMathCore -lThread -lMultiProc -lpthread -stdlib=libc++ -lm -ldl
 MYLIBS=-L/Applications/root_v6.06.02/lib -lGui -lCore -lRIO -lNet -lHist -lGraf -lGraf3d -lGpad -lTree -lRint -lPostscript -lMatrix -lPhysics -lMathCore -lThread -lMultiProc -lpthread -stdlib=libc++ -lm -ldl -lRooFit -lRooFitCore -lHtml -lMinuit -lFumili
 MYROOTSYS=/Applications/root_v6.06.02
-MYHEADERS=AbstractModelProvider.h CompositeModelProvider.h ChannelConvolutionPdf.h Constants.h DampLorentzPdf.h FileUtils.h GaussianPdf.h GraphicsHelper.h HistProcessor.h IndirectParamPdf.h LorentzianPdf.h OrthogonalPdf.h ParabolaGaussModelProvider.h ParabolaLorentzianModelProvider.h RootHelper.h SWCalculatorFrame.h ParabolaPdf.h StringUtils.h Variable.h
-MYSOURCES=AbstractModelProvider.cpp CompositeModelProvider.cpp ChannelConvolutionPdf.cpp Constants.cpp DampLorentzPdf.cpp FileUtils.cpp GaussianPdf.cpp GraphicsHelper.cpp HistProcessor.cpp IndirectParamPdf.cpp LorentzianPdf.cpp OrthogonalPdf.cpp ParabolaGaussModelProvider.cpp ParabolaLorentzianModelProvider.cpp RootHelper.cpp SWCalculatorFrame.cpp ParabolaPdf.cpp StringUtils.cpp Variable.cpp main.cc
+MYHEADERS=src/model/Constants.h \
+          src/model/Model.h \
+          src/roofit/AbstractModelProvider.h \
+          src/roofit/ChannelConvolutionPdf.h \
+          src/roofit/CompositeModelProvider.h \
+          src/roofit/DampLorentzPdf.h \
+	  src/roofit/GaussianPdf.h \
+          src/roofit/IndirectParamPdf.h \
+          src/roofit/LorentzianPdf.h \
+          src/roofit/OrthogonalPdf.h \
+          src/roofit/ParabolaGaussModelProvider.h \
+          src/roofit/ParabolaLorentzianModelProvider.h \
+          src/roofit/ParabolaPdf.h \
+          src/util/FileUtils.h \
+          src/util/GraphicsHelper.h \
+          src/util/HistProcessor.h \
+          src/util/RootHelper.h \
+          src/util/StringUtils.h \
+          src/util/Variable.h \
+          src/widgets/importSpectrumWidget/IImportSpectrumView.h \
+          src/widgets/importSpectrumWidget/ImportSpectrumPresenter.h \
+          src/widgets/importSpectrumWidget/ImportSpectrumView.h \
+          src/widgets/swCalculatorWidget/SWCalculatorFrame.h \
+          src/main.h
+MYSOURCES=src/model/Constants.cpp \
+          src/model/Model.cpp \
+          src/roofit/AbstractModelProvider.cpp \
+          src/roofit/ChannelConvolutionPdf.cpp \
+          src/roofit/CompositeModelProvider.cpp \
+          src/roofit/DampLorentzPdf.cpp \
+	  src/roofit/GaussianPdf.cpp \
+          src/roofit/IndirectParamPdf.cpp \
+          src/roofit/LorentzianPdf.cpp \
+          src/roofit/OrthogonalPdf.cpp \
+          src/roofit/ParabolaGaussModelProvider.cpp \
+          src/roofit/ParabolaLorentzianModelProvider.cpp \
+          src/roofit/ParabolaPdf.cpp \
+          src/util/FileUtils.cpp \
+          src/util/GraphicsHelper.cpp \
+          src/util/HistProcessor.cpp \
+          src/util/RootHelper.cpp \
+          src/util/StringUtils.cpp \
+          src/util/Variable.cpp \
+          src/widgets/importSpectrumWidget/ImportSpectrumPresenter.cpp \
+          src/widgets/importSpectrumWidget/ImportSpectrumView.cpp \
+          src/widgets/swCalculatorWidget/SWCalculatorFrame.cpp \
+          src/main.cc
 
 # build
 build: .build-post

@@ -19,7 +19,7 @@
 #include <RooRealProxy.h>
 #include <TString.h>
 #include "IndirectParamPdf.h"
-#include "Variable.h"
+#include "../util/Variable.h"
 
 class LorentzianPdf : public RooAbsPdf, public IndirectParamPdf {
 public:

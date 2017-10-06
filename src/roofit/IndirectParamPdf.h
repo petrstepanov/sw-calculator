@@ -17,7 +17,7 @@
 #include <TROOT.h>
 #include <RooRealVar.h>
 #include <utility>
-#include "Variable.h"
+#include "../util/Variable.h"
 
 class IndirectParamPdf {
 public:

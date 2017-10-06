@@ -17,8 +17,8 @@
 #include "LorentzianPdf.h"
 #include "DampLorentzPdf.h"
 #include "OrthogonalPdf.h"
-#include "RootHelper.h"
-#include "Constants.h"
+#include "../util/RootHelper.h"
+#include "../model/Constants.h"
 #include "ChannelConvolutionPdf.h"
 #include <RooFormulaVar.h>
 #include <RooGaussian.h>

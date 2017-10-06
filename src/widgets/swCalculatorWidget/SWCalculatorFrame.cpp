@@ -12,7 +12,7 @@
  */
 
 #include "SWCalculatorFrame.h"
-#include "SWCalculatorFrameLinkDef.h"
+#include "../../../SWCalculatorFrameLinkDef.h"
 
 #include <algorithm>  //min
 #include <functional>
@@ -30,16 +30,16 @@
 #include <TG3DLine.h>
 #include <TStopwatch.h>
 //#include <RQ_OBJECT.h>
-#include "GraphicsHelper.h"
-#include "AbstractModelProvider.h"
-#include "ParabolaGaussModelProvider.h"
-#include "ParabolaLorentzianModelProvider.h"
-#include "CompositeModelProvider.h"
-#include "HistProcessor.h"
-#include "StringUtils.h"
-#include "FileUtils.h"
-#include "Variable.h"
-#include "RootHelper.h"
+#include "../../util/GraphicsHelper.h"
+#include "../../roofit/AbstractModelProvider.h"
+#include "../../roofit/ParabolaGaussModelProvider.h"
+#include "../../roofit/ParabolaLorentzianModelProvider.h"
+#include "../../roofit/CompositeModelProvider.h"
+#include "../../util/HistProcessor.h"
+#include "../../util/StringUtils.h"
+#include "../../util/FileUtils.h"
+#include "../../util/Variable.h"
+#include "../../util/RootHelper.h"
 
 using namespace RooFit;
 

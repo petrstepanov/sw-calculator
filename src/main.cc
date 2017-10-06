@@ -1,6 +1,6 @@
 #include <TROOT.h>
 #include <TApplication.h>
-#include "SWCalculatorFrame.h"
+#include "widgets/swCalculatorWidget/SWCalculatorFrame.h"
 
 int main(int argc, char **argv) {
     TApplication theApp("App", &argc, argv);

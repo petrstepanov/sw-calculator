@@ -35,26 +35,29 @@ OBJECTDIR=${CND_BUILDDIR}/${CND_CONF}/${CND_PLATFORM}
 
 # Object Files
 OBJECTFILES= \
-	${OBJECTDIR}/AbstractModelProvider.o \
-	${OBJECTDIR}/ChannelConvolutionPdf.o \
-	${OBJECTDIR}/CompositeModelProvider.o \
-	${OBJECTDIR}/Constants.o \
-	${OBJECTDIR}/DampLorentzPdf.o \
-	${OBJECTDIR}/FileUtils.o \
-	${OBJECTDIR}/GaussianPdf.o \
-	${OBJECTDIR}/GraphicsHelper.o \
-	${OBJECTDIR}/HistProcessor.o \
-	${OBJECTDIR}/IndirectParamPdf.o \
-	${OBJECTDIR}/LorentzianPdf.o \
-	${OBJECTDIR}/OrthogonalPdf.o \
-	${OBJECTDIR}/ParabolaGaussModelProvider.o \
-	${OBJECTDIR}/ParabolaLorentzianModelProvider.o \
-	${OBJECTDIR}/ParabolaPdf.o \
-	${OBJECTDIR}/RootHelper.o \
-	${OBJECTDIR}/SWCalculatorFrame.o \
-	${OBJECTDIR}/StringUtils.o \
-	${OBJECTDIR}/Variable.o \
-	${OBJECTDIR}/main.o
+	${OBJECTDIR}/src/main.o \
+	${OBJECTDIR}/src/model/Constants.o \
+	${OBJECTDIR}/src/model/Model.o \
+	${OBJECTDIR}/src/roofit/AbstractModelProvider.o \
+	${OBJECTDIR}/src/roofit/ChannelConvolutionPdf.o \
+	${OBJECTDIR}/src/roofit/CompositeModelProvider.o \
+	${OBJECTDIR}/src/roofit/DampLorentzPdf.o \
+	${OBJECTDIR}/src/roofit/GaussianPdf.o \
+	${OBJECTDIR}/src/roofit/IndirectParamPdf.o \
+	${OBJECTDIR}/src/roofit/LorentzianPdf.o \
+	${OBJECTDIR}/src/roofit/OrthogonalPdf.o \
+	${OBJECTDIR}/src/roofit/ParabolaGaussModelProvider.o \
+	${OBJECTDIR}/src/roofit/ParabolaLorentzianModelProvider.o \
+	${OBJECTDIR}/src/roofit/ParabolaPdf.o \
+	${OBJECTDIR}/src/util/FileUtils.o \
+	${OBJECTDIR}/src/util/GraphicsHelper.o \
+	${OBJECTDIR}/src/util/HistProcessor.o \
+	${OBJECTDIR}/src/util/RootHelper.o \
+	${OBJECTDIR}/src/util/StringUtils.o \
+	${OBJECTDIR}/src/util/Variable.o \
+	${OBJECTDIR}/src/widgets/importSpectrumWidget/ImportSpectrumPresenter.o \
+	${OBJECTDIR}/src/widgets/importSpectrumWidget/ImportSpectrumView.o \
+	${OBJECTDIR}/src/widgets/swCalculatorWidget/SWCalculatorFrame.o
 
 
 # C Compiler Flags
@@ -81,105 +84,120 @@ ${CND_DISTDIR}/${CND_CONF}/${CND_PLATFORM}/sw-calculator: ${OBJECTFILES}
 	${MKDIR} -p ${CND_DISTDIR}/${CND_CONF}/${CND_PLATFORM}
 	${LINK.cc} -o ${CND_DISTDIR}/${CND_CONF}/${CND_PLATFORM}/sw-calculator ${OBJECTFILES} ${LDLIBSOPTIONS}
 
-${OBJECTDIR}/AbstractModelProvider.o: AbstractModelProvider.cpp
-	${MKDIR} -p ${OBJECTDIR}
+${OBJECTDIR}/src/main.o: src/main.cc
+	${MKDIR} -p ${OBJECTDIR}/src
 	${RM} "$@.d"
-	$(COMPILE.cc) -O2 -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/AbstractModelProvider.o AbstractModelProvider.cpp
+	$(COMPILE.cc) -O2 -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/src/main.o src/main.cc
 
-${OBJECTDIR}/ChannelConvolutionPdf.o: ChannelConvolutionPdf.cpp
-	${MKDIR} -p ${OBJECTDIR}
+${OBJECTDIR}/src/model/Constants.o: src/model/Constants.cpp
+	${MKDIR} -p ${OBJECTDIR}/src/model
 	${RM} "$@.d"
-	$(COMPILE.cc) -O2 -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/ChannelConvolutionPdf.o ChannelConvolutionPdf.cpp
+	$(COMPILE.cc) -O2 -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/src/model/Constants.o src/model/Constants.cpp
 
-${OBJECTDIR}/CompositeModelProvider.o: CompositeModelProvider.cpp
-	${MKDIR} -p ${OBJECTDIR}
+${OBJECTDIR}/src/model/Model.o: src/model/Model.cpp
+	${MKDIR} -p ${OBJECTDIR}/src/model
 	${RM} "$@.d"
-	$(COMPILE.cc) -O2 -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/CompositeModelProvider.o CompositeModelProvider.cpp
+	$(COMPILE.cc) -O2 -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/src/model/Model.o src/model/Model.cpp
 
-${OBJECTDIR}/Constants.o: Constants.cpp
-	${MKDIR} -p ${OBJECTDIR}
+${OBJECTDIR}/src/roofit/AbstractModelProvider.o: src/roofit/AbstractModelProvider.cpp
+	${MKDIR} -p ${OBJECTDIR}/src/roofit
 	${RM} "$@.d"
-	$(COMPILE.cc) -O2 -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/Constants.o Constants.cpp
+	$(COMPILE.cc) -O2 -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/src/roofit/AbstractModelProvider.o src/roofit/AbstractModelProvider.cpp
 
-${OBJECTDIR}/DampLorentzPdf.o: DampLorentzPdf.cpp
-	${MKDIR} -p ${OBJECTDIR}
+${OBJECTDIR}/src/roofit/ChannelConvolutionPdf.o: src/roofit/ChannelConvolutionPdf.cpp
+	${MKDIR} -p ${OBJECTDIR}/src/roofit
 	${RM} "$@.d"
-	$(COMPILE.cc) -O2 -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/DampLorentzPdf.o DampLorentzPdf.cpp
+	$(COMPILE.cc) -O2 -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/src/roofit/ChannelConvolutionPdf.o src/roofit/ChannelConvolutionPdf.cpp
 
-${OBJECTDIR}/FileUtils.o: FileUtils.cpp
-	${MKDIR} -p ${OBJECTDIR}
+${OBJECTDIR}/src/roofit/CompositeModelProvider.o: src/roofit/CompositeModelProvider.cpp
+	${MKDIR} -p ${OBJECTDIR}/src/roofit
 	${RM} "$@.d"
-	$(COMPILE.cc) -O2 -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/FileUtils.o FileUtils.cpp
+	$(COMPILE.cc) -O2 -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/src/roofit/CompositeModelProvider.o src/roofit/CompositeModelProvider.cpp
 
-${OBJECTDIR}/GaussianPdf.o: GaussianPdf.cpp
-	${MKDIR} -p ${OBJECTDIR}
+${OBJECTDIR}/src/roofit/DampLorentzPdf.o: src/roofit/DampLorentzPdf.cpp
+	${MKDIR} -p ${OBJECTDIR}/src/roofit
 	${RM} "$@.d"
-	$(COMPILE.cc) -O2 -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/GaussianPdf.o GaussianPdf.cpp
+	$(COMPILE.cc) -O2 -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/src/roofit/DampLorentzPdf.o src/roofit/DampLorentzPdf.cpp
 
-${OBJECTDIR}/GraphicsHelper.o: GraphicsHelper.cpp
-	${MKDIR} -p ${OBJECTDIR}
+${OBJECTDIR}/src/roofit/GaussianPdf.o: src/roofit/GaussianPdf.cpp
+	${MKDIR} -p ${OBJECTDIR}/src/roofit
 	${RM} "$@.d"
-	$(COMPILE.cc) -O2 -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/GraphicsHelper.o GraphicsHelper.cpp
+	$(COMPILE.cc) -O2 -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/src/roofit/GaussianPdf.o src/roofit/GaussianPdf.cpp
 
-${OBJECTDIR}/HistProcessor.o: HistProcessor.cpp
-	${MKDIR} -p ${OBJECTDIR}
+${OBJECTDIR}/src/roofit/IndirectParamPdf.o: src/roofit/IndirectParamPdf.cpp
+	${MKDIR} -p ${OBJECTDIR}/src/roofit
 	${RM} "$@.d"
-	$(COMPILE.cc) -O2 -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/HistProcessor.o HistProcessor.cpp
+	$(COMPILE.cc) -O2 -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/src/roofit/IndirectParamPdf.o src/roofit/IndirectParamPdf.cpp
 
-${OBJECTDIR}/IndirectParamPdf.o: IndirectParamPdf.cpp
-	${MKDIR} -p ${OBJECTDIR}
+${OBJECTDIR}/src/roofit/LorentzianPdf.o: src/roofit/LorentzianPdf.cpp
+	${MKDIR} -p ${OBJECTDIR}/src/roofit
 	${RM} "$@.d"
-	$(COMPILE.cc) -O2 -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/IndirectParamPdf.o IndirectParamPdf.cpp
+	$(COMPILE.cc) -O2 -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/src/roofit/LorentzianPdf.o src/roofit/LorentzianPdf.cpp
 
-${OBJECTDIR}/LorentzianPdf.o: LorentzianPdf.cpp
-	${MKDIR} -p ${OBJECTDIR}
+${OBJECTDIR}/src/roofit/OrthogonalPdf.o: src/roofit/OrthogonalPdf.cpp
+	${MKDIR} -p ${OBJECTDIR}/src/roofit
 	${RM} "$@.d"
-	$(COMPILE.cc) -O2 -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/LorentzianPdf.o LorentzianPdf.cpp
+	$(COMPILE.cc) -O2 -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/src/roofit/OrthogonalPdf.o src/roofit/OrthogonalPdf.cpp
 
-${OBJECTDIR}/OrthogonalPdf.o: OrthogonalPdf.cpp
-	${MKDIR} -p ${OBJECTDIR}
+${OBJECTDIR}/src/roofit/ParabolaGaussModelProvider.o: src/roofit/ParabolaGaussModelProvider.cpp
+	${MKDIR} -p ${OBJECTDIR}/src/roofit
 	${RM} "$@.d"
-	$(COMPILE.cc) -O2 -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/OrthogonalPdf.o OrthogonalPdf.cpp
+	$(COMPILE.cc) -O2 -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/src/roofit/ParabolaGaussModelProvider.o src/roofit/ParabolaGaussModelProvider.cpp
 
-${OBJECTDIR}/ParabolaGaussModelProvider.o: ParabolaGaussModelProvider.cpp
-	${MKDIR} -p ${OBJECTDIR}
+${OBJECTDIR}/src/roofit/ParabolaLorentzianModelProvider.o: src/roofit/ParabolaLorentzianModelProvider.cpp
+	${MKDIR} -p ${OBJECTDIR}/src/roofit
 	${RM} "$@.d"
-	$(COMPILE.cc) -O2 -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/ParabolaGaussModelProvider.o ParabolaGaussModelProvider.cpp
+	$(COMPILE.cc) -O2 -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/src/roofit/ParabolaLorentzianModelProvider.o src/roofit/ParabolaLorentzianModelProvider.cpp
 
-${OBJECTDIR}/ParabolaLorentzianModelProvider.o: ParabolaLorentzianModelProvider.cpp
-	${MKDIR} -p ${OBJECTDIR}
+${OBJECTDIR}/src/roofit/ParabolaPdf.o: src/roofit/ParabolaPdf.cpp
+	${MKDIR} -p ${OBJECTDIR}/src/roofit
 	${RM} "$@.d"
-	$(COMPILE.cc) -O2 -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/ParabolaLorentzianModelProvider.o ParabolaLorentzianModelProvider.cpp
+	$(COMPILE.cc) -O2 -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/src/roofit/ParabolaPdf.o src/roofit/ParabolaPdf.cpp
 
-${OBJECTDIR}/ParabolaPdf.o: ParabolaPdf.cpp
-	${MKDIR} -p ${OBJECTDIR}
+${OBJECTDIR}/src/util/FileUtils.o: src/util/FileUtils.cpp
+	${MKDIR} -p ${OBJECTDIR}/src/util
 	${RM} "$@.d"
-	$(COMPILE.cc) -O2 -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/ParabolaPdf.o ParabolaPdf.cpp
+	$(COMPILE.cc) -O2 -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/src/util/FileUtils.o src/util/FileUtils.cpp
 
-${OBJECTDIR}/RootHelper.o: RootHelper.cpp
-	${MKDIR} -p ${OBJECTDIR}
+${OBJECTDIR}/src/util/GraphicsHelper.o: src/util/GraphicsHelper.cpp
+	${MKDIR} -p ${OBJECTDIR}/src/util
 	${RM} "$@.d"
-	$(COMPILE.cc) -O2 -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/RootHelper.o RootHelper.cpp
+	$(COMPILE.cc) -O2 -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/src/util/GraphicsHelper.o src/util/GraphicsHelper.cpp
 
-${OBJECTDIR}/SWCalculatorFrame.o: SWCalculatorFrame.cpp
-	${MKDIR} -p ${OBJECTDIR}
+${OBJECTDIR}/src/util/HistProcessor.o: src/util/HistProcessor.cpp
+	${MKDIR} -p ${OBJECTDIR}/src/util
 	${RM} "$@.d"
-	$(COMPILE.cc) -O2 -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/SWCalculatorFrame.o SWCalculatorFrame.cpp
+	$(COMPILE.cc) -O2 -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/src/util/HistProcessor.o src/util/HistProcessor.cpp
 
-${OBJECTDIR}/StringUtils.o: StringUtils.cpp
-	${MKDIR} -p ${OBJECTDIR}
+${OBJECTDIR}/src/util/RootHelper.o: src/util/RootHelper.cpp
+	${MKDIR} -p ${OBJECTDIR}/src/util
 	${RM} "$@.d"
-	$(COMPILE.cc) -O2 -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/StringUtils.o StringUtils.cpp
+	$(COMPILE.cc) -O2 -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/src/util/RootHelper.o src/util/RootHelper.cpp
 
-${OBJECTDIR}/Variable.o: Variable.cpp
-	${MKDIR} -p ${OBJECTDIR}
+${OBJECTDIR}/src/util/StringUtils.o: src/util/StringUtils.cpp
+	${MKDIR} -p ${OBJECTDIR}/src/util
 	${RM} "$@.d"
-	$(COMPILE.cc) -O2 -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/Variable.o Variable.cpp
+	$(COMPILE.cc) -O2 -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/src/util/StringUtils.o src/util/StringUtils.cpp
 
-${OBJECTDIR}/main.o: main.cc
-	${MKDIR} -p ${OBJECTDIR}
+${OBJECTDIR}/src/util/Variable.o: src/util/Variable.cpp
+	${MKDIR} -p ${OBJECTDIR}/src/util
 	${RM} "$@.d"
-	$(COMPILE.cc) -O2 -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/main.o main.cc
+	$(COMPILE.cc) -O2 -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/src/util/Variable.o src/util/Variable.cpp
+
+${OBJECTDIR}/src/widgets/importSpectrumWidget/ImportSpectrumPresenter.o: src/widgets/importSpectrumWidget/ImportSpectrumPresenter.cpp
+	${MKDIR} -p ${OBJECTDIR}/src/widgets/importSpectrumWidget
+	${RM} "$@.d"
+	$(COMPILE.cc) -O2 -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/src/widgets/importSpectrumWidget/ImportSpectrumPresenter.o src/widgets/importSpectrumWidget/ImportSpectrumPresenter.cpp
+
+${OBJECTDIR}/src/widgets/importSpectrumWidget/ImportSpectrumView.o: src/widgets/importSpectrumWidget/ImportSpectrumView.cpp
+	${MKDIR} -p ${OBJECTDIR}/src/widgets/importSpectrumWidget
+	${RM} "$@.d"
+	$(COMPILE.cc) -O2 -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/src/widgets/importSpectrumWidget/ImportSpectrumView.o src/widgets/importSpectrumWidget/ImportSpectrumView.cpp
+
+${OBJECTDIR}/src/widgets/swCalculatorWidget/SWCalculatorFrame.o: src/widgets/swCalculatorWidget/SWCalculatorFrame.cpp
+	${MKDIR} -p ${OBJECTDIR}/src/widgets/swCalculatorWidget
+	${RM} "$@.d"
+	$(COMPILE.cc) -O2 -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/src/widgets/swCalculatorWidget/SWCalculatorFrame.o src/widgets/swCalculatorWidget/SWCalculatorFrame.cpp
 
 # Subprojects
 .build-subprojects:

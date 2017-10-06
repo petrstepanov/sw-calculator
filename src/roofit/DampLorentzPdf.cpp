@@ -12,7 +12,7 @@
  */
 
 #include "DampLorentzPdf.h"
-#include "Constants.h"
+#include "../model/Constants.h"
 #include <RooRealVar.h>
 #include <TMath.h>
 

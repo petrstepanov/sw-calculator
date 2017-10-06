@@ -12,7 +12,6 @@
  */
 
 #include "Variable.h"
-#include "AbstractModelProvider.h"
 #include <iostream>
 
 Variable::Variable() {
