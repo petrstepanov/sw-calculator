@@ -15,6 +15,7 @@
 #define GRAPHICSHELPER_H
 
 #include <TStyle.h>
+#include <RooPlot.h>
 
 class GraphicsHelper {
 	public:

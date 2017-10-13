@@ -13,12 +13,11 @@
 
 #include "Model.h"
 
-Model::Model() {
-}
+Model* Model::instance = nullptr;
 
-Model::Model(const Model& orig) {
+Model* Model::getInstance(){
+	if (!instance){
+            instance = new Model();
+	}
+	return instance;
 }
-
-Model::~Model() {
-}
-

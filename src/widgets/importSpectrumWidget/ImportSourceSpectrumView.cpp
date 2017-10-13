@@ -11,12 +11,12 @@
  * Created on October 11, 2017, 6:36 PM
  */
 
-#include "ImportSpectrumView.h"
+#include "ImportSourceSpectrumView.h"
 
-ImportSpectrumView::ImportSpectrumView(TGCompositeFrame *p) : AbstractImportSpectrumView<ImportSpectrumPresenter>(p){
+ImportSourceSpectrumView::ImportSourceSpectrumView(TGCompositeFrame *p) : AbstractImportSpectrumView<ImportSpectrumPresenter>(p){
 }
 
 // Override base class virtual functions
-ImportSpectrumPresenter* ImportSpectrumView::instantinatePresenter() {
-    return new ImportSpectrumPresenter(this);
+ImportSourceSpectrumPresenter* ImportSourceSpectrumView::instantinatePresenter() {
+    return new ImportSourceSpectrumPresenter(this);
 };

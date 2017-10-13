@@ -57,68 +57,19 @@ namespace std {} using namespace std;
 #include "util/RootHelper.h"
 #include "util/StringUtils.h"
 #include "util/Variable.h"
-#include "widgets/importSpectrumWidget/IImportSpectrumView.h"
-#include "widgets/importSpectrumWidget/ImportSpectrumPresenter.h"
+#include "widgets/importSpectrumWidget/AbstractImportSpectrumView.h"
+#include "widgets/importSpectrumWidget/AbstractImportSpectrumPresenter.h"
 #include "widgets/importSpectrumWidget/ImportSpectrumView.h"
-#include "widgets/swCalculatorWidget/SWCalculatorFrame.h"
+#include "widgets/importSpectrumWidget/ImportSpectrumPresenter.h"
+#include "widgets/importSpectrumWidget/ImportSourceSpectrumView.h"
+#include "widgets/importSpectrumWidget/ImportSourceSpectrumPresenter.h"
+#include "widgets/swCalculatorWidget/SWCalculatorView.h"
+#include "widgets/swCalculatorWidget/SWCalculatorPresenter.h"
+#include "widgets/AbstractPresenter.h"
+#include "widgets/AbstractView.h"
 #include "main.h"
 
 // Header files passed via #pragma extra_include
-
-namespace ROOT {
-   static TClass *SWCalculatorFrame_Dictionary();
-   static void SWCalculatorFrame_TClassManip(TClass*);
-   static void delete_SWCalculatorFrame(void *p);
-   static void deleteArray_SWCalculatorFrame(void *p);
-   static void destruct_SWCalculatorFrame(void *p);
-
-   // Function generating the singleton type initializer
-   static TGenericClassInfo *GenerateInitInstanceLocal(const ::SWCalculatorFrame*)
-   {
-      ::SWCalculatorFrame *ptr = 0;
-      static ::TVirtualIsAProxy* isa_proxy = new ::TIsAProxy(typeid(::SWCalculatorFrame));
-      static ::ROOT::TGenericClassInfo 
-         instance("SWCalculatorFrame", "widgets/swCalculatorWidget/SWCalculatorFrame.h", 32,
-                  typeid(::SWCalculatorFrame), ::ROOT::Internal::DefineBehavior(ptr, ptr),
-                  &SWCalculatorFrame_Dictionary, isa_proxy, 0,
-                  sizeof(::SWCalculatorFrame) );
-      instance.SetDelete(&delete_SWCalculatorFrame);
-      instance.SetDeleteArray(&deleteArray_SWCalculatorFrame);
-      instance.SetDestructor(&destruct_SWCalculatorFrame);
-      return &instance;
-   }
-   TGenericClassInfo *GenerateInitInstance(const ::SWCalculatorFrame*)
-   {
-      return GenerateInitInstanceLocal((::SWCalculatorFrame*)0);
-   }
-   // Static variable to force the class initialization
-   static ::ROOT::TGenericClassInfo *_R__UNIQUE_(Init) = GenerateInitInstanceLocal((const ::SWCalculatorFrame*)0x0); R__UseDummy(_R__UNIQUE_(Init));
-
-   // Dictionary for non-ClassDef classes
-   static TClass *SWCalculatorFrame_Dictionary() {
-      TClass* theClass =::ROOT::GenerateInitInstanceLocal((const ::SWCalculatorFrame*)0x0)->GetClass();
-      SWCalculatorFrame_TClassManip(theClass);
-   return theClass;
-   }
-
-   static void SWCalculatorFrame_TClassManip(TClass* ){
-   }
-
-} // end of namespace ROOT
-
-namespace ROOT {
-   // Wrapper around operator delete
-   static void delete_SWCalculatorFrame(void *p) {
-      delete ((::SWCalculatorFrame*)p);
-   }
-   static void deleteArray_SWCalculatorFrame(void *p) {
-      delete [] ((::SWCalculatorFrame*)p);
-   }
-   static void destruct_SWCalculatorFrame(void *p) {
-      typedef ::SWCalculatorFrame current_t;
-      ((current_t*)p)->~current_t();
-   }
-} // end of namespace ROOT for class ::SWCalculatorFrame
 
 namespace {
   void TriggerDictionaryInitialization_SWCalculatorFrameDict_Impl() {
@@ -142,10 +93,16 @@ namespace {
 "util/RootHelper.h",
 "util/StringUtils.h",
 "util/Variable.h",
-"widgets/importSpectrumWidget/IImportSpectrumView.h",
-"widgets/importSpectrumWidget/ImportSpectrumPresenter.h",
+"widgets/importSpectrumWidget/AbstractImportSpectrumView.h",
+"widgets/importSpectrumWidget/AbstractImportSpectrumPresenter.h",
 "widgets/importSpectrumWidget/ImportSpectrumView.h",
-"widgets/swCalculatorWidget/SWCalculatorFrame.h",
+"widgets/importSpectrumWidget/ImportSpectrumPresenter.h",
+"widgets/importSpectrumWidget/ImportSourceSpectrumView.h",
+"widgets/importSpectrumWidget/ImportSourceSpectrumPresenter.h",
+"widgets/swCalculatorWidget/SWCalculatorView.h",
+"widgets/swCalculatorWidget/SWCalculatorPresenter.h",
+"widgets/AbstractPresenter.h",
+"widgets/AbstractView.h",
 "main.h",
 0
     };
@@ -161,7 +118,6 @@ namespace {
 #pragma clang diagnostic ignored "-Wignored-attributes"
 #pragma clang diagnostic ignored "-Wreturn-type-c-linkage"
 extern int __Cling_Autoloading_Map;
-class __attribute__((annotate("$clingAutoload$widgets/swCalculatorWidget/SWCalculatorFrame.h")))  SWCalculatorFrame;
 )DICTFWDDCLS";
     static const char* payloadCode = R"DICTPAYLOAD(
 #line 1 "SWCalculatorFrameDict dictionary payload"
@@ -190,16 +146,21 @@ class __attribute__((annotate("$clingAutoload$widgets/swCalculatorWidget/SWCalcu
 #include "util/RootHelper.h"
 #include "util/StringUtils.h"
 #include "util/Variable.h"
-#include "widgets/importSpectrumWidget/IImportSpectrumView.h"
-#include "widgets/importSpectrumWidget/ImportSpectrumPresenter.h"
+#include "widgets/importSpectrumWidget/AbstractImportSpectrumView.h"
+#include "widgets/importSpectrumWidget/AbstractImportSpectrumPresenter.h"
 #include "widgets/importSpectrumWidget/ImportSpectrumView.h"
-#include "widgets/swCalculatorWidget/SWCalculatorFrame.h"
+#include "widgets/importSpectrumWidget/ImportSpectrumPresenter.h"
+#include "widgets/importSpectrumWidget/ImportSourceSpectrumView.h"
+#include "widgets/importSpectrumWidget/ImportSourceSpectrumPresenter.h"
+#include "widgets/swCalculatorWidget/SWCalculatorView.h"
+#include "widgets/swCalculatorWidget/SWCalculatorPresenter.h"
+#include "widgets/AbstractPresenter.h"
+#include "widgets/AbstractView.h"
 #include "main.h"
 
 #undef  _BACKWARD_BACKWARD_WARNING_H
 )DICTPAYLOAD";
     static const char* classesHeaders[]={
-"SWCalculatorFrame", payloadCode, "@",
 nullptr};
 
     static bool isInitialized = false;

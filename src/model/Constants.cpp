@@ -13,12 +13,7 @@
 
 #include "Constants.h"
 
-Constants::Constants() {
-}
+const char* Constants::applicationName = "SW Calculator";
 
-Constants::Constants(const Constants& orig) {
-}
-
-Constants::~Constants() {
-}
-
+static const Double_t padMargin[] = {0.12, 0.03, 0.15, 0.05};
+const Double_t* Constants::padMargin = padMargin;

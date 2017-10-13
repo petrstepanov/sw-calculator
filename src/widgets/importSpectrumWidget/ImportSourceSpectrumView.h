@@ -11,18 +11,18 @@
  * Created on October 12, 2017, 4:50 PM
  */
 
-#ifndef IMPORTSPECTRUMVIEW_H
-#define IMPORTSPECTRUMVIEW_H
+#ifndef IMPORTSOURECESPECTRUMVIEW_H
+#define IMPORTSOURCESPECTRUMVIEW_H
 
 #include "AbstractImportSpectrumView.h"
 #include "ImportSpectrumPresenter.h"
 #include <TGFrame.h>
 
-class ImportSpectrumView : public AbstractImportSpectrumView<ImportSpectrumPresenter> {
+class ImportSourceSpectrumView : public AbstractImportSpectrumView<ImportSpectrumPresenter> {
 public:
-    ImportSpectrumView(TGCompositeFrame *p = 0);
+    ImportSourceSpectrumView(TGCompositeFrame *p = 0);
 
-    ImportSpectrumPresenter* instantinatePresenter();
+    ImportSourceSpectrumPresenter* instantinatePresenter();
 };
 
 #endif /* IMPORTSPECTRUMVIEW_H */

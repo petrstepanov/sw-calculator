@@ -35,6 +35,7 @@ OBJECTDIR=${CND_BUILDDIR}/${CND_CONF}/${CND_PLATFORM}
 
 # Object Files
 OBJECTFILES= \
+	${OBJECTDIR}/src/event/EventBus.o \
 	${OBJECTDIR}/src/main.o \
 	${OBJECTDIR}/src/model/Constants.o \
 	${OBJECTDIR}/src/model/Model.o \
@@ -54,10 +55,15 @@ OBJECTFILES= \
 	${OBJECTDIR}/src/util/HistProcessor.o \
 	${OBJECTDIR}/src/util/RootHelper.o \
 	${OBJECTDIR}/src/util/StringUtils.o \
+	${OBJECTDIR}/src/util/UiHelper.o \
 	${OBJECTDIR}/src/util/Variable.o \
+	${OBJECTDIR}/src/widgets/importSpectrumWidget/AbstractImportSpectrumPresenter.o \
+	${OBJECTDIR}/src/widgets/importSpectrumWidget/AbstractImportSpectrumView.o \
+	${OBJECTDIR}/src/widgets/importSpectrumWidget/ImportSourceSpectrumPresenter.o \
 	${OBJECTDIR}/src/widgets/importSpectrumWidget/ImportSpectrumPresenter.o \
 	${OBJECTDIR}/src/widgets/importSpectrumWidget/ImportSpectrumView.o \
-	${OBJECTDIR}/src/widgets/swCalculatorWidget/SWCalculatorFrame.o
+	${OBJECTDIR}/src/widgets/swCalculatorWidget/SWCalculatorPresenter.o \
+	${OBJECTDIR}/src/widgets/swCalculatorWidget/SWCalculatorView.o
 
 
 # C Compiler Flags
@@ -90,6 +96,11 @@ ${OBJECTDIR}/SWCalculatorFrameLinkDef.h.gch: SWCalculatorFrameLinkDef.h
 	${MKDIR} -p ${OBJECTDIR}
 	${RM} "$@.d"
 	$(COMPILE.cc) -g -I/Applications/root_v6.06.02/include -MMD -MP -MF "$@.d" -o "$@" SWCalculatorFrameLinkDef.h
+
+${OBJECTDIR}/src/event/EventBus.o: src/event/EventBus.cpp
+	${MKDIR} -p ${OBJECTDIR}/src/event
+	${RM} "$@.d"
+	$(COMPILE.cc) -g -I/Applications/root_v6.06.02/include -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/src/event/EventBus.o src/event/EventBus.cpp
 
 ${OBJECTDIR}/src/main.o: src/main.cc
 	${MKDIR} -p ${OBJECTDIR}/src
@@ -186,10 +197,30 @@ ${OBJECTDIR}/src/util/StringUtils.o: src/util/StringUtils.cpp
 	${RM} "$@.d"
 	$(COMPILE.cc) -g -I/Applications/root_v6.06.02/include -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/src/util/StringUtils.o src/util/StringUtils.cpp
 
+${OBJECTDIR}/src/util/UiHelper.o: src/util/UiHelper.cpp
+	${MKDIR} -p ${OBJECTDIR}/src/util
+	${RM} "$@.d"
+	$(COMPILE.cc) -g -I/Applications/root_v6.06.02/include -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/src/util/UiHelper.o src/util/UiHelper.cpp
+
 ${OBJECTDIR}/src/util/Variable.o: src/util/Variable.cpp
 	${MKDIR} -p ${OBJECTDIR}/src/util
 	${RM} "$@.d"
 	$(COMPILE.cc) -g -I/Applications/root_v6.06.02/include -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/src/util/Variable.o src/util/Variable.cpp
+
+${OBJECTDIR}/src/widgets/importSpectrumWidget/AbstractImportSpectrumPresenter.o: src/widgets/importSpectrumWidget/AbstractImportSpectrumPresenter.cpp
+	${MKDIR} -p ${OBJECTDIR}/src/widgets/importSpectrumWidget
+	${RM} "$@.d"
+	$(COMPILE.cc) -g -I/Applications/root_v6.06.02/include -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/src/widgets/importSpectrumWidget/AbstractImportSpectrumPresenter.o src/widgets/importSpectrumWidget/AbstractImportSpectrumPresenter.cpp
+
+${OBJECTDIR}/src/widgets/importSpectrumWidget/AbstractImportSpectrumView.o: src/widgets/importSpectrumWidget/AbstractImportSpectrumView.cpp
+	${MKDIR} -p ${OBJECTDIR}/src/widgets/importSpectrumWidget
+	${RM} "$@.d"
+	$(COMPILE.cc) -g -I/Applications/root_v6.06.02/include -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/src/widgets/importSpectrumWidget/AbstractImportSpectrumView.o src/widgets/importSpectrumWidget/AbstractImportSpectrumView.cpp
+
+${OBJECTDIR}/src/widgets/importSpectrumWidget/ImportSourceSpectrumPresenter.o: src/widgets/importSpectrumWidget/ImportSourceSpectrumPresenter.cpp
+	${MKDIR} -p ${OBJECTDIR}/src/widgets/importSpectrumWidget
+	${RM} "$@.d"
+	$(COMPILE.cc) -g -I/Applications/root_v6.06.02/include -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/src/widgets/importSpectrumWidget/ImportSourceSpectrumPresenter.o src/widgets/importSpectrumWidget/ImportSourceSpectrumPresenter.cpp
 
 ${OBJECTDIR}/src/widgets/importSpectrumWidget/ImportSpectrumPresenter.o: src/widgets/importSpectrumWidget/ImportSpectrumPresenter.cpp
 	${MKDIR} -p ${OBJECTDIR}/src/widgets/importSpectrumWidget
@@ -201,15 +232,20 @@ ${OBJECTDIR}/src/widgets/importSpectrumWidget/ImportSpectrumView.o: src/widgets/
 	${RM} "$@.d"
 	$(COMPILE.cc) -g -I/Applications/root_v6.06.02/include -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/src/widgets/importSpectrumWidget/ImportSpectrumView.o src/widgets/importSpectrumWidget/ImportSpectrumView.cpp
 
-${OBJECTDIR}/src/widgets/swCalculatorWidget/SWCalculatorFrame.o: src/widgets/swCalculatorWidget/SWCalculatorFrame.cpp
+${OBJECTDIR}/src/widgets/swCalculatorWidget/SWCalculatorPresenter.o: src/widgets/swCalculatorWidget/SWCalculatorPresenter.cpp
 	${MKDIR} -p ${OBJECTDIR}/src/widgets/swCalculatorWidget
 	${RM} "$@.d"
-	$(COMPILE.cc) -g -I/Applications/root_v6.06.02/include -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/src/widgets/swCalculatorWidget/SWCalculatorFrame.o src/widgets/swCalculatorWidget/SWCalculatorFrame.cpp
+	$(COMPILE.cc) -g -I/Applications/root_v6.06.02/include -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/src/widgets/swCalculatorWidget/SWCalculatorPresenter.o src/widgets/swCalculatorWidget/SWCalculatorPresenter.cpp
 
-${OBJECTDIR}/src/widgets/swCalculatorWidget/SWCalculatorFrame.h.gch: src/widgets/swCalculatorWidget/SWCalculatorFrame.h
+${OBJECTDIR}/src/widgets/swCalculatorWidget/SWCalculatorView.o: src/widgets/swCalculatorWidget/SWCalculatorView.cpp
 	${MKDIR} -p ${OBJECTDIR}/src/widgets/swCalculatorWidget
 	${RM} "$@.d"
-	$(COMPILE.cc) -g -I/Applications/root_v6.06.02/include -MMD -MP -MF "$@.d" -o "$@" src/widgets/swCalculatorWidget/SWCalculatorFrame.h
+	$(COMPILE.cc) -g -I/Applications/root_v6.06.02/include -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/src/widgets/swCalculatorWidget/SWCalculatorView.o src/widgets/swCalculatorWidget/SWCalculatorView.cpp
+
+${OBJECTDIR}/src/widgets/swCalculatorWidget/SWCalculatorView.h.gch: src/widgets/swCalculatorWidget/SWCalculatorView.h
+	${MKDIR} -p ${OBJECTDIR}/src/widgets/swCalculatorWidget
+	${RM} "$@.d"
+	$(COMPILE.cc) -g -I/Applications/root_v6.06.02/include -MMD -MP -MF "$@.d" -o "$@" src/widgets/swCalculatorWidget/SWCalculatorView.h
 
 # Subprojects
 .build-subprojects:

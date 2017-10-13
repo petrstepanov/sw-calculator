@@ -22,6 +22,7 @@
 class HistProcessor {
 public:
 	static HistProcessor* getInstance();
+        
 	TH1* cutHist(TH1*, Int_t, Int_t);
 	RooCurve* subtractCurves(RooCurve*, RooCurve*);
 	TH1* subtractCurve(TH1*, RooCurve*);

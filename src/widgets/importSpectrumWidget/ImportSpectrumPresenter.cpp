@@ -4,21 +4,20 @@
  * and open the template in the editor.
  */
 
-/* 
- * File:   ImportSpectrumPresenter.cpp
- * Author: petrstepanov
- * 
- * Created on October 6, 2017, 12:18 AM
- */
-
 #include "ImportSpectrumPresenter.h"
 
-ImportSpectrumPresenter::ImportSpectrumPresenter() {
+ImportSpectrumPresenter::ImportSpectrumPresenter(ImportSpectrumView* view) : AbstractImportSpectrumPresenter(view){
+}
+        
+void ImportSpectrumPresenter::setModelFileName(char* fileName){
+    Model* model = AbstractImportSpectrumPresenter::getModel();
+    TString* fN = new TString(fileName);
+    model->setFileName(fN);
 }
 
-ImportSpectrumPresenter::ImportSpectrumPresenter(const ImportSpectrumPresenter& orig) {
-}
-
-ImportSpectrumPresenter::~ImportSpectrumPresenter() {
-}
-
+void ImportSpectrumPresenter::setModelHist(TH1F* hist, Bool_t isTwoDetector){
+    Model* model = AbstractImportSpectrumPresenter::getModel();
+    model->setHist(hist);
+    model->setTwoDetector(isTwoDetector);
+};
+    

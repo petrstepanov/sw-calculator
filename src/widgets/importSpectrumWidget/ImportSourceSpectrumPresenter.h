@@ -5,28 +5,29 @@
  */
 
 /* 
- * File:   ImportSpectrumPresenter.h
+ * File:   ImportSourceSpectrumPresenter.h
  * Author: petrstepanov
  *
- * Created on October 11, 2017, 6:30 PM
+ * Created on October 12, 2017, 8:55 PM
  */
 
-#ifndef IMPORTSPECTRUMPRESENTER_H
-#define IMPORTSPECTRUMPRESENTER_H
+#ifndef IMPORTSOURCESPECTRUMPRESENTER_H
+#define IMPORTSOURCESPECTRUMPRESENTER_H
 
 #include "AbstractImportSpectrumPresenter.h"
 //#include "ImportSpectrumView.h"
 #include <TString.h>
 
-class ImportSpectrumView;
+class ImportSourceSpectrumView;
 
-class ImportSpectrumPresenter : AbstractImportSpectrumPresenter<ImportSpectrumView> {
+class ImportSourceSpectrumPresenter : AbstractImportSpectrumPresenter<ImportSourceSpectrumView> {
     public:
-        ImportSpectrumPresenter(ImportSpectrumView* view);
+        ImportSourceSpectrumPresenter(ImportSourceSpectrumView* view);
         
         void setModelFileName(char* fileName);        
         void setModelHist(TH1F* hist, Bool_t isTwoDetector);
 };
 
-#endif /* IMPORTSPECTRUMPRESENTER_H */
+
+#endif /* IMPORTSOURCESPECTRUMPRESENTER_H */
 

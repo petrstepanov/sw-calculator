@@ -43,29 +43,42 @@ Contributor(s):
     <logicalFolder name="HeaderFiles"
                    displayName="Header Files"
                    projectFiles="true">
+      <itemPath>src/widgets/importSpectrumWidget/AbstractImportSpectrumPresenter.h</itemPath>
+      <itemPath>src/widgets/importSpectrumWidget/AbstractImportSpectrumView.h</itemPath>
       <itemPath>src/roofit/AbstractModelProvider.h</itemPath>
+      <itemPath>src/widgets/AbstractPresenter.h</itemPath>
+      <itemPath>src/widgets/AbstractView.h</itemPath>
       <itemPath>src/roofit/ChannelConvolutionPdf.h</itemPath>
       <itemPath>src/roofit/CompositeModelProvider.h</itemPath>
       <itemPath>src/model/Constants.h</itemPath>
       <itemPath>src/roofit/DampLorentzPdf.h</itemPath>
+      <itemPath>src/event/Event.h</itemPath>
+      <itemPath>src/event/EventBus.h</itemPath>
+      <itemPath>src/event/EventHandler.h</itemPath>
       <itemPath>src/util/FileUtils.h</itemPath>
       <itemPath>src/roofit/GaussianPdf.h</itemPath>
       <itemPath>src/util/GraphicsHelper.h</itemPath>
+      <itemPath>src/event/HandlerRegistration.h</itemPath>
       <itemPath>src/util/HistProcessor.h</itemPath>
-      <itemPath>src/widgets/importSpectrumWidget/IImportSpectrumView.h</itemPath>
+      <itemPath>src/model/IModel.h</itemPath>
+      <itemPath>src/widgets/importSpectrumWidget/ImportSourceSpectrumPresenter.h</itemPath>
+      <itemPath>src/widgets/importSpectrumWidget/ImportSourceSpectrumView.h</itemPath>
       <itemPath>src/widgets/importSpectrumWidget/ImportSpectrumPresenter.h</itemPath>
       <itemPath>src/widgets/importSpectrumWidget/ImportSpectrumView.h</itemPath>
       <itemPath>src/roofit/IndirectParamPdf.h</itemPath>
       <itemPath>src/roofit/LorentzianPdf.h</itemPath>
       <itemPath>src/model/Model.h</itemPath>
+      <itemPath>src/event/Object.h</itemPath>
       <itemPath>src/roofit/OrthogonalPdf.h</itemPath>
       <itemPath>src/roofit/ParabolaGaussModelProvider.h</itemPath>
       <itemPath>src/roofit/ParabolaLorentzianModelProvider.h</itemPath>
       <itemPath>src/roofit/ParabolaPdf.h</itemPath>
       <itemPath>src/util/RootHelper.h</itemPath>
-      <itemPath>src/widgets/swCalculatorWidget/SWCalculatorFrame.h</itemPath>
       <itemPath>SWCalculatorFrameLinkDef.h</itemPath>
+      <itemPath>src/widgets/swCalculatorWidget/SWCalculatorPresenter.h</itemPath>
+      <itemPath>src/widgets/swCalculatorWidget/SWCalculatorView.h</itemPath>
       <itemPath>src/util/StringUtils.h</itemPath>
+      <itemPath>src/util/UiHelper.h</itemPath>
       <itemPath>src/util/Variable.h</itemPath>
     </logicalFolder>
     <logicalFolder name="ResourceFiles"
@@ -75,15 +88,19 @@ Contributor(s):
     <logicalFolder name="SourceFiles"
                    displayName="Source Files"
                    projectFiles="true">
+      <itemPath>src/widgets/importSpectrumWidget/AbstractImportSpectrumPresenter.cpp</itemPath>
+      <itemPath>src/widgets/importSpectrumWidget/AbstractImportSpectrumView.cpp</itemPath>
       <itemPath>src/roofit/AbstractModelProvider.cpp</itemPath>
       <itemPath>src/roofit/ChannelConvolutionPdf.cpp</itemPath>
       <itemPath>src/roofit/CompositeModelProvider.cpp</itemPath>
       <itemPath>src/model/Constants.cpp</itemPath>
       <itemPath>src/roofit/DampLorentzPdf.cpp</itemPath>
+      <itemPath>src/event/EventBus.cpp</itemPath>
       <itemPath>src/util/FileUtils.cpp</itemPath>
       <itemPath>src/roofit/GaussianPdf.cpp</itemPath>
       <itemPath>src/util/GraphicsHelper.cpp</itemPath>
       <itemPath>src/util/HistProcessor.cpp</itemPath>
+      <itemPath>src/widgets/importSpectrumWidget/ImportSourceSpectrumPresenter.cpp</itemPath>
       <itemPath>src/widgets/importSpectrumWidget/ImportSpectrumPresenter.cpp</itemPath>
       <itemPath>src/widgets/importSpectrumWidget/ImportSpectrumView.cpp</itemPath>
       <itemPath>src/roofit/IndirectParamPdf.cpp</itemPath>
@@ -94,8 +111,10 @@ Contributor(s):
       <itemPath>src/roofit/ParabolaLorentzianModelProvider.cpp</itemPath>
       <itemPath>src/roofit/ParabolaPdf.cpp</itemPath>
       <itemPath>src/util/RootHelper.cpp</itemPath>
-      <itemPath>src/widgets/swCalculatorWidget/SWCalculatorFrame.cpp</itemPath>
+      <itemPath>src/widgets/swCalculatorWidget/SWCalculatorPresenter.cpp</itemPath>
+      <itemPath>src/widgets/swCalculatorWidget/SWCalculatorView.cpp</itemPath>
       <itemPath>src/util/StringUtils.cpp</itemPath>
+      <itemPath>src/util/UiHelper.cpp</itemPath>
       <itemPath>src/util/Variable.cpp</itemPath>
       <itemPath>src/main.cc</itemPath>
     </logicalFolder>
@@ -158,9 +177,75 @@ Contributor(s):
                             perm="755"
                             owner="root"
                             group="bin"/>
+          <packFileListElem type="File"
+                            to="${PACKAGE_TOP_DIR}bin/${OUTPUT_BASENAME}"
+                            from="${OUTPUT_PATH}"
+                            perm="755"
+                            owner="root"
+                            group="bin"/>
+          <packFileListElem type="File"
+                            to="${PACKAGE_TOP_DIR}bin/${OUTPUT_BASENAME}"
+                            from="${OUTPUT_PATH}"
+                            perm="755"
+                            owner="root"
+                            group="bin"/>
+          <packFileListElem type="File"
+                            to="${PACKAGE_TOP_DIR}bin/${OUTPUT_BASENAME}"
+                            from="${OUTPUT_PATH}"
+                            perm="755"
+                            owner="root"
+                            group="bin"/>
+          <packFileListElem type="File"
+                            to="${PACKAGE_TOP_DIR}bin/${OUTPUT_BASENAME}"
+                            from="${OUTPUT_PATH}"
+                            perm="755"
+                            owner="root"
+                            group="bin"/>
+          <packFileListElem type="File"
+                            to="${PACKAGE_TOP_DIR}bin/${OUTPUT_BASENAME}"
+                            from="${OUTPUT_PATH}"
+                            perm="755"
+                            owner="root"
+                            group="bin"/>
+          <packFileListElem type="File"
+                            to="${PACKAGE_TOP_DIR}bin/${OUTPUT_BASENAME}"
+                            from="${OUTPUT_PATH}"
+                            perm="755"
+                            owner="root"
+                            group="bin"/>
+          <packFileListElem type="File"
+                            to="${PACKAGE_TOP_DIR}bin/${OUTPUT_BASENAME}"
+                            from="${OUTPUT_PATH}"
+                            perm="755"
+                            owner="root"
+                            group="bin"/>
+          <packFileListElem type="File"
+                            to="${PACKAGE_TOP_DIR}bin/${OUTPUT_BASENAME}"
+                            from="${OUTPUT_PATH}"
+                            perm="755"
+                            owner="root"
+                            group="bin"/>
+          <packFileListElem type="File"
+                            to="${PACKAGE_TOP_DIR}bin/${OUTPUT_BASENAME}"
+                            from="${OUTPUT_PATH}"
+                            perm="755"
+                            owner="root"
+                            group="bin"/>
         </packFileList>
       </packaging>
       <item path="SWCalculatorFrameLinkDef.h" ex="false" tool="1" flavor2="0">
+      </item>
+      <item path="src/event/Event.h" ex="false" tool="3" flavor2="0">
+      </item>
+      <item path="src/event/EventBus.cpp" ex="false" tool="1" flavor2="0">
+      </item>
+      <item path="src/event/EventBus.h" ex="false" tool="3" flavor2="0">
+      </item>
+      <item path="src/event/EventHandler.h" ex="false" tool="3" flavor2="0">
+      </item>
+      <item path="src/event/HandlerRegistration.h" ex="false" tool="3" flavor2="0">
+      </item>
+      <item path="src/event/Object.h" ex="false" tool="3" flavor2="0">
       </item>
       <item path="src/main.cc" ex="false" tool="1" flavor2="0">
         <ccTool>
@@ -170,6 +255,8 @@ Contributor(s):
       <item path="src/model/Constants.cpp" ex="false" tool="1" flavor2="0">
       </item>
       <item path="src/model/Constants.h" ex="false" tool="3" flavor2="0">
+      </item>
+      <item path="src/model/IModel.h" ex="false" tool="3" flavor2="0">
       </item>
       <item path="src/model/Model.cpp" ex="false" tool="1" flavor2="0">
       </item>
@@ -263,11 +350,49 @@ Contributor(s):
       </item>
       <item path="src/util/StringUtils.h" ex="false" tool="3" flavor2="0">
       </item>
+      <item path="src/util/UiHelper.cpp" ex="false" tool="1" flavor2="0">
+      </item>
+      <item path="src/util/UiHelper.h" ex="false" tool="3" flavor2="0">
+      </item>
       <item path="src/util/Variable.cpp" ex="false" tool="1" flavor2="0">
       </item>
       <item path="src/util/Variable.h" ex="false" tool="3" flavor2="0">
       </item>
-      <item path="src/widgets/importSpectrumWidget/IImportSpectrumView.h"
+      <item path="src/widgets/AbstractPresenter.h" ex="false" tool="3" flavor2="0">
+      </item>
+      <item path="src/widgets/AbstractView.h" ex="false" tool="3" flavor2="0">
+      </item>
+      <item path="src/widgets/importSpectrumWidget/AbstractImportSpectrumPresenter.cpp"
+            ex="false"
+            tool="1"
+            flavor2="0">
+      </item>
+      <item path="src/widgets/importSpectrumWidget/AbstractImportSpectrumPresenter.h"
+            ex="false"
+            tool="3"
+            flavor2="0">
+      </item>
+      <item path="src/widgets/importSpectrumWidget/AbstractImportSpectrumView.cpp"
+            ex="false"
+            tool="1"
+            flavor2="0">
+      </item>
+      <item path="src/widgets/importSpectrumWidget/AbstractImportSpectrumView.h"
+            ex="false"
+            tool="3"
+            flavor2="0">
+      </item>
+      <item path="src/widgets/importSpectrumWidget/ImportSourceSpectrumPresenter.cpp"
+            ex="false"
+            tool="1"
+            flavor2="0">
+      </item>
+      <item path="src/widgets/importSpectrumWidget/ImportSourceSpectrumPresenter.h"
+            ex="false"
+            tool="3"
+            flavor2="0">
+      </item>
+      <item path="src/widgets/importSpectrumWidget/ImportSourceSpectrumView.h"
             ex="false"
             tool="3"
             flavor2="0">
@@ -292,12 +417,22 @@ Contributor(s):
             tool="3"
             flavor2="0">
       </item>
-      <item path="src/widgets/swCalculatorWidget/SWCalculatorFrame.cpp"
+      <item path="src/widgets/swCalculatorWidget/SWCalculatorPresenter.cpp"
             ex="false"
             tool="1"
             flavor2="0">
       </item>
-      <item path="src/widgets/swCalculatorWidget/SWCalculatorFrame.h"
+      <item path="src/widgets/swCalculatorWidget/SWCalculatorPresenter.h"
+            ex="false"
+            tool="3"
+            flavor2="0">
+      </item>
+      <item path="src/widgets/swCalculatorWidget/SWCalculatorView.cpp"
+            ex="false"
+            tool="1"
+            flavor2="0">
+      </item>
+      <item path="src/widgets/swCalculatorWidget/SWCalculatorView.h"
             ex="false"
             tool="1"
             flavor2="0">
@@ -330,11 +465,25 @@ Contributor(s):
       </compileType>
       <item path="SWCalculatorFrameLinkDef.h" ex="false" tool="3" flavor2="0">
       </item>
+      <item path="src/event/Event.h" ex="false" tool="3" flavor2="0">
+      </item>
+      <item path="src/event/EventBus.cpp" ex="false" tool="1" flavor2="0">
+      </item>
+      <item path="src/event/EventBus.h" ex="false" tool="3" flavor2="0">
+      </item>
+      <item path="src/event/EventHandler.h" ex="false" tool="3" flavor2="0">
+      </item>
+      <item path="src/event/HandlerRegistration.h" ex="false" tool="3" flavor2="0">
+      </item>
+      <item path="src/event/Object.h" ex="false" tool="3" flavor2="0">
+      </item>
       <item path="src/main.cc" ex="false" tool="1" flavor2="0">
       </item>
       <item path="src/model/Constants.cpp" ex="false" tool="1" flavor2="0">
       </item>
       <item path="src/model/Constants.h" ex="false" tool="3" flavor2="0">
+      </item>
+      <item path="src/model/IModel.h" ex="false" tool="3" flavor2="0">
       </item>
       <item path="src/model/Model.cpp" ex="false" tool="1" flavor2="0">
       </item>
@@ -426,11 +575,49 @@ Contributor(s):
       </item>
       <item path="src/util/StringUtils.h" ex="false" tool="3" flavor2="0">
       </item>
+      <item path="src/util/UiHelper.cpp" ex="false" tool="1" flavor2="0">
+      </item>
+      <item path="src/util/UiHelper.h" ex="false" tool="3" flavor2="0">
+      </item>
       <item path="src/util/Variable.cpp" ex="false" tool="1" flavor2="0">
       </item>
       <item path="src/util/Variable.h" ex="false" tool="3" flavor2="0">
       </item>
-      <item path="src/widgets/importSpectrumWidget/IImportSpectrumView.h"
+      <item path="src/widgets/AbstractPresenter.h" ex="false" tool="3" flavor2="0">
+      </item>
+      <item path="src/widgets/AbstractView.h" ex="false" tool="3" flavor2="0">
+      </item>
+      <item path="src/widgets/importSpectrumWidget/AbstractImportSpectrumPresenter.cpp"
+            ex="false"
+            tool="1"
+            flavor2="0">
+      </item>
+      <item path="src/widgets/importSpectrumWidget/AbstractImportSpectrumPresenter.h"
+            ex="false"
+            tool="3"
+            flavor2="0">
+      </item>
+      <item path="src/widgets/importSpectrumWidget/AbstractImportSpectrumView.cpp"
+            ex="false"
+            tool="1"
+            flavor2="0">
+      </item>
+      <item path="src/widgets/importSpectrumWidget/AbstractImportSpectrumView.h"
+            ex="false"
+            tool="3"
+            flavor2="0">
+      </item>
+      <item path="src/widgets/importSpectrumWidget/ImportSourceSpectrumPresenter.cpp"
+            ex="false"
+            tool="1"
+            flavor2="0">
+      </item>
+      <item path="src/widgets/importSpectrumWidget/ImportSourceSpectrumPresenter.h"
+            ex="false"
+            tool="3"
+            flavor2="0">
+      </item>
+      <item path="src/widgets/importSpectrumWidget/ImportSourceSpectrumView.h"
             ex="false"
             tool="3"
             flavor2="0">
@@ -455,12 +642,22 @@ Contributor(s):
             tool="3"
             flavor2="0">
       </item>
-      <item path="src/widgets/swCalculatorWidget/SWCalculatorFrame.cpp"
+      <item path="src/widgets/swCalculatorWidget/SWCalculatorPresenter.cpp"
             ex="false"
             tool="1"
             flavor2="0">
       </item>
-      <item path="src/widgets/swCalculatorWidget/SWCalculatorFrame.h"
+      <item path="src/widgets/swCalculatorWidget/SWCalculatorPresenter.h"
+            ex="false"
+            tool="3"
+            flavor2="0">
+      </item>
+      <item path="src/widgets/swCalculatorWidget/SWCalculatorView.cpp"
+            ex="false"
+            tool="1"
+            flavor2="0">
+      </item>
+      <item path="src/widgets/swCalculatorWidget/SWCalculatorView.h"
             ex="false"
             tool="3"
             flavor2="0">
