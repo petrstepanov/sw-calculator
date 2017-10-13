@@ -60,6 +60,7 @@ OBJECTFILES= \
 	${OBJECTDIR}/src/widgets/importSpectrumWidget/AbstractImportSpectrumPresenter.o \
 	${OBJECTDIR}/src/widgets/importSpectrumWidget/AbstractImportSpectrumView.o \
 	${OBJECTDIR}/src/widgets/importSpectrumWidget/ImportSourceSpectrumPresenter.o \
+	${OBJECTDIR}/src/widgets/importSpectrumWidget/ImportSourceSpectrumView.o \
 	${OBJECTDIR}/src/widgets/importSpectrumWidget/ImportSpectrumPresenter.o \
 	${OBJECTDIR}/src/widgets/importSpectrumWidget/ImportSpectrumView.o \
 	${OBJECTDIR}/src/widgets/swCalculatorWidget/SWCalculatorPresenter.o \
@@ -214,6 +215,11 @@ ${OBJECTDIR}/src/widgets/importSpectrumWidget/ImportSourceSpectrumPresenter.o: s
 	${MKDIR} -p ${OBJECTDIR}/src/widgets/importSpectrumWidget
 	${RM} "$@.d"
 	$(COMPILE.cc) -O2 -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/src/widgets/importSpectrumWidget/ImportSourceSpectrumPresenter.o src/widgets/importSpectrumWidget/ImportSourceSpectrumPresenter.cpp
+
+${OBJECTDIR}/src/widgets/importSpectrumWidget/ImportSourceSpectrumView.o: src/widgets/importSpectrumWidget/ImportSourceSpectrumView.cpp
+	${MKDIR} -p ${OBJECTDIR}/src/widgets/importSpectrumWidget
+	${RM} "$@.d"
+	$(COMPILE.cc) -O2 -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/src/widgets/importSpectrumWidget/ImportSourceSpectrumView.o src/widgets/importSpectrumWidget/ImportSourceSpectrumView.cpp
 
 ${OBJECTDIR}/src/widgets/importSpectrumWidget/ImportSpectrumPresenter.o: src/widgets/importSpectrumWidget/ImportSpectrumPresenter.cpp
 	${MKDIR} -p ${OBJECTDIR}/src/widgets/importSpectrumWidget

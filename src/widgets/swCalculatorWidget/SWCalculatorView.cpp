@@ -16,6 +16,7 @@
 #include "../../SWCalculatorFrameLinkDef.h"
 #include "../../model/Constants.h"
 #include "../importSpectrumWidget/ImportSpectrumView.h"
+#include "../importSpectrumWidget/ImportSourceSpectrumView.h"
 #include <TGFrame.h>
 #include <map>
 //#include <algorithm>  //min
@@ -47,7 +48,8 @@
 
 using namespace RooFit;
 
-SWCalculatorView::SWCalculatorView(TGCompositeFrame* p) : AbstractView<SWCalculatorPresenter>(p){
+SWCalculatorView::SWCalculatorView(TGWindow* w) : AbstractView<SWCalculatorPresenter>(w){
+    initUI();    
 }
 
 SWCalculatorPresenter* SWCalculatorView::instantinatePresenter(){
@@ -55,34 +57,26 @@ SWCalculatorPresenter* SWCalculatorView::instantinatePresenter(){
 }
 
 void SWCalculatorView::initUI(){
-    TGHorizontalFrame* mainChildFrame = new TGHorizontalFrame();
+    std::cout << "SWCalculatorView::initUI" << std::endl;
+
+//    GetParent()->Print();
 
     // Tabs widget
-    tabsWidget = new TGTab(GetParent(), Constants::leftPanelWidth);
+    tabsWidget = new TGTab(this, Constants::leftPanelWidth);
 
-    // "Import Spectrum" tab
-    TGCompositeFrame *tabImport = tabsWidget->AddTab("Import Spectrum");
+    // Import spectrum tab
+    TGCompositeFrame *tabImport = tabsWidget->AddTab("Material Spectrum");
     tabImport->SetLayoutManager(new TGVerticalLayout(tabImport));
-    new ImportSpectrumView(tabImport);
-    // row "Open File"
+    tabImport->AddFrame(new ImportSpectrumView(tabImport), new TGLayoutHints(kLHintsExpandX, dx, dx, dy, dy));
 
-    // container of "Fit Data" tab
-    TGCompositeFrame *tabFit;
-    tabFit = tabsWidget->AddTab("Fit Data");
+    // Import Kapton spectrum tab
+    TGCompositeFrame *tabImportKapton = tabsWidget->AddTab("Kapton Spectrum");
+    tabImportKapton->SetLayoutManager(new TGVerticalLayout(tabImportKapton));
+    tabImportKapton->AddFrame(new ImportSourceSpectrumView(tabImportKapton), new TGLayoutHints(kLHintsExpandX, dx, dx, dy, dy));
+    
+    // Fit Data tab
+    TGCompositeFrame *tabFit = tabsWidget->AddTab("Fit Data");
     tabFit->SetLayoutManager(new TGVerticalLayout(tabFit));
-
-    // Peak Position Row
-//    TGHorizontalFrame *framePeakPosition = new TGHorizontalFrame(tabFit);
-//    TGLabel *lblPeakPosition = new TGLabel(framePeakPosition, "Peak Center, keV");
-//    numPeakPosition = new TGNumberEntry(framePeakPosition, 485, 4, -1, TGNumberFormat::kNESInteger,
-//            TGNumberFormat::kNEAAnyNumber,
-//            TGNumberFormat::kNELLimitMinMax,
-//            -100, 2000);
-//    numPeakPosition->GetNumberEntry()->Connect("TextChanged(char*)", "SWCalculatorFrame",
-//            this, "onNumPeakPositionChange()");
-//    framePeakPosition->AddFrame(lblPeakPosition, new TGLayoutHints(kLHintsNormal, 0, 0, d2x, 0));
-//    framePeakPosition->AddFrame(numPeakPosition, new TGLayoutHints(kLHintsRight));
-//    tabFit->AddFrame(framePeakPosition, new TGLayoutHints(kLHintsExpandX, dx, dx, dx, d2x));
 
     // Fit Range Row
     TGHorizontalFrame *frameFitRange = new TGHorizontalFrame(tabFit);
@@ -99,15 +93,15 @@ void SWCalculatorView::initUI(){
             -9999, 9999);
     numFitMax->GetNumberEntry()->Connect("TextChanged(char*)", "SWCalculatorFrame",
             this, "onNumFitMaxChanged()");
-    frameFitRange->AddFrame(new TGLabel(frameFitRange, "Fit Range, keV"), new TGLayoutHints(kLHintsNormal, 0, 0, d2x, 0));
+    frameFitRange->AddFrame(new TGLabel(frameFitRange, "Fit Range, keV"), new TGLayoutHints(kLHintsNormal, 0, 0, dy, 0));
     frameFitRange->AddFrame(numFitMax, new TGLayoutHints(kLHintsRight));
-    frameFitRange->AddFrame(new TGLabel(frameFitRange, "-"), new TGLayoutHints(kLHintsRight, dx, dx, d2x, 0));
+    frameFitRange->AddFrame(new TGLabel(frameFitRange, "-"), new TGLayoutHints(kLHintsRight, dx, dx, dy, 0));
     frameFitRange->AddFrame(numFitMin, new TGLayoutHints(kLHintsRight));
 
-    tabFit->AddFrame(frameFitRange, new TGLayoutHints(kLHintsExpandX, dx, dx, dx, d2x));
+    tabFit->AddFrame(frameFitRange, new TGLayoutHints(kLHintsExpandX, dx, dx, dy*2, dy));
 
     // Separator
-    tabFit->AddFrame(new TGHorizontal3DLine(tabFit), new TGLayoutHints(kLHintsExpandX, dx, dx, d2x, d2x));
+    tabFit->AddFrame(new TGHorizontal3DLine(tabFit), new TGLayoutHints(kLHintsExpandX, dx, dx, dy, dy));
 
     // Integration Parameters
     TGHorizontalFrame *frameSWidth = new TGHorizontalFrame(tabFit);
@@ -116,11 +110,11 @@ void SWCalculatorView::initUI(){
             TGNumberFormat::kNEANonNegative,
             TGNumberFormat::kNELLimitMin,
             0.01, 9.99);
-    frameSWidth->AddFrame(new TGLabel(frameSWidth, "S Region Width"), new TGLayoutHints(kLHintsNormal, 0, 0, d2x, 0));
+    frameSWidth->AddFrame(new TGLabel(frameSWidth, "S Region Width"), new TGLayoutHints(kLHintsNormal, 0, 0, dy, 0));
     frameSWidth->AddFrame(numSWidth, new TGLayoutHints(kLHintsRight));
-    frameSWidth->AddFrame(lblRescale1, new TGLayoutHints(kLHintsRight, 0, dx, 3*dx/5, 0));
+    frameSWidth->AddFrame(lblRescale1, new TGLayoutHints(kLHintsRight, 0, dx, 3*dy/5, 0));
 
-    tabFit->AddFrame(frameSWidth, new TGLayoutHints(kLHintsExpandX, dx, dx, d2x, d2x));
+    tabFit->AddFrame(frameSWidth, new TGLayoutHints(kLHintsExpandX, dx, dx, dy, dy));
 
     TGHorizontalFrame *frameWWidth = new TGHorizontalFrame(tabFit);
     lblRescale2 = new TGLabel(frameWWidth, "2 x ");
@@ -128,11 +122,11 @@ void SWCalculatorView::initUI(){
             TGNumberFormat::kNEANonNegative,
             TGNumberFormat::kNELLimitMin,
             0.01, 9.99);
-    frameWWidth->AddFrame(new TGLabel(frameWWidth, "W Regions Width"), new TGLayoutHints(kLHintsNormal, 0, 0, d2x, 0));
+    frameWWidth->AddFrame(new TGLabel(frameWWidth, "W Regions Width"), new TGLayoutHints(kLHintsNormal, 0, 0, dy, 0));
     frameWWidth->AddFrame(numWWidth, new TGLayoutHints(kLHintsRight));
-    frameWWidth->AddFrame(lblRescale2, new TGLayoutHints(kLHintsRight, 0, dx, 3*dx/5, 0));
+    frameWWidth->AddFrame(lblRescale2, new TGLayoutHints(kLHintsRight, 0, dx, 3*dy/5, 0));
 
-    tabFit->AddFrame(frameWWidth, new TGLayoutHints(kLHintsExpandX, dx, dx, d2x, d2x));
+    tabFit->AddFrame(frameWWidth, new TGLayoutHints(kLHintsExpandX, dx, dx, dy, dy));
 
     TGHorizontalFrame *frameWShift = new TGHorizontalFrame(tabFit);
     lblRescale3 = new TGLabel(frameWShift, "2 x ");
@@ -140,14 +134,14 @@ void SWCalculatorView::initUI(){
             TGNumberFormat::kNEANonNegative,
             TGNumberFormat::kNELLimitMin,
             0.01, 9.99);
-    frameWShift->AddFrame(new TGLabel(frameWShift, "W Regions Shift"), new TGLayoutHints(kLHintsNormal, 0, 0, d2x, 0));
+    frameWShift->AddFrame(new TGLabel(frameWShift, "W Regions Shift"), new TGLayoutHints(kLHintsNormal, 0, 0, dy, 0));
     frameWShift->AddFrame(numWShift, new TGLayoutHints(kLHintsRight));
-    frameWShift->AddFrame(lblRescale3, new TGLayoutHints(kLHintsRight, 0, dx, 3*dx/5, 0));
+    frameWShift->AddFrame(lblRescale3, new TGLayoutHints(kLHintsRight, 0, dx, 3*dy/5, 0));
 
-    tabFit->AddFrame(frameWShift, new TGLayoutHints(kLHintsExpandX, dx, dx, d2x, d2x));
+    tabFit->AddFrame(frameWShift, new TGLayoutHints(kLHintsExpandX, dx, dx, dy, dy));
 
     // Separator
-    tabFit->AddFrame(new TGHorizontal3DLine(tabFit), new TGLayoutHints(kLHintsExpandX, dx, dx, d2x, d2x));
+    tabFit->AddFrame(new TGHorizontal3DLine(tabFit), new TGLayoutHints(kLHintsExpandX, dx, dx, dy, dy));
 
     // Resolution Function Parameters
     TGHorizontalFrame* convolutionParamsFrame = new TGHorizontalFrame(tabFit);
@@ -166,144 +160,118 @@ void SWCalculatorView::initUI(){
             0.5, 4.0);
     convolutionParamsFrame->AddFrame(new TGLabel(convolutionParamsFrame, "Convolution"), 
                                      new TGLayoutHints(kLHintsLeft | kLHintsTop, 0, dx, 4*dx/5, 0));
-    convolutionParamsFrame->AddFrame(comboConvolutionType, new TGLayoutHints(kLHintsLeft | kLHintsTop, 0, 0, dx/5, 0));
-    convolutionParamsFrame->AddFrame(checkboxResFixed, new TGLayoutHints(kLHintsRight | kLHintsTop, 0, 0, 3*dx/5, 0));
-    convolutionParamsFrame->AddFrame(numResolutionFWHM, new TGLayoutHints(kLHintsRight | kLHintsTop, 0, dx, dx/5, 0));
+    convolutionParamsFrame->AddFrame(comboConvolutionType, new TGLayoutHints(kLHintsLeft | kLHintsTop, 0, 0, dy/5, 0));
+    convolutionParamsFrame->AddFrame(checkboxResFixed, new TGLayoutHints(kLHintsRight | kLHintsTop, 0, 0, 3*dy/5, 0));
+    convolutionParamsFrame->AddFrame(numResolutionFWHM, new TGLayoutHints(kLHintsRight | kLHintsTop, 0, dx, dy/5, 0));
     convolutionParamsFrame->AddFrame(new TGLabel(convolutionParamsFrame, "Resolution FWHM, keV"), 
-                                     new TGLayoutHints(kLHintsRight | kLHintsTop, 0, dx, 4*dx/5, 0));
-    tabFit->AddFrame(convolutionParamsFrame, new TGLayoutHints(kLHintsExpandX, dx, dx, 2*dx, 2*dx));
+                                     new TGLayoutHints(kLHintsRight | kLHintsTop, 0, dx, 4*dy/5, 0));
+    tabFit->AddFrame(convolutionParamsFrame, new TGLayoutHints(kLHintsExpandX, dx, dx, dy, dy));
 
     // Separator
-    tabFit->AddFrame(new TGHorizontal3DLine(tabFit), new TGLayoutHints(kLHintsExpandX, dx, dx, 2*dx, 2*dx));
+    tabFit->AddFrame(new TGHorizontal3DLine(tabFit), new TGLayoutHints(kLHintsExpandX, dx, dx, dy, dy));
 
     // Model parameters
     TGHorizontalFrame* modelParamsFrame = new TGHorizontalFrame(tabFit);
-//	modelParamsFrame->AddFrame(new TGLabel(modelParamsFrame, "Model details:"), new TGLayoutHints(kLHintsNormal, 0, 30, 5, 0));
+    //	modelParamsFrame->AddFrame(new TGLabel(modelParamsFrame, "Model details:"), new TGLayoutHints(kLHintsNormal, 0, 30, 5, 0));
     checkboxHasParabola = new TGCheckButton(modelParamsFrame, "Parabola", -1);
-    modelParamsFrame->AddFrame(checkboxHasParabola, new TGLayoutHints(kLHintsNormal, 0, 4*dx, 4*dx/5, 0));
+    modelParamsFrame->AddFrame(checkboxHasParabola, new TGLayoutHints(kLHintsNormal, 0, 4*dx, 4*dy/5, 0));
 
     numGauss = new TGNumberEntry(modelParamsFrame, 1, 1, -1, TGNumberFormat::kNESInteger,
             TGNumberFormat::kNEANonNegative,
             TGNumberFormat::kNELLimitMinMax,
             0, 5);
-    modelParamsFrame->AddFrame(numGauss, new TGLayoutHints(kLHintsNormal, 0, dx, 2*dx/5, 0));        
-    modelParamsFrame->AddFrame(new TGLabel(modelParamsFrame, "Gauss"), new TGLayoutHints(kLHintsNormal, 0, 6*dx, dx, 0));
+    modelParamsFrame->AddFrame(numGauss, new TGLayoutHints(kLHintsNormal, 0, dx, 2*dy/5, 0));        
+    modelParamsFrame->AddFrame(new TGLabel(modelParamsFrame, "Gauss"), new TGLayoutHints(kLHintsNormal, 0, 3*dx, dy, 0));
 
     numExponent = new TGNumberEntry(modelParamsFrame, 1, 1, -1, TGNumberFormat::kNESInteger,
             TGNumberFormat::kNEANonNegative,
             TGNumberFormat::kNELLimitMinMax,
             0, 55);
-    modelParamsFrame->AddFrame(numExponent, new TGLayoutHints(kLHintsNormal, 0, dx, 2*dx/5, 0));
-    modelParamsFrame->AddFrame(new TGLabel(modelParamsFrame, "Exp"), new TGLayoutHints(kLHintsNormal, 0, 6*dx, dx, 0));
+    modelParamsFrame->AddFrame(numExponent, new TGLayoutHints(kLHintsNormal, 0, dx, 2*dy/5, 0));
+    modelParamsFrame->AddFrame(new TGLabel(modelParamsFrame, "Exp"), new TGLayoutHints(kLHintsNormal, 0, 3*dx, dy, 0));
 
     numDampExponent = new TGNumberEntry(modelParamsFrame, 1, 1, -1, TGNumberFormat::kNESInteger,
             TGNumberFormat::kNEANonNegative,
             TGNumberFormat::kNELLimitMinMax,
             0, 5);
-    modelParamsFrame->AddFrame(numDampExponent, new TGLayoutHints(kLHintsNormal, 0, dx, 2*dx/5, 0));
-    modelParamsFrame->AddFrame(new TGLabel(modelParamsFrame, "Damping Exp"), new TGLayoutHints(kLHintsNormal, 0, 6*dx, dx, 0));
+    modelParamsFrame->AddFrame(numDampExponent, new TGLayoutHints(kLHintsNormal, 0, dx, 2*dy/5, 0));
+    modelParamsFrame->AddFrame(new TGLabel(modelParamsFrame, "Damping Exp"), new TGLayoutHints(kLHintsNormal, 0, 3*dx, dy, 0));
 
-//	hasOrtho = new TGCheckButton(modelParamsFrame, "Ortho Exps", -1);
-//	modelParamsFrme->AddFrame(hasOrtho, new TGLayoutHints(kLHintsNormal, 0, 20, 4, 0));        
+    //	hasOrtho = new TGCheckButton(modelParamsFrame, "Ortho Exps", -1);
+    //	modelParamsFrme->AddFrame(hasOrtho, new TGLayoutHints(kLHintsNormal, 0, 20, 4, 0));        
 
-    // Draw Option
-//	fitFunctionType = new TGComboBox(modelParamsFrame, 0);
-//	fitFunctionType->AddEntry("Gauss",1);
-//	fitFunctionType->AddEntry("Lorentz",2);
-//	fitFunctionType->Select(2);
-//	fitFunctionType->Resize(130, 20);
-
-//	modelParamsFrame->AddFrame(new TGLabel(modelParamsFrame, "Gauss"), new TGLayoutHints(kLHintsNormal, 0, 0, 5, 0));
-//	modelParamsFrame->AddFrame(fitFunctionType, new TGLayoutHints(kLHintsNormal, 0, 0, 2, 0));
-    tabFit->AddFrame(modelParamsFrame, new TGLayoutHints(kLHintsExpandX, dx, dx, d2x, d2x));
+//    tabFit->AddFrame(modelParamsFrame, new TGLayoutHints(kLHintsExpandX, dx, dx, dy, dy));
 
     // Fit Button
-    TGHorizontalFrame* frameFitSpectrum = new TGHorizontalFrame(tabFit);
-    btnFitSpectrum = new TGTextButton(frameFitSpectrum, "Fit and plot");
-    btnFitSpectrum->Connect("Clicked()", "SWCalculatorFrame", this, "onFitClicked()");
-    frameFitSpectrum->AddFrame(btnFitSpectrum, new TGLayoutHints(kLHintsExpandX));
-
-    tabFit->AddFrame(frameFitSpectrum, new TGLayoutHints(kLHintsExpandX, dx, dx, d2x + 3, d2x));
+//    TGHorizontalFrame* frameFitSpectrum = new TGHorizontalFrame(tabFit);
+//    btnFitSpectrum = new TGTextButton(frameFitSpectrum, "Fit and plot");
+//    btnFitSpectrum->Connect("Clicked()", "SWCalculatorFrame", this, "onFitClicked()");
+//    frameFitSpectrum->AddFrame(btnFitSpectrum, new TGLayoutHints(kLHintsExpandX));
+//    tabFit->AddFrame(frameFitSpectrum, new TGLayoutHints(kLHintsExpandX, dx, dx, dy + 3, dy));
 
     // Fit Result TextBox
-    txtFitResult = new TGTextEdit(tabFit);
-    tabFit->AddFrame(txtFitResult, new TGLayoutHints(kLHintsExpandX | kLHintsExpandY, dx, dx, d2x, d2x));
+//    txtFitResult = new TGTextEdit(tabFit);
+//    tabFit->AddFrame(txtFitResult, new TGLayoutHints(kLHintsExpandX | kLHintsExpandY, dx, dx, dy, dy));
 
     // Attach Tabs Widget
-    tabsWidget->SetTab(0);
-    tabsWidget->SetEnabled(1, false);
+//    tabsWidget->SetTab(0);
+//    tabsWidget->SetEnabled(1, false);
     // tabsWidget->SetWidth(540);//Resize(tabsWidget->GetDefaultSize());
-    mainChildFrame->AddFrame(tabsWidget, new TGLayoutHints(kLHintsLeft | kLHintsBottom | kLHintsExpandY, dx, dx, dx, dx));
+    this->AddFrame(tabsWidget, new TGLayoutHints(kLHintsExpandX | kLHintsExpandY, 2*dx, 2*dx, dy, dy));
 
     // Right panel
-    TGVerticalFrame* frameRightVertical = new TGVerticalFrame(mainChildFrame);
-    TGHorizontalFrame* frameExportButtons = new TGHorizontalFrame(frameRightVertical);
-
-    numDisplayMin = new TGNumberEntry(frameExportButtons, 0, 6, -1, TGNumberFormat::kNESRealOne,
-            TGNumberFormat::kNEAAnyNumber,
-            TGNumberFormat::kNELLimitMinMax,
-            -9999, 9999);
-    //numDisplayMin->GetNumberEntry()->Connect("TextChanged(char*)", "SWCalculatorFrame",
-    //	this, "numDisplayMinChanged()");
-    TGLabel *lblDisplayDash = new TGLabel(frameExportButtons, "-");
-    numDisplayMax = new TGNumberEntry(frameExportButtons, 0, 6, -1, TGNumberFormat::kNESRealOne,
-            TGNumberFormat::kNEAAnyNumber,
-            TGNumberFormat::kNELLimitMinMax,
-            -9999, 9999);
-    //numDisplayMax->GetNumberEntry()->Connect("TextChanged(char*)", "SWCalculatorFrame",
-    //	this, "numDisplayMaxChanged()");
-    btnApplyZoom = new TGTextButton(frameExportButtons, "Apply Display Range");
-    btnApplyZoom->Connect("Clicked()", "SWCalculatorFrame", this, "applyZoom()");
-    btnResetZoom = new TGTextButton(frameExportButtons, "Reset");
-    btnResetZoom->Connect("Clicked()", "SWCalculatorFrame", this, "resetZoom()");
-
-    frameExportButtons->AddFrame(numDisplayMin, new TGLayoutHints(kLHintsLeft | kLHintsTop, 0, dx, 0, 0));  // left, right, top, bottom
-    frameExportButtons->AddFrame(lblDisplayDash, new TGLayoutHints(kLHintsLeft | kLHintsTop, 0, dx, d2x, 0));  // left, right, top, bottom
-    frameExportButtons->AddFrame(numDisplayMax, new TGLayoutHints(kLHintsLeft | kLHintsTop, 0, dx, 0, 0));  // left, right, top, bottom
-    frameExportButtons->AddFrame(btnApplyZoom, new TGLayoutHints(kLHintsLeft | kLHintsTop, dx, dx, 0, 0));  // left, right, top, bottom
-    frameExportButtons->AddFrame(btnResetZoom, new TGLayoutHints(kLHintsLeft | kLHintsTop, 0, dx, 0, 0));  // left, right, top, bottom
-
-    btnSaveData = new TGTextButton(frameExportButtons, "Export Fit Data");
-    btnSaveData->Connect("Clicked()", "SWCalculatorFrame", this, "saveData()");
-    btnSaveData->SetEnabled(false);
-    frameExportButtons->AddFrame(btnSaveData, new TGLayoutHints(kLHintsRight | kLHintsTop, 0, 0, 0, 0));  // left, right, top, bottom
-
-    btnSaveImage = new TGTextButton(frameExportButtons, "Save Image");
-    btnSaveImage->Connect("Clicked()", "SWCalculatorFrame", this, "saveImage()");
-    btnSaveImage->SetEnabled(false);
-    frameExportButtons->AddFrame(btnSaveImage, new TGLayoutHints(kLHintsRight | kLHintsTop, 0, dx, 0, 0));
-
-    setToolbarEnabled(kFALSE);
+//    TGVerticalFrame* frameRightVertical = new TGVerticalFrame(GetParent());
+//    TGHorizontalFrame* frameExportButtons = new TGHorizontalFrame(frameRightVertical);
+//
+//    numDisplayMin = new TGNumberEntry(frameExportButtons, 0, 6, -1, TGNumberFormat::kNESRealOne,
+//            TGNumberFormat::kNEAAnyNumber,
+//            TGNumberFormat::kNELLimitMinMax,
+//            -9999, 9999);
+//    TGLabel *lblDisplayDash = new TGLabel(frameExportButtons, "-");
+//    numDisplayMax = new TGNumberEntry(frameExportButtons, 0, 6, -1, TGNumberFormat::kNESRealOne,
+//            TGNumberFormat::kNEAAnyNumber,
+//            TGNumberFormat::kNELLimitMinMax,
+//            -9999, 9999);
+//    btnApplyZoom = new TGTextButton(frameExportButtons, "Apply Display Range");
+//    btnApplyZoom->Connect("Clicked()", "SWCalculatorFrame", this, "applyZoom()");
+//    btnResetZoom = new TGTextButton(frameExportButtons, "Reset");
+//    btnResetZoom->Connect("Clicked()", "SWCalculatorFrame", this, "resetZoom()");
+//
+//    frameExportButtons->AddFrame(numDisplayMin, new TGLayoutHints(kLHintsLeft | kLHintsTop, 0, dx, 0, 0));  // left, right, top, bottom
+//    frameExportButtons->AddFrame(lblDisplayDash, new TGLayoutHints(kLHintsLeft | kLHintsTop, 0, dx, dy, 0));  // left, right, top, bottom
+//    frameExportButtons->AddFrame(numDisplayMax, new TGLayoutHints(kLHintsLeft | kLHintsTop, 0, dx, 0, 0));  // left, right, top, bottom
+//    frameExportButtons->AddFrame(btnApplyZoom, new TGLayoutHints(kLHintsLeft | kLHintsTop, dx, dx, 0, 0));  // left, right, top, bottom
+//    frameExportButtons->AddFrame(btnResetZoom, new TGLayoutHints(kLHintsLeft | kLHintsTop, 0, dx, 0, 0));  // left, right, top, bottom
+//
+//    btnSaveData = new TGTextButton(frameExportButtons, "Export Fit Data");
+//    btnSaveData->Connect("Clicked()", "SWCalculatorFrame", this, "saveData()");
+//    btnSaveData->SetEnabled(false);
+//    frameExportButtons->AddFrame(btnSaveData, new TGLayoutHints(kLHintsRight | kLHintsTop, 0, 0, 0, 0));  // left, right, top, bottom
+//
+//    btnSaveImage = new TGTextButton(frameExportButtons, "Save Image");
+//    btnSaveImage->Connect("Clicked()", "SWCalculatorFrame", this, "saveImage()");
+//    btnSaveImage->SetEnabled(false);
+//    frameExportButtons->AddFrame(btnSaveImage, new TGLayoutHints(kLHintsRight | kLHintsTop, 0, dx, 0, 0));
+//
+//    setToolbarEnabled(kFALSE);
 
     // Attach Right Canvas (Plot)
-    TRootEmbeddedCanvas *embedPlot = new TRootEmbeddedCanvas("embedPlot", frameRightVertical, 600, 600);
-    frameRightVertical->AddFrame(embedPlot, new TGLayoutHints(kLHintsLeft | kLHintsTop | kLHintsExpandX | kLHintsExpandY, dx, dx, dx, dx));
-    canvasPlot = embedPlot->GetCanvas();
-
-    frameRightVertical->AddFrame(frameExportButtons, new TGLayoutHints(kLHintsExpandX, 0, dx, 0, 0));
-
-    mainChildFrame->AddFrame(frameRightVertical, new TGLayoutHints(kLHintsExpandX | kLHintsExpandY, 0, 0, 0, dx));
-
-    this->GetParentComposite()->AddFrame(mainChildFrame, new TGLayoutHints(kLHintsExpandX | kLHintsExpandY, 0, 0, 0, 0));
-
-
-//    this->template GetParentComposite()->SetMWMHints(kMWMDecorAll, kMWMFuncAll, kMWMInputModeless);
-    this->GetParentComposite()->MapSubwindows();
-
-//    this->template GetParentComposite()->Resize(mainFrame->GetDefaultSize());
-    this->GetParentComposite()->MapWindow();
-
-    // Preview Canvas Settings
-    // canvasHist->SetMargin(0.12, 0.07, 0.12, 0.07);
+//    TRootEmbeddedCanvas *embedPlot = new TRootEmbeddedCanvas("embedPlot", frameRightVertical, 600, 600);
+//    frameRightVertical->AddFrame(embedPlot, new TGLayoutHints(kLHintsLeft | kLHintsTop | kLHintsExpandX | kLHintsExpandY, dx, dx, dx, dx));
+//    canvasPlot = embedPlot->GetCanvas();
+//
+//    frameRightVertical->AddFrame(frameExportButtons, new TGLayoutHints(kLHintsExpandX, 0, dx, 0, 0));
+//
+//    this->GetParentComposite()->AddFrame(frameRightVertical, new TGLayoutHints(kLHintsLeft | kLHintsTop | kLHintsExpandX | kLHintsExpandY, 0, 0, 0, dx));
 
     // Plot Canvas Settings
-    padData = new TPad("padData", "Pad for data", 0.0, 0.3, 1.0, 1.0, kWhite); // x_low, y_low, x_hi, y_hi
-    padData->SetMargin(Constants::padMargin[0], Constants::padMargin[1], Constants::padMargin[2], Constants::padMargin[3]);
-    padData->Draw();
-
-    padChi2 = new TPad("padChi2", "Pad for chi^2", 0.0, 0.0, 1.0, 0.3, kWhite);
-    padChi2->SetMargin(Constants::padMargin[0], Constants::padMargin[1], Constants::padMargin[2], Constants::padMargin[3]);
-    padChi2->Draw();
+//    padData = new TPad("padData", "Pad for data", 0.0, 0.3, 1.0, 1.0, kWhite); // x_low, y_low, x_hi, y_hi
+//    padData->SetMargin(Constants::padMargin[0], Constants::padMargin[1], Constants::padMargin[2], Constants::padMargin[3]);
+//    padData->Draw();
+//
+//    padChi2 = new TPad("padChi2", "Pad for chi^2", 0.0, 0.0, 1.0, 0.3, kWhite);
+//    padChi2->SetMargin(Constants::padMargin[0], Constants::padMargin[1], Constants::padMargin[2], Constants::padMargin[3]);
+//    padChi2->Draw();
 }
 
 Int_t SWCalculatorView::getFitMinValue(){

@@ -20,7 +20,7 @@
 
 class ImportSpectrumView : public AbstractImportSpectrumView<ImportSpectrumPresenter> {
 public:
-    ImportSpectrumView(TGCompositeFrame *p = 0);
+    ImportSpectrumView(TGWindow *p = 0);
 
     ImportSpectrumPresenter* instantinatePresenter();
 };

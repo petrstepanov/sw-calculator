@@ -15,10 +15,11 @@
 #define ABSTRACTVIEW_H
 
 #include <TGFrame.h>
+#include <iostream>
 
 enum Padding {
-   dx = 5,
-   d2x = 2*dx,
+   dx = 10,
+   dy = 5,
    d3x = 3*dx
 };
 //
@@ -30,12 +31,12 @@ enum Padding {
 template <class P>
 class AbstractView : public TGCompositeFrame {
   public:
-    AbstractView(TGCompositeFrame *w = 0) : 
+    AbstractView(TGWindow *w = 0) : 
         TGCompositeFrame(w){
-            parentCompositeFrame = w;
-            initUI();
+            std::cout << "AbstractView::AbstractView()" << std::endl;            
+//            parentCompositeFrame = w;
     }
-    
+        
     ~AbstractView(){
         delete presenter;
     }
@@ -47,17 +48,17 @@ class AbstractView : public TGCompositeFrame {
         return presenter;
     }
 
-    TGCompositeFrame* GetParentComposite(){
-        return parentCompositeFrame;
-    }
+//    TGCompositeFrame* GetParentComposite(){
+//        return parentCompositeFrame;
+//    }
 
   private:
     P* presenter;
-    TGCompositeFrame* parentCompositeFrame;    
+//    TGCompositeFrame* parentCompositeFrame;    
     
   protected:
     virtual P* instantinatePresenter()=0;
-    virtual void initUI(){};
+    virtual void initUI()=0;
 };
 
 #endif /* ABSTRACTVIEW_H */

@@ -60,6 +60,7 @@ OBJECTFILES= \
 	${OBJECTDIR}/src/widgets/importSpectrumWidget/AbstractImportSpectrumPresenter.o \
 	${OBJECTDIR}/src/widgets/importSpectrumWidget/AbstractImportSpectrumView.o \
 	${OBJECTDIR}/src/widgets/importSpectrumWidget/ImportSourceSpectrumPresenter.o \
+	${OBJECTDIR}/src/widgets/importSpectrumWidget/ImportSourceSpectrumView.o \
 	${OBJECTDIR}/src/widgets/importSpectrumWidget/ImportSpectrumPresenter.o \
 	${OBJECTDIR}/src/widgets/importSpectrumWidget/ImportSpectrumView.o \
 	${OBJECTDIR}/src/widgets/swCalculatorWidget/SWCalculatorPresenter.o \
@@ -80,13 +81,11 @@ FFLAGS=
 ASFLAGS=
 
 # Link Libraries and Options
-LDLIBSOPTIONS=-L/Applications/root_v6.06.02/lib lib/sw-calculator.so
+LDLIBSOPTIONS=-L/Applications/root_v6.06.02/lib
 
 # Build Targets
 .build-conf: ${BUILD_SUBPROJECTS}
 	"${MAKE}"  -f nbproject/Makefile-${CND_CONF}.mk ${CND_DISTDIR}/${CND_CONF}/${CND_PLATFORM}/sw-calculator
-
-${CND_DISTDIR}/${CND_CONF}/${CND_PLATFORM}/sw-calculator: lib/sw-calculator.so
 
 ${CND_DISTDIR}/${CND_CONF}/${CND_PLATFORM}/sw-calculator: ${OBJECTFILES}
 	${MKDIR} -p ${CND_DISTDIR}/${CND_CONF}/${CND_PLATFORM}
@@ -222,6 +221,11 @@ ${OBJECTDIR}/src/widgets/importSpectrumWidget/ImportSourceSpectrumPresenter.o: s
 	${RM} "$@.d"
 	$(COMPILE.cc) -g -I/Applications/root_v6.06.02/include -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/src/widgets/importSpectrumWidget/ImportSourceSpectrumPresenter.o src/widgets/importSpectrumWidget/ImportSourceSpectrumPresenter.cpp
 
+${OBJECTDIR}/src/widgets/importSpectrumWidget/ImportSourceSpectrumView.o: src/widgets/importSpectrumWidget/ImportSourceSpectrumView.cpp
+	${MKDIR} -p ${OBJECTDIR}/src/widgets/importSpectrumWidget
+	${RM} "$@.d"
+	$(COMPILE.cc) -g -I/Applications/root_v6.06.02/include -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/src/widgets/importSpectrumWidget/ImportSourceSpectrumView.o src/widgets/importSpectrumWidget/ImportSourceSpectrumView.cpp
+
 ${OBJECTDIR}/src/widgets/importSpectrumWidget/ImportSpectrumPresenter.o: src/widgets/importSpectrumWidget/ImportSpectrumPresenter.cpp
 	${MKDIR} -p ${OBJECTDIR}/src/widgets/importSpectrumWidget
 	${RM} "$@.d"
@@ -253,8 +257,6 @@ ${OBJECTDIR}/src/widgets/swCalculatorWidget/SWCalculatorView.h.gch: src/widgets/
 # Clean Targets
 .clean-conf: ${CLEAN_SUBPROJECTS}
 	${RM} -r ${CND_BUILDDIR}/${CND_CONF}
-	${RM} -r ${CND_DISTDIR}/${CND_CONF}/${CND_PLATFORM}/sw-calculator.so
-	${RM} ${CND_DISTDIR}/${CND_CONF}/${CND_PLATFORM}/sw-calculator
 
 # Subprojects
 .clean-subprojects:

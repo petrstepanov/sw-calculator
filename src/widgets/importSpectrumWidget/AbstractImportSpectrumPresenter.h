@@ -21,11 +21,16 @@
 template <class V>
 class AbstractImportSpectrumPresenter : public AbstractPresenter<Model, V> {
 public:
-    AbstractImportSpectrumPresenter(V* view);
-//    virtual ~AbstractImportSpectrumPresenter();
+    AbstractImportSpectrumPresenter(V* view) : AbstractPresenter<Model, V>(view) {
+    }
+
+    virtual ~AbstractImportSpectrumPresenter(){
+    }
 
     // Override base class virtual methods
-    Model* instantinateModel();
+    Model* instantinateModel(){
+        return Model::getInstance();
+    }
     
     // View functions
     void onOpenFileClicked();

@@ -21,19 +21,80 @@
 #include <TGTextEdit.h>
 #include <TGNumberEntry.h>
 #include <TCanvas.h>
-
+#include <TRootEmbeddedCanvas.h>
 // Omit circular dependency
 //class AbstractImportSpectrumPresenter;
 
 template <class P>
 class AbstractImportSpectrumView : public AbstractView<P> {
   public:
-    AbstractImportSpectrumView(TGCompositeFrame *p = 0);
-    virtual ~AbstractImportSpectrumView();
+    AbstractImportSpectrumView(TGWindow *w) : AbstractView<P>(w){    
+        initUI();
+    }
+
+    ~AbstractImportSpectrumView(){
+        // default destructor doesn't follow pointers
+        delete btnOpenFile;
+        delete lblFileName;
+        delete txtFileBrowser;
+        delete numEnergyColumn;
+        delete numCountsColumn;
+        delete btnImportSpectrum;
+    }
     
     // Override base class virtual functions
+    void initUI(){
+        // Open File Frame
+        TGHorizontalFrame* frameOpenFile = new TGHorizontalFrame(this->GetParent());
+        btnOpenFile = new TGTextButton(frameOpenFile, "Open File");
+        btnOpenFile->Connect("Clicked()", "AbstractImportSpectrumView", this, "onOpenFileClicked()");
+        frameOpenFile->AddFrame(btnOpenFile, new TGLayoutHints(kLHintsLeft | kLHintsTop));
+        lblFileName = new TGLabel(frameOpenFile, "");
+        frameOpenFile->AddFrame(lblFileName, new TGLayoutHints(kLHintsLeft | kLHintsTop, dx, 0, dx)); // left right top bottom
+        this->AddFrame(frameOpenFile, new TGLayoutHints(kLHintsExpandX, dx, dx, dy/2, dy));
+
+        // File browser
+        txtFileBrowser = new TGTextEdit(this->GetParent());
+        this->AddFrame(txtFileBrowser, new TGLayoutHints(kLHintsExpandX | kLHintsExpandY, dx, dx, dy/2, dy));
+
+        // Energy column
+        TGHorizontalFrame* frameEnergyColumn = new TGHorizontalFrame(this->GetParent());
+        TGLabel* lblEnergyColumn = new TGLabel(frameEnergyColumn, "Energy Column #");
+        numEnergyColumn = new TGNumberEntry(frameEnergyColumn, 1, 2, -1, TGNumberFormat::kNESInteger,
+                TGNumberFormat::kNEANonNegative,
+                TGNumberFormat::kNELLimitMinMax,
+                1, 99);
+        frameEnergyColumn->AddFrame(lblEnergyColumn, new TGLayoutHints(kLHintsNormal, 0, 0, dx, 0));
+        frameEnergyColumn->AddFrame(numEnergyColumn, new TGLayoutHints(kLHintsRight));
+        this->AddFrame(frameEnergyColumn, new TGLayoutHints(kLHintsExpandX, dx, dx, dy, dy));
+
+        // Counts column
+        TGHorizontalFrame* frameCountsColumn = new TGHorizontalFrame(this->GetParent());
+        TGLabel* lblCountsColumn = new TGLabel(frameCountsColumn, "Counts Column #");
+        numCountsColumn = new TGNumberEntry(frameCountsColumn, 2, 2, -1, TGNumberFormat::kNESInteger,
+                TGNumberFormat::kNEANonNegative,
+                TGNumberFormat::kNELLimitMinMax,
+                1, 99);
+        frameCountsColumn->AddFrame(lblCountsColumn, new TGLayoutHints(kLHintsNormal, 0, 0, dx, 0));
+        frameCountsColumn->AddFrame(numCountsColumn, new TGLayoutHints(kLHintsRight));
+        this->AddFrame(frameCountsColumn, new TGLayoutHints(kLHintsExpandX, dx, dx, dy, dy));
+
+        // Import Spectrum button
+        TGHorizontalFrame* frameImportSpectrum = new TGHorizontalFrame(this->GetParent());
+        btnImportSpectrum = new TGTextButton(frameImportSpectrum, "Import Spectrum");
+        btnImportSpectrum->Connect("Clicked()", "AbstractImportSpectrumView", this, "onImportSpectrumClicked()");
+        btnImportSpectrum->SetEnabled(false);
+        frameImportSpectrum->AddFrame(btnImportSpectrum, new TGLayoutHints(kLHintsExpandX));
+        this->AddFrame(frameImportSpectrum, new TGLayoutHints(kLHintsExpandX, dx, dx, dy, dy));
+
+        // Histogram canvas
+        TRootEmbeddedCanvas* embedHist = new TRootEmbeddedCanvas("embedHist", this->GetParent());
+        canvasHist = embedHist->GetCanvas(); //new TCanvas("canvasHist", 10, 10, idHist);
+        canvasHist->SetLogy();
+        this->AddFrame(embedHist, new TGLayoutHints(kLHintsExpandX | kLHintsExpandY, dx, dx, dy, dx));    
+    }    
+
     P* instantinatePresenter() = 0;
-    void initUI();
 
     // Calls from Presenter
     void loadFile(const char* fileNamePath);

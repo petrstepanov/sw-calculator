@@ -12,16 +12,6 @@
 #include "../../util/FileUtils.h"
 
 template <class V>
-AbstractImportSpectrumPresenter<V>::AbstractImportSpectrumPresenter(V* view) : 
-    AbstractPresenter<Model, V>(view) {
-}
-
-template <class V>
-Model* AbstractImportSpectrumPresenter<V>::instantinateModel(){
-    return Model::getInstance();
-}
-
-template <class V>
 void AbstractImportSpectrumPresenter<V>::onOpenFileClicked(){
     // Get FileInfo from open file dialog
     TGFileInfo* fileInfo = UiHelper::getFileFromDialog();

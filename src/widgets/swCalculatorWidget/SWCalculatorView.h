@@ -35,12 +35,11 @@ class SWCalculatorPresenter;
 
 class SWCalculatorView : public AbstractView<SWCalculatorPresenter> {
   public:
-    SWCalculatorView(TGCompositeFrame *p = 0);
+    SWCalculatorView(TGWindow *w = 0);
     virtual ~SWCalculatorView();
     
     // Override base class virtual functions
     SWCalculatorPresenter* instantinatePresenter();
-    void initUI();
 
     // Calls from Presenter
     Int_t getFitMinValue();
@@ -55,14 +54,16 @@ class SWCalculatorView : public AbstractView<SWCalculatorPresenter> {
     Int_t getNumDampExp();
     void setToolbarEnabled(Bool_t isEnabled);
     
-  private:
+  protected:
+    void initUI();
+
     // Calls to Presenter
 
 //      #if defined(__ROOTCLING__)
 //	  ClassDef(SWCalculatorFrame, 1);
 //      #endif
 
-private:
+  private:
     TGTab* tabsWidget;
     TGNumberEntry* numPeakPosition;
 

@@ -101,6 +101,7 @@ Contributor(s):
       <itemPath>src/util/GraphicsHelper.cpp</itemPath>
       <itemPath>src/util/HistProcessor.cpp</itemPath>
       <itemPath>src/widgets/importSpectrumWidget/ImportSourceSpectrumPresenter.cpp</itemPath>
+      <itemPath>src/widgets/importSpectrumWidget/ImportSourceSpectrumView.cpp</itemPath>
       <itemPath>src/widgets/importSpectrumWidget/ImportSpectrumPresenter.cpp</itemPath>
       <itemPath>src/widgets/importSpectrumWidget/ImportSpectrumView.cpp</itemPath>
       <itemPath>src/roofit/IndirectParamPdf.cpp</itemPath>
@@ -150,9 +151,6 @@ Contributor(s):
           <linkerDepDynSerchKind>0</linkerDepDynSerchKind>
           <linkerCopySharedLibs>false</linkerCopySharedLibs>
           <commandlineTool>g++</commandlineTool>
-          <linkerLibItems>
-            <linkerLibFileItem>lib/sw-calculator.so</linkerLibFileItem>
-          </linkerLibItems>
           <commandLine>-lGui -lCore -lRIO -lNet -lHist -lGraf -lGraf3d -lGpad -lTree -lRint -lPostscript -lMatrix -lPhysics -lMathCore -lThread -lMultiProc -lpthread -stdlib=libc++ -lm -ldl -lRooFit -lRooFitCore -lHtml -lMinuit -lFumili</commandLine>
         </linkerTool>
       </compileType>
@@ -162,6 +160,18 @@ Contributor(s):
           <packFileListElem type="File"
                             to="${PACKAGE_TOP_DIR}bin/SWCalculatorFrameLib.so"
                             from="${CND_DISTDIR}/${CND_CONF}/${CND_PLATFORM}/SWCalculatorFrameLib.so"
+                            perm="755"
+                            owner="root"
+                            group="bin"/>
+          <packFileListElem type="File"
+                            to="${PACKAGE_TOP_DIR}bin/${OUTPUT_BASENAME}"
+                            from="${OUTPUT_PATH}"
+                            perm="755"
+                            owner="root"
+                            group="bin"/>
+          <packFileListElem type="File"
+                            to="${PACKAGE_TOP_DIR}bin/${OUTPUT_BASENAME}"
+                            from="${OUTPUT_PATH}"
                             perm="755"
                             owner="root"
                             group="bin"/>
@@ -392,6 +402,11 @@ Contributor(s):
             tool="3"
             flavor2="0">
       </item>
+      <item path="src/widgets/importSpectrumWidget/ImportSourceSpectrumView.cpp"
+            ex="false"
+            tool="1"
+            flavor2="0">
+      </item>
       <item path="src/widgets/importSpectrumWidget/ImportSourceSpectrumView.h"
             ex="false"
             tool="3"
@@ -615,6 +630,11 @@ Contributor(s):
       <item path="src/widgets/importSpectrumWidget/ImportSourceSpectrumPresenter.h"
             ex="false"
             tool="3"
+            flavor2="0">
+      </item>
+      <item path="src/widgets/importSpectrumWidget/ImportSourceSpectrumView.cpp"
+            ex="false"
+            tool="1"
             flavor2="0">
       </item>
       <item path="src/widgets/importSpectrumWidget/ImportSourceSpectrumView.h"

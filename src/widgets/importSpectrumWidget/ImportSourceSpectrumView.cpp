@@ -13,7 +13,8 @@
 
 #include "ImportSourceSpectrumView.h"
 
-ImportSourceSpectrumView::ImportSourceSpectrumView(TGCompositeFrame *p) : AbstractImportSpectrumView<ImportSpectrumPresenter>(p){
+ImportSourceSpectrumView::ImportSourceSpectrumView(TGWindow *w) : AbstractImportSpectrumView<ImportSourceSpectrumPresenter>(w){
+    initUI();
 }
 
 // Override base class virtual functions

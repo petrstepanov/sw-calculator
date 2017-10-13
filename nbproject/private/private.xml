@@ -16,15 +16,20 @@
     </editor-bookmarks>
     <open-files xmlns="http://www.netbeans.org/ns/projectui-open-files/2">
         <group>
-            <file>file:/Users/petrstepanov/Development/NetBeansProjects/sw-calculator/src/model/Constants.h</file>
+            <file>file:/Users/petrstepanov/Development/NetBeansProjects/sw-calculator/src/widgets/importSpectrumWidget/ImportSourceSpectrumView.cpp</file>
+            <file>file:/Users/petrstepanov/Development/NetBeansProjects/sw-calculator/src/widgets/importSpectrumWidget/AbstractImportSpectrumView.h</file>
             <file>file:/Users/petrstepanov/Development/NetBeansProjects/sw-calculator/src/widgets/importSpectrumWidget/AbstractImportSpectrumView.cpp</file>
             <file>file:/Users/petrstepanov/Development/NetBeansProjects/sw-calculator/src/widgets/swCalculatorWidget/SWCalculatorView.h</file>
             <file>file:/Users/petrstepanov/Development/NetBeansProjects/sw-calculator/src/widgets/swCalculatorWidget/SWCalculatorView.cpp</file>
             <file>file:/Users/petrstepanov/Development/NetBeansProjects/sw-calculator/src/widgets/importSpectrumWidget/ImportSpectrumView.h</file>
+            <file>file:/Users/petrstepanov/Development/NetBeansProjects/sw-calculator/src/widgets/importSpectrumWidget/ImportSourceSpectrumPresenter.h</file>
+            <file>file:/Users/petrstepanov/Development/NetBeansProjects/sw-calculator/src/widgets/importSpectrumWidget/ImportSourceSpectrumView.h</file>
+            <file>file:/Users/petrstepanov/Development/NetBeansProjects/sw-calculator/src/main.cc</file>
+            <file>file:/Users/petrstepanov/Development/NetBeansProjects/sw-calculator/src/widgets/importSpectrumWidget/ImportSourceSpectrumPresenter.cpp</file>
+            <file>file:/Users/petrstepanov/Development/NetBeansProjects/sw-calculator/src/widgets/AbstractView.h</file>
+            <file>file:/Users/petrstepanov/Development/NetBeansProjects/sw-calculator/src/widgets/importSpectrumWidget/ImportSpectrumPresenter.h</file>
+            <file>file:/Users/petrstepanov/Development/NetBeansProjects/sw-calculator/src/widgets/importSpectrumWidget/ImportSpectrumPresenter.cpp</file>
             <file>file:/Users/petrstepanov/Development/NetBeansProjects/sw-calculator/src/widgets/importSpectrumWidget/ImportSpectrumView.cpp</file>
-            <file>file:/Users/petrstepanov/Development/NetBeansProjects/sw-calculator/src/roofit/CompositeModelProvider.cpp</file>
-            <file>file:/Users/petrstepanov/Development/NetBeansProjects/sw-calculator/src/roofit/CompositeModelProvider.h</file>
-            <file>file:/Users/petrstepanov/Development/NetBeansProjects/sw-calculator/src/model/Constants.cpp</file>
         </group>
     </open-files>
 </project-private>

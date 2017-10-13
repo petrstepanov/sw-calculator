@@ -28,6 +28,5 @@ class ImportSourceSpectrumPresenter : AbstractImportSpectrumPresenter<ImportSour
         void setModelHist(TH1F* hist, Bool_t isTwoDetector);
 };
 
-
 #endif /* IMPORTSOURCESPECTRUMPRESENTER_H */
 

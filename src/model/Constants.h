@@ -24,7 +24,7 @@ class Constants {
     static constexpr Double_t a_B = 0.529177; // Bohr radius, Å
     
     static const Int_t windowWidth = 1000;
-    static const Int_t windowHeight = 800;
+    static const Int_t windowHeight = 600;
     static const Int_t leftPanelWidth = 420;
     
     static const Double_t* padMargin; // left, right, bottom, top
