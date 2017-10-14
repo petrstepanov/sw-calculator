@@ -84,7 +84,7 @@ MYLDFLAGS=-m64
 MYGLIBS=-L/Applications/root_v6.06.02/lib -lGui -lCore -lRIO -lNet -lHist -lGraf -lGraf3d -lGpad -lTree -lRint -lPostscript -lMatrix -lPhysics -lMathCore -lThread -lMultiProc -lpthread -stdlib=libc++ -lm -ldl
 MYLIBS=-L/Applications/root_v6.06.02/lib -lGui -lCore -lRIO -lNet -lHist -lGraf -lGraf3d -lGpad -lTree -lRint -lPostscript -lMatrix -lPhysics -lMathCore -lThread -lMultiProc -lpthread -stdlib=libc++ -lm -ldl -lRooFit -lRooFitCore -lHtml -lMinuit -lFumili
 MYROOTSYS=/Applications/root_v6.06.02
-#MYHEADERS=model/Constants.h \
+MYHEADERS=model/Constants.h \
           model/Model.h \
           roofit/AbstractModelProvider.h \
           roofit/ChannelConvolutionPdf.h \
@@ -102,19 +102,20 @@ MYROOTSYS=/Applications/root_v6.06.02
           util/HistProcessor.h \
           util/RootHelper.h \
           util/StringUtils.h \
+          util/UiHelper.h \
           util/Variable.h \
-          widgets/importSpectrumWidget/AbstractImportSpectrumView.h \
           widgets/importSpectrumWidget/AbstractImportSpectrumPresenter.h \
-          widgets/importSpectrumWidget/ImportSpectrumView.h \
-          widgets/importSpectrumWidget/ImportSpectrumPresenter.h \
-          widgets/importSpectrumWidget/ImportSourceSpectrumView.h \
+          widgets/importSpectrumWidget/AbstractImportSpectrumView.h \
           widgets/importSpectrumWidget/ImportSourceSpectrumPresenter.h \
-          widgets/swCalculatorWidget/SWCalculatorView.h \
+          widgets/importSpectrumWidget/ImportSourceSpectrumView.h \
+          widgets/importSpectrumWidget/ImportSpectrumPresenter.h \
+          widgets/importSpectrumWidget/ImportSpectrumView.h \
           widgets/swCalculatorWidget/SWCalculatorPresenter.h \
+          widgets/swCalculatorWidget/SWCalculatorView.h \
           widgets/AbstractPresenter.h \
           widgets/AbstractView.h \
           main.h
-#MYSOURCES=model/Constants.cpp \
+MYSOURCES=model/Constants.cpp \
           model/Model.cpp \
           roofit/AbstractModelProvider.cpp \
           roofit/ChannelConvolutionPdf.cpp \
@@ -132,11 +133,16 @@ MYROOTSYS=/Applications/root_v6.06.02
           util/HistProcessor.cpp \
           util/RootHelper.cpp \
           util/StringUtils.cpp \
+          util/UiHelper.cpp \
           util/Variable.cpp \
-          widgets/importSpectrumWidget/AbstractImportSpectrumView.cpp \
           widgets/importSpectrumWidget/AbstractImportSpectrumPresenter.cpp \
-          widgets/swCalculatorWidget/SWCalculatorView.cpp \
+          widgets/importSpectrumWidget/AbstractImportSpectrumView.cpp \
+          widgets/importSpectrumWidget/ImportSourceSpectrumPresenter.cpp \
+          widgets/importSpectrumWidget/ImportSourceSpectrumView.cpp \
+          widgets/importSpectrumWidget/ImportSpectrumPresenter.cpp \
+          widgets/importSpectrumWidget/ImportSpectrumView.cpp \
           widgets/swCalculatorWidget/SWCalculatorPresenter.cpp \
+          widgets/swCalculatorWidget/SWCalculatorView.cpp \
           main.cc
 
 # build
@@ -144,12 +150,12 @@ build: .build-post
 
 .build-pre:
 # Add your pre 'build' code here...
-#	@echo Generating dictionary: SWCalculatorFrameDict.cpp
-#	cd src; \
+	@echo Generating dictionary: SWCalculatorFrameDict.cpp
+	cd src; \
 	rootcling -f SWCalculatorFrameDict.cpp -c $(MYCFLAGS) -p $(MYHEADERS) SWCalculatorFrameLinkDef.h
 #https://root.cern.ch/interacting-shared-libraries-rootcint
-#	@echo Generating shared library: sw-calculator.so
-#	cd src; \
+	@echo Generating shared library: sw-calculator.so
+	cd src; \
 	g++ -shared -o ../lib/sw-calculator.so $(MYCFLAGS) $(MYLIBS) SWCalculatorFrameDict.cpp $(MYSOURCES)
 
 .build-post: .build-impl

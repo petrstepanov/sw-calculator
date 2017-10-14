@@ -56,15 +56,16 @@ namespace std {} using namespace std;
 #include "util/HistProcessor.h"
 #include "util/RootHelper.h"
 #include "util/StringUtils.h"
+#include "util/UiHelper.h"
 #include "util/Variable.h"
-#include "widgets/importSpectrumWidget/AbstractImportSpectrumView.h"
 #include "widgets/importSpectrumWidget/AbstractImportSpectrumPresenter.h"
-#include "widgets/importSpectrumWidget/ImportSpectrumView.h"
-#include "widgets/importSpectrumWidget/ImportSpectrumPresenter.h"
-#include "widgets/importSpectrumWidget/ImportSourceSpectrumView.h"
+#include "widgets/importSpectrumWidget/AbstractImportSpectrumView.h"
 #include "widgets/importSpectrumWidget/ImportSourceSpectrumPresenter.h"
-#include "widgets/swCalculatorWidget/SWCalculatorView.h"
+#include "widgets/importSpectrumWidget/ImportSourceSpectrumView.h"
+#include "widgets/importSpectrumWidget/ImportSpectrumPresenter.h"
+#include "widgets/importSpectrumWidget/ImportSpectrumView.h"
 #include "widgets/swCalculatorWidget/SWCalculatorPresenter.h"
+#include "widgets/swCalculatorWidget/SWCalculatorView.h"
 #include "widgets/AbstractPresenter.h"
 #include "widgets/AbstractView.h"
 #include "main.h"
@@ -92,15 +93,16 @@ namespace {
 "util/HistProcessor.h",
 "util/RootHelper.h",
 "util/StringUtils.h",
+"util/UiHelper.h",
 "util/Variable.h",
-"widgets/importSpectrumWidget/AbstractImportSpectrumView.h",
 "widgets/importSpectrumWidget/AbstractImportSpectrumPresenter.h",
-"widgets/importSpectrumWidget/ImportSpectrumView.h",
-"widgets/importSpectrumWidget/ImportSpectrumPresenter.h",
-"widgets/importSpectrumWidget/ImportSourceSpectrumView.h",
+"widgets/importSpectrumWidget/AbstractImportSpectrumView.h",
 "widgets/importSpectrumWidget/ImportSourceSpectrumPresenter.h",
-"widgets/swCalculatorWidget/SWCalculatorView.h",
+"widgets/importSpectrumWidget/ImportSourceSpectrumView.h",
+"widgets/importSpectrumWidget/ImportSpectrumPresenter.h",
+"widgets/importSpectrumWidget/ImportSpectrumView.h",
 "widgets/swCalculatorWidget/SWCalculatorPresenter.h",
+"widgets/swCalculatorWidget/SWCalculatorView.h",
 "widgets/AbstractPresenter.h",
 "widgets/AbstractView.h",
 "main.h",
@@ -145,15 +147,16 @@ extern int __Cling_Autoloading_Map;
 #include "util/HistProcessor.h"
 #include "util/RootHelper.h"
 #include "util/StringUtils.h"
+#include "util/UiHelper.h"
 #include "util/Variable.h"
-#include "widgets/importSpectrumWidget/AbstractImportSpectrumView.h"
 #include "widgets/importSpectrumWidget/AbstractImportSpectrumPresenter.h"
-#include "widgets/importSpectrumWidget/ImportSpectrumView.h"
-#include "widgets/importSpectrumWidget/ImportSpectrumPresenter.h"
-#include "widgets/importSpectrumWidget/ImportSourceSpectrumView.h"
+#include "widgets/importSpectrumWidget/AbstractImportSpectrumView.h"
 #include "widgets/importSpectrumWidget/ImportSourceSpectrumPresenter.h"
-#include "widgets/swCalculatorWidget/SWCalculatorView.h"
+#include "widgets/importSpectrumWidget/ImportSourceSpectrumView.h"
+#include "widgets/importSpectrumWidget/ImportSpectrumPresenter.h"
+#include "widgets/importSpectrumWidget/ImportSpectrumView.h"
 #include "widgets/swCalculatorWidget/SWCalculatorPresenter.h"
+#include "widgets/swCalculatorWidget/SWCalculatorView.h"
 #include "widgets/AbstractPresenter.h"
 #include "widgets/AbstractView.h"
 #include "main.h"

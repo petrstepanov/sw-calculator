@@ -47,7 +47,7 @@ class AbstractView : public TGCompositeFrame {
         }
         return presenter;
     }
-
+    
 //    TGCompositeFrame* GetParentComposite(){
 //        return parentCompositeFrame;
 //    }

@@ -15,5 +15,4 @@
 
 const char* Constants::applicationName = "SW Calculator";
 
-static const Double_t padMargin[] = {0.12, 0.03, 0.15, 0.05};
-const Double_t* Constants::padMargin = padMargin;
+const Double_t Constants::padMargin[4] = {0.12, 0.03, 0.15, 0.05};

@@ -27,7 +27,7 @@ class Constants {
     static const Int_t windowHeight = 600;
     static const Int_t leftPanelWidth = 420;
     
-    static const Double_t* padMargin; // left, right, bottom, top
+    static const Double_t padMargin[4]; // left, right, bottom, top
     
     static const char* applicationName;
 };
