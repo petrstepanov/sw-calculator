@@ -14,7 +14,6 @@
 #include "ImportSourceSpectrumView.h"
 
 ImportSourceSpectrumView::ImportSourceSpectrumView(TGWindow *w) : AbstractImportSpectrumView<ImportSourceSpectrumPresenter>(w){
-    initUI();
 }
 
 // Override base class virtual functions

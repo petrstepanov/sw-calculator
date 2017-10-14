@@ -67,12 +67,12 @@ void SWCalculatorView::initUI(){
     // Import spectrum tab
     TGCompositeFrame *tabImport = tabsWidget->AddTab("Material Spectrum");
     tabImport->SetLayoutManager(new TGVerticalLayout(tabImport));
-    tabImport->AddFrame(new ImportSpectrumView(tabImport), new TGLayoutHints(kLHintsExpandX, dx, dx, dy, dy));
+    tabImport->AddFrame(new ImportSpectrumView(tabImport), new TGLayoutHints(kLHintsExpandX | kLHintsExpandY, dx, dx, dy, dy));
 
     // Import Kapton spectrum tab
     TGCompositeFrame *tabImportKapton = tabsWidget->AddTab("Kapton Spectrum");
     tabImportKapton->SetLayoutManager(new TGVerticalLayout(tabImportKapton));
-    tabImportKapton->AddFrame(new ImportSourceSpectrumView(tabImportKapton), new TGLayoutHints(kLHintsExpandX, dx, dx, dy, dy));
+    tabImportKapton->AddFrame(new ImportSourceSpectrumView(tabImportKapton), new TGLayoutHints(kLHintsExpandX | kLHintsExpandY, dx, dx, dy, dy));
     
     // Fit Data tab
     TGCompositeFrame *tabFit = tabsWidget->AddTab("Fit Data");
@@ -217,7 +217,7 @@ void SWCalculatorView::initUI(){
 //    tabsWidget->SetTab(0);
 //    tabsWidget->SetEnabled(1, false);
     // tabsWidget->SetWidth(540);//Resize(tabsWidget->GetDefaultSize());
-    this->AddFrame(tabsWidget, new TGLayoutHints(kLHintsExpandX | kLHintsExpandY, 2*dx, 2*dx, dy, dy));
+    this->AddFrame(tabsWidget, new TGLayoutHints(kLHintsExpandX | kLHintsExpandY, dx, dx, 2*dy, 2*dy));
 
     // Right panel
 //    TGVerticalFrame* frameRightVertical = new TGVerticalFrame(GetParent());

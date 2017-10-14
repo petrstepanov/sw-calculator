@@ -22,6 +22,7 @@
 #include <TGNumberEntry.h>
 #include <TCanvas.h>
 #include <TRootEmbeddedCanvas.h>
+#include <iostream>
 // Omit circular dependency
 //class AbstractImportSpectrumPresenter;
 
@@ -45,20 +46,20 @@ class AbstractImportSpectrumView : public AbstractView<P> {
     // Override base class virtual functions
     void initUI(){
         // Open File Frame
-        TGHorizontalFrame* frameOpenFile = new TGHorizontalFrame(this->GetParent());
+        TGHorizontalFrame* frameOpenFile = new TGHorizontalFrame(this);
         btnOpenFile = new TGTextButton(frameOpenFile, "Open File");
         btnOpenFile->Connect("Clicked()", "AbstractImportSpectrumView", this, "onOpenFileClicked()");
         frameOpenFile->AddFrame(btnOpenFile, new TGLayoutHints(kLHintsLeft | kLHintsTop));
         lblFileName = new TGLabel(frameOpenFile, "");
         frameOpenFile->AddFrame(lblFileName, new TGLayoutHints(kLHintsLeft | kLHintsTop, dx, 0, dx)); // left right top bottom
-        this->AddFrame(frameOpenFile, new TGLayoutHints(kLHintsExpandX, dx, dx, dy/2, dy));
+        this->AddFrame(frameOpenFile, new TGLayoutHints(kLHintsExpandX, dx, dx, dy, dy/2));
 
         // File browser
-        txtFileBrowser = new TGTextEdit(this->GetParent());
-        this->AddFrame(txtFileBrowser, new TGLayoutHints(kLHintsExpandX | kLHintsExpandY, dx, dx, dy/2, dy));
+        txtFileBrowser = new TGTextEdit(this);
+        this->AddFrame(txtFileBrowser, new TGLayoutHints(kLHintsExpandX | kLHintsExpandY, dx, dx, dy, dy/2));
 
         // Energy column
-        TGHorizontalFrame* frameEnergyColumn = new TGHorizontalFrame(this->GetParent());
+        TGHorizontalFrame* frameEnergyColumn = new TGHorizontalFrame(this);
         TGLabel* lblEnergyColumn = new TGLabel(frameEnergyColumn, "Energy Column #");
         numEnergyColumn = new TGNumberEntry(frameEnergyColumn, 1, 2, -1, TGNumberFormat::kNESInteger,
                 TGNumberFormat::kNEANonNegative,
@@ -69,7 +70,7 @@ class AbstractImportSpectrumView : public AbstractView<P> {
         this->AddFrame(frameEnergyColumn, new TGLayoutHints(kLHintsExpandX, dx, dx, dy, dy));
 
         // Counts column
-        TGHorizontalFrame* frameCountsColumn = new TGHorizontalFrame(this->GetParent());
+        TGHorizontalFrame* frameCountsColumn = new TGHorizontalFrame(this);
         TGLabel* lblCountsColumn = new TGLabel(frameCountsColumn, "Counts Column #");
         numCountsColumn = new TGNumberEntry(frameCountsColumn, 2, 2, -1, TGNumberFormat::kNESInteger,
                 TGNumberFormat::kNEANonNegative,
@@ -80,7 +81,7 @@ class AbstractImportSpectrumView : public AbstractView<P> {
         this->AddFrame(frameCountsColumn, new TGLayoutHints(kLHintsExpandX, dx, dx, dy, dy));
 
         // Import Spectrum button
-        TGHorizontalFrame* frameImportSpectrum = new TGHorizontalFrame(this->GetParent());
+        TGHorizontalFrame* frameImportSpectrum = new TGHorizontalFrame(this);
         btnImportSpectrum = new TGTextButton(frameImportSpectrum, "Import Spectrum");
         btnImportSpectrum->Connect("Clicked()", "AbstractImportSpectrumView", this, "onImportSpectrumClicked()");
         btnImportSpectrum->SetEnabled(false);
@@ -88,7 +89,7 @@ class AbstractImportSpectrumView : public AbstractView<P> {
         this->AddFrame(frameImportSpectrum, new TGLayoutHints(kLHintsExpandX, dx, dx, dy, dy));
 
         // Histogram canvas
-        TRootEmbeddedCanvas* embedHist = new TRootEmbeddedCanvas("embedHist", this->GetParent());
+        TRootEmbeddedCanvas* embedHist = new TRootEmbeddedCanvas("embedHist", this);
         canvasHist = embedHist->GetCanvas(); //new TCanvas("canvasHist", 10, 10, idHist);
         canvasHist->SetLogy();
         this->AddFrame(embedHist, new TGLayoutHints(kLHintsExpandX | kLHintsExpandY, dx, dx, dy, dx));    
