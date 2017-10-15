@@ -114,8 +114,10 @@ MYHEADERS=model/Constants.h \
           widgets/importSpectrumWidget/ImportSpectrumView.h \
           widgets/swCalculatorWidget/SWCalculatorPresenter.h \
           widgets/swCalculatorWidget/SWCalculatorView.h \
+	  widgets/testView/TTripleSliderDemo.h\
           widgets/AbstractPresenter.h \
           widgets/AbstractView.h \
+          widgets/MainView.h \
           main.h
 MYSOURCES=model/Constants.cpp \
           model/Model.cpp \
@@ -145,7 +147,9 @@ MYSOURCES=model/Constants.cpp \
           widgets/importSpectrumWidget/ImportSpectrumView.cpp \
           widgets/swCalculatorWidget/SWCalculatorPresenter.cpp \
           widgets/swCalculatorWidget/SWCalculatorView.cpp \
-          main.cc
+	  widgets/testView/TTripleSliderDemo.cpp\
+	  widgets/MainView.cpp\
+	  main.cc
 
 # build
 build: .build-post

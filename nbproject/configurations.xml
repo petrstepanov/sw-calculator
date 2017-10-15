@@ -67,6 +67,7 @@ Contributor(s):
       <itemPath>src/widgets/importSpectrumWidget/ImportSpectrumView.h</itemPath>
       <itemPath>src/roofit/IndirectParamPdf.h</itemPath>
       <itemPath>src/roofit/LorentzianPdf.h</itemPath>
+      <itemPath>src/widgets/MainView.h</itemPath>
       <itemPath>src/model/Model.h</itemPath>
       <itemPath>src/event/Object.h</itemPath>
       <itemPath>src/roofit/OrthogonalPdf.h</itemPath>
@@ -78,6 +79,7 @@ Contributor(s):
       <itemPath>src/widgets/swCalculatorWidget/SWCalculatorPresenter.h</itemPath>
       <itemPath>src/widgets/swCalculatorWidget/SWCalculatorView.h</itemPath>
       <itemPath>src/util/StringUtils.h</itemPath>
+      <itemPath>src/widgets/testView/TTripleSliderDemo.h</itemPath>
       <itemPath>src/util/UiHelper.h</itemPath>
       <itemPath>src/util/Variable.h</itemPath>
     </logicalFolder>
@@ -106,6 +108,7 @@ Contributor(s):
       <itemPath>src/widgets/importSpectrumWidget/ImportSpectrumView.cpp</itemPath>
       <itemPath>src/roofit/IndirectParamPdf.cpp</itemPath>
       <itemPath>src/roofit/LorentzianPdf.cpp</itemPath>
+      <itemPath>src/widgets/MainView.cpp</itemPath>
       <itemPath>src/model/Model.cpp</itemPath>
       <itemPath>src/roofit/OrthogonalPdf.cpp</itemPath>
       <itemPath>src/roofit/ParabolaGaussModelProvider.cpp</itemPath>
@@ -115,6 +118,7 @@ Contributor(s):
       <itemPath>src/widgets/swCalculatorWidget/SWCalculatorPresenter.cpp</itemPath>
       <itemPath>src/widgets/swCalculatorWidget/SWCalculatorView.cpp</itemPath>
       <itemPath>src/util/StringUtils.cpp</itemPath>
+      <itemPath>src/widgets/testView/TTripleSliderDemo.cpp</itemPath>
       <itemPath>src/util/UiHelper.cpp</itemPath>
       <itemPath>src/util/Variable.cpp</itemPath>
       <itemPath>src/main.cc</itemPath>
@@ -386,6 +390,10 @@ Contributor(s):
       </item>
       <item path="src/widgets/AbstractView.h" ex="false" tool="3" flavor2="0">
       </item>
+      <item path="src/widgets/MainView.cpp" ex="false" tool="1" flavor2="0">
+      </item>
+      <item path="src/widgets/MainView.h" ex="false" tool="3" flavor2="0">
+      </item>
       <item path="src/widgets/importSpectrumWidget/AbstractImportSpectrumPresenter.cpp"
             ex="false"
             tool="1"
@@ -464,6 +472,16 @@ Contributor(s):
       <item path="src/widgets/swCalculatorWidget/SWCalculatorView.h"
             ex="false"
             tool="1"
+            flavor2="0">
+      </item>
+      <item path="src/widgets/testView/TTripleSliderDemo.cpp"
+            ex="false"
+            tool="1"
+            flavor2="0">
+      </item>
+      <item path="src/widgets/testView/TTripleSliderDemo.h"
+            ex="false"
+            tool="3"
             flavor2="0">
       </item>
     </conf>
@@ -616,6 +634,10 @@ Contributor(s):
       </item>
       <item path="src/widgets/AbstractView.h" ex="false" tool="3" flavor2="0">
       </item>
+      <item path="src/widgets/MainView.cpp" ex="false" tool="1" flavor2="0">
+      </item>
+      <item path="src/widgets/MainView.h" ex="false" tool="3" flavor2="0">
+      </item>
       <item path="src/widgets/importSpectrumWidget/AbstractImportSpectrumPresenter.cpp"
             ex="false"
             tool="1"
@@ -692,6 +714,16 @@ Contributor(s):
             flavor2="0">
       </item>
       <item path="src/widgets/swCalculatorWidget/SWCalculatorView.h"
+            ex="false"
+            tool="3"
+            flavor2="0">
+      </item>
+      <item path="src/widgets/testView/TTripleSliderDemo.cpp"
+            ex="false"
+            tool="1"
+            flavor2="0">
+      </item>
+      <item path="src/widgets/testView/TTripleSliderDemo.h"
             ex="false"
             tool="3"
             flavor2="0">

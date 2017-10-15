@@ -23,6 +23,7 @@ public:
     virtual ~RootHelper();
     
     static void deleteObject(const char* name);
+    static void deleteObject(TObject* obj);
     static Int_t getNumCpu();
 private:
 

@@ -26,10 +26,16 @@ RootHelper::~RootHelper() {
 
 void RootHelper::deleteObject(const char* name){
     TObject* obj = gROOT->FindObject(name);
-    if (obj) {
+    deleteObject(obj);
+}
+
+void RootHelper::deleteObject(TObject* obj){
+    if (obj){
         obj->Delete();
+        delete obj;
     }
 }
+
 
 Int_t RootHelper::getNumCpu(){
     // Get number of CPUs

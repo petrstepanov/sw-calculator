@@ -29,11 +29,12 @@
 #include <RooCurve.h>
 #include <RooPlot.h>
 #include "../AbstractView.h"
-//#include "SWCalculatorPresenter.h"
+#include "SWCalculatorPresenter.h"
 
 class SWCalculatorPresenter;
 
 class SWCalculatorView : public AbstractView<SWCalculatorPresenter> {
+//class SWCalculatorView : public TGMainFrame {
   public:
     SWCalculatorView(const TGWindow *w = 0);
     virtual ~SWCalculatorView();
@@ -62,6 +63,7 @@ class SWCalculatorView : public AbstractView<SWCalculatorPresenter> {
     void onResetZoomClicked();
     void onSaveDataClicked();
     void onSaveImageClicked();    
+//    void CloseWindow();
     
   protected:
     void initUI();
@@ -71,6 +73,7 @@ class SWCalculatorView : public AbstractView<SWCalculatorPresenter> {
 //      #endif
 
   private:
+    TGTextButton* btn;
     TGTab* tabsWidget;
     TGNumberEntry* numPeakPosition;
 

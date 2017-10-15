@@ -57,6 +57,7 @@ OBJECTFILES= \
 	${OBJECTDIR}/src/util/StringUtils.o \
 	${OBJECTDIR}/src/util/UiHelper.o \
 	${OBJECTDIR}/src/util/Variable.o \
+	${OBJECTDIR}/src/widgets/MainView.o \
 	${OBJECTDIR}/src/widgets/importSpectrumWidget/AbstractImportSpectrumPresenter.o \
 	${OBJECTDIR}/src/widgets/importSpectrumWidget/AbstractImportSpectrumView.o \
 	${OBJECTDIR}/src/widgets/importSpectrumWidget/ImportSourceSpectrumPresenter.o \
@@ -64,7 +65,8 @@ OBJECTFILES= \
 	${OBJECTDIR}/src/widgets/importSpectrumWidget/ImportSpectrumPresenter.o \
 	${OBJECTDIR}/src/widgets/importSpectrumWidget/ImportSpectrumView.o \
 	${OBJECTDIR}/src/widgets/swCalculatorWidget/SWCalculatorPresenter.o \
-	${OBJECTDIR}/src/widgets/swCalculatorWidget/SWCalculatorView.o
+	${OBJECTDIR}/src/widgets/swCalculatorWidget/SWCalculatorView.o \
+	${OBJECTDIR}/src/widgets/testView/TTripleSliderDemo.o
 
 
 # C Compiler Flags
@@ -201,6 +203,11 @@ ${OBJECTDIR}/src/util/Variable.o: src/util/Variable.cpp
 	${RM} "$@.d"
 	$(COMPILE.cc) -O2 -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/src/util/Variable.o src/util/Variable.cpp
 
+${OBJECTDIR}/src/widgets/MainView.o: src/widgets/MainView.cpp
+	${MKDIR} -p ${OBJECTDIR}/src/widgets
+	${RM} "$@.d"
+	$(COMPILE.cc) -O2 -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/src/widgets/MainView.o src/widgets/MainView.cpp
+
 ${OBJECTDIR}/src/widgets/importSpectrumWidget/AbstractImportSpectrumPresenter.o: src/widgets/importSpectrumWidget/AbstractImportSpectrumPresenter.cpp
 	${MKDIR} -p ${OBJECTDIR}/src/widgets/importSpectrumWidget
 	${RM} "$@.d"
@@ -240,6 +247,11 @@ ${OBJECTDIR}/src/widgets/swCalculatorWidget/SWCalculatorView.o: src/widgets/swCa
 	${MKDIR} -p ${OBJECTDIR}/src/widgets/swCalculatorWidget
 	${RM} "$@.d"
 	$(COMPILE.cc) -O2 -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/src/widgets/swCalculatorWidget/SWCalculatorView.o src/widgets/swCalculatorWidget/SWCalculatorView.cpp
+
+${OBJECTDIR}/src/widgets/testView/TTripleSliderDemo.o: src/widgets/testView/TTripleSliderDemo.cpp
+	${MKDIR} -p ${OBJECTDIR}/src/widgets/testView
+	${RM} "$@.d"
+	$(COMPILE.cc) -O2 -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/src/widgets/testView/TTripleSliderDemo.o src/widgets/testView/TTripleSliderDemo.cpp
 
 # Subprojects
 .build-subprojects:

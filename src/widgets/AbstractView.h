@@ -24,7 +24,7 @@ enum Padding {
 };
 
 template <class P>
-class AbstractView : public TGCompositeFrame {
+class AbstractView : public TGMainFrame {
   public:
     AbstractView(const TGWindow *w=0) : 
         TGMainFrame(w){

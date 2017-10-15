@@ -34,7 +34,6 @@
 //#include <TGMsgBox.h>
 #include <TG3DLine.h>
 //#include <TStopwatch.h>
-#include <RQ_OBJECT.h>
 //#include "../../util/GraphicsHelper.h"
 //#include "../../roofit/AbstractModelProvider.h"
 //#include "../../roofit/ParabolaGaussModelProvider.h"
@@ -48,8 +47,9 @@
 
 using namespace RooFit;
 
+//SWCalculatorView::SWCalculatorView(const TGWindow* w) : TGMainFrame(w, Constants::windowWidth, Constants::windowHeight){
 SWCalculatorView::SWCalculatorView(const TGWindow* w) : AbstractView<SWCalculatorPresenter>(w){
-    initUI();    
+    initUI();
 }
 
 SWCalculatorPresenter* SWCalculatorView::instantinatePresenter(){
@@ -57,7 +57,7 @@ SWCalculatorPresenter* SWCalculatorView::instantinatePresenter(){
 }
 
 void SWCalculatorView::initUI(){    
-    this->SetLayoutManager(new TGHorizontalLayout(this));
+    SetLayoutManager(new TGHorizontalLayout(this));
     
     // Tabs widget
     tabsWidget = new TGTab(this, Constants::leftPanelWidth);
@@ -82,15 +82,13 @@ void SWCalculatorView::initUI(){
             TGNumberFormat::kNEAAnyNumber,
             TGNumberFormat::kNELLimitMinMax,
             -9999, 9999);
-    numFitMin->GetNumberEntry()->Connect("TextChanged(char*)", "SWCalculatorView",
-            this, "onNumFitMinChanged()");
+    numFitMin->GetNumberEntry()->Connect("TextChanged(char*)", "SWCalculatorView", this, "onNumFitMinChanged()");
 
     numFitMax = new TGNumberEntry(frameFitRange, 537, 4, -1, TGNumberFormat::kNESInteger,
             TGNumberFormat::kNEAAnyNumber,
             TGNumberFormat::kNELLimitMinMax,
             -9999, 9999);
-    numFitMax->GetNumberEntry()->Connect("TextChanged(char*)", "SWCalculatorView",
-            this, "onNumFitMaxChanged()");
+    numFitMax->GetNumberEntry()->Connect("TextChanged(char*)", "SWCalculatorView", this, "onNumFitMaxChanged()");
     frameFitRange->AddFrame(new TGLabel(frameFitRange, "Fit Range, keV"), new TGLayoutHints(kLHintsNormal, 0, 0, dy, 0));
     frameFitRange->AddFrame(numFitMax, new TGLayoutHints(kLHintsRight));
     frameFitRange->AddFrame(new TGLabel(frameFitRange, "-"), new TGLayoutHints(kLHintsRight, dx, dx, dy, 0));
@@ -215,7 +213,7 @@ void SWCalculatorView::initUI(){
     tabsWidget->SetTab(0);
 //    tabsWidget->SetEnabled(2, false);
     tabsWidget->SetWidth(Constants::leftPanelWidth); // Resize(tabsWidget->GetDefaultSize());
-    this->AddFrame(tabsWidget, new TGLayoutHints(kLHintsLeft | kLHintsTop | kLHintsExpandY, dx, dx, 2*dy, 2*dy));
+    AddFrame(tabsWidget, new TGLayoutHints(kLHintsLeft | kLHintsTop | kLHintsExpandY, dx, dx, 2*dy, 2*dy));
 
     // Right panel
     TGVerticalFrame* frameRightVertical = new TGVerticalFrame(this);
@@ -261,8 +259,13 @@ void SWCalculatorView::initUI(){
 
     frameRightVertical->AddFrame(frameExportButtons, new TGLayoutHints(kLHintsExpandX, 0, dx, 0, 0));
 
-    this->AddFrame(frameRightVertical, new TGLayoutHints(kLHintsLeft | kLHintsTop | kLHintsExpandX | kLHintsExpandY, 0, 0, 0, dx));
+    AddFrame(frameRightVertical, new TGLayoutHints(kLHintsLeft | kLHintsTop | kLHintsExpandX | kLHintsExpandY, 0, 0, 0, dx));
 
+    MapSubwindows();
+//    Resize(GetDefaultSize());
+    Resize(Constants::windowWidth, Constants::windowHeight);
+    MapWindow();
+    
     // Plot Canvas Settings
     padData = new TPad("padData", "Pad for data", 0.0, 0.3, 1.0, 1.0, kWhite); // x_low, y_low, x_hi, y_hi
     padData->SetMargin(Constants::padMargin[0], Constants::padMargin[1], Constants::padMargin[2], Constants::padMargin[3]);
@@ -271,6 +274,11 @@ void SWCalculatorView::initUI(){
     padChi2 = new TPad("padChi2", "Pad for chi^2", 0.0, 0.0, 1.0, 0.3, kWhite);
     padChi2->SetMargin(Constants::padMargin[0], Constants::padMargin[1], Constants::padMargin[2], Constants::padMargin[3]);
     padChi2->Draw();
+    
+//    MapSubwindows();
+//    Resize(GetDefaultSize());
+//    Resize(Constants::windowWidth, Constants::windowHeight);
+//    MapWindow();
 }
 
 // Calls from Presenter
@@ -325,65 +333,63 @@ void SWCalculatorView::setToolbarEnabled(Bool_t isEnabled){
 }
 
 // Calls to Presenter
-void onNumFitMinChanged(){
+void SWCalculatorView::onNumFitMinChanged(){
     std::cout << "SWCalculatorView::onNumFitMinChanged()" << std::endl;
 }
 
-void onNumFitMaxChanged(){
+void SWCalculatorView::onNumFitMaxChanged(){
     std::cout << "SWCalculatorView::onNumFitMaxChanged()" << std::endl;    
 }
 
-void onFitSpectrumClicked(){
+void SWCalculatorView::onFitSpectrumClicked(){
     std::cout << "SWCalculatorView::onFitSpectrumClicked()" << std::endl;    
 }
 
-void onApplyZoomClicked(){
+void SWCalculatorView::onApplyZoomClicked(){
     std::cout << "SWCalculatorView::onApplyZoomClicked()" << std::endl;    
 }
 
-void onResetZoomClicked(){
+void SWCalculatorView::onResetZoomClicked(){
     std::cout << "SWCalculatorView::onResetZoomClicked()" << std::endl;    
 }
 
-void onSaveDataClicked(){
+void SWCalculatorView::onSaveDataClicked(){
     std::cout << "SWCalculatorView::onSaveDataClicked()" << std::endl;        
 }
 
-void onSaveImageClicked(){
+void SWCalculatorView::onSaveImageClicked(){
     std::cout << "SWCalculatorView::onSaveImageClicked()" << std::endl;    
 }
 
 SWCalculatorView::~SWCalculatorView() {
-//    mainFrame->Cleanup();
-    delete tabsWidget;
-    delete numPeakPosition;
-    delete numFitMin;
-    delete numFitMax;
-    delete lblRescale1;
-    delete lblRescale2;
-    delete lblRescale3;
-    delete numSWidth;
-    delete numWWidth;
-    delete numWShift;
-    delete comboConvolutionType;
-    delete numResolutionFWHM;
-    delete checkboxResFixed;
-    delete checkboxHasParabola;
-    delete numGauss;
-    delete numExponent;
-    delete numDampExponent;
-    delete btnFitSpectrum;
-    delete txtFitResult;  
-    delete btnSaveData;
-    delete btnSaveImage;
-    delete canvasPlot;
-    delete numDisplayMin;
-    delete numDisplayMax;
-//  delete hasOrtho;
-    delete btnApplyZoom;
-    delete btnResetZoom;              
-    delete fitFrame;
-    delete chiFrame;
-    delete padData;
-    delete padChi2;
+//    Cleanup();
+//    if(numPeakPosition){numPeakPosition->Delete(); delete numPeakPosition;}
+//    if(numFitMin){numFitMin->Delete(); delete numFitMin;}
+//    if(numFitMax){numFitMax->Delete(); delete numFitMax;}
+//    if(lblRescale1){lblRescale1->Delete(); delete lblRescale1;}
+//    if(lblRescale2){lblRescale2->Delete(); delete lblRescale2;}
+//    if(lblRescale3){lblRescale3->Delete(); delete lblRescale3;}
+//    if(numSWidth){numSWidth->Delete(); delete numSWidth;}
+//    if(numWWidth){numWWidth->Delete(); delete numWWidth;}
+//    if(numWShift){numWShift->Delete(); delete numWShift;}
+//    if(comboConvolutionType){comboConvolutionType->Delete(); delete comboConvolutionType;}
+//    if(numResolutionFWHM){numResolutionFWHM->Delete(); delete numResolutionFWHM;}
+//    if(checkboxResFixed){checkboxResFixed->Delete(); delete checkboxResFixed;}
+//    if(checkboxHasParabola){checkboxHasParabola->Delete(); delete checkboxHasParabola;}
+//    if(numGauss){numGauss->Delete(); delete numGauss;}
+//    if(numExponent){numExponent->Delete(); delete numExponent;}
+//    if(numDampExponent){numDampExponent->Delete(); delete numDampExponent;}
+//    if(btnFitSpectrum){btnFitSpectrum->Delete(); delete btnFitSpectrum;}
+//    if(txtFitResult){txtFitResult->Delete(); delete txtFitResult;}
+//    if(btnSaveData){btnSaveData->Delete(); delete btnSaveData;}
+//    if(btnSaveImage){btnSaveImage->Delete(); delete btnSaveImage;}
+//    if(canvasPlot){canvasPlot->Delete(); delete canvasPlot;}
+//    if(numDisplayMin){numDisplayMin->Delete(); delete numDisplayMin;}
+//    if(numDisplayMax){numDisplayMax->Delete(); delete numDisplayMax;}
+//    if(btnApplyZoom){btnApplyZoom->Delete(); delete btnApplyZoom;}
+//    if(btnResetZoom){btnResetZoom->Delete(); delete btnResetZoom;}
+//    if(fitFrame){fitFrame->Delete(); delete fitFrame;}
+//    if(chiFrame){chiFrame->Delete(); delete chiFrame;}
+//    if(padData){padData->Delete(); delete padData;}
+//    if(padChi2){padChi2->Delete(); delete padChi2;}
 }

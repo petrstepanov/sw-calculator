@@ -2,18 +2,31 @@
 #include <TApplication.h>
 #include <TGFrame.h>
 #include "widgets/swCalculatorWidget/SWCalculatorView.h"
+#include "widgets/testView/TTripleSliderDemo.h"
+#include "widgets/MainView.h"
 #include "model/Constants.h"
+
+//int main(int argc, char **argv) {
+//    TApplication* app = new TApplication(Constants::applicationName, &argc, argv);
+//    TTripleSliderDemo* tt = new TTripleSliderDemo(gClient->GetRoot());
+//    app->Run();
+//    return 0;
+//}
+
+//int main(int argc, char **argv) {
+//    TApplication* app = new TApplication(Constants::applicationName, &argc, argv);
+//    SWCalculatorView* swCalculatorView = new SWCalculatorView(gClient->GetRoot());
+//    app->Run();
+//    return 0;
+//}
 
 int main(int argc, char **argv) {
     TApplication* app = new TApplication(Constants::applicationName, &argc, argv);
-//    TGMainFrame* mainFrame = new TGMainFrame(gClient->GetRoot(), Constants::windowWidth, Constants::windowHeight, kMainFrame);
-    SWCalculatorView* swCalculatorView = new SWCalculatorView(gClient->GetRoot());
-    swCalculatorView->MapSubwindows();
-    swCalculatorView->Resize(swCalculatorView->GetDefaultSize());
-    swCalculatorView->MapWindow();
-    swCalculatorView->Resize(Constants::windowWidth, Constants::windowHeight);
+    MainView* mainView = new MainView(gClient->GetRoot());
+    SWCalculatorView* swCalculatorView = new SWCalculatorView(mainView);
+    mainView->AddFrame(swCalculatorView, new TGLayoutHints(kLHintsExpandX | kLHintsExpandY));
+    mainView->mapAndResize();
     app->Run();
-
     return 0;
 }
 
