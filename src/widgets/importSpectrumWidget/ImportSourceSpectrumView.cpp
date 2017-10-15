@@ -13,10 +13,11 @@
 
 #include "ImportSourceSpectrumView.h"
 
-ImportSourceSpectrumView::ImportSourceSpectrumView(const TGWindow *w) : AbstractImportSpectrumView<ImportSourceSpectrumPresenter>(w){
+ImportSourceSpectrumView::ImportSourceSpectrumView(const TGWindow *w) : AbstractImportSpectrumView(w){
 }
 
 // Override base class virtual functions
-ImportSourceSpectrumPresenter* ImportSourceSpectrumView::instantinatePresenter() {
+AbstractImportSpectrumPresenter* ImportSourceSpectrumView::instantinatePresenter() {
+    std::cout << "ImportSourceSpectrumView::instantinatePresenter()" << std::endl;    
     return new ImportSourceSpectrumPresenter(this);
 };

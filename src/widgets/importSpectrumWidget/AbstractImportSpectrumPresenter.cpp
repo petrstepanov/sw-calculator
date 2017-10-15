@@ -11,26 +11,31 @@
 #include "../../util/UiHelper.h"
 #include "../../util/FileUtils.h"
 
-template <class V>
-void AbstractImportSpectrumPresenter<V>::onOpenFileClicked(){
+AbstractImportSpectrumPresenter::AbstractImportSpectrumPresenter(AbstractImportSpectrumView* view) : 
+    AbstractPresenter<Model, AbstractImportSpectrumView>(view) {
+}
+
+void AbstractImportSpectrumPresenter::onOpenFileClicked(){
+    std::cout << "AbstractImportSpectrumPresenter::onOpenFileClicked()" << std::endl;
+    AbstractImportSpectrumView* view = getView();
+    
     // Get FileInfo from open file dialog
-    TGFileInfo* fileInfo = UiHelper::getFileFromDialog();
-    if ((fileInfo->fFilename == NULL) || (strlen(fileInfo->fFilename)>0)){
+    TGFileInfo* fileInfo = UiHelper::getFileFromDialog(view->GetParent());
+    if (!fileInfo->fFilename){
+        std::cout << "AbstractImportSpectrumPresenter::onOpenFileClicked() filename is NULL" << std::endl;
         return;
     }
     // Update Model with new file name (virtual function)
     setModelFileName(fileInfo->fFilename);
     // Update View to reflect 
-    V* v = AbstractPresenter<Model, V>::getView();
-    AbstractImportSpectrumView<AbstractImportSpectrumPresenter>* view = static_cast<AbstractImportSpectrumView<AbstractImportSpectrumPresenter>*>(v);
     view->loadFile(fileInfo->fFilename);
 }
 
-template <class V>
-void AbstractImportSpectrumPresenter<V>::onImportSpectrumClicked(){
+void AbstractImportSpectrumPresenter::onImportSpectrumClicked(){
+    std::cout << "AbstractImportSpectrumPresenter::onImportSpectrumClicked()" << std::endl;
+
     // Import Histogram
-    V* v = AbstractPresenter<Model, V>::getView();
-    AbstractImportSpectrumView<AbstractImportSpectrumPresenter>* view = static_cast<AbstractImportSpectrumView<AbstractImportSpectrumPresenter>*>(v);
+    AbstractImportSpectrumView* view = getView();
     Int_t energyColumn = view->getEnergyColumnNumber();
     Int_t countsColumn = view->getCountsColumnNumber();
     TString* fileName = view->getFileName();

@@ -22,7 +22,7 @@ public:
     UiHelper(const UiHelper& orig);
     virtual ~UiHelper();
     
-    static TGFileInfo* getFileFromDialog();
+    static TGFileInfo* getFileFromDialog(const TGWindow* main);
     static void showOkDialog(const char* message);
 private:
 

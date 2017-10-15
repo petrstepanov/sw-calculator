@@ -15,14 +15,14 @@
 #define ABSTRACTIMPORTSPECTRUMPRESENTER_H
 
 #include "../AbstractPresenter.h"
-#include "AbstractImportSpectrumView.h"
+//#include "AbstractImportSpectrumView.h"
 #include "../../model/Model.h"
 
-template <class V>
-class AbstractImportSpectrumPresenter : public AbstractPresenter<Model, V> {
+class AbstractImportSpectrumView;
+
+class AbstractImportSpectrumPresenter : public AbstractPresenter<Model, AbstractImportSpectrumView> {
 public:
-    AbstractImportSpectrumPresenter(V* view) : AbstractPresenter<Model, V>(view) {
-    }
+    AbstractImportSpectrumPresenter(AbstractImportSpectrumView* view);
 
     virtual ~AbstractImportSpectrumPresenter(){
     }
@@ -37,7 +37,7 @@ public:
     void onImportSpectrumClicked();
     
     // Different implementations for importing Kapton spectrum and regular spectrum
-    virtual void setModelFileName(char*){};
+    virtual void setModelFileName(const char*){};
     virtual void setModelHist(TH1F* hist, Bool_t isTwoDetector){};
 };
 

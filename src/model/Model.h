@@ -18,15 +18,24 @@
 #include <TH1F.h>
 #include <RtypesCore.h>
 #include <RooCurve.h>
+#include <iostream>
 
 class Model {
 public:
     static Model* getInstance();
 
-    void setFileName(TString* name){ strFileName = name; }
+    void setFileName(TString* name){ 
+        std::cout << "Model::setFileName(), " << name << std::endl;
+        strFileName = name; 
+    }
+    
     TString* getFileName(){ return strFileName; }
 
-    void setSourceFileName(TString* name){ strSourceContribFileName = name; }
+    void setSourceFileName(TString* name){ 
+        std::cout << "Model::setSourceFileName(), " << name << std::endl;
+        strSourceContribFileName = name; 
+    }
+    
     TString* getSourceFileName(){ return strSourceContribFileName; }
     
     void setHist(TH1F* hist){ fullHist = hist; }

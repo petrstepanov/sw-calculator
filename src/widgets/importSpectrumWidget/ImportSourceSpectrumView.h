@@ -18,11 +18,11 @@
 #include "ImportSourceSpectrumPresenter.h"
 #include <TGWindow.h>
 
-class ImportSourceSpectrumView : public AbstractImportSpectrumView<ImportSourceSpectrumPresenter> {
+class ImportSourceSpectrumView : public AbstractImportSpectrumView {
 public:
     ImportSourceSpectrumView(const TGWindow *w = 0);
 
-    ImportSourceSpectrumPresenter* instantinatePresenter();
+    AbstractImportSpectrumPresenter* instantinatePresenter();
 };
 
 #endif /* IMPORTSOURCESPECTRUMVIEW_H */

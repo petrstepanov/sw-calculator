@@ -10,28 +10,93 @@
 #include "../../util/StringUtils.h"
 #include "../../util/GraphicsHelper.h"
 
+AbstractImportSpectrumView::AbstractImportSpectrumView(const TGWindow* w) : AbstractView<AbstractImportSpectrumPresenter>(w){    
+    initUI();
+}
+
+AbstractImportSpectrumView::~AbstractImportSpectrumView() {
+    // default destructor doesn't follow pointers
+    delete btnOpenFile;
+    delete lblFileName;
+    delete txtFileBrowser;
+    delete numEnergyColumn;
+    delete numCountsColumn;
+    delete btnImportSpectrum;
+}
+
+void AbstractImportSpectrumView::initUI(){
+    // Open File Frame
+    TGHorizontalFrame* frameOpenFile = new TGHorizontalFrame(this);
+    btnOpenFile = new TGTextButton(frameOpenFile, "Open File");
+    btnOpenFile->Connect("Clicked()", "AbstractImportSpectrumView", this, "onOpenFileClicked()");
+    frameOpenFile->AddFrame(btnOpenFile, new TGLayoutHints(kLHintsLeft | kLHintsTop));
+    lblFileName = new TGLabel(frameOpenFile, "");
+    frameOpenFile->AddFrame(lblFileName, new TGLayoutHints(kLHintsLeft | kLHintsTop, dx, 0, dx)); // left right top bottom
+    this->AddFrame(frameOpenFile, new TGLayoutHints(kLHintsExpandX, dx, dx, dy, dy/2));
+
+    // File browser
+    txtFileBrowser = new TGTextEdit(this);
+    this->AddFrame(txtFileBrowser, new TGLayoutHints(kLHintsExpandX | kLHintsExpandY, dx, dx, dy, dy/2));
+
+    // Energy column
+    TGHorizontalFrame* frameEnergyColumn = new TGHorizontalFrame(this);
+    TGLabel* lblEnergyColumn = new TGLabel(frameEnergyColumn, "Energy Column #");
+    numEnergyColumn = new TGNumberEntry(frameEnergyColumn, 1, 2, -1, TGNumberFormat::kNESInteger,
+            TGNumberFormat::kNEANonNegative,
+            TGNumberFormat::kNELLimitMinMax,
+            1, 99);
+    frameEnergyColumn->AddFrame(lblEnergyColumn, new TGLayoutHints(kLHintsNormal, 0, 0, dx, 0));
+    frameEnergyColumn->AddFrame(numEnergyColumn, new TGLayoutHints(kLHintsRight));
+    this->AddFrame(frameEnergyColumn, new TGLayoutHints(kLHintsExpandX, dx, dx, dy, dy));
+
+    // Counts column
+    TGHorizontalFrame* frameCountsColumn = new TGHorizontalFrame(this);
+    TGLabel* lblCountsColumn = new TGLabel(frameCountsColumn, "Counts Column #");
+    numCountsColumn = new TGNumberEntry(frameCountsColumn, 2, 2, -1, TGNumberFormat::kNESInteger,
+            TGNumberFormat::kNEANonNegative,
+            TGNumberFormat::kNELLimitMinMax,
+            1, 99);
+    frameCountsColumn->AddFrame(lblCountsColumn, new TGLayoutHints(kLHintsNormal, 0, 0, dx, 0));
+    frameCountsColumn->AddFrame(numCountsColumn, new TGLayoutHints(kLHintsRight));
+    this->AddFrame(frameCountsColumn, new TGLayoutHints(kLHintsExpandX, dx, dx, dy, dy));
+
+    // Import Spectrum button
+    TGHorizontalFrame* frameImportSpectrum = new TGHorizontalFrame(this);
+    btnImportSpectrum = new TGTextButton(frameImportSpectrum, "Import Spectrum");
+    btnImportSpectrum->Connect("Clicked()", "AbstractImportSpectrumView", this, "onImportSpectrumClicked()");
+//    btnImportSpectrum->SetEnabled(false);
+    frameImportSpectrum->AddFrame(btnImportSpectrum, new TGLayoutHints(kLHintsExpandX));
+    this->AddFrame(frameImportSpectrum, new TGLayoutHints(kLHintsExpandX, dx, dx, dy, dy));
+
+    // Histogram canvas
+    TRootEmbeddedCanvas* embedHist = new TRootEmbeddedCanvas("embedHist", this);
+    canvasHist = embedHist->GetCanvas(); //new TCanvas("canvasHist", 10, 10, idHist);
+    canvasHist->SetLogy();
+    this->AddFrame(embedHist, new TGLayoutHints(kLHintsExpandX | kLHintsExpandY, dx, dx, dy, dx));   
+}
+
+AbstractImportSpectrumPresenter* AbstractImportSpectrumView::instantinatePresenter() {
+    std::cout << "AbstractImportSpectrumView::instantinatePresenter()" << std::endl;
+    return new AbstractImportSpectrumPresenter(this);
+}
+
 // Calls to Presenter
 
-template <class P>
-void AbstractImportSpectrumView<P>::onOpenFileClicked(){
-        std::cout << "AbstractImportSpectrumView::onOpenFileClicked()" << std::endl;
-        P* p = this->template getPresenter();
-//        AbstractImportSpectrumPresenter<AbstractImportSpectrumView>* presenter = static_cast<AbstractImportSpectrumPresenter<AbstractImportSpectrumView>*>(p);
-//        presenter->onOpenFileClicked();
-    }
+void AbstractImportSpectrumView::onOpenFileClicked(){
+    std::cout << "AbstractImportSpectrumView::onOpenFileClicked()" << std::endl;
+    AbstractImportSpectrumPresenter* presenter = this->getPresenter();
+    presenter->onOpenFileClicked();
+}
     
-
-template <class P>
-void AbstractImportSpectrumView<P>::onImportSpectrumClicked(){
+void AbstractImportSpectrumView::onImportSpectrumClicked(){
     std::cout << "AbstractImportSpectrumView::onImportSpectrumClicked()" << std::endl;
-    P* p = this->template getPresenter();
-//    AbstractImportSpectrumPresenter<AbstractImportSpectrumView>* presenter = static_cast<AbstractImportSpectrumPresenter<AbstractImportSpectrumView>*>(p);
-//    presenter->onImportSpectrumClicked();
+    AbstractImportSpectrumPresenter* presenter = this->getPresenter();
+    presenter->onImportSpectrumClicked();
 }
 
 // Calls from Presenter 
-template <class P>
-void AbstractImportSpectrumView<P>::loadFile(const char* fileNamePath){
+void AbstractImportSpectrumView::loadFile(const char* fileNamePath){
+    std::cout << "AbstractImportSpectrumView::loadFile() " << fileNamePath << std::endl;
     // Load file contents to FileBrowser
     txtFileBrowser->LoadFile(fileNamePath);
     // Update FileName label
@@ -39,24 +104,20 @@ void AbstractImportSpectrumView<P>::loadFile(const char* fileNamePath){
     lblFileName->SetText(fileName->Data());
 }
 
-template <class P>
-Int_t AbstractImportSpectrumView<P>::getEnergyColumnNumber(){
+Int_t AbstractImportSpectrumView::getEnergyColumnNumber(){
     return numEnergyColumn->GetIntNumber();
 }
 
-template <class P>
-Int_t AbstractImportSpectrumView<P>::getCountsColumnNumber(){
+Int_t AbstractImportSpectrumView::getCountsColumnNumber(){
     return numCountsColumn->GetIntNumber();
 }
 
-template <class P>
-TString* AbstractImportSpectrumView<P>::getFileName(){
+TString* AbstractImportSpectrumView::getFileName(){
     const char* s = (lblFileName->GetText())->GetString();
     return new TString(s);
 }
 
-template <class P>
-void AbstractImportSpectrumView<P>::drawHistogram(TH1F* hist){
+void AbstractImportSpectrumView::drawHistogram(TH1F* hist){
     GraphicsHelper* graphicsHelper = GraphicsHelper::getInstance();
     canvasHist->cd();
     hist->Draw();

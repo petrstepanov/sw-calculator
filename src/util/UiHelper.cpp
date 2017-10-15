@@ -13,6 +13,7 @@
 
 #include "UiHelper.h"
 #include <TGMsgBox.h>
+#include <TGFileDialog.h>
 #include "../model/Constants.h"
 
 UiHelper::UiHelper() {
@@ -24,19 +25,21 @@ UiHelper::UiHelper(const UiHelper& orig) {
 UiHelper::~UiHelper() {
 }
 
-TGFileInfo* UiHelper::getFileFromDialog(){
+TGFileInfo* UiHelper::getFileFromDialog(const TGWindow* main){    
     // show file dialog
     TGFileInfo* fileInfo = new TGFileInfo();
+//    TGFileInfo* fileInfo = new TGFileInfo();
     const char* filetypes[] = { "All files",  "*",
                                 "Data files", "*.[dD][aA][tT]",
                                 "CSV files",  "*.[cC][sS][vV]",
                                 "Text files", "*.[tT][xX][tT]",
                                 0, 0 };
-    char fIniDir[] = ".";
+    static TString dir(".");
     fileInfo->fFileTypes = filetypes;
-    fileInfo->fIniDir = fIniDir;
+    fileInfo->fIniDir = StrDup(dir);
     // TODO: check Dialog Centering
-    new TGFileDialog(gClient->GetRoot(), gClient->GetRoot(), kFDOpen, fileInfo);
+    new TGFileDialog(gClient->GetRoot(), main, kFDOpen, fileInfo);
+    printf("Open file: %s (dir: %s)\n", fileInfo->fFilename, fileInfo->fIniDir);
     return fileInfo;
 }
 

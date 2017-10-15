@@ -28,7 +28,7 @@ class AbstractPresenter {
 //        delete view;
     }
 
-    V* getView() {
+    virtual V* getView() {
         return view;
     }
 

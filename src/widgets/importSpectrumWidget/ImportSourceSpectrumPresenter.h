@@ -15,16 +15,16 @@
 #define IMPORTSOURCESPECTRUMPRESENTER_H
 
 #include "AbstractImportSpectrumPresenter.h"
-//#include "ImportSpectrumView.h"
+#include "ImportSpectrumView.h"
 #include <TString.h>
 
-class ImportSourceSpectrumView;
+//class ImportSourceSpectrumView;
 
-class ImportSourceSpectrumPresenter : AbstractImportSpectrumPresenter<ImportSourceSpectrumView> {
+class ImportSourceSpectrumPresenter : public AbstractImportSpectrumPresenter {
     public:
-        ImportSourceSpectrumPresenter(ImportSourceSpectrumView* view);
+        ImportSourceSpectrumPresenter(AbstractImportSpectrumView* view);
         
-        void setModelFileName(char* fileName);        
+        void setModelFileName(const char* fileName);        
         void setModelHist(TH1F* hist, Bool_t isTwoDetector);
 };
 

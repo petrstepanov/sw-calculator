@@ -24,12 +24,10 @@ enum Padding {
 };
 
 template <class P>
-class AbstractView : public TGMainFrame {
+class AbstractView : public TGCompositeFrame {
   public:
-    AbstractView(const TGWindow *w=0) : 
-        TGMainFrame(w){
-            std::cout << "AbstractView::AbstractView()" << std::endl;            
-//            parentCompositeFrame = w;
+    AbstractView(const TGWindow *w=0) : TGCompositeFrame(w){
+        presenter = NULL;
     }
         
     ~AbstractView(){
@@ -37,7 +35,9 @@ class AbstractView : public TGMainFrame {
     }
     
     P* getPresenter(){
+        std::cout << "AbstractView::getPresenter()" << std::endl;
         if (presenter == NULL){
+            std::cout << "AbstractView::getPresenter() is null" << std::endl;            
             presenter = instantinatePresenter();
         }
         return presenter;

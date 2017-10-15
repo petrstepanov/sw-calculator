@@ -6,17 +6,22 @@
 
 #include "ImportSpectrumPresenter.h"
 
-ImportSpectrumPresenter::ImportSpectrumPresenter(ImportSpectrumView* view) : AbstractImportSpectrumPresenter(view){
+ImportSpectrumPresenter::ImportSpectrumPresenter(AbstractImportSpectrumView* view) : AbstractImportSpectrumPresenter(view){
+    std::cout << "ImportSpectrumPresenter::ImportSpectrumPresenter()" << std::endl;    
 }
         
-void ImportSpectrumPresenter::setModelFileName(char* fileName){
-    Model* model = AbstractImportSpectrumPresenter::getModel();
+void ImportSpectrumPresenter::setModelFileName(const char* fileName){
+    std::cout << "ImportSpectrumPresenter::setModelFilename()" << std::endl;
+
+    Model* model = getModel();
     TString* fN = new TString(fileName);
     model->setFileName(fN);
 }
 
 void ImportSpectrumPresenter::setModelHist(TH1F* hist, Bool_t isTwoDetector){
-    Model* model = AbstractImportSpectrumPresenter::getModel();
+    std::cout << "ImportSpectrumPresenter::setModelHist()" << std::endl;
+    
+    Model* model = getModel();
     model->setHist(hist);
     model->setTwoDetector(isTwoDetector);
 };

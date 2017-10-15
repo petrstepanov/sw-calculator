@@ -74,6 +74,47 @@ namespace std {} using namespace std;
 // Header files passed via #pragma extra_include
 
 namespace ROOT {
+   static TClass *AbstractImportSpectrumView_Dictionary();
+   static void AbstractImportSpectrumView_TClassManip(TClass*);
+   static void delete_AbstractImportSpectrumView(void *p);
+   static void deleteArray_AbstractImportSpectrumView(void *p);
+   static void destruct_AbstractImportSpectrumView(void *p);
+
+   // Function generating the singleton type initializer
+   static TGenericClassInfo *GenerateInitInstanceLocal(const ::AbstractImportSpectrumView*)
+   {
+      ::AbstractImportSpectrumView *ptr = 0;
+      static ::TVirtualIsAProxy* isa_proxy = new ::TIsAProxy(typeid(::AbstractImportSpectrumView));
+      static ::ROOT::TGenericClassInfo 
+         instance("AbstractImportSpectrumView", "widgets/importSpectrumWidget/AbstractImportSpectrumView.h", 32,
+                  typeid(::AbstractImportSpectrumView), ::ROOT::Internal::DefineBehavior(ptr, ptr),
+                  &AbstractImportSpectrumView_Dictionary, isa_proxy, 0,
+                  sizeof(::AbstractImportSpectrumView) );
+      instance.SetDelete(&delete_AbstractImportSpectrumView);
+      instance.SetDeleteArray(&deleteArray_AbstractImportSpectrumView);
+      instance.SetDestructor(&destruct_AbstractImportSpectrumView);
+      return &instance;
+   }
+   TGenericClassInfo *GenerateInitInstance(const ::AbstractImportSpectrumView*)
+   {
+      return GenerateInitInstanceLocal((::AbstractImportSpectrumView*)0);
+   }
+   // Static variable to force the class initialization
+   static ::ROOT::TGenericClassInfo *_R__UNIQUE_(Init) = GenerateInitInstanceLocal((const ::AbstractImportSpectrumView*)0x0); R__UseDummy(_R__UNIQUE_(Init));
+
+   // Dictionary for non-ClassDef classes
+   static TClass *AbstractImportSpectrumView_Dictionary() {
+      TClass* theClass =::ROOT::GenerateInitInstanceLocal((const ::AbstractImportSpectrumView*)0x0)->GetClass();
+      AbstractImportSpectrumView_TClassManip(theClass);
+   return theClass;
+   }
+
+   static void AbstractImportSpectrumView_TClassManip(TClass* ){
+   }
+
+} // end of namespace ROOT
+
+namespace ROOT {
    static TClass *SWCalculatorView_Dictionary();
    static void SWCalculatorView_TClassManip(TClass*);
    static void *new_SWCalculatorView(void *p = 0);
@@ -117,6 +158,20 @@ namespace ROOT {
    }
 
 } // end of namespace ROOT
+
+namespace ROOT {
+   // Wrapper around operator delete
+   static void delete_AbstractImportSpectrumView(void *p) {
+      delete ((::AbstractImportSpectrumView*)p);
+   }
+   static void deleteArray_AbstractImportSpectrumView(void *p) {
+      delete [] ((::AbstractImportSpectrumView*)p);
+   }
+   static void destruct_AbstractImportSpectrumView(void *p) {
+      typedef ::AbstractImportSpectrumView current_t;
+      ((current_t*)p)->~current_t();
+   }
+} // end of namespace ROOT for class ::AbstractImportSpectrumView
 
 namespace ROOT {
    // Wrappers around operator new
@@ -188,6 +243,7 @@ namespace {
 #pragma clang diagnostic ignored "-Wignored-attributes"
 #pragma clang diagnostic ignored "-Wreturn-type-c-linkage"
 extern int __Cling_Autoloading_Map;
+class __attribute__((annotate("$clingAutoload$widgets/importSpectrumWidget/AbstractImportSpectrumView.h")))  AbstractImportSpectrumView;
 class __attribute__((annotate("$clingAutoload$widgets/swCalculatorWidget/SWCalculatorPresenter.h")))  SWCalculatorView;
 )DICTFWDDCLS";
     static const char* payloadCode = R"DICTPAYLOAD(
@@ -234,6 +290,7 @@ class __attribute__((annotate("$clingAutoload$widgets/swCalculatorWidget/SWCalcu
 #undef  _BACKWARD_BACKWARD_WARNING_H
 )DICTPAYLOAD";
     static const char* classesHeaders[]={
+"AbstractImportSpectrumView", payloadCode, "@",
 "SWCalculatorView", payloadCode, "@",
 nullptr};
 
