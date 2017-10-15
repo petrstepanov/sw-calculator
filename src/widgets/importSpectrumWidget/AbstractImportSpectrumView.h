@@ -41,7 +41,7 @@ class AbstractImportSpectrumView : public AbstractView<AbstractImportSpectrumPre
     AbstractImportSpectrumPresenter* instantinatePresenter();
 
     // Calls from Presenter
-    void loadFile(const char* fileNamePath);
+    void loadFile(TString* fileNamePath);
     TString* getFileName();
     Int_t getEnergyColumnNumber();
     Int_t getCountsColumnNumber();

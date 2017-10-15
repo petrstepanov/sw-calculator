@@ -17,12 +17,11 @@ ImportSourceSpectrumPresenter::ImportSourceSpectrumPresenter(AbstractImportSpect
     std::cout << "ImportSourceSpectrumPresenter::ImportSourceSpectrumPresenter()" << std::endl;    
 }
         
-void ImportSourceSpectrumPresenter::setModelFileName(const char* fileName){
-    std::cout << "ImportSourceSpectrumPresenter::setModelFilename()" << std::endl;
+void ImportSourceSpectrumPresenter::setModelFileName(TString* fileName){
+    std::cout << "ImportSourceSpectrumPresenter::setModelFilename() " << *fileName << std::endl;
     
     Model* model = getModel();
-    TString* fN = new TString(fileName);
-    model->setSourceFileName(fN);
+    model->setSourceFileName(fileName);
 }
 
 void ImportSourceSpectrumPresenter::setModelHist(TH1F* hist, Bool_t isTwoDetector){

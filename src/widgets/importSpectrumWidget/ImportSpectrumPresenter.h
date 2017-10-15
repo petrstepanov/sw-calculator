@@ -24,7 +24,7 @@ class ImportSpectrumPresenter : public AbstractImportSpectrumPresenter {
     public:
         ImportSpectrumPresenter(AbstractImportSpectrumView* view);
         
-        void setModelFileName(const char* fileName);        
+        void setModelFileName(TString* fileName);        
         void setModelHist(TH1F* hist, Bool_t isTwoDetector);
 };
 

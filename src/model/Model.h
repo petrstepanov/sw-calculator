@@ -23,33 +23,52 @@
 class Model {
 public:
     static Model* getInstance();
-
-    void setFileName(TString* name){ 
-        std::cout << "Model::setFileName(), " << name << std::endl;
-        strFileName = name; 
+    
+    void setFileName(TString* fileName){ 
+        std::cout << "Model::setFileName(), " << *fileName << std::endl;
+        strFileName = fileName; 
     }
     
-    TString* getFileName(){ return strFileName; }
+    TString* getFileName(){ 
+        return strFileName; 
+    }
 
-    void setSourceFileName(TString* name){ 
-        std::cout << "Model::setSourceFileName(), " << name << std::endl;
-        strSourceContribFileName = name; 
+    void setSourceFileName(TString* fileName){  
+        std::cout << "Model::setSourceFileName(), " << fileName << std::endl;
+        strSourceContribFileName = fileName; 
     }
     
-    TString* getSourceFileName(){ return strSourceContribFileName; }
+    TString* getSourceFileName(){ 
+        return strSourceContribFileName; 
+    }
     
-    void setHist(TH1F* hist){ fullHist = hist; }
-    TH1F* getHist(){ return fullHist; }
+    void setHist(TH1F* hist){ 
+        fullHist = hist; 
+    }
+    
+    TH1F* getHist(){ 
+        return fullHist; 
+    }
 
-    void setSourceHist(TH1F* hist){ sourceHist = hist; }
-    TH1F* getSourceHist(){ return sourceHist; }
+    void setSourceHist(TH1F* hist){ 
+        sourceHist = hist; 
+    }
+    
+    TH1F* getSourceHist(){ 
+        return sourceHist; 
+    }
 
-    void setTwoDetector(Bool_t b){ twoDetector = b; }
-    Bool_t isTwoDetector(){ return twoDetector; }
+    void setTwoDetector(Bool_t b){ 
+        twoDetector = b; 
+    }
+    
+    Bool_t isTwoDetector(){ 
+        return twoDetector; 
+    }
 
     
 private:
-    Model(){};                              // Private so that it can  not be called
+    Model();                              // Private so that it can  not be called
     static Model* instance;
 
     TString* strFileName = nullptr;

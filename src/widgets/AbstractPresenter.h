@@ -19,6 +19,7 @@ template <class M, class V>
 class AbstractPresenter {
   public:
     AbstractPresenter(V* v){
+        model = nullptr;
         view = v;
         addEventListeners();
     }

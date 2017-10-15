@@ -1,9 +1,10 @@
-#include <TROOT.h>
+   #include <TROOT.h>
 #include <TApplication.h>
 #include <TGFrame.h>
 #include "widgets/swCalculatorWidget/SWCalculatorView.h"
 #include "widgets/MainView.h"
 #include "model/Constants.h"
+#include "model/Model.h"
 
 //int main(int argc, char **argv) {
 //    TApplication* app = new TApplication(Constants::applicationName, &argc, argv);
@@ -20,6 +21,8 @@
 //}
 
 int main(int argc, char **argv) {
+//    Model* model = Model::getInstance();
+//    model->setFileName(new TString("name"));
     TApplication* app = new TApplication(Constants::applicationName, &argc, argv);
     MainView* mainView = new MainView(gClient->GetRoot());
     SWCalculatorView* swCalculatorView = new SWCalculatorView(mainView);

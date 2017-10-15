@@ -25,7 +25,7 @@ HistProcessor* HistProcessor::instance = NULL;
 
 HistProcessor* HistProcessor::getInstance(){
 	if (!instance){
-		instance = new HistProcessor;
+		instance = new HistProcessor();
 	}
 	return instance;
 }

@@ -30,8 +30,8 @@ void AbstractImportSpectrumView::initUI(){
     btnOpenFile = new TGTextButton(frameOpenFile, "Open File");
     btnOpenFile->Connect("Clicked()", "AbstractImportSpectrumView", this, "onOpenFileClicked()");
     frameOpenFile->AddFrame(btnOpenFile, new TGLayoutHints(kLHintsLeft | kLHintsTop));
-    lblFileName = new TGLabel(frameOpenFile, "");
-    frameOpenFile->AddFrame(lblFileName, new TGLayoutHints(kLHintsLeft | kLHintsTop, dx, 0, dx)); // left right top bottom
+    lblFileName = new TGLabel(frameOpenFile, "no file loaded");
+    frameOpenFile->AddFrame(lblFileName, new TGLayoutHints(kLHintsLeft | kLHintsTop | kLHintsExpandX, dx, 0, dx)); // left right top bottom
     this->AddFrame(frameOpenFile, new TGLayoutHints(kLHintsExpandX, dx, dx, dy, dy/2));
 
     // File browser
@@ -95,12 +95,12 @@ void AbstractImportSpectrumView::onImportSpectrumClicked(){
 }
 
 // Calls from Presenter 
-void AbstractImportSpectrumView::loadFile(const char* fileNamePath){
-    std::cout << "AbstractImportSpectrumView::loadFile() " << fileNamePath << std::endl;
+void AbstractImportSpectrumView::loadFile(TString* fileNamePath){
+    std::cout << "AbstractImportSpectrumView::loadFile() " << *fileNamePath << std::endl;
     // Load file contents to FileBrowser
-    txtFileBrowser->LoadFile(fileNamePath);
+    txtFileBrowser->LoadFile(fileNamePath->Data());
     // Update FileName label
-    TString* fileName = StringUtils::stripFileName(new TString(fileNamePath));
+    TString* fileName = StringUtils::stripFileName(fileNamePath);
     lblFileName->SetText(fileName->Data());
 }
 

@@ -24,11 +24,12 @@ void AbstractImportSpectrumPresenter::onOpenFileClicked(){
     if (!fileInfo->fFilename){
         std::cout << "AbstractImportSpectrumPresenter::onOpenFileClicked() filename is NULL" << std::endl;
         return;
-    }
+    }    
+    TString* fileNamePath = new TString(fileInfo->fFilename);
     // Update Model with new file name (virtual function)
-    setModelFileName(fileInfo->fFilename);
+    this->setModelFileName(fileNamePath);
     // Update View to reflect 
-    view->loadFile(fileInfo->fFilename);
+    view->loadFile(fileNamePath);
 }
 
 void AbstractImportSpectrumPresenter::onImportSpectrumClicked(){
