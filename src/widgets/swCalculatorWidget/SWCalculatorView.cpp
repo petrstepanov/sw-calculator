@@ -63,14 +63,14 @@ void SWCalculatorView::initUI(){
     tabsWidget = new TGTab(this, Constants::leftPanelWidth);
 
     // Import spectrum tab
-//    TGCompositeFrame *tabImport = tabsWidget->AddTab("Material Spectrum");
-//    tabImport->SetLayoutManager(new TGVerticalLayout(tabImport));
-//    tabImport->AddFrame(new ImportSpectrumView(tabImport), new TGLayoutHints(kLHintsExpandX | kLHintsExpandY, 0, 0, dy, dy));
+    TGCompositeFrame *tabImport = tabsWidget->AddTab("Material Spectrum");
+    tabImport->SetLayoutManager(new TGVerticalLayout(tabImport));
+    tabImport->AddFrame(new ImportSpectrumView(tabImport), new TGLayoutHints(kLHintsExpandX | kLHintsExpandY, 0, 0, dy, dy));
 
     // Import Kapton spectrum tab
-//    TGCompositeFrame *tabImportKapton = tabsWidget->AddTab("Kapton Spectrum");
-//    tabImportKapton->SetLayoutManager(new TGVerticalLayout(tabImportKapton));
-//    tabImportKapton->AddFrame(new ImportSourceSpectrumView(tabImportKapton), new TGLayoutHints(kLHintsExpandX | kLHintsExpandY, 0, 0, dy, dy));
+    TGCompositeFrame *tabImportKapton = tabsWidget->AddTab("Kapton Spectrum");
+    tabImportKapton->SetLayoutManager(new TGVerticalLayout(tabImportKapton));
+    tabImportKapton->AddFrame(new ImportSourceSpectrumView(tabImportKapton), new TGLayoutHints(kLHintsExpandX | kLHintsExpandY, 0, 0, dy, dy));
     
     // Fit Data tab
     TGCompositeFrame *tabFit = tabsWidget->AddTab("Fit Data");
