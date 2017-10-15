@@ -20,7 +20,7 @@
 
 class ImportSourceSpectrumView : public AbstractImportSpectrumView<ImportSourceSpectrumPresenter> {
 public:
-    ImportSourceSpectrumView(TGWindow *w = 0);
+    ImportSourceSpectrumView(const TGWindow *w = 0);
 
     ImportSourceSpectrumPresenter* instantinatePresenter();
 };

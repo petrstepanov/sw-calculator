@@ -22,17 +22,12 @@ enum Padding {
    dy = 5,
    d3x = 3*dx
 };
-//
-//enum ViewLayout {
-//    horizontal,
-//    vertical
-//};
 
 template <class P>
 class AbstractView : public TGCompositeFrame {
   public:
-    AbstractView(TGWindow *w = 0) : 
-        TGCompositeFrame(w){
+    AbstractView(const TGWindow *w=0) : 
+        TGMainFrame(w){
             std::cout << "AbstractView::AbstractView()" << std::endl;            
 //            parentCompositeFrame = w;
     }

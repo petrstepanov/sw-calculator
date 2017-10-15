@@ -13,7 +13,7 @@
 
 #include "SWCalculatorView.h"
 #include "SWCalculatorPresenter.h"
-#include "../../SWCalculatorFrameLinkDef.h"
+#include "../../SWCalculatorLinkDef.h"
 #include "../../model/Constants.h"
 #include "../importSpectrumWidget/ImportSpectrumView.h"
 #include "../importSpectrumWidget/ImportSourceSpectrumView.h"
@@ -34,7 +34,7 @@
 //#include <TGMsgBox.h>
 #include <TG3DLine.h>
 //#include <TStopwatch.h>
-////#include <RQ_OBJECT.h>
+#include <RQ_OBJECT.h>
 //#include "../../util/GraphicsHelper.h"
 //#include "../../roofit/AbstractModelProvider.h"
 //#include "../../roofit/ParabolaGaussModelProvider.h"
@@ -48,7 +48,7 @@
 
 using namespace RooFit;
 
-SWCalculatorView::SWCalculatorView(TGWindow* w) : AbstractView<SWCalculatorPresenter>(w){
+SWCalculatorView::SWCalculatorView(const TGWindow* w) : AbstractView<SWCalculatorPresenter>(w){
     initUI();    
 }
 
@@ -63,14 +63,14 @@ void SWCalculatorView::initUI(){
     tabsWidget = new TGTab(this, Constants::leftPanelWidth);
 
     // Import spectrum tab
-    TGCompositeFrame *tabImport = tabsWidget->AddTab("Material Spectrum");
-    tabImport->SetLayoutManager(new TGVerticalLayout(tabImport));
-    tabImport->AddFrame(new ImportSpectrumView(tabImport), new TGLayoutHints(kLHintsExpandX | kLHintsExpandY, 0, 0, dy, dy));
+//    TGCompositeFrame *tabImport = tabsWidget->AddTab("Material Spectrum");
+//    tabImport->SetLayoutManager(new TGVerticalLayout(tabImport));
+//    tabImport->AddFrame(new ImportSpectrumView(tabImport), new TGLayoutHints(kLHintsExpandX | kLHintsExpandY, 0, 0, dy, dy));
 
     // Import Kapton spectrum tab
-    TGCompositeFrame *tabImportKapton = tabsWidget->AddTab("Kapton Spectrum");
-    tabImportKapton->SetLayoutManager(new TGVerticalLayout(tabImportKapton));
-    tabImportKapton->AddFrame(new ImportSourceSpectrumView(tabImportKapton), new TGLayoutHints(kLHintsExpandX | kLHintsExpandY, 0, 0, dy, dy));
+//    TGCompositeFrame *tabImportKapton = tabsWidget->AddTab("Kapton Spectrum");
+//    tabImportKapton->SetLayoutManager(new TGVerticalLayout(tabImportKapton));
+//    tabImportKapton->AddFrame(new ImportSourceSpectrumView(tabImportKapton), new TGLayoutHints(kLHintsExpandX | kLHintsExpandY, 0, 0, dy, dy));
     
     // Fit Data tab
     TGCompositeFrame *tabFit = tabsWidget->AddTab("Fit Data");
@@ -82,14 +82,14 @@ void SWCalculatorView::initUI(){
             TGNumberFormat::kNEAAnyNumber,
             TGNumberFormat::kNELLimitMinMax,
             -9999, 9999);
-    numFitMin->GetNumberEntry()->Connect("TextChanged(char*)", "SWCalculatorFrame",
+    numFitMin->GetNumberEntry()->Connect("TextChanged(char*)", "SWCalculatorView",
             this, "onNumFitMinChanged()");
 
     numFitMax = new TGNumberEntry(frameFitRange, 537, 4, -1, TGNumberFormat::kNESInteger,
             TGNumberFormat::kNEAAnyNumber,
             TGNumberFormat::kNELLimitMinMax,
             -9999, 9999);
-    numFitMax->GetNumberEntry()->Connect("TextChanged(char*)", "SWCalculatorFrame",
+    numFitMax->GetNumberEntry()->Connect("TextChanged(char*)", "SWCalculatorView",
             this, "onNumFitMaxChanged()");
     frameFitRange->AddFrame(new TGLabel(frameFitRange, "Fit Range, keV"), new TGLayoutHints(kLHintsNormal, 0, 0, dy, 0));
     frameFitRange->AddFrame(numFitMax, new TGLayoutHints(kLHintsRight));
@@ -203,7 +203,7 @@ void SWCalculatorView::initUI(){
     // Fit Button
     TGHorizontalFrame* frameFitSpectrum = new TGHorizontalFrame(tabFit);
     btnFitSpectrum = new TGTextButton(frameFitSpectrum, "Fit and plot");
-    btnFitSpectrum->Connect("Clicked()", "SWCalculatorFrame", this, "onFitClicked()");
+    btnFitSpectrum->Connect("Clicked()", "SWCalculatorView", this, "onFitSpectrumClicked()");
     frameFitSpectrum->AddFrame(btnFitSpectrum, new TGLayoutHints(kLHintsExpandX));
     tabFit->AddFrame(frameFitSpectrum, new TGLayoutHints(kLHintsExpandX, dx, dx, dy + 3, dy));
 
@@ -230,9 +230,9 @@ void SWCalculatorView::initUI(){
             TGNumberFormat::kNELLimitMinMax,
             -9999, 9999);
     btnApplyZoom = new TGTextButton(frameExportButtons, "Apply Display Range");
-    btnApplyZoom->Connect("Clicked()", "SWCalculatorFrame", this, "applyZoom()");
+    btnApplyZoom->Connect("Clicked()", "SWCalculatorView", this, "onApplyZoomClicked()");
     btnResetZoom = new TGTextButton(frameExportButtons, "Reset");
-    btnResetZoom->Connect("Clicked()", "SWCalculatorFrame", this, "resetZoom()");
+    btnResetZoom->Connect("Clicked()", "SWCalculatorView", this, "onResetZoomClicked()");
 
     frameExportButtons->AddFrame(numDisplayMin, new TGLayoutHints(kLHintsLeft | kLHintsTop, 0, dx, 0, 0));  // left, right, top, bottom
     frameExportButtons->AddFrame(new TGLabel(frameExportButtons, "-"), new TGLayoutHints(kLHintsLeft | kLHintsTop, 0, dx, dy, 0));  // left, right, top, bottom
@@ -242,13 +242,13 @@ void SWCalculatorView::initUI(){
 
     // Save data file button
     btnSaveData = new TGTextButton(frameExportButtons, "Export Fit Data");
-    btnSaveData->Connect("Clicked()", "SWCalculatorFrame", this, "saveData()");
+    btnSaveData->Connect("Clicked()", "SWCalculatorView", this, "onSaveDataClicked()");
     btnSaveData->SetEnabled(false);
     frameExportButtons->AddFrame(btnSaveData, new TGLayoutHints(kLHintsRight | kLHintsTop, 0, 0, 0, 0));  // left, right, top, bottom
 
     // Save image button
     btnSaveImage = new TGTextButton(frameExportButtons, "Save Image");
-    btnSaveImage->Connect("Clicked()", "SWCalculatorFrame", this, "saveImage()");
+    btnSaveImage->Connect("Clicked()", "SWCalculatorView", this, "onSaveImageClicked()");
     btnSaveImage->SetEnabled(false);
     frameExportButtons->AddFrame(btnSaveImage, new TGLayoutHints(kLHintsRight | kLHintsTop, 0, dx, 0, 0));
 
@@ -272,6 +272,8 @@ void SWCalculatorView::initUI(){
     padChi2->SetMargin(Constants::padMargin[0], Constants::padMargin[1], Constants::padMargin[2], Constants::padMargin[3]);
     padChi2->Draw();
 }
+
+// Calls from Presenter
 
 Int_t SWCalculatorView::getFitMinValue(){
     return numFitMin->GetNumber();    
@@ -322,8 +324,37 @@ void SWCalculatorView::setToolbarEnabled(Bool_t isEnabled){
     numDisplayMax->SetState(isEnabled);
 }
 
+// Calls to Presenter
+void onNumFitMinChanged(){
+    std::cout << "SWCalculatorView::onNumFitMinChanged()" << std::endl;
+}
+
+void onNumFitMaxChanged(){
+    std::cout << "SWCalculatorView::onNumFitMaxChanged()" << std::endl;    
+}
+
+void onFitSpectrumClicked(){
+    std::cout << "SWCalculatorView::onFitSpectrumClicked()" << std::endl;    
+}
+
+void onApplyZoomClicked(){
+    std::cout << "SWCalculatorView::onApplyZoomClicked()" << std::endl;    
+}
+
+void onResetZoomClicked(){
+    std::cout << "SWCalculatorView::onResetZoomClicked()" << std::endl;    
+}
+
+void onSaveDataClicked(){
+    std::cout << "SWCalculatorView::onSaveDataClicked()" << std::endl;        
+}
+
+void onSaveImageClicked(){
+    std::cout << "SWCalculatorView::onSaveImageClicked()" << std::endl;    
+}
+
 SWCalculatorView::~SWCalculatorView() {
-//	mainFrame->Cleanup();
+//    mainFrame->Cleanup();
     delete tabsWidget;
     delete numPeakPosition;
     delete numFitMin;

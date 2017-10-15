@@ -149,8 +149,10 @@ Contributor(s):
             <pElem>.</pElem>
           </linkerDynSerch>
           <linkerDepDynSerchKind>0</linkerDepDynSerchKind>
-          <linkerCopySharedLibs>false</linkerCopySharedLibs>
           <commandlineTool>g++</commandlineTool>
+          <linkerLibItems>
+            <linkerLibFileItem>lib/sw-calculator.so</linkerLibFileItem>
+          </linkerLibItems>
           <commandLine>-lGui -lCore -lRIO -lNet -lHist -lGraf -lGraf3d -lGpad -lTree -lRint -lPostscript -lMatrix -lPhysics -lMathCore -lThread -lMultiProc -lpthread -stdlib=libc++ -lm -ldl -lRooFit -lRooFitCore -lHtml -lMinuit -lFumili</commandLine>
         </linkerTool>
       </compileType>
@@ -232,6 +234,18 @@ Contributor(s):
           <packFileListElem type="File"
                             to="${PACKAGE_TOP_DIR}bin/${OUTPUT_BASENAME}"
                             from="${OUTPUT_PATH}"
+                            perm="755"
+                            owner="root"
+                            group="bin"/>
+          <packFileListElem type="File"
+                            to="${PACKAGE_TOP_DIR}bin/${OUTPUT_BASENAME}"
+                            from="${OUTPUT_PATH}"
+                            perm="755"
+                            owner="root"
+                            group="bin"/>
+          <packFileListElem type="File"
+                            to="${PACKAGE_TOP_DIR}bin/sw-calculator.so"
+                            from="${CND_DISTDIR}/${CND_CONF}/${CND_PLATFORM}/sw-calculator.so"
                             perm="755"
                             owner="root"
                             group="bin"/>

@@ -13,7 +13,7 @@
 
 #include "ImportSpectrumView.h"
 
-ImportSpectrumView::ImportSpectrumView(TGWindow *w) : AbstractImportSpectrumView<ImportSpectrumPresenter>(w){
+ImportSpectrumView::ImportSpectrumView(const TGWindow *w) : AbstractImportSpectrumView<ImportSpectrumPresenter>(w){
 }
 
 // Override base class virtual functions

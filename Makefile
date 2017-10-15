@@ -75,6 +75,8 @@
 # Environment 
 MKDIR=mkdir
 CP=cp
+MV=mv
+CD=cd
 CCADMIN=CCadmin
 RANLIB=ranlib
 
@@ -150,29 +152,39 @@ build: .build-post
 
 .build-pre:
 # Add your pre 'build' code here...
+# https://root.cern.ch/interacting-shared-libraries-rootcint
+
 	@echo Generating dictionary: SWCalculatorFrameDict.cpp
-	cd src; \
-	rootcling -f SWCalculatorFrameDict.cpp -c $(MYCFLAGS) -p $(MYHEADERS) SWCalculatorFrameLinkDef.h
-#https://root.cern.ch/interacting-shared-libraries-rootcint
+	$(CD) src; \
+	rootcling -f SWCalculatorDict.cpp -c $(MYCFLAGS) -p $(MYHEADERS) SWCalculatorLinkDef.h
+
 	@echo Generating shared library: sw-calculator.so
-	cd src; \
-	g++ -shared -o ../lib/sw-calculator.so $(MYCFLAGS) $(MYLIBS) SWCalculatorFrameDict.cpp $(MYSOURCES)
+	$(CD) src; \
+	g++ -shared -o sw-calculator.so $(MYCFLAGS) $(MYLIBS) SWCalculatorDict.cpp $(MYSOURCES)
+
+	@echo Move shared library './src/sw-calculator.so' to './lib/...'
+	$(MV) ./src/sw-calculator.so ./lib/sw-calculator.so
+	$(MV) ./src/SWCalculatorDict_rdict.pcm ./lib/SWCalculatorDict_rdict.pcm
 
 .build-post: .build-impl
 # Add your post 'build' code here...
-	@echo Copying shared library 'sw-calculator.so' to 
-	$(CP) ./lib/sw-calculator.so ./dist/Debug/GNU-MacOSX/sw-calculator.so
 
-#sw-calculator.so:
-#	@echo Generating shared library: sw-calculator.so
-#	cd src; \
-#	g++ -shared -o ../lib/sw-calculator.so $(MYCFLAGS) $(MYLIBS) SWCalculatorFrameDict.cpp $(MYSOURCES)
+
+lib/sw-calculator.so:
+	@echo Generating shared library: sw-calculator.so
+
 	
 # clean
 clean: .clean-post
 
 .clean-pre:
 # Add your pre 'clean' code here...
+	@echo Cleaning shared libraries
+	rm -f ./sw-*.so
+
+	@echo Cleaning dictionaries
+	rm -f ./src/*Dict.cpp
+	rm -f ./src/*Dict_rdict.pcm
 
 .clean-post: .clean-impl
 # Add your post 'clean' code here...

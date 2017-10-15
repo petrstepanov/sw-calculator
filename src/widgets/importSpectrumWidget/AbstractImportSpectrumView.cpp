@@ -13,6 +13,7 @@
 // Calls to Presenter
 template <class P>
 void AbstractImportSpectrumView<P>::onOpenFileClicked(){
+    std::cout << "AbstractImportSpectrumView::onOpenFileClicked()" << std::endl;
     P* p = this->template getPresenter();
     AbstractImportSpectrumPresenter<AbstractImportSpectrumView>* presenter = static_cast<AbstractImportSpectrumPresenter<AbstractImportSpectrumView>*>(p);
     presenter->onOpenFileClicked();
@@ -20,6 +21,7 @@ void AbstractImportSpectrumView<P>::onOpenFileClicked(){
 
 template <class P>
 void AbstractImportSpectrumView<P>::onImportSpectrumClicked(){
+    std::cout << "AbstractImportSpectrumView::onImportSpectrumClicked()" << std::endl;
     P* p = this->template getPresenter();
     AbstractImportSpectrumPresenter<AbstractImportSpectrumView>* presenter = static_cast<AbstractImportSpectrumPresenter<AbstractImportSpectrumView>*>(p);
     presenter->onImportSpectrumClicked();

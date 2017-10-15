@@ -81,11 +81,15 @@ FFLAGS=
 ASFLAGS=
 
 # Link Libraries and Options
-LDLIBSOPTIONS=-L/Applications/root_v6.06.02/lib
+LDLIBSOPTIONS=-L/Applications/root_v6.06.02/lib lib/sw-calculator.so
 
 # Build Targets
 .build-conf: ${BUILD_SUBPROJECTS}
 	"${MAKE}"  -f nbproject/Makefile-${CND_CONF}.mk ${CND_DISTDIR}/${CND_CONF}/${CND_PLATFORM}/sw-calculator
+	${CP} lib/sw-calculator.so ${CND_DISTDIR}/${CND_CONF}/${CND_PLATFORM}
+	-install_name_tool -change sw-calculator.so @executable_path/sw-calculator.so ${CND_DISTDIR}/${CND_CONF}/${CND_PLATFORM}/sw-calculator
+
+${CND_DISTDIR}/${CND_CONF}/${CND_PLATFORM}/sw-calculator: lib/sw-calculator.so
 
 ${CND_DISTDIR}/${CND_CONF}/${CND_PLATFORM}/sw-calculator: ${OBJECTFILES}
 	${MKDIR} -p ${CND_DISTDIR}/${CND_CONF}/${CND_PLATFORM}
@@ -257,6 +261,8 @@ ${OBJECTDIR}/src/widgets/swCalculatorWidget/SWCalculatorView.h.gch: src/widgets/
 # Clean Targets
 .clean-conf: ${CLEAN_SUBPROJECTS}
 	${RM} -r ${CND_BUILDDIR}/${CND_CONF}
+	${RM} -r ${CND_DISTDIR}/${CND_CONF}/${CND_PLATFORM}/sw-calculator.so
+	${RM} ${CND_DISTDIR}/${CND_CONF}/${CND_PLATFORM}/sw-calculator
 
 # Subprojects
 .clean-subprojects:

@@ -1,6 +1,6 @@
 // Do NOT change. Changes will be lost next time file is generated
 
-#define R__DICTIONARY_FILENAME SWCalculatorFrameDict
+#define R__DICTIONARY_FILENAME SWCalculatorDict
 
 /*******************************************************************/
 #include <stddef.h>
@@ -72,8 +72,74 @@ namespace std {} using namespace std;
 
 // Header files passed via #pragma extra_include
 
+namespace ROOT {
+   static TClass *SWCalculatorView_Dictionary();
+   static void SWCalculatorView_TClassManip(TClass*);
+   static void *new_SWCalculatorView(void *p = 0);
+   static void *newArray_SWCalculatorView(Long_t size, void *p);
+   static void delete_SWCalculatorView(void *p);
+   static void deleteArray_SWCalculatorView(void *p);
+   static void destruct_SWCalculatorView(void *p);
+
+   // Function generating the singleton type initializer
+   static TGenericClassInfo *GenerateInitInstanceLocal(const ::SWCalculatorView*)
+   {
+      ::SWCalculatorView *ptr = 0;
+      static ::TVirtualIsAProxy* isa_proxy = new ::TIsAProxy(typeid(::SWCalculatorView));
+      static ::ROOT::TGenericClassInfo 
+         instance("SWCalculatorView", "widgets/swCalculatorWidget/SWCalculatorView.h", 36,
+                  typeid(::SWCalculatorView), ::ROOT::Internal::DefineBehavior(ptr, ptr),
+                  &SWCalculatorView_Dictionary, isa_proxy, 0,
+                  sizeof(::SWCalculatorView) );
+      instance.SetNew(&new_SWCalculatorView);
+      instance.SetNewArray(&newArray_SWCalculatorView);
+      instance.SetDelete(&delete_SWCalculatorView);
+      instance.SetDeleteArray(&deleteArray_SWCalculatorView);
+      instance.SetDestructor(&destruct_SWCalculatorView);
+      return &instance;
+   }
+   TGenericClassInfo *GenerateInitInstance(const ::SWCalculatorView*)
+   {
+      return GenerateInitInstanceLocal((::SWCalculatorView*)0);
+   }
+   // Static variable to force the class initialization
+   static ::ROOT::TGenericClassInfo *_R__UNIQUE_(Init) = GenerateInitInstanceLocal((const ::SWCalculatorView*)0x0); R__UseDummy(_R__UNIQUE_(Init));
+
+   // Dictionary for non-ClassDef classes
+   static TClass *SWCalculatorView_Dictionary() {
+      TClass* theClass =::ROOT::GenerateInitInstanceLocal((const ::SWCalculatorView*)0x0)->GetClass();
+      SWCalculatorView_TClassManip(theClass);
+   return theClass;
+   }
+
+   static void SWCalculatorView_TClassManip(TClass* ){
+   }
+
+} // end of namespace ROOT
+
+namespace ROOT {
+   // Wrappers around operator new
+   static void *new_SWCalculatorView(void *p) {
+      return  p ? new(p) ::SWCalculatorView : new ::SWCalculatorView;
+   }
+   static void *newArray_SWCalculatorView(Long_t nElements, void *p) {
+      return p ? new(p) ::SWCalculatorView[nElements] : new ::SWCalculatorView[nElements];
+   }
+   // Wrapper around operator delete
+   static void delete_SWCalculatorView(void *p) {
+      delete ((::SWCalculatorView*)p);
+   }
+   static void deleteArray_SWCalculatorView(void *p) {
+      delete [] ((::SWCalculatorView*)p);
+   }
+   static void destruct_SWCalculatorView(void *p) {
+      typedef ::SWCalculatorView current_t;
+      ((current_t*)p)->~current_t();
+   }
+} // end of namespace ROOT for class ::SWCalculatorView
+
 namespace {
-  void TriggerDictionaryInitialization_SWCalculatorFrameDict_Impl() {
+  void TriggerDictionaryInitialization_SWCalculatorDict_Impl() {
     static const char* headers[] = {
 "model/Constants.h",
 "model/Model.h",
@@ -115,14 +181,15 @@ namespace {
 0
     };
     static const char* fwdDeclCode = R"DICTFWDDCLS(
-#line 1 "SWCalculatorFrameDict dictionary forward declarations' payload"
+#line 1 "SWCalculatorDict dictionary forward declarations' payload"
 #pragma clang diagnostic ignored "-Wkeyword-compat"
 #pragma clang diagnostic ignored "-Wignored-attributes"
 #pragma clang diagnostic ignored "-Wreturn-type-c-linkage"
 extern int __Cling_Autoloading_Map;
+class __attribute__((annotate("$clingAutoload$widgets/swCalculatorWidget/SWCalculatorPresenter.h")))  SWCalculatorView;
 )DICTFWDDCLS";
     static const char* payloadCode = R"DICTPAYLOAD(
-#line 1 "SWCalculatorFrameDict dictionary payload"
+#line 1 "SWCalculatorDict dictionary payload"
 
 #ifndef G__VECTOR_HAS_CLASS_ITERATOR
   #define G__VECTOR_HAS_CLASS_ITERATOR 1
@@ -164,22 +231,23 @@ extern int __Cling_Autoloading_Map;
 #undef  _BACKWARD_BACKWARD_WARNING_H
 )DICTPAYLOAD";
     static const char* classesHeaders[]={
+"SWCalculatorView", payloadCode, "@",
 nullptr};
 
     static bool isInitialized = false;
     if (!isInitialized) {
-      TROOT::RegisterModule("SWCalculatorFrameDict",
+      TROOT::RegisterModule("SWCalculatorDict",
         headers, includePaths, payloadCode, fwdDeclCode,
-        TriggerDictionaryInitialization_SWCalculatorFrameDict_Impl, {}, classesHeaders);
+        TriggerDictionaryInitialization_SWCalculatorDict_Impl, {}, classesHeaders);
       isInitialized = true;
     }
   }
   static struct DictInit {
     DictInit() {
-      TriggerDictionaryInitialization_SWCalculatorFrameDict_Impl();
+      TriggerDictionaryInitialization_SWCalculatorDict_Impl();
     }
   } __TheDictionaryInitializer;
 }
-void TriggerDictionaryInitialization_SWCalculatorFrameDict() {
-  TriggerDictionaryInitialization_SWCalculatorFrameDict_Impl();
+void TriggerDictionaryInitialization_SWCalculatorDict() {
+  TriggerDictionaryInitialization_SWCalculatorDict_Impl();
 }

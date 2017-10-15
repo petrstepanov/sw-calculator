@@ -35,7 +35,7 @@ class SWCalculatorPresenter;
 
 class SWCalculatorView : public AbstractView<SWCalculatorPresenter> {
   public:
-    SWCalculatorView(TGWindow *w = 0);
+    SWCalculatorView(const TGWindow *w = 0);
     virtual ~SWCalculatorView();
     
     // Override base class virtual functions
@@ -54,11 +54,18 @@ class SWCalculatorView : public AbstractView<SWCalculatorPresenter> {
     Int_t getNumDampExp();
     void setToolbarEnabled(Bool_t isEnabled);
     
+    // Calls to Presenter
+    void onNumFitMinChanged();
+    void onNumFitMaxChanged();
+    void onFitSpectrumClicked();
+    void onApplyZoomClicked();
+    void onResetZoomClicked();
+    void onSaveDataClicked();
+    void onSaveImageClicked();    
+    
   protected:
     void initUI();
-
-    // Calls to Presenter
-
+    
 //      #if defined(__ROOTCLING__)
 //	  ClassDef(SWCalculatorFrame, 1);
 //      #endif

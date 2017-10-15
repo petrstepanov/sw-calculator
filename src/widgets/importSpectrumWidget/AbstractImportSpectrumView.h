@@ -29,7 +29,7 @@
 template <class P>
 class AbstractImportSpectrumView : public AbstractView<P> {
   public:
-    AbstractImportSpectrumView(TGWindow *w) : AbstractView<P>(w){    
+    AbstractImportSpectrumView(const TGWindow *w) : AbstractView<P>(w){    
         initUI();
     }
 
