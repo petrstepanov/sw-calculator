@@ -65,8 +65,7 @@ OBJECTFILES= \
 	${OBJECTDIR}/src/widgets/importSpectrumWidget/ImportSpectrumPresenter.o \
 	${OBJECTDIR}/src/widgets/importSpectrumWidget/ImportSpectrumView.o \
 	${OBJECTDIR}/src/widgets/swCalculatorWidget/SWCalculatorPresenter.o \
-	${OBJECTDIR}/src/widgets/swCalculatorWidget/SWCalculatorView.o \
-	${OBJECTDIR}/src/widgets/testView/TTripleSliderDemo.o
+	${OBJECTDIR}/src/widgets/swCalculatorWidget/SWCalculatorView.o
 
 
 # C Compiler Flags
@@ -247,11 +246,6 @@ ${OBJECTDIR}/src/widgets/swCalculatorWidget/SWCalculatorView.o: src/widgets/swCa
 	${MKDIR} -p ${OBJECTDIR}/src/widgets/swCalculatorWidget
 	${RM} "$@.d"
 	$(COMPILE.cc) -O2 -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/src/widgets/swCalculatorWidget/SWCalculatorView.o src/widgets/swCalculatorWidget/SWCalculatorView.cpp
-
-${OBJECTDIR}/src/widgets/testView/TTripleSliderDemo.o: src/widgets/testView/TTripleSliderDemo.cpp
-	${MKDIR} -p ${OBJECTDIR}/src/widgets/testView
-	${RM} "$@.d"
-	$(COMPILE.cc) -O2 -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/src/widgets/testView/TTripleSliderDemo.o src/widgets/testView/TTripleSliderDemo.cpp
 
 # Subprojects
 .build-subprojects:

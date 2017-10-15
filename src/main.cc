@@ -2,7 +2,6 @@
 #include <TApplication.h>
 #include <TGFrame.h>
 #include "widgets/swCalculatorWidget/SWCalculatorView.h"
-#include "widgets/testView/TTripleSliderDemo.h"
 #include "widgets/MainView.h"
 #include "model/Constants.h"
 

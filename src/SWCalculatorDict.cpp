@@ -66,7 +66,6 @@ namespace std {} using namespace std;
 #include "widgets/importSpectrumWidget/ImportSpectrumView.h"
 #include "widgets/swCalculatorWidget/SWCalculatorPresenter.h"
 #include "widgets/swCalculatorWidget/SWCalculatorView.h"
-#include "widgets/testView/TTripleSliderDemo.h"
 #include "widgets/AbstractPresenter.h"
 #include "widgets/AbstractView.h"
 #include "widgets/MainView.h"
@@ -120,47 +119,6 @@ namespace ROOT {
 } // end of namespace ROOT
 
 namespace ROOT {
-   static TClass *TTripleSliderDemo_Dictionary();
-   static void TTripleSliderDemo_TClassManip(TClass*);
-   static void delete_TTripleSliderDemo(void *p);
-   static void deleteArray_TTripleSliderDemo(void *p);
-   static void destruct_TTripleSliderDemo(void *p);
-
-   // Function generating the singleton type initializer
-   static TGenericClassInfo *GenerateInitInstanceLocal(const ::TTripleSliderDemo*)
-   {
-      ::TTripleSliderDemo *ptr = 0;
-      static ::TVirtualIsAProxy* isa_proxy = new ::TIsAProxy(typeid(::TTripleSliderDemo));
-      static ::ROOT::TGenericClassInfo 
-         instance("TTripleSliderDemo", "widgets/testView/TTripleSliderDemo.h", 30,
-                  typeid(::TTripleSliderDemo), ::ROOT::Internal::DefineBehavior(ptr, ptr),
-                  &TTripleSliderDemo_Dictionary, isa_proxy, 0,
-                  sizeof(::TTripleSliderDemo) );
-      instance.SetDelete(&delete_TTripleSliderDemo);
-      instance.SetDeleteArray(&deleteArray_TTripleSliderDemo);
-      instance.SetDestructor(&destruct_TTripleSliderDemo);
-      return &instance;
-   }
-   TGenericClassInfo *GenerateInitInstance(const ::TTripleSliderDemo*)
-   {
-      return GenerateInitInstanceLocal((::TTripleSliderDemo*)0);
-   }
-   // Static variable to force the class initialization
-   static ::ROOT::TGenericClassInfo *_R__UNIQUE_(Init) = GenerateInitInstanceLocal((const ::TTripleSliderDemo*)0x0); R__UseDummy(_R__UNIQUE_(Init));
-
-   // Dictionary for non-ClassDef classes
-   static TClass *TTripleSliderDemo_Dictionary() {
-      TClass* theClass =::ROOT::GenerateInitInstanceLocal((const ::TTripleSliderDemo*)0x0)->GetClass();
-      TTripleSliderDemo_TClassManip(theClass);
-   return theClass;
-   }
-
-   static void TTripleSliderDemo_TClassManip(TClass* ){
-   }
-
-} // end of namespace ROOT
-
-namespace ROOT {
    // Wrappers around operator new
    static void *new_SWCalculatorView(void *p) {
       return  p ? new(p) ::SWCalculatorView : new ::SWCalculatorView;
@@ -180,20 +138,6 @@ namespace ROOT {
       ((current_t*)p)->~current_t();
    }
 } // end of namespace ROOT for class ::SWCalculatorView
-
-namespace ROOT {
-   // Wrapper around operator delete
-   static void delete_TTripleSliderDemo(void *p) {
-      delete ((::TTripleSliderDemo*)p);
-   }
-   static void deleteArray_TTripleSliderDemo(void *p) {
-      delete [] ((::TTripleSliderDemo*)p);
-   }
-   static void destruct_TTripleSliderDemo(void *p) {
-      typedef ::TTripleSliderDemo current_t;
-      ((current_t*)p)->~current_t();
-   }
-} // end of namespace ROOT for class ::TTripleSliderDemo
 
 namespace {
   void TriggerDictionaryInitialization_SWCalculatorDict_Impl() {
@@ -226,7 +170,6 @@ namespace {
 "widgets/importSpectrumWidget/ImportSpectrumView.h",
 "widgets/swCalculatorWidget/SWCalculatorPresenter.h",
 "widgets/swCalculatorWidget/SWCalculatorView.h",
-"widgets/testView/TTripleSliderDemo.h",
 "widgets/AbstractPresenter.h",
 "widgets/AbstractView.h",
 "widgets/MainView.h",
@@ -246,7 +189,6 @@ namespace {
 #pragma clang diagnostic ignored "-Wreturn-type-c-linkage"
 extern int __Cling_Autoloading_Map;
 class __attribute__((annotate("$clingAutoload$widgets/swCalculatorWidget/SWCalculatorPresenter.h")))  SWCalculatorView;
-class __attribute__((annotate("$clingAutoload$widgets/testView/TTripleSliderDemo.h")))  TTripleSliderDemo;
 )DICTFWDDCLS";
     static const char* payloadCode = R"DICTPAYLOAD(
 #line 1 "SWCalculatorDict dictionary payload"
@@ -284,7 +226,6 @@ class __attribute__((annotate("$clingAutoload$widgets/testView/TTripleSliderDemo
 #include "widgets/importSpectrumWidget/ImportSpectrumView.h"
 #include "widgets/swCalculatorWidget/SWCalculatorPresenter.h"
 #include "widgets/swCalculatorWidget/SWCalculatorView.h"
-#include "widgets/testView/TTripleSliderDemo.h"
 #include "widgets/AbstractPresenter.h"
 #include "widgets/AbstractView.h"
 #include "widgets/MainView.h"
@@ -294,7 +235,6 @@ class __attribute__((annotate("$clingAutoload$widgets/testView/TTripleSliderDemo
 )DICTPAYLOAD";
     static const char* classesHeaders[]={
 "SWCalculatorView", payloadCode, "@",
-"TTripleSliderDemo", payloadCode, "@",
 nullptr};
 
     static bool isInitialized = false;

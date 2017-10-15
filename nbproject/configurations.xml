@@ -79,7 +79,6 @@ Contributor(s):
       <itemPath>src/widgets/swCalculatorWidget/SWCalculatorPresenter.h</itemPath>
       <itemPath>src/widgets/swCalculatorWidget/SWCalculatorView.h</itemPath>
       <itemPath>src/util/StringUtils.h</itemPath>
-      <itemPath>src/widgets/testView/TTripleSliderDemo.h</itemPath>
       <itemPath>src/util/UiHelper.h</itemPath>
       <itemPath>src/util/Variable.h</itemPath>
     </logicalFolder>
@@ -118,7 +117,6 @@ Contributor(s):
       <itemPath>src/widgets/swCalculatorWidget/SWCalculatorPresenter.cpp</itemPath>
       <itemPath>src/widgets/swCalculatorWidget/SWCalculatorView.cpp</itemPath>
       <itemPath>src/util/StringUtils.cpp</itemPath>
-      <itemPath>src/widgets/testView/TTripleSliderDemo.cpp</itemPath>
       <itemPath>src/util/UiHelper.cpp</itemPath>
       <itemPath>src/util/Variable.cpp</itemPath>
       <itemPath>src/main.cc</itemPath>
@@ -238,6 +236,18 @@ Contributor(s):
           <packFileListElem type="File"
                             to="${PACKAGE_TOP_DIR}bin/${OUTPUT_BASENAME}"
                             from="${OUTPUT_PATH}"
+                            perm="755"
+                            owner="root"
+                            group="bin"/>
+          <packFileListElem type="File"
+                            to="${PACKAGE_TOP_DIR}bin/${OUTPUT_BASENAME}"
+                            from="${OUTPUT_PATH}"
+                            perm="755"
+                            owner="root"
+                            group="bin"/>
+          <packFileListElem type="File"
+                            to="${PACKAGE_TOP_DIR}bin/sw-calculator.so"
+                            from="${CND_DISTDIR}/${CND_CONF}/${CND_PLATFORM}/sw-calculator.so"
                             perm="755"
                             owner="root"
                             group="bin"/>
@@ -474,16 +484,6 @@ Contributor(s):
             tool="1"
             flavor2="0">
       </item>
-      <item path="src/widgets/testView/TTripleSliderDemo.cpp"
-            ex="false"
-            tool="1"
-            flavor2="0">
-      </item>
-      <item path="src/widgets/testView/TTripleSliderDemo.h"
-            ex="false"
-            tool="3"
-            flavor2="0">
-      </item>
     </conf>
     <conf name="Release" type="1">
       <toolsSet>
@@ -714,16 +714,6 @@ Contributor(s):
             flavor2="0">
       </item>
       <item path="src/widgets/swCalculatorWidget/SWCalculatorView.h"
-            ex="false"
-            tool="3"
-            flavor2="0">
-      </item>
-      <item path="src/widgets/testView/TTripleSliderDemo.cpp"
-            ex="false"
-            tool="1"
-            flavor2="0">
-      </item>
-      <item path="src/widgets/testView/TTripleSliderDemo.h"
             ex="false"
             tool="3"
             flavor2="0">
