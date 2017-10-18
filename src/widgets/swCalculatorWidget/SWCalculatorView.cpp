@@ -50,6 +50,8 @@ using namespace RooFit;
 //SWCalculatorView::SWCalculatorView(const TGWindow* w) : TGMainFrame(w, Constants::windowWidth, Constants::windowHeight){
 SWCalculatorView::SWCalculatorView(const TGWindow* w) : AbstractView<SWCalculatorPresenter>(w){
     initUI();
+    SWCalculatorPresenter* presenter = getPresenter();
+    presenter->addEventListeners();
 }
 
 SWCalculatorPresenter* SWCalculatorView::instantinatePresenter(){
@@ -65,12 +67,12 @@ void SWCalculatorView::initUI(){
     // Import spectrum tab
     TGCompositeFrame *tabImport = tabsWidget->AddTab("Material Spectrum");
     tabImport->SetLayoutManager(new TGVerticalLayout(tabImport));
-    tabImport->AddFrame(new ImportSpectrumView(tabImport), new TGLayoutHints(kLHintsExpandX | kLHintsExpandY, 0, 0, dy, dy));
+    tabImport->AddFrame(new ImportSpectrumView(tabImport), new TGLayoutHints(kLHintsExpandX | kLHintsExpandY, dx, dx, dy*2, dy));
 
     // Import Kapton spectrum tab
     TGCompositeFrame *tabImportKapton = tabsWidget->AddTab("Kapton Spectrum");
     tabImportKapton->SetLayoutManager(new TGVerticalLayout(tabImportKapton));
-    tabImportKapton->AddFrame(new ImportSourceSpectrumView(tabImportKapton), new TGLayoutHints(kLHintsExpandX | kLHintsExpandY, 0, 0, dy, dy));
+    tabImportKapton->AddFrame(new ImportSourceSpectrumView(tabImportKapton), new TGLayoutHints(kLHintsExpandX | kLHintsExpandY, dx, dx, dy*2, dy));
     
     // Fit Data tab
     TGCompositeFrame *tabFit = tabsWidget->AddTab("Fit Data");
@@ -101,19 +103,20 @@ void SWCalculatorView::initUI(){
 
     // Integration Parameters
     TGHorizontalFrame *frameSWidth = new TGHorizontalFrame(tabFit);
-    lblRescale1 = new TGLabel(frameSWidth, "2 x ");
+    lblRescale1 = new TGLabel(frameSWidth, "# x ");
+    lblRescale1->SetTextJustify(kTextLeft);
     numSWidth = new TGNumberEntry(frameSWidth, 1.60, 4, -1, TGNumberFormat::kNESRealTwo,
             TGNumberFormat::kNEANonNegative,
             TGNumberFormat::kNELLimitMin,
             0.01, 9.99);
-    frameSWidth->AddFrame(new TGLabel(frameSWidth, "S Region Width"), new TGLayoutHints(kLHintsNormal, 0, 0, dy, 0));
-    frameSWidth->AddFrame(numSWidth, new TGLayoutHints(kLHintsRight));
-    frameSWidth->AddFrame(lblRescale1, new TGLayoutHints(kLHintsRight, 0, dx, 3*dy/5, 0));
+    frameSWidth->AddFrame(new TGLabel(frameSWidth, "S Region Width"), new TGLayoutHints(kLHintsLeft | kLHintsTop, 0, 0, dy, 0));
+    frameSWidth->AddFrame(numSWidth, new TGLayoutHints(kLHintsRight | kLHintsTop));
+    frameSWidth->AddFrame(lblRescale1, new TGLayoutHints(kLHintsRight | kLHintsTop, 0, dx, 3*dy/5, 0));
 
     tabFit->AddFrame(frameSWidth, new TGLayoutHints(kLHintsExpandX, dx, dx, dy, dy));
 
     TGHorizontalFrame *frameWWidth = new TGHorizontalFrame(tabFit);
-    lblRescale2 = new TGLabel(frameWWidth, "2 x ");
+    lblRescale2 = new TGLabel(frameWWidth, "# x ");
     numWWidth = new TGNumberEntry(frameWWidth, 3.00, 4, -1, TGNumberFormat::kNESRealTwo,
             TGNumberFormat::kNEANonNegative,
             TGNumberFormat::kNELLimitMin,
@@ -125,7 +128,7 @@ void SWCalculatorView::initUI(){
     tabFit->AddFrame(frameWWidth, new TGLayoutHints(kLHintsExpandX, dx, dx, dy, dy));
 
     TGHorizontalFrame *frameWShift = new TGHorizontalFrame(tabFit);
-    lblRescale3 = new TGLabel(frameWShift, "2 x ");
+    lblRescale3 = new TGLabel(frameWShift, "# x ");
     numWShift = new TGNumberEntry(frameWShift, 2.76, 4, -1, TGNumberFormat::kNESRealTwo,
             TGNumberFormat::kNEANonNegative,
             TGNumberFormat::kNELLimitMin,
@@ -211,7 +214,7 @@ void SWCalculatorView::initUI(){
 
     // Attach Tabs Widget
     tabsWidget->SetTab(0);
-//    tabsWidget->SetEnabled(2, false);
+    setTabEnabled(2, false);
     tabsWidget->SetWidth(Constants::leftPanelWidth); // Resize(tabsWidget->GetDefaultSize());
     AddFrame(tabsWidget, new TGLayoutHints(kLHintsLeft | kLHintsTop | kLHintsExpandY, dx, dx, 2*dy, 2*dy));
 
@@ -261,11 +264,6 @@ void SWCalculatorView::initUI(){
 
     AddFrame(frameRightVertical, new TGLayoutHints(kLHintsLeft | kLHintsTop | kLHintsExpandX | kLHintsExpandY, 0, 0, 0, dx));
 
-    MapSubwindows();
-//    Resize(GetDefaultSize());
-    Resize(Constants::windowWidth, Constants::windowHeight);
-    MapWindow();
-    
     // Plot Canvas Settings
     padData = new TPad("padData", "Pad for data", 0.0, 0.3, 1.0, 1.0, kWhite); // x_low, y_low, x_hi, y_hi
     padData->SetMargin(Constants::padMargin[0], Constants::padMargin[1], Constants::padMargin[2], Constants::padMargin[3]);
@@ -274,14 +272,13 @@ void SWCalculatorView::initUI(){
     padChi2 = new TPad("padChi2", "Pad for chi^2", 0.0, 0.0, 1.0, 0.3, kWhite);
     padChi2->SetMargin(Constants::padMargin[0], Constants::padMargin[1], Constants::padMargin[2], Constants::padMargin[3]);
     padChi2->Draw();
-    
-//    MapSubwindows();
-//    Resize(GetDefaultSize());
-//    Resize(Constants::windowWidth, Constants::windowHeight);
-//    MapWindow();
 }
 
 // Calls from Presenter
+
+void SWCalculatorView::setTabEnabled(Int_t tabNumber, Bool_t isEnabled){
+    tabsWidget->SetEnabled(tabNumber, isEnabled);
+}
 
 Int_t SWCalculatorView::getFitMinValue(){
     return numFitMin->GetNumber();    
@@ -289,6 +286,13 @@ Int_t SWCalculatorView::getFitMinValue(){
 
 Int_t SWCalculatorView::getFitMaxValue(){
     return numFitMax->GetNumber();    
+}
+
+void SWCalculatorView::setFitMinMaxValues(Int_t min, Int_t max){
+    numFitMin->SetNumber(min);  
+    numFitMin->SetLimitValues(min,max);
+    numFitMax->SetNumber(max);  
+    numFitMax->SetLimitValues(min,max);
 }
 
 Double_t SWCalculatorView::getSWidth(){
@@ -332,6 +336,12 @@ void SWCalculatorView::setToolbarEnabled(Bool_t isEnabled){
     numDisplayMax->SetState(isEnabled);
 }
 
+void SWCalculatorView::setTwoDetector(Bool_t isTwoDetector){
+    lblRescale1->SetText(isTwoDetector ? "2 x " : " ");
+    lblRescale2->SetText(isTwoDetector ? "2 x " : " ");
+    lblRescale3->SetText(isTwoDetector ? "2 x " : " ");
+}
+
 // Calls to Presenter
 void SWCalculatorView::onNumFitMinChanged(){
     std::cout << "SWCalculatorView::onNumFitMinChanged()" << std::endl;
@@ -342,7 +352,8 @@ void SWCalculatorView::onNumFitMaxChanged(){
 }
 
 void SWCalculatorView::onFitSpectrumClicked(){
-    std::cout << "SWCalculatorView::onFitSpectrumClicked()" << std::endl;    
+    SWCalculatorPresenter* presenter = getPresenter();
+    presenter->onFitSpectrumClicked();
 }
 
 void SWCalculatorView::onApplyZoomClicked(){
@@ -362,34 +373,34 @@ void SWCalculatorView::onSaveImageClicked(){
 }
 
 SWCalculatorView::~SWCalculatorView() {
-//    Cleanup();
-//    if(numPeakPosition){numPeakPosition->Delete(); delete numPeakPosition;}
-//    if(numFitMin){numFitMin->Delete(); delete numFitMin;}
-//    if(numFitMax){numFitMax->Delete(); delete numFitMax;}
-//    if(lblRescale1){lblRescale1->Delete(); delete lblRescale1;}
-//    if(lblRescale2){lblRescale2->Delete(); delete lblRescale2;}
-//    if(lblRescale3){lblRescale3->Delete(); delete lblRescale3;}
-//    if(numSWidth){numSWidth->Delete(); delete numSWidth;}
-//    if(numWWidth){numWWidth->Delete(); delete numWWidth;}
-//    if(numWShift){numWShift->Delete(); delete numWShift;}
-//    if(comboConvolutionType){comboConvolutionType->Delete(); delete comboConvolutionType;}
-//    if(numResolutionFWHM){numResolutionFWHM->Delete(); delete numResolutionFWHM;}
-//    if(checkboxResFixed){checkboxResFixed->Delete(); delete checkboxResFixed;}
-//    if(checkboxHasParabola){checkboxHasParabola->Delete(); delete checkboxHasParabola;}
-//    if(numGauss){numGauss->Delete(); delete numGauss;}
-//    if(numExponent){numExponent->Delete(); delete numExponent;}
-//    if(numDampExponent){numDampExponent->Delete(); delete numDampExponent;}
-//    if(btnFitSpectrum){btnFitSpectrum->Delete(); delete btnFitSpectrum;}
-//    if(txtFitResult){txtFitResult->Delete(); delete txtFitResult;}
-//    if(btnSaveData){btnSaveData->Delete(); delete btnSaveData;}
-//    if(btnSaveImage){btnSaveImage->Delete(); delete btnSaveImage;}
-//    if(canvasPlot){canvasPlot->Delete(); delete canvasPlot;}
-//    if(numDisplayMin){numDisplayMin->Delete(); delete numDisplayMin;}
-//    if(numDisplayMax){numDisplayMax->Delete(); delete numDisplayMax;}
-//    if(btnApplyZoom){btnApplyZoom->Delete(); delete btnApplyZoom;}
-//    if(btnResetZoom){btnResetZoom->Delete(); delete btnResetZoom;}
-//    if(fitFrame){fitFrame->Delete(); delete fitFrame;}
-//    if(chiFrame){chiFrame->Delete(); delete chiFrame;}
-//    if(padData){padData->Delete(); delete padData;}
-//    if(padChi2){padChi2->Delete(); delete padChi2;}
+    Cleanup();
+    if(numPeakPosition){numPeakPosition->Delete(); delete numPeakPosition;}
+    if(numFitMin){numFitMin->Delete(); delete numFitMin;}
+    if(numFitMax){numFitMax->Delete(); delete numFitMax;}
+    if(lblRescale1){lblRescale1->Delete(); delete lblRescale1;}
+    if(lblRescale2){lblRescale2->Delete(); delete lblRescale2;}
+    if(lblRescale3){lblRescale3->Delete(); delete lblRescale3;}
+    if(numSWidth){numSWidth->Delete(); delete numSWidth;}
+    if(numWWidth){numWWidth->Delete(); delete numWWidth;}
+    if(numWShift){numWShift->Delete(); delete numWShift;}
+    if(comboConvolutionType){comboConvolutionType->Delete(); delete comboConvolutionType;}
+    if(numResolutionFWHM){numResolutionFWHM->Delete(); delete numResolutionFWHM;}
+    if(checkboxResFixed){checkboxResFixed->Delete(); delete checkboxResFixed;}
+    if(checkboxHasParabola){checkboxHasParabola->Delete(); delete checkboxHasParabola;}
+    if(numGauss){numGauss->Delete(); delete numGauss;}
+    if(numExponent){numExponent->Delete(); delete numExponent;}
+    if(numDampExponent){numDampExponent->Delete(); delete numDampExponent;}
+    if(btnFitSpectrum){btnFitSpectrum->Delete(); delete btnFitSpectrum;}
+    if(txtFitResult){txtFitResult->Delete(); delete txtFitResult;}
+    if(btnSaveData){btnSaveData->Delete(); delete btnSaveData;}
+    if(btnSaveImage){btnSaveImage->Delete(); delete btnSaveImage;}
+    if(canvasPlot){canvasPlot->Delete(); delete canvasPlot;}
+    if(numDisplayMin){numDisplayMin->Delete(); delete numDisplayMin;}
+    if(numDisplayMax){numDisplayMax->Delete(); delete numDisplayMax;}
+    if(btnApplyZoom){btnApplyZoom->Delete(); delete btnApplyZoom;}
+    if(btnResetZoom){btnResetZoom->Delete(); delete btnResetZoom;}
+    if(fitFrame){fitFrame->Delete(); delete fitFrame;}
+    if(chiFrame){chiFrame->Delete(); delete chiFrame;}
+    if(padData){padData->Delete(); delete padData;}
+    if(padChi2){padChi2->Delete(); delete padChi2;}
 }

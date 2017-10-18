@@ -19,7 +19,7 @@
 #include <TGWindow.h>
 #include <TGButton.h>
 #include <TGLabel.h>
-#include <TGTextEdit.h>
+#include <TGTextView.h>
 #include <TGNumberEntry.h>
 #include <TCanvas.h>
 #include <TRootEmbeddedCanvas.h>
@@ -46,16 +46,16 @@ class AbstractImportSpectrumView : public AbstractView<AbstractImportSpectrumPre
     Int_t getEnergyColumnNumber();
     Int_t getCountsColumnNumber();
     void drawHistogram(TH1F* hist);
-    
     // Calls to Presenter
     void onOpenFileClicked();
     void onImportSpectrumClicked();    
+    virtual Int_t getHistogramColor();
     
   private:
     // Ui components
     TGTextButton* btnOpenFile;
     TGLabel* lblFileName;
-    TGTextEdit* txtFileBrowser;
+    TGTextView* txtFileBrowser;
     TGNumberEntry* numEnergyColumn;    
     TGNumberEntry* numCountsColumn;
     TGTextButton* btnImportSpectrum;    

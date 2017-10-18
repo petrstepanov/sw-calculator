@@ -15,6 +15,7 @@
 #define UIHELPER_H
 
 #include <TGFileDialog.h>
+#include <TGLabel.h>
 
 class UiHelper {
 public:
@@ -24,6 +25,7 @@ public:
     
     static TGFileInfo* getFileFromDialog(const TGWindow* main);
     static void showOkDialog(const char* message);
+    static void setLabelColor(TGLabel* label, const char* color);
 private:
 
 };

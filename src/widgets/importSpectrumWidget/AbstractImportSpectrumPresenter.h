@@ -38,7 +38,7 @@ public:
     
     // Different implementations for importing Kapton spectrum and regular spectrum
     virtual void setModelFileName(TString* fileNamePath){};
-    virtual void setModelHist(TH1F* hist, Bool_t isTwoDetector){};
+    virtual void setModelHist(TH1F* hist){};
 };
 
 #endif /* ABSTRACTIMPORTSPECTRUMPRESENTER_H */

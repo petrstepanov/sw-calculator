@@ -43,6 +43,12 @@ TGFileInfo* UiHelper::getFileFromDialog(const TGWindow* main){
     return fileInfo;
 }
 
-void showOkDialog(const char* message){
+void UiHelper::showOkDialog(const char* message){
     new TGMsgBox(gClient->GetRoot(), gClient->GetRoot(), Constants::applicationName, message, kMBIconAsterisk, kMBOk);
+}
+
+void UiHelper::setLabelColor(TGLabel* label, const char* color){
+    ULong_t lblFileNameTextColor;
+    gClient->GetColorByName(color, lblFileNameTextColor);    
+    label->SetTextColor(15);
 }

@@ -15,15 +15,6 @@
 #include <TUnixSystem.h>
 #include <iostream>
 
-RootHelper::RootHelper() {
-}
-
-RootHelper::RootHelper(const RootHelper& orig) {
-}
-
-RootHelper::~RootHelper() {
-}
-
 void RootHelper::deleteObject(const char* name){
     TObject* obj = gROOT->FindObject(name);
     deleteObject(obj);
@@ -36,7 +27,6 @@ void RootHelper::deleteObject(TObject* obj){
     }
 }
 
-
 Int_t RootHelper::getNumCpu(){
     // Get number of CPUs
     SysInfo_t sysInfo;
@@ -46,3 +36,13 @@ Int_t RootHelper::getNumCpu(){
     return (sysInfo.fCpus >= 0) ? sysInfo.fCpus : 1;
 }
 
+TStopwatch* RootHelper::watch = new TStopwatch();
+
+void RootHelper::startTimer(){
+    watch->Start();    
+}
+
+void RootHelper::stopAndPrintTimer(){
+    watch->Stop();
+    watch->Print();
+}

@@ -86,7 +86,14 @@ MYLDFLAGS=-m64
 MYGLIBS=-L/Applications/root_v6.06.02/lib -lGui -lCore -lRIO -lNet -lHist -lGraf -lGraf3d -lGpad -lTree -lRint -lPostscript -lMatrix -lPhysics -lMathCore -lThread -lMultiProc -lpthread -stdlib=libc++ -lm -ldl
 MYLIBS=-L/Applications/root_v6.06.02/lib -lGui -lCore -lRIO -lNet -lHist -lGraf -lGraf3d -lGpad -lTree -lRint -lPostscript -lMatrix -lPhysics -lMathCore -lThread -lMultiProc -lpthread -stdlib=libc++ -lm -ldl -lRooFit -lRooFitCore -lHtml -lMinuit -lFumili
 MYROOTSYS=/Applications/root_v6.06.02
-MYHEADERS=model/Constants.h \
+MYHEADERS=event/Event.h \
+          event/EventBus.h \
+          event/EventHandler.h \
+          event/HandlerRegistration.h \
+          event/Object.h \
+	  event/events/HistogramImportedEvent.h \
+	  event/events/IsTwoDetectorEvent.h \
+	  model/Constants.h \
           model/Model.h \
           roofit/AbstractModelProvider.h \
           roofit/ChannelConvolutionPdf.h \
@@ -118,7 +125,10 @@ MYHEADERS=model/Constants.h \
           widgets/AbstractView.h \
           widgets/MainView.h \
           main.h
-MYSOURCES=model/Constants.cpp \
+MYSOURCES=event/EventBus.cpp \
+	  event/events/HistogramImportedEvent.cpp \
+	  event/events/IsTwoDetectorEvent.cpp \
+	  model/Constants.cpp \
           model/Model.cpp \
           roofit/AbstractModelProvider.cpp \
           roofit/ChannelConvolutionPdf.cpp \

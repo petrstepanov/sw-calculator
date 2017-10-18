@@ -23,6 +23,8 @@ public:
     ImportSpectrumView(const TGWindow *p = 0);
 
     AbstractImportSpectrumPresenter* instantinatePresenter();
+    
+    Int_t getHistogramColor();
 };
 
 #endif /* IMPORTSPECTRUMVIEW_H */

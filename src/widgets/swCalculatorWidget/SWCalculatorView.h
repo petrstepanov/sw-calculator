@@ -43,7 +43,9 @@ class SWCalculatorView : public AbstractView<SWCalculatorPresenter> {
     SWCalculatorPresenter* instantinatePresenter();
 
     // Calls from Presenter
+    void setTabEnabled(Int_t, Bool_t);
     Int_t getFitMinValue();
+    void setFitMinMaxValues(Int_t, Int_t);
     Int_t getFitMaxValue();
     Double_t getSWidth();
     Double_t getWWidth();
@@ -54,7 +56,7 @@ class SWCalculatorView : public AbstractView<SWCalculatorPresenter> {
     Int_t getNumExp();
     Int_t getNumDampExp();
     void setToolbarEnabled(Bool_t isEnabled);
-    
+    void setTwoDetector(Bool_t isTwoDetector);
     // Calls to Presenter
     void onNumFitMinChanged();
     void onNumFitMaxChanged();
@@ -62,7 +64,7 @@ class SWCalculatorView : public AbstractView<SWCalculatorPresenter> {
     void onApplyZoomClicked();
     void onResetZoomClicked();
     void onSaveDataClicked();
-    void onSaveImageClicked();    
+    void onSaveImageClicked();   
 //    void CloseWindow();
     
   protected:

@@ -36,6 +36,8 @@ OBJECTDIR=${CND_BUILDDIR}/${CND_CONF}/${CND_PLATFORM}
 # Object Files
 OBJECTFILES= \
 	${OBJECTDIR}/src/event/EventBus.o \
+	${OBJECTDIR}/src/event/events/HistogramImportedEvent.o \
+	${OBJECTDIR}/src/event/events/IsTwoDetectorEvent.o \
 	${OBJECTDIR}/src/main.o \
 	${OBJECTDIR}/src/model/Constants.o \
 	${OBJECTDIR}/src/model/Model.o \
@@ -96,6 +98,16 @@ ${OBJECTDIR}/src/event/EventBus.o: src/event/EventBus.cpp
 	${MKDIR} -p ${OBJECTDIR}/src/event
 	${RM} "$@.d"
 	$(COMPILE.cc) -O2 -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/src/event/EventBus.o src/event/EventBus.cpp
+
+${OBJECTDIR}/src/event/events/HistogramImportedEvent.o: src/event/events/HistogramImportedEvent.cpp
+	${MKDIR} -p ${OBJECTDIR}/src/event/events
+	${RM} "$@.d"
+	$(COMPILE.cc) -O2 -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/src/event/events/HistogramImportedEvent.o src/event/events/HistogramImportedEvent.cpp
+
+${OBJECTDIR}/src/event/events/IsTwoDetectorEvent.o: src/event/events/IsTwoDetectorEvent.cpp
+	${MKDIR} -p ${OBJECTDIR}/src/event/events
+	${RM} "$@.d"
+	$(COMPILE.cc) -O2 -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/src/event/events/IsTwoDetectorEvent.o src/event/events/IsTwoDetectorEvent.cpp
 
 ${OBJECTDIR}/src/main.o: src/main.cc
 	${MKDIR} -p ${OBJECTDIR}/src

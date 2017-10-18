@@ -38,6 +38,13 @@
 namespace std {} using namespace std;
 
 // Header files passed as explicit arguments
+#include "event/Event.h"
+#include "event/EventBus.h"
+#include "event/EventHandler.h"
+#include "event/HandlerRegistration.h"
+#include "event/Object.h"
+#include "event/events/HistogramImportedEvent.h"
+#include "event/events/IsTwoDetectorEvent.h"
 #include "model/Constants.h"
 #include "model/Model.h"
 #include "roofit/AbstractModelProvider.h"
@@ -197,6 +204,13 @@ namespace ROOT {
 namespace {
   void TriggerDictionaryInitialization_SWCalculatorDict_Impl() {
     static const char* headers[] = {
+"event/Event.h",
+"event/EventBus.h",
+"event/EventHandler.h",
+"event/HandlerRegistration.h",
+"event/Object.h",
+"event/events/HistogramImportedEvent.h",
+"event/events/IsTwoDetectorEvent.h",
 "model/Constants.h",
 "model/Model.h",
 "roofit/AbstractModelProvider.h",
@@ -254,6 +268,13 @@ class __attribute__((annotate("$clingAutoload$widgets/swCalculatorWidget/SWCalcu
 #endif
 
 #define _BACKWARD_BACKWARD_WARNING_H
+#include "event/Event.h"
+#include "event/EventBus.h"
+#include "event/EventHandler.h"
+#include "event/HandlerRegistration.h"
+#include "event/Object.h"
+#include "event/events/HistogramImportedEvent.h"
+#include "event/events/IsTwoDetectorEvent.h"
 #include "model/Constants.h"
 #include "model/Model.h"
 #include "roofit/AbstractModelProvider.h"

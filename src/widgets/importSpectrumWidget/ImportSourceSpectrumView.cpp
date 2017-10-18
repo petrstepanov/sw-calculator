@@ -12,12 +12,17 @@
  */
 
 #include "ImportSourceSpectrumView.h"
+#include "../../model/Constants.h"
+
 
 ImportSourceSpectrumView::ImportSourceSpectrumView(const TGWindow *w) : AbstractImportSpectrumView(w){
 }
 
 // Override base class virtual functions
 AbstractImportSpectrumPresenter* ImportSourceSpectrumView::instantinatePresenter() {
-    std::cout << "ImportSourceSpectrumView::instantinatePresenter()" << std::endl;    
     return new ImportSourceSpectrumPresenter(this);
 };
+
+Int_t ImportSourceSpectrumView::getHistogramColor(){
+    return Constants::colorWarning->GetNumber();
+}

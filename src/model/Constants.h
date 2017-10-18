@@ -15,6 +15,7 @@
 #define CONSTANTS_H
 
 #include <TROOT.h>
+#include <TColor.h>
 
 class Constants {
   public:
@@ -26,10 +27,15 @@ class Constants {
     static const Int_t windowWidth = 1200;
     static const Int_t windowHeight = 600;
     static const Int_t leftPanelWidth = 420;
+//    static const Int_t btnOpenFileWidth = 220;
     
     static const Double_t padMargin[4]; // left, right, bottom, top
     
     static const char* applicationName;
+    
+    static TColor* colorPrimary;
+    static TColor* colorWarning;
+    static TColor* colorGray;
 };
 
 #endif /* CONSTANTS_H */

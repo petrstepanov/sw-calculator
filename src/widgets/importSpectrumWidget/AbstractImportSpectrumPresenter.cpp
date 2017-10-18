@@ -16,15 +16,13 @@ AbstractImportSpectrumPresenter::AbstractImportSpectrumPresenter(AbstractImportS
 }
 
 void AbstractImportSpectrumPresenter::onOpenFileClicked(){
-    std::cout << "AbstractImportSpectrumPresenter::onOpenFileClicked()" << std::endl;
     AbstractImportSpectrumView* view = getView();
     
     // Get FileInfo from open file dialog
     TGFileInfo* fileInfo = UiHelper::getFileFromDialog(view->GetParent());
     if (!fileInfo->fFilename){
-        std::cout << "AbstractImportSpectrumPresenter::onOpenFileClicked() filename is NULL" << std::endl;
         return;
-    }    
+    }
     TString* fileNamePath = new TString(fileInfo->fFilename);
     // Update Model with new file name (virtual function)
     this->setModelFileName(fileNamePath);
@@ -33,8 +31,6 @@ void AbstractImportSpectrumPresenter::onOpenFileClicked(){
 }
 
 void AbstractImportSpectrumPresenter::onImportSpectrumClicked(){
-    std::cout << "AbstractImportSpectrumPresenter::onImportSpectrumClicked()" << std::endl;
-
     // Import Histogram
     AbstractImportSpectrumView* view = getView();
     Int_t energyColumn = view->getEnergyColumnNumber();
@@ -47,8 +43,7 @@ void AbstractImportSpectrumPresenter::onImportSpectrumClicked(){
     }
     
     // Update Model
-    Bool_t isTwoDetector = (hist->GetXaxis()->GetXmin() < 0) && (hist->GetXaxis()->GetXmax() > 0);
-    setModelHist(hist, isTwoDetector);
+    setModelHist(hist);
     
     // Update View
     view->drawHistogram(hist);

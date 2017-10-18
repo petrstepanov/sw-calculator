@@ -19,8 +19,12 @@
 #include <RtypesCore.h>
 #include <RooCurve.h>
 #include <iostream>
+#include "../event/events/HistogramImportedEvent.h"
+#include "../event/events/IsTwoDetectorEvent.h"
+#include "../event/Object.h"
+#include "../event/EventBus.h"
 
-class Model {
+class Model : public Object {
 public:
     static Model* getInstance();
     
@@ -43,7 +47,10 @@ public:
     }
     
     void setHist(TH1F* hist){ 
-        fullHist = hist; 
+        fullHist = hist;
+        Double_t histMin = hist->GetXaxis()->GetXmin();
+        Double_t histMax = hist->GetXaxis()->GetXmax();
+        EventBus::FireEvent(*(new HistogramImportedEvent(*this, histMin, histMax))); // Fire the event
     }
     
     TH1F* getHist(){ 
@@ -59,7 +66,8 @@ public:
     }
 
     void setTwoDetector(Bool_t b){ 
-        twoDetector = b; 
+        twoDetector = b;
+        EventBus::FireEvent(*(new IsTwoDetectorEvent(*this, twoDetector))); // Fire the event        
     }
     
     Bool_t isTwoDetector(){ 

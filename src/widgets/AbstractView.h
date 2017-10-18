@@ -35,9 +35,7 @@ class AbstractView : public TGCompositeFrame {
     }
     
     P* getPresenter(){
-        std::cout << "AbstractView::getPresenter()" << std::endl;
         if (presenter == NULL){
-            std::cout << "AbstractView::getPresenter() is null" << std::endl;            
             presenter = instantinatePresenter();
         }
         return presenter;

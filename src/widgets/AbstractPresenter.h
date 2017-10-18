@@ -21,7 +21,6 @@ class AbstractPresenter {
     AbstractPresenter(V* v){
         model = nullptr;
         view = v;
-        addEventListeners();
     }
     
     ~AbstractPresenter(){

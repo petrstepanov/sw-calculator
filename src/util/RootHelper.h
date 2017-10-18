@@ -15,18 +15,17 @@
 #define ROOTHELPER_H
 
 #include <TROOT.h>
+#include <TStopwatch.h>
 
 class RootHelper {
 public:
-    RootHelper();
-    RootHelper(const RootHelper& orig);
-    virtual ~RootHelper();
-    
     static void deleteObject(const char* name);
     static void deleteObject(TObject* obj);
     static Int_t getNumCpu();
+    static void startTimer(void);
+    static void stopAndPrintTimer();
 private:
-
+    static TStopwatch* watch;
 };
 
 #endif /* ROOTHELPER_H */

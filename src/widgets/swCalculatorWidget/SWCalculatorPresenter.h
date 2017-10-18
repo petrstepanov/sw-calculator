@@ -27,7 +27,10 @@ public:
     // Override base class virtual methods
     Model* instantinateModel();
     
+    void addEventListeners();
     // View functions
+    
+    void onFitSpectrumClicked();
 };
 
 #endif /* SWCALCULATORPRESENTER_H */

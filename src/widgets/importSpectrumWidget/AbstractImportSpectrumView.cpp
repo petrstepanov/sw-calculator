@@ -9,6 +9,8 @@
 #include <TRootEmbeddedCanvas.h>
 #include "../../util/StringUtils.h"
 #include "../../util/GraphicsHelper.h"
+#include "../../model/Constants.h"
+#include "../../util/UiHelper.h"
 
 AbstractImportSpectrumView::AbstractImportSpectrumView(const TGWindow* w) : AbstractView<AbstractImportSpectrumPresenter>(w){    
     initUI();
@@ -27,81 +29,92 @@ AbstractImportSpectrumView::~AbstractImportSpectrumView() {
 void AbstractImportSpectrumView::initUI(){
     // Open File Frame
     TGHorizontalFrame* frameOpenFile = new TGHorizontalFrame(this);
-    btnOpenFile = new TGTextButton(frameOpenFile, "Open File");
-    btnOpenFile->Connect("Clicked()", "AbstractImportSpectrumView", this, "onOpenFileClicked()");
-    frameOpenFile->AddFrame(btnOpenFile, new TGLayoutHints(kLHintsLeft | kLHintsTop));
-    lblFileName = new TGLabel(frameOpenFile, "no file loaded");
-    frameOpenFile->AddFrame(lblFileName, new TGLayoutHints(kLHintsLeft | kLHintsTop | kLHintsExpandX, dx, 0, dx)); // left right top bottom
-    this->AddFrame(frameOpenFile, new TGLayoutHints(kLHintsExpandX, dx, dx, dy, dy/2));
+    {
+        btnOpenFile = new TGTextButton(frameOpenFile, " Open File ");
+        btnOpenFile->Connect("Clicked()", "AbstractImportSpectrumView", this, "onOpenFileClicked()");
+        frameOpenFile->AddFrame(btnOpenFile, new TGLayoutHints(kLHintsLeft | kLHintsTop));
+
+        lblFileName = new TGLabel(frameOpenFile, "no file loaded");
+        lblFileName->SetTextJustify(kTextLeft);
+        lblFileName->Disable(kTRUE);
+//        lblFileName->SetTextColor(Constants::colorGray);
+//        UiHelper::setLabelColor(lblFileName, "gray");
+        frameOpenFile->AddFrame(lblFileName, new TGLayoutHints(kLHintsLeft | kLHintsTop | kLHintsExpandX, dx, 0, dy*3/5)); // left right top bottom
+    }
+    AddFrame(frameOpenFile, new TGLayoutHints(kLHintsExpandX, 0, 0, 0, dy));
 
     // File browser
-    txtFileBrowser = new TGTextEdit(this);
-    this->AddFrame(txtFileBrowser, new TGLayoutHints(kLHintsExpandX | kLHintsExpandY, dx, dx, dy, dy/2));
+    txtFileBrowser = new TGTextView(this);
+//    txtFileBrowser->AddLine("no file loaded");
+//    txtFileBrowser->ChangeOptions(0);
+    AddFrame(txtFileBrowser, new TGLayoutHints(kLHintsExpandX | kLHintsExpandY, 0, 0, dy, dy));
 
     // Energy column
     TGHorizontalFrame* frameEnergyColumn = new TGHorizontalFrame(this);
-    TGLabel* lblEnergyColumn = new TGLabel(frameEnergyColumn, "Energy Column #");
-    numEnergyColumn = new TGNumberEntry(frameEnergyColumn, 1, 2, -1, TGNumberFormat::kNESInteger,
-            TGNumberFormat::kNEANonNegative,
-            TGNumberFormat::kNELLimitMinMax,
-            1, 99);
-    frameEnergyColumn->AddFrame(lblEnergyColumn, new TGLayoutHints(kLHintsNormal, 0, 0, dx, 0));
-    frameEnergyColumn->AddFrame(numEnergyColumn, new TGLayoutHints(kLHintsRight));
-    this->AddFrame(frameEnergyColumn, new TGLayoutHints(kLHintsExpandX, dx, dx, dy, dy));
+    {
+        TGLabel* lblEnergyColumn = new TGLabel(frameEnergyColumn, "Energy column #");
+        numEnergyColumn = new TGNumberEntry(frameEnergyColumn, 1, 2, -1, TGNumberFormat::kNESInteger,
+                TGNumberFormat::kNEANonNegative,
+                TGNumberFormat::kNELLimitMinMax,
+                1, 99);
+        frameEnergyColumn->AddFrame(lblEnergyColumn, new TGLayoutHints(kLHintsLeft | kLHintsTop, 0, 0, dy*6/5));
+        frameEnergyColumn->AddFrame(numEnergyColumn, new TGLayoutHints(kLHintsRight | kLHintsTop));
+    }
+    AddFrame(frameEnergyColumn, new TGLayoutHints(kLHintsExpandX, 0, 0, dy, dy));
 
     // Counts column
     TGHorizontalFrame* frameCountsColumn = new TGHorizontalFrame(this);
-    TGLabel* lblCountsColumn = new TGLabel(frameCountsColumn, "Counts Column #");
-    numCountsColumn = new TGNumberEntry(frameCountsColumn, 2, 2, -1, TGNumberFormat::kNESInteger,
-            TGNumberFormat::kNEANonNegative,
-            TGNumberFormat::kNELLimitMinMax,
-            1, 99);
-    frameCountsColumn->AddFrame(lblCountsColumn, new TGLayoutHints(kLHintsNormal, 0, 0, dx, 0));
-    frameCountsColumn->AddFrame(numCountsColumn, new TGLayoutHints(kLHintsRight));
-    this->AddFrame(frameCountsColumn, new TGLayoutHints(kLHintsExpandX, dx, dx, dy, dy));
+    {
+        TGLabel* lblCountsColumn = new TGLabel(frameCountsColumn, "Counts column #");
+        numCountsColumn = new TGNumberEntry(frameCountsColumn, 2, 2, -1, TGNumberFormat::kNESInteger,
+                TGNumberFormat::kNEANonNegative,
+                TGNumberFormat::kNELLimitMinMax,
+                1, 99);
+        frameCountsColumn->AddFrame(lblCountsColumn, new TGLayoutHints(kLHintsNormal, 0, 0, dy*6/5, 0));
+        frameCountsColumn->AddFrame(numCountsColumn, new TGLayoutHints(kLHintsRight));
+    }
+    AddFrame(frameCountsColumn, new TGLayoutHints(kLHintsExpandX, 0, 0, dy, dy));
 
     // Import Spectrum button
-    TGHorizontalFrame* frameImportSpectrum = new TGHorizontalFrame(this);
-    btnImportSpectrum = new TGTextButton(frameImportSpectrum, "Import Spectrum");
+    btnImportSpectrum = new TGTextButton(this, "Import Spectrum");
     btnImportSpectrum->Connect("Clicked()", "AbstractImportSpectrumView", this, "onImportSpectrumClicked()");
-//    btnImportSpectrum->SetEnabled(false);
-    frameImportSpectrum->AddFrame(btnImportSpectrum, new TGLayoutHints(kLHintsExpandX));
-    this->AddFrame(frameImportSpectrum, new TGLayoutHints(kLHintsExpandX, dx, dx, dy, dy));
+    btnImportSpectrum->SetEnabled(kFALSE);
+    AddFrame(btnImportSpectrum, new TGLayoutHints(kLHintsExpandX, 0, 0, dy, dy));
 
     // Histogram canvas
     TRootEmbeddedCanvas* embedHist = new TRootEmbeddedCanvas("embedHist", this);
-    canvasHist = embedHist->GetCanvas(); //new TCanvas("canvasHist", 10, 10, idHist);
+    canvasHist = embedHist->GetCanvas();
+    canvasHist->SetMargin(0.09, 0.04, 0.14, 0.1);
     canvasHist->SetLogy();
-    this->AddFrame(embedHist, new TGLayoutHints(kLHintsExpandX | kLHintsExpandY, dx, dx, dy, dx));   
+    AddFrame(embedHist, new TGLayoutHints(kLHintsExpandX | kLHintsExpandY, 0, 0, dy, 0));   
 }
 
 AbstractImportSpectrumPresenter* AbstractImportSpectrumView::instantinatePresenter() {
-    std::cout << "AbstractImportSpectrumView::instantinatePresenter()" << std::endl;
     return new AbstractImportSpectrumPresenter(this);
 }
 
 // Calls to Presenter
 
 void AbstractImportSpectrumView::onOpenFileClicked(){
-    std::cout << "AbstractImportSpectrumView::onOpenFileClicked()" << std::endl;
     AbstractImportSpectrumPresenter* presenter = this->getPresenter();
     presenter->onOpenFileClicked();
 }
     
 void AbstractImportSpectrumView::onImportSpectrumClicked(){
-    std::cout << "AbstractImportSpectrumView::onImportSpectrumClicked()" << std::endl;
     AbstractImportSpectrumPresenter* presenter = this->getPresenter();
     presenter->onImportSpectrumClicked();
 }
 
 // Calls from Presenter 
 void AbstractImportSpectrumView::loadFile(TString* fileNamePath){
-    std::cout << "AbstractImportSpectrumView::loadFile() " << *fileNamePath << std::endl;
     // Load file contents to FileBrowser
     txtFileBrowser->LoadFile(fileNamePath->Data());
     // Update FileName label
     TString* fileName = StringUtils::stripFileName(fileNamePath);
     lblFileName->SetText(fileName->Data());
+    lblFileName->Disable(kFALSE);
+    // Enable Import button
+    btnImportSpectrum->SetEnabled(kTRUE);
 }
 
 Int_t AbstractImportSpectrumView::getEnergyColumnNumber(){
@@ -120,9 +133,17 @@ TString* AbstractImportSpectrumView::getFileName(){
 void AbstractImportSpectrumView::drawHistogram(TH1F* hist){
     GraphicsHelper* graphicsHelper = GraphicsHelper::getInstance();
     canvasHist->cd();
+    hist->SetLineColor(getHistogramColor());
+    hist->SetFillColorAlpha(getHistogramColor(), 0.3);   
+    hist->GetXaxis()->SetLabelOffset(0.03);
+    hist->GetYaxis()->SetLabelOffset(0.015);
     hist->Draw();
     graphicsHelper->setDefaultAxisFonts(hist->GetXaxis());
     graphicsHelper->setDefaultAxisFonts(hist->GetYaxis());
     hist->SetStats(0);
     canvasHist->Update();
+}
+
+Int_t AbstractImportSpectrumView::getHistogramColor(){
+    return Constants::colorPrimary->GetNumber();
 }

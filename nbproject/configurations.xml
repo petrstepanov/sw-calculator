@@ -60,12 +60,14 @@ Contributor(s):
       <itemPath>src/util/GraphicsHelper.h</itemPath>
       <itemPath>src/event/HandlerRegistration.h</itemPath>
       <itemPath>src/util/HistProcessor.h</itemPath>
+      <itemPath>src/event/events/HistogramImportedEvent.h</itemPath>
       <itemPath>src/model/IModel.h</itemPath>
       <itemPath>src/widgets/importSpectrumWidget/ImportSourceSpectrumPresenter.h</itemPath>
       <itemPath>src/widgets/importSpectrumWidget/ImportSourceSpectrumView.h</itemPath>
       <itemPath>src/widgets/importSpectrumWidget/ImportSpectrumPresenter.h</itemPath>
       <itemPath>src/widgets/importSpectrumWidget/ImportSpectrumView.h</itemPath>
       <itemPath>src/roofit/IndirectParamPdf.h</itemPath>
+      <itemPath>src/event/events/IsTwoDetectorEvent.h</itemPath>
       <itemPath>src/roofit/LorentzianPdf.h</itemPath>
       <itemPath>src/widgets/MainView.h</itemPath>
       <itemPath>src/model/Model.h</itemPath>
@@ -101,11 +103,13 @@ Contributor(s):
       <itemPath>src/roofit/GaussianPdf.cpp</itemPath>
       <itemPath>src/util/GraphicsHelper.cpp</itemPath>
       <itemPath>src/util/HistProcessor.cpp</itemPath>
+      <itemPath>src/event/events/HistogramImportedEvent.cpp</itemPath>
       <itemPath>src/widgets/importSpectrumWidget/ImportSourceSpectrumPresenter.cpp</itemPath>
       <itemPath>src/widgets/importSpectrumWidget/ImportSourceSpectrumView.cpp</itemPath>
       <itemPath>src/widgets/importSpectrumWidget/ImportSpectrumPresenter.cpp</itemPath>
       <itemPath>src/widgets/importSpectrumWidget/ImportSpectrumView.cpp</itemPath>
       <itemPath>src/roofit/IndirectParamPdf.cpp</itemPath>
+      <itemPath>src/event/events/IsTwoDetectorEvent.cpp</itemPath>
       <itemPath>src/roofit/LorentzianPdf.cpp</itemPath>
       <itemPath>src/widgets/MainView.cpp</itemPath>
       <itemPath>src/model/Model.cpp</itemPath>
@@ -281,6 +285,30 @@ Contributor(s):
                             perm="755"
                             owner="root"
                             group="bin"/>
+          <packFileListElem type="File"
+                            to="${PACKAGE_TOP_DIR}bin/sw-calculator.so"
+                            from="${CND_DISTDIR}/${CND_CONF}/${CND_PLATFORM}/sw-calculator.so"
+                            perm="755"
+                            owner="root"
+                            group="bin"/>
+          <packFileListElem type="File"
+                            to="${PACKAGE_TOP_DIR}bin/${OUTPUT_BASENAME}"
+                            from="${OUTPUT_PATH}"
+                            perm="755"
+                            owner="root"
+                            group="bin"/>
+          <packFileListElem type="File"
+                            to="${PACKAGE_TOP_DIR}bin/sw-calculator.so"
+                            from="${CND_DISTDIR}/${CND_CONF}/${CND_PLATFORM}/sw-calculator.so"
+                            perm="755"
+                            owner="root"
+                            group="bin"/>
+          <packFileListElem type="File"
+                            to="${PACKAGE_TOP_DIR}bin/${OUTPUT_BASENAME}"
+                            from="${OUTPUT_PATH}"
+                            perm="755"
+                            owner="root"
+                            group="bin"/>
         </packFileList>
       </packaging>
       <item path="SWCalculatorFrameLinkDef.h" ex="false" tool="1" flavor2="0">
@@ -296,6 +324,26 @@ Contributor(s):
       <item path="src/event/HandlerRegistration.h" ex="false" tool="3" flavor2="0">
       </item>
       <item path="src/event/Object.h" ex="false" tool="3" flavor2="0">
+      </item>
+      <item path="src/event/events/HistogramImportedEvent.cpp"
+            ex="false"
+            tool="1"
+            flavor2="0">
+      </item>
+      <item path="src/event/events/HistogramImportedEvent.h"
+            ex="false"
+            tool="3"
+            flavor2="0">
+      </item>
+      <item path="src/event/events/IsTwoDetectorEvent.cpp"
+            ex="false"
+            tool="1"
+            flavor2="0">
+      </item>
+      <item path="src/event/events/IsTwoDetectorEvent.h"
+            ex="false"
+            tool="3"
+            flavor2="0">
       </item>
       <item path="src/main.cc" ex="false" tool="1" flavor2="0">
         <ccTool>
@@ -535,6 +583,26 @@ Contributor(s):
       <item path="src/event/HandlerRegistration.h" ex="false" tool="3" flavor2="0">
       </item>
       <item path="src/event/Object.h" ex="false" tool="3" flavor2="0">
+      </item>
+      <item path="src/event/events/HistogramImportedEvent.cpp"
+            ex="false"
+            tool="1"
+            flavor2="0">
+      </item>
+      <item path="src/event/events/HistogramImportedEvent.h"
+            ex="false"
+            tool="3"
+            flavor2="0">
+      </item>
+      <item path="src/event/events/IsTwoDetectorEvent.cpp"
+            ex="false"
+            tool="1"
+            flavor2="0">
+      </item>
+      <item path="src/event/events/IsTwoDetectorEvent.h"
+            ex="false"
+            tool="3"
+            flavor2="0">
       </item>
       <item path="src/main.cc" ex="false" tool="1" flavor2="0">
       </item>
