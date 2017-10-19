@@ -42,6 +42,7 @@ OBJECTFILES= \
 	${OBJECTDIR}/src/model/Constants.o \
 	${OBJECTDIR}/src/model/Model.o \
 	${OBJECTDIR}/src/roofit/AbstractModelProvider.o \
+	${OBJECTDIR}/src/roofit/BackgroundPdf.o \
 	${OBJECTDIR}/src/roofit/ChannelConvolutionPdf.o \
 	${OBJECTDIR}/src/roofit/CompositeModelProvider.o \
 	${OBJECTDIR}/src/roofit/DampLorentzPdf.o \
@@ -128,6 +129,11 @@ ${OBJECTDIR}/src/roofit/AbstractModelProvider.o: src/roofit/AbstractModelProvide
 	${MKDIR} -p ${OBJECTDIR}/src/roofit
 	${RM} "$@.d"
 	$(COMPILE.cc) -O2 -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/src/roofit/AbstractModelProvider.o src/roofit/AbstractModelProvider.cpp
+
+${OBJECTDIR}/src/roofit/BackgroundPdf.o: src/roofit/BackgroundPdf.cpp
+	${MKDIR} -p ${OBJECTDIR}/src/roofit
+	${RM} "$@.d"
+	$(COMPILE.cc) -O2 -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/src/roofit/BackgroundPdf.o src/roofit/BackgroundPdf.cpp
 
 ${OBJECTDIR}/src/roofit/ChannelConvolutionPdf.o: src/roofit/ChannelConvolutionPdf.cpp
 	${MKDIR} -p ${OBJECTDIR}/src/roofit

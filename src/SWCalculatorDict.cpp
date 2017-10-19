@@ -48,6 +48,7 @@ namespace std {} using namespace std;
 #include "model/Constants.h"
 #include "model/Model.h"
 #include "roofit/AbstractModelProvider.h"
+#include "roofit/BackgroundPdf.h"
 #include "roofit/ChannelConvolutionPdf.h"
 #include "roofit/CompositeModelProvider.h"
 #include "roofit/DampLorentzPdf.h"
@@ -214,6 +215,7 @@ namespace {
 "model/Constants.h",
 "model/Model.h",
 "roofit/AbstractModelProvider.h",
+"roofit/BackgroundPdf.h",
 "roofit/ChannelConvolutionPdf.h",
 "roofit/CompositeModelProvider.h",
 "roofit/DampLorentzPdf.h",
@@ -278,6 +280,7 @@ class __attribute__((annotate("$clingAutoload$widgets/swCalculatorWidget/SWCalcu
 #include "model/Constants.h"
 #include "model/Model.h"
 #include "roofit/AbstractModelProvider.h"
+#include "roofit/BackgroundPdf.h"
 #include "roofit/ChannelConvolutionPdf.h"
 #include "roofit/CompositeModelProvider.h"
 #include "roofit/DampLorentzPdf.h"

@@ -16,6 +16,7 @@
 #include <TAxis.h>
 #include <TBox.h>
 #include <TLatex.h>
+#include <TMath.h>
 #include <iostream>
 
 // Private Singleton Members
@@ -63,7 +64,10 @@ void GraphicsHelper::drawSWRegions(RooPlot* frame, Double_t sWidth, Double_t wWi
 
     yMax = 0.96*yMax;
     Double_t textSize = 0.05;
-    Double_t letterY = yMin + (yMax-yMin)/300000;
+    Double_t logYMin = TMath::Log10(yMin);
+    Double_t logYMax = TMath::Log10(yMax);
+    Double_t letterBottomShift = logYMin + (logYMax - logYMin)*0.25;
+    Double_t letterY = TMath::Power(10, letterBottomShift);
     Double_t letterOpacity = 0.15;
     
     std::cout << "S integration range (" << mean - sWidth / 2 << ", " << mean + sWidth / 2. << ")" << std::endl;

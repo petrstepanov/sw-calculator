@@ -48,6 +48,7 @@ Contributor(s):
       <itemPath>src/roofit/AbstractModelProvider.h</itemPath>
       <itemPath>src/widgets/AbstractPresenter.h</itemPath>
       <itemPath>src/widgets/AbstractView.h</itemPath>
+      <itemPath>src/roofit/BackgroundPdf.h</itemPath>
       <itemPath>src/roofit/ChannelConvolutionPdf.h</itemPath>
       <itemPath>src/roofit/CompositeModelProvider.h</itemPath>
       <itemPath>src/model/Constants.h</itemPath>
@@ -94,6 +95,7 @@ Contributor(s):
       <itemPath>src/widgets/importSpectrumWidget/AbstractImportSpectrumPresenter.cpp</itemPath>
       <itemPath>src/widgets/importSpectrumWidget/AbstractImportSpectrumView.cpp</itemPath>
       <itemPath>src/roofit/AbstractModelProvider.cpp</itemPath>
+      <itemPath>src/roofit/BackgroundPdf.cpp</itemPath>
       <itemPath>src/roofit/ChannelConvolutionPdf.cpp</itemPath>
       <itemPath>src/roofit/CompositeModelProvider.cpp</itemPath>
       <itemPath>src/model/Constants.cpp</itemPath>
@@ -309,6 +311,18 @@ Contributor(s):
                             perm="755"
                             owner="root"
                             group="bin"/>
+          <packFileListElem type="File"
+                            to="${PACKAGE_TOP_DIR}bin/sw-calculator.so"
+                            from="${CND_DISTDIR}/${CND_CONF}/${CND_PLATFORM}/sw-calculator.so"
+                            perm="755"
+                            owner="root"
+                            group="bin"/>
+          <packFileListElem type="File"
+                            to="${PACKAGE_TOP_DIR}bin/${OUTPUT_BASENAME}"
+                            from="${OUTPUT_PATH}"
+                            perm="755"
+                            owner="root"
+                            group="bin"/>
         </packFileList>
       </packaging>
       <item path="SWCalculatorFrameLinkDef.h" ex="false" tool="1" flavor2="0">
@@ -366,6 +380,10 @@ Contributor(s):
             flavor2="0">
       </item>
       <item path="src/roofit/AbstractModelProvider.h" ex="false" tool="3" flavor2="0">
+      </item>
+      <item path="src/roofit/BackgroundPdf.cpp" ex="false" tool="1" flavor2="0">
+      </item>
+      <item path="src/roofit/BackgroundPdf.h" ex="false" tool="3" flavor2="0">
       </item>
       <item path="src/roofit/ChannelConvolutionPdf.cpp"
             ex="false"
@@ -622,6 +640,10 @@ Contributor(s):
             flavor2="0">
       </item>
       <item path="src/roofit/AbstractModelProvider.h" ex="false" tool="3" flavor2="0">
+      </item>
+      <item path="src/roofit/BackgroundPdf.cpp" ex="false" tool="1" flavor2="0">
+      </item>
+      <item path="src/roofit/BackgroundPdf.h" ex="false" tool="3" flavor2="0">
       </item>
       <item path="src/roofit/ChannelConvolutionPdf.cpp"
             ex="false"

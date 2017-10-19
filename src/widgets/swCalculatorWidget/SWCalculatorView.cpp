@@ -129,7 +129,7 @@ void SWCalculatorView::initUI(){
     for (std::map<Int_t, TString>::iterator it=convTypes.begin(); it!=convTypes.end(); ++it){
         comboConvolutionType->AddEntry((it->second).Data(), it->first);
     }
-    comboConvolutionType->Select(4);
+    comboConvolutionType->Select(1);
     comboConvolutionType->Resize(75, 20);        
     checkboxResFixed = new TGCheckButton(convolutionParamsFrame, "fixed");
     checkboxResFixed->SetOn();              
@@ -155,21 +155,21 @@ void SWCalculatorView::initUI(){
     checkboxHasParabola = new TGCheckButton(modelParamsFrame, "Parabola", -1);
     modelParamsFrame->AddFrame(checkboxHasParabola, new TGLayoutHints(kLHintsNormal, 0, 4*dx, 4*dy/5, 0));
 
-    numGauss = new TGNumberEntry(modelParamsFrame, 1, 1, -1, TGNumberFormat::kNESInteger,
+    numGauss = new TGNumberEntry(modelParamsFrame, 3, 1, -1, TGNumberFormat::kNESInteger,
             TGNumberFormat::kNEANonNegative,
             TGNumberFormat::kNELLimitMinMax,
             0, 5);
     modelParamsFrame->AddFrame(numGauss, new TGLayoutHints(kLHintsNormal, 0, dx, 2*dy/5, 0));        
     modelParamsFrame->AddFrame(new TGLabel(modelParamsFrame, "Gauss"), new TGLayoutHints(kLHintsNormal, 0, 3*dx, dy, 0));
 
-    numExponent = new TGNumberEntry(modelParamsFrame, 1, 1, -1, TGNumberFormat::kNESInteger,
+    numExponent = new TGNumberEntry(modelParamsFrame, 0, 1, -1, TGNumberFormat::kNESInteger,
             TGNumberFormat::kNEANonNegative,
             TGNumberFormat::kNELLimitMinMax,
             0, 55);
     modelParamsFrame->AddFrame(numExponent, new TGLayoutHints(kLHintsNormal, 0, dx, 2*dy/5, 0));
     modelParamsFrame->AddFrame(new TGLabel(modelParamsFrame, "Exp"), new TGLayoutHints(kLHintsNormal, 0, 3*dx, dy, 0));
 
-    numDampExponent = new TGNumberEntry(modelParamsFrame, 1, 1, -1, TGNumberFormat::kNESInteger,
+    numDampExponent = new TGNumberEntry(modelParamsFrame, 0, 1, -1, TGNumberFormat::kNESInteger,
             TGNumberFormat::kNEANonNegative,
             TGNumberFormat::kNELLimitMinMax,
             0, 5);

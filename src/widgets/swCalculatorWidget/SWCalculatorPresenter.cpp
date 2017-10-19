@@ -120,9 +120,14 @@ void SWCalculatorPresenter::onFitSpectrumClicked(){
         Int_t convType = view->getConvolutionType();
         Double_t resFWHM = view->getResolutionFWHM();
         Bool_t isResFixed = view->isResolutionFixed();
-        Bool_t isTwoDetector = model->isTwoDetector();
-        Double_t bgFraction = histProcessor->calcBackgroundFraction(fitHist);
-        modelProvider = new CompositeModelProvider(e, e0, hasParabola, numGauss, numExp, numDampExp, kFALSE, convType, resFWHM, isResFixed, bgFraction, isTwoDetector);
+
+        modelProvider = new CompositeModelProvider(e, e0);
+        if (model->isTwoDetector()){
+            modelProvider->initTwoDetector(hasParabola, numGauss, numExp, numDampExp, convType, resFWHM, isResFixed);
+        } else {
+            Double_t bgFraction = histProcessor->calcBackgroundFraction(fitHist);
+            modelProvider->initSingleDetector(hasParabola, numGauss, numExp, numDampExp, convType, resFWHM, isResFixed, bgFraction);                
+        }
     }
     
     // Obtain fitting model and convoluted model
@@ -254,8 +259,8 @@ void SWCalculatorPresenter::onFitSpectrumClicked(){
 	// curveFitNoBg->SetLineWidth(2);
 	fitHistNoBg = (TH1F*) histProcessor->subtractCurve(fitHist, curveBg);
         RooDataHist* dataNoBg = new RooDataHist("dataNoBg", "Dataset with e (no background)", RooArgSet(*e), RooFit::Import(*fitHistNoBg));
-        dataNoBg->plotOn(fitFrame, RooFit::LineColor(kGray + 3), RooFit::XErrorSize(0), RooFit::MarkerSize(0.5), 
-            RooFit::MarkerColor(kGray), RooFit::DataError(RooAbsData::SumW2), RooFit::Name("dataNoBg"));
+        dataNoBg->plotOn(fitFrame, RooFit::LineColor(kGray), RooFit::XErrorSize(0), RooFit::MarkerSize(0.5), 
+            RooFit::DataError(RooAbsData::None), RooFit::Name("dataNoBg"));
 	fitFrame->drawBefore("data", "dataNoBg");        
     }
 

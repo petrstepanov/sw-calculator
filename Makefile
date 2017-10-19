@@ -96,6 +96,7 @@ MYHEADERS=event/Event.h \
 	  model/Constants.h \
           model/Model.h \
           roofit/AbstractModelProvider.h \
+          roofit/BackgroundPdf.h \
           roofit/ChannelConvolutionPdf.h \
           roofit/CompositeModelProvider.h \
           roofit/DampLorentzPdf.h \
@@ -131,6 +132,7 @@ MYSOURCES=event/EventBus.cpp \
 	  model/Constants.cpp \
           model/Model.cpp \
           roofit/AbstractModelProvider.cpp \
+          roofit/BackgroundPdf.cpp \
           roofit/ChannelConvolutionPdf.cpp \
           roofit/CompositeModelProvider.cpp \
           roofit/DampLorentzPdf.cpp \

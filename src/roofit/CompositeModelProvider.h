@@ -23,7 +23,7 @@ public:
     CompositeModelProvider();
     CompositeModelProvider(const CompositeModelProvider& orig);
     
-    CompositeModelProvider(RooRealVar* x, RooRealVar* x0, Bool_t hasParabola = kTRUE, const Int_t numGauss = 1, const Int_t numLorentz = 1, const Int_t numLorentzSum = 1, Bool_t hasOrthogonal = kFALSE, Int_t convType = 0, Double_t convFWHM = 1.7, Bool_t isConvFixed = kFALSE, Double_t constBgFraction = 0, Bool_t isTwoDetector = kTRUE);
+    CompositeModelProvider(RooRealVar* x, RooRealVar* x0);
 //    virtual ~CompositeModelProvider();
 
     std::list<Variable*> getIndirectParameters();
@@ -31,17 +31,24 @@ public:
     
     static std::map<Int_t, TString> getConvolutionTypes(void);
     
+    void initTwoDetector(Bool_t hasParabola = kTRUE, const Int_t numGauss = 1, const Int_t numLorentz = 1, const Int_t numLorentzSum = 1, /*Bool_t hasOrthogonal = kFALSE,*/ Int_t convType = 0, Double_t convFWHM = 1.7, Bool_t isConvFixed = kFALSE);
+    void initSingleDetector(Bool_t hasParabola = kTRUE, const Int_t numGauss = 1, const Int_t numLorentz = 1, const Int_t numLorentzSum = 1, /*Bool_t hasOrthogonal = kFALSE,*/ Int_t convType = 0, Double_t convFWHM = 1.7, Bool_t isConvFixed = kFALSE, Double_t bgFraction = 0.1);
+    
 private:
     RooArgList* pdfList;
     RooArgList* coeffList;
-    Bool_t isTwoDetector;
     RooRealVar* observable;
-
+    Bool_t isTwoDetector;
+    
     static std::map<Int_t, TString> createConvolutionType(){
         std::map<Int_t, TString> m = {{1, TString("None")}, {2, TString("FFT3")}, {3, TString("Numeric")}, {4, TString("Custom")}};
         return m;
     }; 
     static std::map<Int_t, TString> convolutionType;
+    
+    void initModel(Bool_t hasParabola, const Int_t, const Int_t numLorentz, const Int_t numLorentzSum);
+    void initBackground(Double_t backgroundFraction);
+    void initResolutionFunction(Int_t convType, Double_t convFWHM, Bool_t isConvFixed);
     
     Double_t* getDefaultGaussAs(Int_t numGauss);
     Double_t* getDefaultLorentzAs(Int_t numGauss);
