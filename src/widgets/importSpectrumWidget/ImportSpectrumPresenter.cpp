@@ -21,10 +21,16 @@ void ImportSpectrumPresenter::setModelHist(TH1F* hist){
     model->setHist(hist);
 
     HistProcessor* histProcessor = HistProcessor::getInstance();
-    std::pair<Double_t, Double_t> safeFitRange = histProcessor->getHistogramSafeFitRange(hist);
-    model->setSafeFitRange(safeFitRange.first, safeFitRange.second);
+    Bool_t isTwoDetector = histProcessor->isTwoDetetor(hist);
+
+    if (isTwoDetector){
+        std::pair<Double_t, Double_t> safeFitRange = histProcessor->getHistogramSafeFitRange(hist);
+        model->setSafeFitRange(safeFitRange.first, safeFitRange.second);
+    } else {
+        std::pair<Double_t, Double_t> safeFitRange = std::make_pair(491, 531);        
+        model->setSafeFitRange(safeFitRange.first, safeFitRange.second);
+    }
     
-    Bool_t isTwoDetector = (hist->GetXaxis()->GetXmin() < -10) && (hist->GetXaxis()->GetXmax() > 10);
     model->setTwoDetector(isTwoDetector);
 };
     

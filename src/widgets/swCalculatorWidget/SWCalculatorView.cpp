@@ -60,13 +60,13 @@ void SWCalculatorView::initUI(){
 
     // Fit Range Row
     TGHorizontalFrame *frameFitRange = new TGHorizontalFrame(tabFit);
-    numFitMin = new TGNumberEntry(frameFitRange, 485, 4, -1, TGNumberFormat::kNESInteger,
+    numFitMin = new TGNumberEntry(frameFitRange, -60, 4, -1, TGNumberFormat::kNESInteger,
             TGNumberFormat::kNEAAnyNumber,
             TGNumberFormat::kNELLimitMinMax,
             -9999, 9999);
     numFitMin->GetNumberEntry()->Connect("TextChanged(char*)", "SWCalculatorView", this, "onNumFitMinChanged()");
 
-    numFitMax = new TGNumberEntry(frameFitRange, 537, 4, -1, TGNumberFormat::kNESInteger,
+    numFitMax = new TGNumberEntry(frameFitRange, 60, 4, -1, TGNumberFormat::kNESInteger,
             TGNumberFormat::kNEAAnyNumber,
             TGNumberFormat::kNELLimitMinMax,
             -9999, 9999);
@@ -269,19 +269,26 @@ Int_t SWCalculatorView::getFitMaxValue(){
     return numFitMax->GetNumber();    
 }
 
-void SWCalculatorView::setFitMinMaxValues(Int_t min, Int_t max){
-    Int_t fitMin = numFitMin->GetNumber();
-    // If previous value was out of the new range ROOT sets maximum from the range
+void SWCalculatorView::setFitMinMaxRange(Int_t min, Int_t max){
     numFitMin->SetLimitValues(min,max);
-    if (numFitMin->GetNumber() != fitMin){
-        numFitMin->SetNumber(min);
-    }
-    Int_t fitMax = numFitMax->GetNumber();
     numFitMax->SetLimitValues(min,max);
-    if (numFitMax->GetNumber() != fitMax){
-        numFitMax->SetNumber(max);
+}
+
+void SWCalculatorView::setFitMinMaxValues(Bool_t isTwoDetector){
+    if (isTwoDetector){
+        Int_t leftLimitMin = TMath::Abs(numFitMin->GetNumMin());
+        Int_t rightLimitMax = TMath::Abs(numFitMax->GetNumMax());
+        
+        Int_t limit = TMath::Min(leftLimitMin, rightLimitMax);
+        if (numFitMin->GetNumber() < -limit) numFitMin->SetNumber(-limit);
+        if (numFitMax->GetNumber() > limit) numFitMax->SetNumber(limit);
+    }
+    else {
+        numFitMin->SetNumber(496);
+        numFitMax->SetNumber(526);
     }
 }
+
 
 Double_t SWCalculatorView::getSWidth(){
     return numSWidth->GetNumber();
@@ -340,7 +347,7 @@ void SWCalculatorView::setToolbarEnabled(Bool_t isEnabled){
     numDisplayMax->SetState(isEnabled);
 }
 
-void SWCalculatorView::setTwoDetector(Bool_t isTwoDetector){
+void SWCalculatorView::updateRegionLabels(Bool_t isTwoDetector){
     lblRescale1->SetText(isTwoDetector ? "2 x " : " ");
     lblRescale2->SetText(isTwoDetector ? "2 x " : " ");
     lblRescale3->SetText(isTwoDetector ? "2 x " : " ");

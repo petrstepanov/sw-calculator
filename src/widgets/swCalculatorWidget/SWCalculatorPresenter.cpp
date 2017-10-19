@@ -49,7 +49,7 @@ void SWCalculatorPresenter::addEventListeners(){
         
         virtual void onEvent(HistogramImportedEvent & e) override {
             std::cout << "HistogramImportedEventListener::onEvent()" << std::endl;
-            view->setFitMinMaxValues(e.getHistMin() + 0.5, e.getHistMax());
+            view->setFitMinMaxRange(e.getHistMin() + 0.5, e.getHistMax());
             view->setTabEnabled(1, true);
             view->setTabEnabled(2, true);
         }        
@@ -63,7 +63,8 @@ void SWCalculatorPresenter::addEventListeners(){
         
         virtual void onEvent(IsTwoDetectorEvent & e) override {
             std::cout << "IsTwoDetectorEvent::onEvent()" << std::endl;
-            view->setTwoDetector(e.isTwoDetector());
+            view->updateRegionLabels(e.isTwoDetector());
+            view->setFitMinMaxValues(e.isTwoDetector());
         }        
         SWCalculatorView* view = nullptr;
     };
@@ -174,10 +175,19 @@ void SWCalculatorPresenter::onFitSpectrumClicked(){
     graphicsHelper->setupAxis(fitFrame->GetYaxis(), "Counts", 1.6, 0.012);
 
     // Evaluate Counts axis limits
-    Double_t yAxisMin = 0.1;
-    while (yAxisMin * 10 < fitHist->GetBinContent(fitHist->GetMinimumBin()) + 1) yAxisMin *= 10;
-    Double_t logYAxisMax = 1.15 * TMath::Log10(fitHist->GetBinContent(fitHist->GetMaximumBin())); // Max limit is 15% larger hist maximum
-    Double_t yAxisMax = pow(10, logYAxisMax);  
+    Double_t yAxisMin, yAxisMax;
+    if (model->isTwoDetector()){
+        yAxisMin=0.1;
+        while (yAxisMin * 10 < fitHist->GetBinContent(fitHist->GetMinimumBin()) + 1) yAxisMin *= 10;        
+        Double_t logYAxisMax = 1.15 * TMath::Log10(fitHist->GetBinContent(fitHist->GetMaximumBin())); // Max limit is 15% larger hist maximum
+        yAxisMax = pow(10, logYAxisMax);  
+    }
+    else {
+        Double_t logMin = TMath::Log10(fitHist->GetBinContent(fitHist->GetMinimumBin()));
+        yAxisMin = TMath::Power(10, logMin/2);
+        Double_t logYAxisMax = 1.05 * TMath::Log10(fitHist->GetBinContent(fitHist->GetMaximumBin())); // Max limit is 15% larger hist maximum
+        yAxisMax = pow(10, logYAxisMax);  
+    }
     std::cout << "Counts axis limits: " << yAxisMin << ", " << yAxisMax << std::endl;
 
     {
@@ -251,7 +261,8 @@ void SWCalculatorPresenter::onFitSpectrumClicked(){
     if (!model->isTwoDetector()){
         // Plot Convoluted Model background (its added after convolution graph because otherwise it changes backgroud)
         fittingNonConvolutedModel->plotOn(fitFrame, RooFit::Components(*(modelProvider->getBgComponents())), 
-            RooFit::LineStyle(kDashed), RooFit::LineColor(kViolet + 6), RooFit::LineWidth(1), RooFit::Name("bg"));        
+            RooFit::LineStyle(kDashed), RooFit::LineColor(kPink -4), RooFit::LineWidth(1), RooFit::Name("bg"));
+        legend->AddEntry(fitFrame->findObject("bg"), "Atan background", "l");        
         // Plot fit without background
 	RooCurve* curveBg = fitFrame->getCurve("bg");        
         // RooCurve* curveFitNoBg = histProcessor->subtractCurves(curveFit, curveBg);
@@ -259,9 +270,10 @@ void SWCalculatorPresenter::onFitSpectrumClicked(){
 	// curveFitNoBg->SetLineWidth(2);
 	fitHistNoBg = (TH1F*) histProcessor->subtractCurve(fitHist, curveBg);
         RooDataHist* dataNoBg = new RooDataHist("dataNoBg", "Dataset with e (no background)", RooArgSet(*e), RooFit::Import(*fitHistNoBg));
-        dataNoBg->plotOn(fitFrame, RooFit::LineColor(kGray), RooFit::XErrorSize(0), RooFit::MarkerSize(0.5), 
-            RooFit::DataError(RooAbsData::None), RooFit::Name("dataNoBg"));
-	fitFrame->drawBefore("data", "dataNoBg");        
+        dataNoBg->plotOn(fitFrame, RooFit::XErrorSize(0), RooFit::MarkerSize(0.5), 
+            RooFit::DataError(RooAbsData::None), RooFit::MarkerColor(kGray), RooFit::Name("dataNoBg"));
+	fitFrame->drawBefore("data", "dataNoBg");
+        legend->AddEntry(fitFrame->findObject("dataNoBg"), "Subtracted background", "p");
     }
 
     // Plot data points

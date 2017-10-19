@@ -47,7 +47,8 @@ class SWCalculatorView : public AbstractView<SWCalculatorPresenter> {
     // Calls from Presenter
     void setTabEnabled(Int_t, Bool_t);
     Int_t getFitMinValue();
-    void setFitMinMaxValues(Int_t, Int_t);
+    void setFitMinMaxRange(Int_t min, Int_t max);
+    void setFitMinMaxValues(Bool_t isTwoDetector);
     Int_t getFitMaxValue();
     Double_t getSWidth();
     Double_t getWWidth();
@@ -62,7 +63,7 @@ class SWCalculatorView : public AbstractView<SWCalculatorPresenter> {
     TPad* getPadData();
     TPad* getPadChi2();
     void setToolbarEnabled(Bool_t isEnabled);
-    void setTwoDetector(Bool_t isTwoDetector);
+    void updateRegionLabels(Bool_t isTwoDetector);
     void displayFilename(TString* fileName);
     void displayFitParameters(RooFitResult* fitResult);
     void displayIndirectParameters(std::list<Variable*> parameters);

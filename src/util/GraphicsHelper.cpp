@@ -65,8 +65,9 @@ void GraphicsHelper::drawSWRegions(RooPlot* frame, Double_t sWidth, Double_t wWi
     yMax = 0.96*yMax;
     Double_t textSize = 0.05;
     Double_t logYMin = TMath::Log10(yMin);
-    Double_t logYMax = TMath::Log10(yMax);
-    Double_t letterBottomShift = logYMin + (logYMax - logYMin)*0.25;
+    Double_t logYMax = TMath::Log10(yMax);  
+    Double_t heightCoeff = isTwoDetector ? 0.25 : 0.75;
+    Double_t letterBottomShift = logYMin + (logYMax - logYMin)*heightCoeff;
     Double_t letterY = TMath::Power(10, letterBottomShift);
     Double_t letterOpacity = 0.15;
     
@@ -75,7 +76,8 @@ void GraphicsHelper::drawSWRegions(RooPlot* frame, Double_t sWidth, Double_t wWi
     sBox->SetLineWidth(0);
     sBox->SetFillColorAlpha(19, 0.6);
     frame->addObject(sBox);
-    TLatex* s = new TLatex(mean - 0.8, letterY, "#it{S}");
+    TLatex* s = new TLatex(mean, letterY, "#it{S}");
+    s->SetTextAlign(22);    
     s->SetTextColorAlpha(1, letterOpacity);
     s->SetTextSize(textSize);    
     frame->addObject(s);
@@ -85,7 +87,8 @@ void GraphicsHelper::drawSWRegions(RooPlot* frame, Double_t sWidth, Double_t wWi
     w1Box->SetLineWidth(0);
     w1Box->SetFillColorAlpha(19, 0.6);
     frame->addObject(w1Box);
-    TLatex* w1 = new TLatex(mean-wShift-wWidth/2-1.5, letterY, "#it{W_{1}}");
+    TLatex* w1 = new TLatex(mean-wShift-wWidth/2, letterY, "#it{W_{1}}");
+    w1->SetTextAlign(22);
     w1->SetTextColorAlpha(1, letterOpacity);
     w1->SetTextSize(textSize);    
     frame->addObject(w1);
@@ -95,9 +98,12 @@ void GraphicsHelper::drawSWRegions(RooPlot* frame, Double_t sWidth, Double_t wWi
     w2Box->SetLineWidth(0);
     w2Box->SetFillColorAlpha(19, 0.6);
     frame->addObject(w2Box);
-    TLatex* w2 = new TLatex(mean+wShift+wWidth/2-1.5, letterY, "#it{W_{2}}");
+    TLatex* w2 = new TLatex(mean+wShift+wWidth/2, letterY, "#it{W_{2}}");
+    w2->SetTextAlign(22);
+    w2->SetTextSize(textSize);
     w2->SetTextColorAlpha(1, letterOpacity);
-    w2->SetTextSize(textSize);    
+//    w2->SetBBoxCenterX(mean+wShift+wWidth/2);
+//    w2->SetBBoxCenterY(letterY);
     frame->addObject(w2);
 
 }
