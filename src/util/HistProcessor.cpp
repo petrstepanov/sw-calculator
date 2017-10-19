@@ -16,6 +16,7 @@
 #include <iostream>
 #include <TF1.h>
 #include <RooAbsPdf.h>
+#include <cmath>
 
 HistProcessor::HistProcessor(){};
 
@@ -104,12 +105,15 @@ TH1* HistProcessor::getChi2Hist(TH1* hist, RooCurve* curve){
 		Double_t count = hist->GetBinContent(i);
 		Double_t error = sqrt(count);//hist -> GetBinError(i);
 		Double_t theor = curve->Eval(hist->GetXaxis()->GetBinCenter(i));
-		if (theor != 0){
-                        // We want the chi^2 to be positive and negative
-			Double_t chi2 = (count - theor) * std::abs(count - theor) / pow(error, 2);
-                        // std::cout << hist->GetBinCenter(i) << " " << count << " " << theor << " " << chi2 << std::endl;
-			chiHist->SetBinContent(i, chi2);
-		}
+                // We want the chi^2 to be positive and negative
+                Double_t chi2 = (count - theor) * std::abs(count - theor) / pow(error, 2);
+                if(std::isfinite(chi2)) {
+                    chiHist->SetBinContent(i, chi2);
+                }
+                else {
+                    chiHist->SetBinContent(i, 0);                    
+                    std::cout << "Histogram at E=" << hist->GetBinCenter(i) << " (bin " << i << ") has count " << count << std::endl;
+                }
 	}
 	return chiHist;
 }
@@ -137,37 +141,40 @@ Bool_t HistProcessor::hasAtan(TH1* hist){
 
 Double_t HistProcessor::calcBackgroundFraction(TH1* hist){
 	Int_t nBins = hist->GetXaxis()->GetNbins();
+        Int_t maxBin = hist->GetMinimumBin();
 	const Int_t wingBins = 10;
-	Double_t fullInt = hist->Integral(1, nBins);
+	Double_t leftWingAverage = (hist->Integral(1, wingBins)) / (Double_t)(wingBins);
 	Double_t rightWingAverage = (hist->Integral(nBins - (wingBins - 1), nBins)) / (Double_t)(wingBins);
-	Double_t bgInt = nBins * rightWingAverage;
-	Double_t bg = bgInt / fullInt;
-	return bg > 0 ? bg : 0.1;
+        Double_t backgroundCounts = leftWingAverage*(maxBin) + rightWingAverage*(nBins-maxBin);
+	Double_t fullInt = hist->Integral(1, nBins);
+	Double_t bgFraction = backgroundCounts / fullInt;
+	return bgFraction;
 }
 
-std::pair<Double_t, Int_t> HistProcessor::getChi2(TH1* hist, RooCurve* curve, Int_t numberOfFreeParameters){
-	Double_t nBins = hist->GetXaxis()->GetNbins();
-
-	Int_t degreesOfFreedom = 0;
-
-	Double_t sum = 0;
-	for (int i = 1; i <= nBins; i++){
-		Double_t value = hist->GetBinContent(i);
-		Double_t fit = curve->Eval(hist->GetXaxis()->GetBinCenter(i));
-		Double_t error = hist->GetBinError(i);
-		if (value != 0 && error != 0){
-			// std::cout << "value: " << value << " fit: " << fit << "  error: " << error << std::endl;
-			sum += pow(value - fit, 2) / value;
-			degreesOfFreedom++;
-		}
-	}
-	degreesOfFreedom -= (numberOfFreeParameters + 1);
-	std::cout << "sum: " << sum << std::endl;
-	std::cout << "number of free prameters: " << numberOfFreeParameters << std::endl;
-	std::cout << "degrees of freedom: " << degreesOfFreedom << std::endl;
-	// Double_t chi2Int = sum / (Double_t)(degreesOfFreedom);
-	// Double_t chi2IntErr = sqrt((double)2*degreesOfFreedom);
-	return std::make_pair(sum, degreesOfFreedom);
+std::pair<Double_t, Int_t> HistProcessor::getChi2(TH1* hist, RooCurve* curve, RooAbsPdf* model){
+    RooArgSet* params = model->getVariables();
+    params->Print("v");
+    Int_t numberOfFreeParameters = params->getSize();   
+    Double_t nBins = hist->GetXaxis()->GetNbins();
+    Int_t degreesOfFreedom = 0;
+    Double_t sum = 0;
+    for (int i = 1; i <= nBins; i++){
+        Double_t value = hist->GetBinContent(i);
+        Double_t fit = curve->Eval(hist->GetXaxis()->GetBinCenter(i));
+        Double_t error = hist->GetBinError(i);
+        if (value != 0 && error != 0){
+            // std::cout << "value: " << value << " fit: " << fit << "  error: " << error << std::endl;
+            sum += pow(value - fit, 2) / value;
+            degreesOfFreedom++;
+        }
+    }
+    degreesOfFreedom -= (numberOfFreeParameters + 1);
+    std::cout << "sum: " << sum << std::endl;
+    std::cout << "number of free prameters: " << numberOfFreeParameters << std::endl;
+    std::cout << "degrees of freedom: " << degreesOfFreedom << std::endl;
+    // Double_t chi2Int = sum / (Double_t)(degreesOfFreedom);
+    // Double_t chi2IntErr = sqrt((double)2*degreesOfFreedom);
+    return std::make_pair(sum, degreesOfFreedom);
 }
 
 std::pair<Double_t, Double_t> HistProcessor::calcIntegral(TH1* hist, Double_t min, Double_t max){
@@ -184,6 +191,32 @@ std::pair<Double_t, Double_t> HistProcessor::calcIntegral(TH1* hist, Double_t mi
 	return std::make_pair(sum, error);
 }
 
+std::pair<Double_t, Double_t> HistProcessor::getSParameter(TH1* hist, Double_t sWidth, Double_t mean) {
+    // Calculate full histogram integral
+    std::pair<Double_t, Double_t> fullInt;    
+    fullInt.first = hist->IntegralAndError(1, hist->GetXaxis()->GetNbins(), fullInt.second, "width");
+    // std::cout << "Full Integral: " << fullInt.first << " ± " << fullInt.second << std::endl;
+    std::pair<Double_t, Double_t> sInt = calcIntegral(hist, mean - sWidth/2, mean + sWidth/2);
+    // std::cout << "S Integral: " << sInt.first << " ± " << sInt.second << std::endl;
+    Double_t S = sInt.first / fullInt.first;
+    Double_t dS = sqrt(pow((1 / fullInt.first)*(sInt.second), 2) + pow((sInt.first / fullInt.first / fullInt.first*fullInt.second), 2));
+    return std::make_pair(S, dS);
+}
+
+std::pair<Double_t, Double_t> HistProcessor::getWParameter(TH1* hist, Double_t wWidth, Double_t wShift, Double_t mean) {
+    // Calculate full histogram integral
+    std::pair<Double_t, Double_t> fullInt;    
+    fullInt.first = hist->IntegralAndError(1, hist->GetXaxis()->GetNbins(), fullInt.second, "width");
+    // std::cout << "Full Integral: " << fullInt.first << " ± " << fullInt.second << std::endl;
+    std::pair<Double_t, Double_t> w1Int = calcIntegral(hist, mean - wShift - wWidth, mean - wShift);
+    // std::cout << "W1 Integral: " << w1Int.first << " ± " << w1Int.second << std::endl;
+    std::pair<Double_t, Double_t> w2Int = calcIntegral(hist, mean + wShift, mean + wShift + wWidth);
+    // std::cout << "W2 Integral: " << w2Int.first << " ± " << w2Int.second << std::endl;
+    Double_t W = (w1Int.first + w2Int.first) / fullInt.first;
+    Double_t dW = sqrt(pow((1 / fullInt.first)*(w1Int.second), 2) + pow((1 / fullInt.first)*(w2Int.second), 2) + pow(((w1Int.first + w2Int.first) / fullInt.first / fullInt.first*fullInt.second), 2));
+    return std::make_pair(W, dW);
+}
+
 Bool_t HistProcessor::isTwoDetetor(TH1* hist){
 	TAxis* x = hist->GetXaxis();
 	return !((x->GetXmin() < 511) && (x->GetXmax() > 511));
@@ -192,4 +225,24 @@ Bool_t HistProcessor::isTwoDetetor(TH1* hist){
 Double_t HistProcessor::getPdfMaximumX(RooAbsPdf* pdf, const RooArgList& args){
     TF1* tf1 = pdf->asTF(args);
     return tf1->GetMaximumX();
+}
+
+std::pair<Double_t, Double_t> HistProcessor::getHistogramSafeFitRange(TH1* hist){
+    Int_t maxBin = hist->GetMaximumBin();
+    Int_t firstBin;
+    for (Int_t i = 1; i < maxBin; i++){
+        if (hist->GetBinContent(i) < 1){
+            firstBin = i;
+        }
+    }
+    firstBin++;
+    Int_t lastBin;
+    Int_t nbins = hist->GetXaxis()->GetNbins();
+    for (Int_t i = nbins; i > maxBin; i--){
+        if (hist->GetBinContent(i) < 1){
+            lastBin = i;
+        }
+    }
+    lastBin--;
+    return std::make_pair(hist->GetXaxis()->GetBinLowEdge(firstBin), hist->GetXaxis()->GetBinUpEdge(lastBin));
 }

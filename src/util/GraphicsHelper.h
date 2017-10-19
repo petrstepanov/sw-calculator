@@ -33,13 +33,7 @@ class GraphicsHelper {
 		void setupAxis(TAxis* axis, const char* title = "",
 		               Double_t titleOffset = DEFAULT_X_TITLE_OFFSET,
 		               Double_t labelOffset = DEFAULT_X_LABEL_OFFSET);
-		void setupPlotAxis(RooPlot* plot, const char* xTitle = "",
-		                   Double_t xTitleOffset = DEFAULT_X_TITLE_OFFSET,
-		                   Double_t xLabelOffset = DEFAULT_X_LABEL_OFFSET,
-		                   const char* yTitle = "",
-		                   Double_t yTitleOffset = DEFAULT_Y_TITLE_OFFSET,
-		                   Double_t yLabelOffset = DEFAULT_Y_LABEL_OFFSET);
-
+                void drawSWRegions(RooPlot* frame, Double_t sWidth, Double_t wWidth, Double_t wShift, Double_t mean, Double_t yMin, Double_t yMax, Bool_t isTwoDetector);
 	private:
 		GraphicsHelper();
 		static GraphicsHelper* instance;

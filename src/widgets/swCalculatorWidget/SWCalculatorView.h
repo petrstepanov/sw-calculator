@@ -27,7 +27,9 @@
 #include <TH1I.h>
 #include <TH1F.h>
 #include <RooCurve.h>
+#include <RooFitResult.h>
 #include <RooPlot.h>
+#include "../../util/Variable.h"
 #include "../AbstractView.h"
 #include "SWCalculatorPresenter.h"
 
@@ -55,8 +57,20 @@ class SWCalculatorView : public AbstractView<SWCalculatorPresenter> {
     Int_t getNumGauss();
     Int_t getNumExp();
     Int_t getNumDampExp();
+    Double_t getResolutionFWHM();
+    Bool_t isResolutionFixed();
+    TPad* getPadData();
+    TPad* getPadChi2();
     void setToolbarEnabled(Bool_t isEnabled);
     void setTwoDetector(Bool_t isTwoDetector);
+    void displayFilename(TString* fileName);
+    void displayFitParameters(RooFitResult* fitResult);
+    void displayIndirectParameters(std::list<Variable*> parameters);
+    void displayIntensities(std::list<std::pair<const char*, Double_t>> intensities);
+    void displayChi2(Double_t sumChi2, Int_t freeParameters, Int_t degreesFreedom);
+    void displaySW(std::pair<Double_t, Double_t> sValueError, std::pair<Double_t, Double_t> wValueError);
+    void updateCanvas();
+    
     // Calls to Presenter
     void onNumFitMinChanged();
     void onNumFitMaxChanged();

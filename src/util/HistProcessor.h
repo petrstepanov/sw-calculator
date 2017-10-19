@@ -21,26 +21,29 @@
 
 class HistProcessor {
 public:
-	static HistProcessor* getInstance();
-        
-	TH1* cutHist(TH1*, Int_t, Int_t);
-	RooCurve* subtractCurves(RooCurve*, RooCurve*);
-	TH1* subtractCurve(TH1*, RooCurve*);
-	TH1* getChi2Hist(TH1*, RooCurve*);
-        Double_t getTotalCounts(TH1*);
-	Bool_t hasBackground(TH1*);
-	Bool_t hasAtan(TH1*);
-	Double_t calcBackgroundFraction(TH1*);
-	std::pair<Double_t, Int_t> getChi2(TH1*, RooCurve*, Int_t);
-	std::pair<Double_t, Double_t> calcIntegral(TH1*, Double_t, Double_t);
-	Bool_t isTwoDetetor(TH1*);
-        Double_t getPdfMaximumX (RooAbsPdf*, const RooArgList&);
+    static HistProcessor* getInstance();
 
+    TH1* cutHist(TH1*, Int_t, Int_t);
+    RooCurve* subtractCurves(RooCurve*, RooCurve*);
+    TH1* subtractCurve(TH1*, RooCurve*);
+    TH1* getChi2Hist(TH1*, RooCurve*);
+    Double_t getTotalCounts(TH1*);
+    Bool_t hasBackground(TH1*);
+    Bool_t hasAtan(TH1*);
+    Double_t calcBackgroundFraction(TH1*);
+    std::pair<Double_t, Int_t> getChi2(TH1*, RooCurve*, RooAbsPdf*);
+    std::pair<Double_t, Double_t> calcIntegral(TH1*, Double_t, Double_t);
+    Bool_t isTwoDetetor(TH1*);
+    Double_t getPdfMaximumX (RooAbsPdf*, const RooArgList&);
+    std::pair<Double_t, Double_t> getHistogramSafeFitRange(TH1*);
+    std::pair<Double_t, Double_t> getSParameter(TH1* hist, Double_t sWidth, Double_t mean);
+    std::pair<Double_t, Double_t> getWParameter(TH1* hist, Double_t wWidth, Double_t wShift, Double_t mean);
+    
 private:
-	HistProcessor();                                      // Private so that it can  not be called
-	HistProcessor(HistProcessor const&);                  // Copy constructor is private
-	HistProcessor& operator=(HistProcessor const&);       // Assignment operator is private
-	static HistProcessor* instance;
+    HistProcessor();                                      // Private so that it can  not be called
+    HistProcessor(HistProcessor const&);                  // Copy constructor is private
+    HistProcessor& operator=(HistProcessor const&);       // Assignment operator is private
+    static HistProcessor* instance;
 };
 
 #endif /* HISTPROCESSOR_H */

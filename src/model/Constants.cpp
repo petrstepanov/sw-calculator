@@ -15,7 +15,9 @@
 
 const char* Constants::applicationName = "SW Calculator";
 
-const Double_t Constants::padMargin[4] = {0.12, 0.03, 0.15, 0.05};
+const Double_t Constants::padMargin[4] = {0.10, 0.03, 0.15, 0.05}; // left, right, bottom, top
+const Int_t Constants::colorSet[7]  = {kViolet+6, kSpring-5, kAzure+8, kPink+1, kRed-7, kViolet-4, kGray+1}; 
+
 
 TColor* Constants::colorPrimary = new TColor(0.232, 0.757, 0.832);
 TColor* Constants::colorWarning = new TColor(0.832, 0.769, 0.232);

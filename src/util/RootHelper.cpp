@@ -23,7 +23,7 @@ void RootHelper::deleteObject(const char* name){
 void RootHelper::deleteObject(TObject* obj){
     if (obj){
         obj->Delete();
-        delete obj;
+//        delete obj;
     }
 }
 

@@ -50,7 +50,6 @@ public:
         fullHist = hist;
         Double_t histMin = hist->GetXaxis()->GetXmin();
         Double_t histMax = hist->GetXaxis()->GetXmax();
-        EventBus::FireEvent(*(new HistogramImportedEvent(*this, histMin, histMax))); // Fire the event
     }
     
     TH1F* getHist(){ 
@@ -74,6 +73,10 @@ public:
         return twoDetector; 
     }
 
+    void setSafeFitRange(Double_t eMin, Double_t eMax){
+        safeFitRange = std::make_pair(eMin, eMax);
+        EventBus::FireEvent(*(new HistogramImportedEvent(*this, eMin, eMax))); // Fire the event        
+    }
     
 private:
     Model();                              // Private so that it can  not be called
@@ -89,6 +92,7 @@ private:
     TH1F* peakHistNoBg = nullptr;
     TH1F* chiHist = nullptr;
     Bool_t twoDetector;
+    std::pair<Double_t, Double_t> safeFitRange;
 };
 
 #endif /* MODEL_H */

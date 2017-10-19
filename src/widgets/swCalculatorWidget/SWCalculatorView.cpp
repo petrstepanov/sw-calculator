@@ -17,33 +17,13 @@
 #include "../../model/Constants.h"
 #include "../importSpectrumWidget/ImportSpectrumView.h"
 #include "../importSpectrumWidget/ImportSourceSpectrumView.h"
+#include "../../util/StringUtils.h"
 #include <TGFrame.h>
 #include <map>
-//#include <algorithm>  //min
-//#include <functional>
-//#include <sstream>
+#include <sstream>
 #include <TRootEmbeddedCanvas.h>
-//#include <TBox.h>
-//#include <RooDataHist.h>
-//#include <RooFitResult.h>
-//#include <RooChi2Var.h>
-//#include <RooMinuit.h>
-//#include <RooMinimizer.h>
-//#include <RooAddPdf.h>
-//#include <TGFileDialog.h>
-//#include <TGMsgBox.h>
 #include <TG3DLine.h>
-//#include <TStopwatch.h>
-//#include "../../util/GraphicsHelper.h"
-//#include "../../roofit/AbstractModelProvider.h"
-//#include "../../roofit/ParabolaGaussModelProvider.h"
-//#include "../../roofit/ParabolaLorentzianModelProvider.h"
 #include "../../roofit/CompositeModelProvider.h"
-//#include "../../util/HistProcessor.h"
-//#include "../../util/StringUtils.h"
-//#include "../../util/FileUtils.h"
-//#include "../../util/Variable.h"
-//#include "../../util/RootHelper.h"
 
 using namespace RooFit;
 
@@ -67,12 +47,12 @@ void SWCalculatorView::initUI(){
     // Import spectrum tab
     TGCompositeFrame *tabImport = tabsWidget->AddTab("Material Spectrum");
     tabImport->SetLayoutManager(new TGVerticalLayout(tabImport));
-    tabImport->AddFrame(new ImportSpectrumView(tabImport), new TGLayoutHints(kLHintsExpandX | kLHintsExpandY, dx, dx, dy*2, dy));
+    tabImport->AddFrame(new ImportSpectrumView(tabImport), new TGLayoutHints(kLHintsExpandX | kLHintsExpandY, dx, dx, dy*2, dy*2));
 
     // Import Kapton spectrum tab
     TGCompositeFrame *tabImportKapton = tabsWidget->AddTab("Kapton Spectrum");
     tabImportKapton->SetLayoutManager(new TGVerticalLayout(tabImportKapton));
-    tabImportKapton->AddFrame(new ImportSourceSpectrumView(tabImportKapton), new TGLayoutHints(kLHintsExpandX | kLHintsExpandY, dx, dx, dy*2, dy));
+    tabImportKapton->AddFrame(new ImportSourceSpectrumView(tabImportKapton), new TGLayoutHints(kLHintsExpandX | kLHintsExpandY, dx, dx, dy*2, dy*2));
     
     // Fit Data tab
     TGCompositeFrame *tabFit = tabsWidget->AddTab("Fit Data");
@@ -214,6 +194,7 @@ void SWCalculatorView::initUI(){
 
     // Attach Tabs Widget
     tabsWidget->SetTab(0);
+    setTabEnabled(1, false);    
     setTabEnabled(2, false);
     tabsWidget->SetWidth(Constants::leftPanelWidth); // Resize(tabsWidget->GetDefaultSize());
     AddFrame(tabsWidget, new TGLayoutHints(kLHintsLeft | kLHintsTop | kLHintsExpandY, dx, dx, 2*dy, 2*dy));
@@ -289,10 +270,17 @@ Int_t SWCalculatorView::getFitMaxValue(){
 }
 
 void SWCalculatorView::setFitMinMaxValues(Int_t min, Int_t max){
-    numFitMin->SetNumber(min);  
+    Int_t fitMin = numFitMin->GetNumber();
+    // If previous value was out of the new range ROOT sets maximum from the range
     numFitMin->SetLimitValues(min,max);
-    numFitMax->SetNumber(max);  
+    if (numFitMin->GetNumber() != fitMin){
+        numFitMin->SetNumber(min);
+    }
+    Int_t fitMax = numFitMax->GetNumber();
     numFitMax->SetLimitValues(min,max);
+    if (numFitMax->GetNumber() != fitMax){
+        numFitMax->SetNumber(max);
+    }
 }
 
 Double_t SWCalculatorView::getSWidth(){
@@ -327,6 +315,22 @@ Int_t SWCalculatorView::getNumDampExp(){
     return numDampExponent->GetNumber();
 }
 
+Double_t SWCalculatorView::getResolutionFWHM(){
+    return numResolutionFWHM->GetNumber();
+}
+
+Bool_t SWCalculatorView::isResolutionFixed() {
+    return checkboxResFixed->IsOn();
+}
+
+TPad* SWCalculatorView::getPadData() {
+    return padData;
+}
+
+TPad* SWCalculatorView::getPadChi2() {
+    return padChi2;
+}
+
 void SWCalculatorView::setToolbarEnabled(Bool_t isEnabled){
     btnApplyZoom->SetEnabled(isEnabled);
     btnResetZoom->SetEnabled(isEnabled);
@@ -340,6 +344,71 @@ void SWCalculatorView::setTwoDetector(Bool_t isTwoDetector){
     lblRescale1->SetText(isTwoDetector ? "2 x " : " ");
     lblRescale2->SetText(isTwoDetector ? "2 x " : " ");
     lblRescale3->SetText(isTwoDetector ? "2 x " : " ");
+}
+
+void SWCalculatorView::displayFilename(TString* fileName) {
+    txtFitResult->AddLineFast("");
+    TString* onlyFileName = StringUtils::stripFileName(fileName);
+    txtFitResult->AddLineFast(Form("    %s", onlyFileName->Data()));    
+}
+
+void SWCalculatorView::displayFitParameters(RooFitResult* fitResult) {
+    std::ostringstream os;
+    fitResult->printStream(os, fitResult->defaultPrintContents(""), fitResult->defaultPrintStyle(""));
+    std::istringstream iss(os.str());
+    std::string str;
+    for (int i = 0; i<4; i++){
+            std::getline(iss, str);
+    }
+    while (std::getline(iss, str)){
+            txtFitResult->AddLineFast(str.c_str());
+    }    
+}
+
+void SWCalculatorView::displayIndirectParameters(std::list<Variable*> parameters) {
+    std::list<Variable*>::iterator iter;
+    txtFitResult->AddLineFast("  ------------------------------------------------");
+    for (iter = parameters.begin(); iter != parameters.end(); ++iter) {
+        Variable* v = (*iter);
+        TString str = (v->getError() == 0) ?
+            Form("%*s    %1.4e %s", 22, v->getDescription(), v->getValue(), v->getUnit()) :
+            Form("%*s    %1.4e (%1.2e) %s", 22, v->getDescription(), v->getValue(), v->getError(), v->getUnit());
+        txtFitResult->AddLineFast(str);
+    }
+}
+
+void SWCalculatorView::displayIntensities(std::list<std::pair<const char*, Double_t> > intensities) {
+    std::list<std::pair<const char*, Double_t>>::iterator iter;
+    txtFitResult->AddLineFast("  ------------------------------------------------");
+    for (iter = intensities.begin(); iter != intensities.end(); ++iter) {
+        std::pair<const char*, Double_t> p = (*iter);
+        TString str = Form("%*s    %f %c", 22, p.first, p.second*100, '%');
+        txtFitResult->AddLineFast(str);
+    }
+}
+
+void SWCalculatorView::displayChi2(Double_t sumChi2, Int_t freeParameters, Int_t degreesFreedom) {
+    txtFitResult->AddLineFast("  ------------------------------------------------");
+    Double_t chi2ByFreePars = sumChi2 / (Double_t)(degreesFreedom);
+    Double_t chi2Err = sqrt((double)2 * freeParameters) / degreesFreedom;
+    TString strChiInt = Form("%*s   %2.1f/%d = %1.2f +/- %1.2f", 22, "chi^2/N", sumChi2, degreesFreedom, chi2ByFreePars, chi2Err);
+    txtFitResult->AddLineFast(strChiInt);
+}
+
+void SWCalculatorView::displaySW(std::pair<Double_t, Double_t> sValueError, std::pair<Double_t, Double_t> wValueError) {
+    txtFitResult->AddLineFast("  ------------------------------------------------");
+    TString strS = Form("%*s    %1.4e +/-  %1.2e", 22, "S Parameter", sValueError.first, sValueError.second);
+    txtFitResult->AddLineFast(strS);
+    TString strW = Form("%*s    %1.4e +/-  %1.2e", 22, "W Parameter", wValueError.first, wValueError.second);
+    txtFitResult->AddLineFast(strW);
+    txtFitResult->AddLineFast("  ------------------------------------------------");
+    // Update output
+    txtFitResult->Update();
+    txtFitResult->ScrollUp(1000);
+}
+
+void SWCalculatorView::updateCanvas() {
+    canvasPlot->Update();
 }
 
 // Calls to Presenter

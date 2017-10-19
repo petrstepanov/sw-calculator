@@ -36,6 +36,8 @@ class Constants {
     static TColor* colorPrimary;
     static TColor* colorWarning;
     static TColor* colorGray;
+    
+    static const Int_t colorSet[7];
 };
 
 #endif /* CONSTANTS_H */

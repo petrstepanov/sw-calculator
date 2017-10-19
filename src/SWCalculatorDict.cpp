@@ -136,7 +136,7 @@ namespace ROOT {
       ::SWCalculatorView *ptr = 0;
       static ::TVirtualIsAProxy* isa_proxy = new ::TIsAProxy(typeid(::SWCalculatorView));
       static ::ROOT::TGenericClassInfo 
-         instance("SWCalculatorView", "widgets/swCalculatorWidget/SWCalculatorView.h", 36,
+         instance("SWCalculatorView", "widgets/swCalculatorWidget/SWCalculatorView.h", 38,
                   typeid(::SWCalculatorView), ::ROOT::Internal::DefineBehavior(ptr, ptr),
                   &SWCalculatorView_Dictionary, isa_proxy, 0,
                   sizeof(::SWCalculatorView) );
