@@ -134,10 +134,10 @@ class SWCalculatorView : public AbstractView<SWCalculatorPresenter> {
     TGTextButton* btnSaveImage;
     TCanvas* canvasPlot;
     TGDoubleHSlider* zoomSlider;
-    TGTextEntry* displayMin;
-    TGTextEntry* displayMax;
-    TGTextBuffer* tbMin;
-    TGTextBuffer* tbMax;
+    TGNumberEntry* displayMin;
+    TGNumberEntry* displayMax;
+//    TGTextBuffer* tbMin;
+//    TGTextBuffer* tbMax;
 
 //    TGNumberEntry* numDisplayMin;
 //    TGNumberEntry* numDisplayMax;
