@@ -345,6 +345,9 @@ void SWCalculatorPresenter::onFitSpectrumClicked(){
         view->displaySW(sValueError, wValueError);
     }
 
+    view->initRooPlots(fitFrame, chiFrame);
     view->setToolbarEnabled(kTRUE);
+    view->setDisplayLimits(fitMin, fitMax);
     RootHelper::stopAndPrintTimer();
 }
+

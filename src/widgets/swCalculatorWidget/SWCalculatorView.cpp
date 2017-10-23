@@ -19,6 +19,8 @@
 #include "../importSpectrumWidget/ImportSourceSpectrumView.h"
 #include "../../util/StringUtils.h"
 #include <TGFrame.h>
+#include <TGTextBuffer.h>
+
 #include <map>
 #include <sstream>
 #include <TRootEmbeddedCanvas.h>
@@ -203,24 +205,50 @@ void SWCalculatorView::initUI(){
     TGVerticalFrame* frameRightVertical = new TGVerticalFrame(this);
     TGHorizontalFrame* frameExportButtons = new TGHorizontalFrame(frameRightVertical);
 
-    numDisplayMin = new TGNumberEntry(frameExportButtons, 0, 6, -1, TGNumberFormat::kNESRealOne,
-            TGNumberFormat::kNEAAnyNumber,
-            TGNumberFormat::kNELLimitMinMax,
-            -9999, 9999);
-    numDisplayMax = new TGNumberEntry(frameExportButtons, 0, 6, -1, TGNumberFormat::kNESRealOne,
-            TGNumberFormat::kNEAAnyNumber,
-            TGNumberFormat::kNELLimitMinMax,
-            -9999, 9999);
-    btnApplyZoom = new TGTextButton(frameExportButtons, "Apply Display Range");
-    btnApplyZoom->Connect("Clicked()", "SWCalculatorView", this, "onApplyZoomClicked()");
-    btnResetZoom = new TGTextButton(frameExportButtons, "Reset");
-    btnResetZoom->Connect("Clicked()", "SWCalculatorView", this, "onResetZoomClicked()");
+//    numDisplayMin = new TGNumberEntry(frameExportButtons, 0, 6, -1, TGNumberFormat::kNESRealOne,
+//            TGNumberFormat::kNEAAnyNumber,
+//            TGNumberFormat::kNELLimitMinMax,
+//            -9999, 9999);
+//    numDisplayMax = new TGNumberEntry(frameExportButtons, 0, 6, -1, TGNumberFormat::kNESRealOne,
+//            TGNumberFormat::kNEAAnyNumber,
+//            TGNumberFormat::kNELLimitMinMax,
+//            -9999, 9999);
+//    btnApplyZoom = new TGTextButton(frameExportButtons, "Apply Display Range");
+//    btnApplyZoom->Connect("Clicked()", "SWCalculatorView", this, "onApplyZoomClicked()");
+//    btnResetZoom = new TGTextButton(frameExportButtons, "Reset");
+//    btnResetZoom->Connect("Clicked()", "SWCalculatorView", this, "onResetZoomClicked()");
 
-    frameExportButtons->AddFrame(numDisplayMin, new TGLayoutHints(kLHintsLeft | kLHintsTop, 0, dx, 0, 0));  // left, right, top, bottom
-    frameExportButtons->AddFrame(new TGLabel(frameExportButtons, "-"), new TGLayoutHints(kLHintsLeft | kLHintsTop, 0, dx, dy, 0));  // left, right, top, bottom
-    frameExportButtons->AddFrame(numDisplayMax, new TGLayoutHints(kLHintsLeft | kLHintsTop, 0, dx, 0, 0));  // left, right, top, bottom
-    frameExportButtons->AddFrame(btnApplyZoom, new TGLayoutHints(kLHintsLeft | kLHintsTop, dx, dx, 0, 0));  // left, right, top, bottom
-    frameExportButtons->AddFrame(btnResetZoom, new TGLayoutHints(kLHintsLeft | kLHintsTop, 0, dx, 0, 0));  // left, right, top, bottom
+//    frameExportButtons->AddFrame(numDisplayMin, new TGLayoutHints(kLHintsLeft | kLHintsTop, 0, dx, 0, 0));  // left, right, top, bottom
+//    frameExportButtons->AddFrame(new TGLabel(frameExportButtons, "-"), new TGLayoutHints(kLHintsLeft | kLHintsTop, 0, dx, dy, 0));  // left, right, top, bottom
+//    frameExportButtons->AddFrame(numDisplayMax, new TGLayoutHints(kLHintsLeft | kLHintsTop, 0, dx, 0, 0));  // left, right, top, bottom
+//    frameExportButtons->AddFrame(btnApplyZoom, new TGLayoutHints(kLHintsLeft | kLHintsTop, dx, dx, 0, 0));  // left, right, top, bottom
+//    frameExportButtons->AddFrame(btnResetZoom, new TGLayoutHints(kLHintsLeft | kLHintsTop, 0, dx, 0, 0));  // left, right, top, bottom
+
+    
+    displayMin = new TGTextEntry(frameExportButtons, tbMin = new TGTextBuffer(5), -1);
+    displayMin->Connect("TextChanged(char*)", "SWCalculatorView", this, "onDisplayMinChange(char*)");
+    frameExportButtons->AddFrame(displayMin, new TGLayoutHints(kLHintsLeft | kLHintsTop, 0, dx, 0, 0));
+
+    zoomSlider = new TGDoubleHSlider(frameExportButtons, 190, kDoubleScaleBoth, -1, kHorizontalFrame, GetDefaultFrameBackground(), kFALSE, kFALSE);
+    zoomSlider->Connect("PositionChanged()", "SWCalculatorView",
+                       this, "onSliderChange()");
+    zoomSlider->SetRange(-60,60);    
+    zoomSlider->SetPosition(-60,60);
+    frameExportButtons->AddFrame(zoomSlider, new TGLayoutHints(kLHintsLeft | kLHintsTop | kLHintsExpandX, dx, dx, 0, 0));
+
+    displayMax = new TGTextEntry(frameExportButtons, tbMax = new TGTextBuffer(5), -1);
+    displayMax->Connect("TextChanged(char*)", "SWCalculatorView", this, "onDisplayMaxChange(char*)");
+    frameExportButtons->AddFrame(displayMax, new TGLayoutHints(kLHintsLeft | kLHintsTop, 0, dx, 0, 0));
+//    tbMin->AddText(0, "0.0");
+//    tbMax->AddText(0, "0.0");
+//    
+//    char buf[32];
+//    sprintf(buf, "%.1f", zoomSlider->GetMinPosition());
+//    tbMin->Clear();
+//    tbMin->AddText(0, buf);
+//    sprintf(buf, "%.1f", zoomSlider->GetMaxPosition());
+//    tbMax->Clear();
+//    tbMax->AddText(0, buf);
 
     // Save data file button
     btnSaveData = new TGTextButton(frameExportButtons, "Export Fit Data");
@@ -272,10 +300,12 @@ Int_t SWCalculatorView::getFitMaxValue(){
 void SWCalculatorView::setFitMinMaxRange(Int_t min, Int_t max){
     numFitMin->SetLimitValues(min,max);
     numFitMax->SetLimitValues(min,max);
+    zoomSlider->SetRange(min,max);
 }
 
 void SWCalculatorView::setFitMinMaxValues(Bool_t isTwoDetector){
     if (isTwoDetector){
+        // Set fit values
         Int_t leftLimitMin = TMath::Abs(numFitMin->GetNumMin());
         Int_t rightLimitMax = TMath::Abs(numFitMax->GetNumMax());
         
@@ -285,10 +315,92 @@ void SWCalculatorView::setFitMinMaxValues(Bool_t isTwoDetector){
     }
     else {
         numFitMin->SetNumber(496);
-        numFitMax->SetNumber(526);
+        numFitMax->SetNumber(526);       
     }
 }
 
+void SWCalculatorView::setDisplayLimits(Float_t min, Float_t max) {
+    // Update slider position
+    zoomSlider->SetPosition(min, max);
+
+    // Update text boxes' values
+//    Bool_t isEnabled = displayMin->IsEnabled();
+//    displayMin->SetEnabled(kTRUE);
+//    displayMax->SetEnabled(kTRUE);
+    char buf[32];
+    sprintf(buf, "%.1f", zoomSlider->GetMinPosition());
+    tbMin->Clear();
+    tbMin->AddText(0, buf);
+    sprintf(buf, "%.1f", zoomSlider->GetMaxPosition());
+    tbMax->Clear();
+    tbMax->AddText(0, buf);
+//    displayMin->SetEnabled(isEnabled);
+//    displayMax->SetEnabled(isEnabled);
+}
+
+void SWCalculatorView::updateCanvasLimits(Double_t min, Double_t max) {
+    std::cout << "(" << min << ", " << max << ")" << std::endl;
+    fitFrame->GetXaxis()->SetRangeUser(min, max);
+    chiFrame->GetXaxis()->SetRangeUser(min, max);
+    padData->Modified();
+    padData->Update();
+    padChi2->Modified();
+    padChi2->Update();
+
+//    canvasPlot->Modified();
+//    canvasPlot->Update(); 
+    
+//    padData->cd();
+//    fitFrame->Draw();
+//    padData->SetLogy();
+//    padChi2->cd();
+//    chiFrame->Draw();
+//    padData->Update();
+//    padChi2->Update();
+//    canvasPlot->Update();    
+}
+
+void SWCalculatorView::onDisplayMinChange(char* c) {
+    Double_t min = atof(tbMin->GetString());
+    Double_t max = zoomSlider->GetMaxPosition();
+    std::cout << "(" << min << ", " << max << ")" << std::endl;
+    zoomSlider->SetPosition(min, max);    
+    updateCanvasLimits(min, max);
+}
+
+void SWCalculatorView::onDisplayMaxChange(char* c) {
+    Double_t min = zoomSlider->GetMinPosition();
+    Double_t max = atof(tbMax->GetString());
+    std::cout << "(" << min << ", " << max << ")" << std::endl;
+    zoomSlider->SetPosition(min, max);
+    updateCanvasLimits(min, max);
+}
+
+void SWCalculatorView::onSliderChange() {
+   char buf[32];
+   
+   sprintf(buf, "%.1f", zoomSlider->GetMinPosition());
+   tbMin->Clear();
+   tbMin->AddText(0, buf);
+   displayMin->SetCursorPosition(displayMin->GetCursorPosition());
+   displayMin->Deselect();
+   gClient->NeedRedraw(displayMin);
+
+   sprintf(buf, "%.1f", zoomSlider->GetMaxPosition());
+   tbMax->Clear();
+   tbMax->AddText(0, buf);
+   displayMax->SetCursorPosition(displayMax->GetCursorPosition());
+   displayMax->Deselect();
+   gClient->NeedRedraw(displayMax);
+
+//   updateCanvasLimits(zoomSlider->GetMinPosition()-0.05, zoomSlider->GetMaxPosition());
+   updateCanvasLimits(zoomSlider->GetMinPosition(), zoomSlider->GetMaxPosition());
+}
+
+void SWCalculatorView::initRooPlots(RooPlot* fitFrame, RooPlot* chiFrame) {
+    this->fitFrame = fitFrame;
+    this->chiFrame = chiFrame;
+}
 
 Double_t SWCalculatorView::getSWidth(){
     return numSWidth->GetNumber();
@@ -339,12 +451,14 @@ TPad* SWCalculatorView::getPadChi2() {
 }
 
 void SWCalculatorView::setToolbarEnabled(Bool_t isEnabled){
-    btnApplyZoom->SetEnabled(isEnabled);
-    btnResetZoom->SetEnabled(isEnabled);
+//    btnApplyZoom->SetEnabled(isEnabled);
+//    btnResetZoom->SetEnabled(isEnabled);
     btnSaveImage->SetEnabled(isEnabled);
     btnSaveData->SetEnabled(isEnabled);
-    numDisplayMin->SetState(isEnabled);
-    numDisplayMax->SetState(isEnabled);
+//    numDisplayMin->SetState(isEnabled);
+//    numDisplayMax->SetState(isEnabled);
+    displayMin->SetEnabled(isEnabled);
+    displayMax->SetEnabled(isEnabled);
 }
 
 void SWCalculatorView::updateRegionLabels(Bool_t isTwoDetector){
@@ -471,10 +585,10 @@ SWCalculatorView::~SWCalculatorView() {
     if(btnSaveData){btnSaveData->Delete(); delete btnSaveData;}
     if(btnSaveImage){btnSaveImage->Delete(); delete btnSaveImage;}
     if(canvasPlot){canvasPlot->Delete(); delete canvasPlot;}
-    if(numDisplayMin){numDisplayMin->Delete(); delete numDisplayMin;}
-    if(numDisplayMax){numDisplayMax->Delete(); delete numDisplayMax;}
-    if(btnApplyZoom){btnApplyZoom->Delete(); delete btnApplyZoom;}
-    if(btnResetZoom){btnResetZoom->Delete(); delete btnResetZoom;}
+//    if(numDisplayMin){numDisplayMin->Delete(); delete numDisplayMin;}
+//    if(numDisplayMax){numDisplayMax->Delete(); delete numDisplayMax;}
+//    if(btnApplyZoom){btnApplyZoom->Delete(); delete btnApplyZoom;}
+//    if(btnResetZoom){btnResetZoom->Delete(); delete btnResetZoom;}
     if(fitFrame){fitFrame->Delete(); delete fitFrame;}
     if(chiFrame){chiFrame->Delete(); delete chiFrame;}
     if(padData){padData->Delete(); delete padData;}

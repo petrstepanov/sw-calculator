@@ -29,6 +29,9 @@
 #include <RooCurve.h>
 #include <RooFitResult.h>
 #include <RooPlot.h>
+#include <TGDoubleSlider.h>
+#include <TGTextEntry.h>
+#include <TGTextBuffer.h>
 #include "../../util/Variable.h"
 #include "../AbstractView.h"
 #include "SWCalculatorPresenter.h"
@@ -71,7 +74,7 @@ class SWCalculatorView : public AbstractView<SWCalculatorPresenter> {
     void displayChi2(Double_t sumChi2, Int_t freeParameters, Int_t degreesFreedom);
     void displaySW(std::pair<Double_t, Double_t> sValueError, std::pair<Double_t, Double_t> wValueError);
     void updateCanvas();
-    
+    void setDisplayLimits(Float_t min, Float_t max);
     // Calls to Presenter
     void onNumFitMinChanged();
     void onNumFitMaxChanged();
@@ -80,7 +83,14 @@ class SWCalculatorView : public AbstractView<SWCalculatorPresenter> {
     void onResetZoomClicked();
     void onSaveDataClicked();
     void onSaveImageClicked();   
-//    void CloseWindow();
+    //    void CloseWindow();
+    void initRooPlots(RooPlot* fitFrame, RooPlot* chiFrame);
+    
+    // Update display range functions
+    void onDisplayMinChange(char* c);
+    void onDisplayMaxChange(char* c);
+    void onSliderChange();      
+    void updateCanvasLimits(Double_t min, Double_t max);
     
   protected:
     void initUI();
@@ -123,11 +133,17 @@ class SWCalculatorView : public AbstractView<SWCalculatorPresenter> {
     TGTextButton* btnSaveData;
     TGTextButton* btnSaveImage;
     TCanvas* canvasPlot;
-    TGNumberEntry* numDisplayMin;
-    TGNumberEntry* numDisplayMax;
+    TGDoubleHSlider* zoomSlider;
+    TGTextEntry* displayMin;
+    TGTextEntry* displayMax;
+    TGTextBuffer* tbMin;
+    TGTextBuffer* tbMax;
+
+//    TGNumberEntry* numDisplayMin;
+//    TGNumberEntry* numDisplayMax;
 //    TGCheckButton* hasOrtho;
-    TGTextButton*  btnApplyZoom;
-    TGTextButton*  btnResetZoom;              
+//    TGTextButton*  btnApplyZoom;
+//    TGTextButton*  btnResetZoom;              
     RooPlot* fitFrame;
     RooPlot* chiFrame;
     TPad* padData;
