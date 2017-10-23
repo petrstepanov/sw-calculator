@@ -123,6 +123,12 @@ void SWCalculatorPresenter::onFitSpectrumClicked(){
         Bool_t isResFixed = view->isResolutionFixed();
 
         modelProvider = new CompositeModelProvider(e, e0);
+                
+        TH1F* kaptonHist = model->getSourceHist();
+        if (kaptonHist){
+            modelProvider->initSourcePdf(kaptonHist, 0.12, kTRUE);
+        }
+        
         if (model->isTwoDetector()){
             modelProvider->initTwoDetector(hasParabola, numGauss, numExp, numDampExp, convType, resFWHM, isResFixed);
         } else {
@@ -154,7 +160,6 @@ void SWCalculatorPresenter::onFitSpectrumClicked(){
     RooMinimizer* m = new RooMinimizer(*chi2);
     // m->setStrategy(RooMinimizer::Speed);
     m->setMinimizerType("Minuit");
-
     Int_t resultMigrad = m->migrad();
     Int_t resultHesse = m->hesse();
     std::cout << "RooMinimizer: migrad=" << resultMigrad << ", hesse=" << resultHesse << std::endl;

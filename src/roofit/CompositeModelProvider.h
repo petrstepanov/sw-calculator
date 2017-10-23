@@ -16,6 +16,7 @@
 
 #include "AbstractModelProvider.h"
 #include <RooRealVar.h>
+#include <RooHistPdf.h>
 #include "../util/Variable.h"
 
 class CompositeModelProvider : public AbstractModelProvider {
@@ -34,10 +35,14 @@ public:
     void initTwoDetector(Bool_t hasParabola = kTRUE, const Int_t numGauss = 1, const Int_t numLorentz = 1, const Int_t numLorentzSum = 1, /*Bool_t hasOrthogonal = kFALSE,*/ Int_t convType = 0, Double_t convFWHM = 1.7, Bool_t isConvFixed = kFALSE);
     void initSingleDetector(Bool_t hasParabola = kTRUE, const Int_t numGauss = 1, const Int_t numLorentz = 1, const Int_t numLorentzSum = 1, /*Bool_t hasOrthogonal = kFALSE,*/ Int_t convType = 0, Double_t convFWHM = 1.7, Bool_t isConvFixed = kFALSE, Double_t bgFraction = 0.1);
     
+    void initSourcePdf(TH1F* sourceHist, Double_t sourceContribution, Bool_t isFixed = kTRUE);
+    
 private:
     RooArgList* pdfList;
     RooArgList* coeffList;
     RooRealVar* observable;
+    RooHistPdf* sourcePdf = nullptr;
+    RooRealVar* sourceContribution = nullptr;
     Bool_t isTwoDetector;
     
     static std::map<Int_t, TString> createConvolutionType(){

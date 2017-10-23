@@ -29,17 +29,38 @@
 #include <RooNumConvPdf.h>
 #include <RooGenericPdf.h>
 #include <RooCachedPdf.h>
+#include <RooDataHist.h>
+#include <RooFit.h>
 #include <TIterator.h>
 #include <TMath.h>
+#include <TH1F.h>
 
 CompositeModelProvider::CompositeModelProvider(RooRealVar* x, RooRealVar* x0) : AbstractModelProvider(x0){
     observable = x;
 }
 
+void CompositeModelProvider::initSourcePdf(TH1F* sourceHist, Double_t sourceContribution, Bool_t isFixed) {
+    RooDataHist* sourceDataHist = new RooDataHist("sourceDataHist", "Source Data Hist", RooArgList(*observable), RooFit::Import(*sourceHist));
+    this->sourcePdf = new RooHistPdf("sourcePdf", "Source contribution PDF", *observable, *sourceDataHist, 0);
+    if (isFixed){
+        this->sourceContribution = new RooRealVar("sourceContribution", "Source contribution", sourceContribution, sourceContribution, sourceContribution);
+    } else {
+        this->sourceContribution = new RooRealVar("sourceContribution", "Source contribution", sourceContribution, sourceContribution/2, sourceContribution*2);
+    }
+}
+
+
 void CompositeModelProvider::initModel(Bool_t hasParabola, const Int_t numGauss, const Int_t numLorentz, const Int_t numLorentzSum){
     pdfList = new RooArgList();
     coeffList = new RooArgList();
 
+    // Check source contribution
+    if (sourcePdf) {
+        pdfList->add(*sourcePdf);
+        coeffList->add(*sourceContribution);
+        components->add(*sourcePdf);
+    }
+    
     // Define parabola
     if (hasParabola){
             RootHelper::deleteObject("parabolaRoot");
