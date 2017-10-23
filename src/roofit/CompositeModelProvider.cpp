@@ -39,14 +39,10 @@ CompositeModelProvider::CompositeModelProvider(RooRealVar* x, RooRealVar* x0) : 
     observable = x;
 }
 
-void CompositeModelProvider::initSourcePdf(TH1F* sourceHist, Double_t sourceContribution, Bool_t isFixed) {
+void CompositeModelProvider::initSourcePdf(TH1F* sourceHist, RooAbsReal* sourceContrib) {
     RooDataHist* sourceDataHist = new RooDataHist("sourceDataHist", "Source Data Hist", RooArgList(*observable), RooFit::Import(*sourceHist));
-    this->sourcePdf = new RooHistPdf("sourcePdf", "Source contribution PDF", *observable, *sourceDataHist, 0);
-    if (isFixed){
-        this->sourceContribution = new RooRealVar("sourceContribution", "Source contribution", sourceContribution, sourceContribution, sourceContribution);
-    } else {
-        this->sourceContribution = new RooRealVar("sourceContribution", "Source contribution", sourceContribution, sourceContribution/2, sourceContribution*2);
-    }
+    this->sourcePdf = new RooHistPdf("sourcePdf", "Source contribution", *observable, *sourceDataHist, 0);
+    this->sourceContribution = sourceContrib;
 }
 
 
@@ -56,9 +52,11 @@ void CompositeModelProvider::initModel(Bool_t hasParabola, const Int_t numGauss,
 
     // Check source contribution
     if (sourcePdf) {
-        pdfList->add(*sourcePdf);
-        coeffList->add(*sourceContribution);
-        components->add(*sourcePdf);
+        if (sourceContribution->getVal()!=0){
+            pdfList->add(*sourcePdf);
+            coeffList->add(*sourceContribution);
+            components->add(*sourcePdf);
+        }
     }
     
     // Define parabola

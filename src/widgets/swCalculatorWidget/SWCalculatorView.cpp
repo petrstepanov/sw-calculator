@@ -57,7 +57,7 @@ void SWCalculatorView::initUI(){
     tabImportKapton->AddFrame(new ImportSourceSpectrumView(tabImportKapton), new TGLayoutHints(kLHintsExpandX | kLHintsExpandY, dx, dx, dy*2, dy*2));
     
     // Fit Data tab
-    TGCompositeFrame *tabFit = tabsWidget->AddTab("Fit Data");
+    tabFit = tabsWidget->AddTab("Fit Data");
     tabFit->SetLayoutManager(new TGVerticalLayout(tabFit));
 
     // Fit Range Row
@@ -75,7 +75,7 @@ void SWCalculatorView::initUI(){
     numFitMax->GetNumberEntry()->Connect("TextChanged(char*)", "SWCalculatorView", this, "onNumFitMaxChanged()");
     frameFitRange->AddFrame(new TGLabel(frameFitRange, "Fit Range, keV"), new TGLayoutHints(kLHintsNormal, 0, 0, dy, 0));
     frameFitRange->AddFrame(numFitMax, new TGLayoutHints(kLHintsRight));
-    frameFitRange->AddFrame(new TGLabel(frameFitRange, "-"), new TGLayoutHints(kLHintsRight, dx, dx, dy, 0));
+    frameFitRange->AddFrame(new TGLabel(frameFitRange, "-"), new TGLayoutHints(kLHintsRight, dx, dx, 3*dy/5, 0));
     frameFitRange->AddFrame(numFitMin, new TGLayoutHints(kLHintsRight));
 
     tabFit->AddFrame(frameFitRange, new TGLayoutHints(kLHintsExpandX, dx, dx, dy*2, dy));
@@ -151,6 +151,13 @@ void SWCalculatorView::initUI(){
     // Separator
     tabFit->AddFrame(new TGHorizontal3DLine(tabFit), new TGLayoutHints(kLHintsExpandX, dx, dx, dy, dy));
 
+    // Add source contribution frame
+    sourceContributionFrame = new TGVerticalFrame(tabFit);
+    sourceContributionView = new RooRealVarView(sourceContributionFrame);
+    sourceContributionFrame->AddFrame(sourceContributionView, new TGLayoutHints(kLHintsExpandX, dx, dx, dy, dy));
+    sourceContributionFrame->AddFrame(new TGHorizontal3DLine(sourceContributionFrame), new TGLayoutHints(kLHintsExpandX, dx, dx, dy, dy));
+    tabFit->AddFrame(sourceContributionFrame, new TGLayoutHints(kLHintsLeft | kLHintsTop | kLHintsExpandX));
+    
     // Model parameters
     TGHorizontalFrame* modelParamsFrame = new TGHorizontalFrame(tabFit);
     //	modelParamsFrame->AddFrame(new TGLabel(modelParamsFrame, "Model details:"), new TGLayoutHints(kLHintsNormal, 0, 30, 5, 0));
@@ -278,6 +285,11 @@ void SWCalculatorView::initUI(){
 
     AddFrame(frameRightVertical, new TGLayoutHints(kLHintsLeft | kLHintsTop | kLHintsExpandX | kLHintsExpandY, 0, 0, 0, dx));
 
+//    MapSubwindows();  
+    // You should call, for example HideFrame(TGFrame *f), only after the frames have been laid out and the sub windows 
+    // of the composite frame have been mapped via method MapSubwindows()
+//    setSourceContributionFrameVisible(kFALSE);
+    
     // Plot Canvas Settings
     padData = new TPad("padData", "Pad for data", 0.0, 0.3, 1.0, 1.0, kWhite); // x_low, y_low, x_hi, y_hi
     padData->SetMargin(Constants::padMargin[0], Constants::padMargin[1], Constants::padMargin[2], Constants::padMargin[3]);
@@ -289,6 +301,11 @@ void SWCalculatorView::initUI(){
 }
 
 // Calls from Presenter
+
+RooRealVarView* SWCalculatorView::getSourceContributionView() {
+    return sourceContributionView;
+}
+
 
 void SWCalculatorView::setTabEnabled(Int_t tabNumber, Bool_t isEnabled){
     tabsWidget->SetEnabled(tabNumber, isEnabled);
@@ -439,6 +456,12 @@ void SWCalculatorView::setToolbarEnabled(Bool_t isEnabled){
     displayMax->SetState(isEnabled);
 }
 
+void SWCalculatorView::setSourceContributionFrameVisible(Bool_t isVisible) {
+    if (isVisible) tabFit->ShowFrame(sourceContributionFrame);
+    else tabFit->HideFrame(sourceContributionFrame);
+}
+
+
 void SWCalculatorView::updateRegionLabels(Bool_t isTwoDetector){
     lblRescale1->SetText(isTwoDetector ? "2 x " : " ");
     lblRescale2->SetText(isTwoDetector ? "2 x " : " ");
@@ -542,27 +565,27 @@ void SWCalculatorView::onSaveImageClicked(){
 
 SWCalculatorView::~SWCalculatorView() {
     Cleanup();
-    if(numPeakPosition){numPeakPosition->Delete(); delete numPeakPosition;}
-    if(numFitMin){numFitMin->Delete(); delete numFitMin;}
-    if(numFitMax){numFitMax->Delete(); delete numFitMax;}
-    if(lblRescale1){lblRescale1->Delete(); delete lblRescale1;}
-    if(lblRescale2){lblRescale2->Delete(); delete lblRescale2;}
-    if(lblRescale3){lblRescale3->Delete(); delete lblRescale3;}
-    if(numSWidth){numSWidth->Delete(); delete numSWidth;}
-    if(numWWidth){numWWidth->Delete(); delete numWWidth;}
-    if(numWShift){numWShift->Delete(); delete numWShift;}
-    if(comboConvolutionType){comboConvolutionType->Delete(); delete comboConvolutionType;}
-    if(numResolutionFWHM){numResolutionFWHM->Delete(); delete numResolutionFWHM;}
-    if(checkboxResFixed){checkboxResFixed->Delete(); delete checkboxResFixed;}
-    if(checkboxHasParabola){checkboxHasParabola->Delete(); delete checkboxHasParabola;}
-    if(numGauss){numGauss->Delete(); delete numGauss;}
-    if(numExponent){numExponent->Delete(); delete numExponent;}
-    if(numDampExponent){numDampExponent->Delete(); delete numDampExponent;}
-    if(btnFitSpectrum){btnFitSpectrum->Delete(); delete btnFitSpectrum;}
-    if(txtFitResult){txtFitResult->Delete(); delete txtFitResult;}
-    if(btnSaveData){btnSaveData->Delete(); delete btnSaveData;}
-    if(btnSaveImage){btnSaveImage->Delete(); delete btnSaveImage;}
-    if(canvasPlot){canvasPlot->Delete(); delete canvasPlot;}
+    delete numPeakPosition;
+    delete numFitMin;
+    delete numFitMax;
+    delete lblRescale1;
+    delete lblRescale2;
+    delete lblRescale3;
+    delete numSWidth;
+    delete numWWidth;
+    delete numWShift;
+    delete comboConvolutionType;
+    delete numResolutionFWHM;
+    delete checkboxResFixed;
+    delete checkboxHasParabola;
+    delete numGauss;
+    delete numExponent;
+    delete numDampExponent;
+    delete btnFitSpectrum;
+    delete txtFitResult;
+    delete btnSaveData;
+    delete btnSaveImage;
+    delete canvasPlot;
 //    if(numDisplayMin){numDisplayMin->Delete(); delete numDisplayMin;}
 //    if(numDisplayMax){numDisplayMax->Delete(); delete numDisplayMax;}
 //    if(btnApplyZoom){btnApplyZoom->Delete(); delete btnApplyZoom;}

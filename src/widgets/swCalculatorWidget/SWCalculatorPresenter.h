@@ -31,6 +31,8 @@ public:
     // View functions
     
     void onFitSpectrumClicked();
+    
+    void onInitModel();
 };
 
 #endif /* SWCALCULATORPRESENTER_H */

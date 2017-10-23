@@ -77,10 +77,13 @@ Contributor(s):
       <itemPath>src/roofit/ParabolaGaussModelProvider.h</itemPath>
       <itemPath>src/roofit/ParabolaLorentzianModelProvider.h</itemPath>
       <itemPath>src/roofit/ParabolaPdf.h</itemPath>
+      <itemPath>src/widgets/rooRealVarWidget/RooRealVarPresenter.h</itemPath>
+      <itemPath>src/widgets/rooRealVarWidget/RooRealVarView.h</itemPath>
       <itemPath>src/util/RootHelper.h</itemPath>
       <itemPath>SWCalculatorFrameLinkDef.h</itemPath>
       <itemPath>src/widgets/swCalculatorWidget/SWCalculatorPresenter.h</itemPath>
       <itemPath>src/widgets/swCalculatorWidget/SWCalculatorView.h</itemPath>
+      <itemPath>src/event/events/SourceHistogramImportedEvent.h</itemPath>
       <itemPath>src/util/StringUtils.h</itemPath>
       <itemPath>src/util/UiHelper.h</itemPath>
       <itemPath>src/util/Variable.h</itemPath>
@@ -119,9 +122,12 @@ Contributor(s):
       <itemPath>src/roofit/ParabolaGaussModelProvider.cpp</itemPath>
       <itemPath>src/roofit/ParabolaLorentzianModelProvider.cpp</itemPath>
       <itemPath>src/roofit/ParabolaPdf.cpp</itemPath>
+      <itemPath>src/widgets/rooRealVarWidget/RooRealVarPresenter.cpp</itemPath>
+      <itemPath>src/widgets/rooRealVarWidget/RooRealVarView.cpp</itemPath>
       <itemPath>src/util/RootHelper.cpp</itemPath>
       <itemPath>src/widgets/swCalculatorWidget/SWCalculatorPresenter.cpp</itemPath>
       <itemPath>src/widgets/swCalculatorWidget/SWCalculatorView.cpp</itemPath>
+      <itemPath>src/event/events/SourceHistogramImportedEvent.cpp</itemPath>
       <itemPath>src/util/StringUtils.cpp</itemPath>
       <itemPath>src/util/UiHelper.cpp</itemPath>
       <itemPath>src/util/Variable.cpp</itemPath>
@@ -323,6 +329,18 @@ Contributor(s):
                             perm="755"
                             owner="root"
                             group="bin"/>
+          <packFileListElem type="File"
+                            to="${PACKAGE_TOP_DIR}bin/sw-calculator.so"
+                            from="${CND_DISTDIR}/${CND_CONF}/${CND_PLATFORM}/sw-calculator.so"
+                            perm="755"
+                            owner="root"
+                            group="bin"/>
+          <packFileListElem type="File"
+                            to="${PACKAGE_TOP_DIR}bin/${OUTPUT_BASENAME}"
+                            from="${OUTPUT_PATH}"
+                            perm="755"
+                            owner="root"
+                            group="bin"/>
         </packFileList>
       </packaging>
       <item path="SWCalculatorFrameLinkDef.h" ex="false" tool="1" flavor2="0">
@@ -355,6 +373,16 @@ Contributor(s):
             flavor2="0">
       </item>
       <item path="src/event/events/IsTwoDetectorEvent.h"
+            ex="false"
+            tool="3"
+            flavor2="0">
+      </item>
+      <item path="src/event/events/SourceHistogramImportedEvent.cpp"
+            ex="false"
+            tool="1"
+            flavor2="0">
+      </item>
+      <item path="src/event/events/SourceHistogramImportedEvent.h"
             ex="false"
             tool="3"
             flavor2="0">
@@ -542,6 +570,26 @@ Contributor(s):
             tool="3"
             flavor2="0">
       </item>
+      <item path="src/widgets/rooRealVarWidget/RooRealVarPresenter.cpp"
+            ex="false"
+            tool="1"
+            flavor2="0">
+      </item>
+      <item path="src/widgets/rooRealVarWidget/RooRealVarPresenter.h"
+            ex="false"
+            tool="3"
+            flavor2="0">
+      </item>
+      <item path="src/widgets/rooRealVarWidget/RooRealVarView.cpp"
+            ex="false"
+            tool="1"
+            flavor2="0">
+      </item>
+      <item path="src/widgets/rooRealVarWidget/RooRealVarView.h"
+            ex="false"
+            tool="3"
+            flavor2="0">
+      </item>
       <item path="src/widgets/swCalculatorWidget/SWCalculatorPresenter.cpp"
             ex="false"
             tool="1"
@@ -618,6 +666,16 @@ Contributor(s):
             flavor2="0">
       </item>
       <item path="src/event/events/IsTwoDetectorEvent.h"
+            ex="false"
+            tool="3"
+            flavor2="0">
+      </item>
+      <item path="src/event/events/SourceHistogramImportedEvent.cpp"
+            ex="false"
+            tool="1"
+            flavor2="0">
+      </item>
+      <item path="src/event/events/SourceHistogramImportedEvent.h"
             ex="false"
             tool="3"
             flavor2="0">
@@ -796,6 +854,26 @@ Contributor(s):
             flavor2="0">
       </item>
       <item path="src/widgets/importSpectrumWidget/ImportSpectrumView.h"
+            ex="false"
+            tool="3"
+            flavor2="0">
+      </item>
+      <item path="src/widgets/rooRealVarWidget/RooRealVarPresenter.cpp"
+            ex="false"
+            tool="1"
+            flavor2="0">
+      </item>
+      <item path="src/widgets/rooRealVarWidget/RooRealVarPresenter.h"
+            ex="false"
+            tool="3"
+            flavor2="0">
+      </item>
+      <item path="src/widgets/rooRealVarWidget/RooRealVarView.cpp"
+            ex="false"
+            tool="1"
+            flavor2="0">
+      </item>
+      <item path="src/widgets/rooRealVarWidget/RooRealVarView.h"
             ex="false"
             tool="3"
             flavor2="0">

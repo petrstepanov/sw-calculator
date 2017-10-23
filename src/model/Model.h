@@ -21,8 +21,10 @@
 #include <iostream>
 #include "../event/events/HistogramImportedEvent.h"
 #include "../event/events/IsTwoDetectorEvent.h"
+#include "../event/events/SourceHistogramImportedEvent.h"
 #include "../event/Object.h"
 #include "../event/EventBus.h"
+#include <RooRealVar.h>
 
 class Model : public Object {
 public:
@@ -58,6 +60,7 @@ public:
 
     void setSourceHist(TH1F* hist){ 
         sourceHist = hist; 
+        EventBus::FireEvent(*(new SourceHistogramImportedEvent(*this))); // Fire the event           
     }
     
     TH1F* getSourceHist(){ 
@@ -78,6 +81,10 @@ public:
         EventBus::FireEvent(*(new HistogramImportedEvent(*this, eMin, eMax))); // Fire the event        
     }
     
+    RooRealVar* getSourceContribution(){
+        return sourceContribution;
+    }
+    
 private:
     Model();                              // Private so that it can  not be called
     static Model* instance;
@@ -91,6 +98,7 @@ private:
     RooCurve* curveFit = nullptr;
     TH1F* peakHistNoBg = nullptr;
     TH1F* chiHist = nullptr;
+    RooRealVar* sourceContribution = nullptr;
     Bool_t twoDetector;
     std::pair<Double_t, Double_t> safeFitRange;
 };

@@ -38,6 +38,7 @@ OBJECTFILES= \
 	${OBJECTDIR}/src/event/EventBus.o \
 	${OBJECTDIR}/src/event/events/HistogramImportedEvent.o \
 	${OBJECTDIR}/src/event/events/IsTwoDetectorEvent.o \
+	${OBJECTDIR}/src/event/events/SourceHistogramImportedEvent.o \
 	${OBJECTDIR}/src/main.o \
 	${OBJECTDIR}/src/model/Constants.o \
 	${OBJECTDIR}/src/model/Model.o \
@@ -67,6 +68,8 @@ OBJECTFILES= \
 	${OBJECTDIR}/src/widgets/importSpectrumWidget/ImportSourceSpectrumView.o \
 	${OBJECTDIR}/src/widgets/importSpectrumWidget/ImportSpectrumPresenter.o \
 	${OBJECTDIR}/src/widgets/importSpectrumWidget/ImportSpectrumView.o \
+	${OBJECTDIR}/src/widgets/rooRealVarWidget/RooRealVarPresenter.o \
+	${OBJECTDIR}/src/widgets/rooRealVarWidget/RooRealVarView.o \
 	${OBJECTDIR}/src/widgets/swCalculatorWidget/SWCalculatorPresenter.o \
 	${OBJECTDIR}/src/widgets/swCalculatorWidget/SWCalculatorView.o
 
@@ -118,6 +121,11 @@ ${OBJECTDIR}/src/event/events/IsTwoDetectorEvent.o: src/event/events/IsTwoDetect
 	${MKDIR} -p ${OBJECTDIR}/src/event/events
 	${RM} "$@.d"
 	$(COMPILE.cc) -g -I/Applications/root_v6.06.02/include -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/src/event/events/IsTwoDetectorEvent.o src/event/events/IsTwoDetectorEvent.cpp
+
+${OBJECTDIR}/src/event/events/SourceHistogramImportedEvent.o: src/event/events/SourceHistogramImportedEvent.cpp
+	${MKDIR} -p ${OBJECTDIR}/src/event/events
+	${RM} "$@.d"
+	$(COMPILE.cc) -g -I/Applications/root_v6.06.02/include -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/src/event/events/SourceHistogramImportedEvent.o src/event/events/SourceHistogramImportedEvent.cpp
 
 ${OBJECTDIR}/src/main.o: src/main.cc
 	${MKDIR} -p ${OBJECTDIR}/src
@@ -263,6 +271,16 @@ ${OBJECTDIR}/src/widgets/importSpectrumWidget/ImportSpectrumView.o: src/widgets/
 	${MKDIR} -p ${OBJECTDIR}/src/widgets/importSpectrumWidget
 	${RM} "$@.d"
 	$(COMPILE.cc) -g -I/Applications/root_v6.06.02/include -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/src/widgets/importSpectrumWidget/ImportSpectrumView.o src/widgets/importSpectrumWidget/ImportSpectrumView.cpp
+
+${OBJECTDIR}/src/widgets/rooRealVarWidget/RooRealVarPresenter.o: src/widgets/rooRealVarWidget/RooRealVarPresenter.cpp
+	${MKDIR} -p ${OBJECTDIR}/src/widgets/rooRealVarWidget
+	${RM} "$@.d"
+	$(COMPILE.cc) -g -I/Applications/root_v6.06.02/include -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/src/widgets/rooRealVarWidget/RooRealVarPresenter.o src/widgets/rooRealVarWidget/RooRealVarPresenter.cpp
+
+${OBJECTDIR}/src/widgets/rooRealVarWidget/RooRealVarView.o: src/widgets/rooRealVarWidget/RooRealVarView.cpp
+	${MKDIR} -p ${OBJECTDIR}/src/widgets/rooRealVarWidget
+	${RM} "$@.d"
+	$(COMPILE.cc) -g -I/Applications/root_v6.06.02/include -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/src/widgets/rooRealVarWidget/RooRealVarView.o src/widgets/rooRealVarWidget/RooRealVarView.cpp
 
 ${OBJECTDIR}/src/widgets/swCalculatorWidget/SWCalculatorPresenter.o: src/widgets/swCalculatorWidget/SWCalculatorPresenter.cpp
 	${MKDIR} -p ${OBJECTDIR}/src/widgets/swCalculatorWidget

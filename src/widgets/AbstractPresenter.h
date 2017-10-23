@@ -14,6 +14,8 @@
 #ifndef ABSTRACTPRESENTER_H
 #define ABSTRACTPRESENTER_H
 
+#include <iostream>
+
 template <class M, class V>
 
 class AbstractPresenter {
@@ -35,10 +37,17 @@ class AbstractPresenter {
     M* getModel(){
         if (!model){
             model = instantinateModel();
+            onInitModel();            
         }          
         return model;
     }
 
+    void setModel(M* m){
+        std::cout << "AbstractPresenter::setModel" << std::endl;        
+        model = m;
+        onInitModel();
+    }
+    
   private:
     M* model;
     V* view;
@@ -46,6 +55,7 @@ class AbstractPresenter {
   protected:
     virtual M* instantinateModel()=0;
     virtual void addEventListeners(){}
+    virtual void onInitModel(){}    
 };
 
 #endif /* ABSTRACTPRESENTER_H */

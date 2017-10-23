@@ -35,6 +35,7 @@
 #include "../../util/Variable.h"
 #include "../AbstractView.h"
 #include "SWCalculatorPresenter.h"
+#include "../rooRealVarWidget/RooRealVarView.h"
 
 class SWCalculatorPresenter;
 
@@ -48,6 +49,7 @@ class SWCalculatorView : public AbstractView<SWCalculatorPresenter> {
     SWCalculatorPresenter* instantinatePresenter();
 
     // Calls from Presenter
+    RooRealVarView* getSourceContributionView();
     void setTabEnabled(Int_t, Bool_t);
     Int_t getFitMinValue();
     void setFitMinMaxRange(Int_t min, Int_t max);
@@ -91,6 +93,7 @@ class SWCalculatorView : public AbstractView<SWCalculatorPresenter> {
     void onDisplayMaxChange(char* c);
     void onSliderChange();      
     void updateCanvasLimits(Double_t min, Double_t max);
+    void setSourceContributionFrameVisible(Bool_t isVisible);
     
   protected:
     void initUI();
@@ -103,7 +106,8 @@ class SWCalculatorView : public AbstractView<SWCalculatorPresenter> {
     TGTextButton* btn;
     TGTab* tabsWidget;
     TGNumberEntry* numPeakPosition;
-
+    TGCompositeFrame *tabFit;
+    
     // Fit and W,S ranges
     TGNumberEntry* numFitMin;
     TGNumberEntry* numFitMax;
@@ -119,6 +123,10 @@ class SWCalculatorView : public AbstractView<SWCalculatorPresenter> {
     TGNumberEntry* numResolutionFWHM;
     TGCheckButton* checkboxResFixed;
 
+    // Source contribution view
+    RooRealVarView* sourceContributionView;
+    TGVerticalFrame* sourceContributionFrame;
+    
     // Fitting function
     TGCheckButton* checkboxHasParabola;
     TGNumberEntry* numGauss;

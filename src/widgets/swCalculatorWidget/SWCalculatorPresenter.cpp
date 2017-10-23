@@ -32,16 +32,24 @@
 #include <TMath.h>
 #include <TLegend.h>
 #include <iostream>
+#include "../rooRealVarWidget/RooRealVarView.h"
 
 SWCalculatorPresenter::SWCalculatorPresenter(SWCalculatorView* view) : AbstractPresenter<Model, SWCalculatorView>(view) {
+    // Need to instantinate RooRealVarView model for source Contribution
+//    Model* model = getModel();
 }
 
 Model* SWCalculatorPresenter::instantinateModel(){
     return Model::getInstance();
 }
 
+void SWCalculatorPresenter::onInitModel() {
+    std::cout << "SWCalculatorPresenter::onInitModel" << std::endl;    
+}
+
 void SWCalculatorPresenter::addEventListeners(){
     SWCalculatorView* view = getView();
+    Model* model = getModel();
     
     class HistogramImportedEventListener : public EventHandler<HistogramImportedEvent> {
       public:
@@ -56,6 +64,21 @@ void SWCalculatorPresenter::addEventListeners(){
         SWCalculatorView* view = nullptr;
     };
     EventBus::AddHandler<HistogramImportedEvent>(*(new HistogramImportedEventListener(view)));
+
+    class SourceHistogramImportedEventListener : public EventHandler<SourceHistogramImportedEvent> {
+      public:
+        SourceHistogramImportedEventListener(SWCalculatorView* v, Model* m) : view(v), model(m) {}
+        
+        virtual void onEvent(SourceHistogramImportedEvent & e) override {
+            std::cout << "SourceHistogramImportedEventListener::onEvent()" << std::endl;
+            RooRealVarView* sourceContributionView = view->getSourceContributionView();
+            sourceContributionView->getPresenter()->setModel(model->getSourceContribution());
+            view->setSourceContributionFrameVisible(kTRUE);
+        }        
+        SWCalculatorView* view = nullptr;
+        Model* model = nullptr;
+    };
+    EventBus::AddHandler<SourceHistogramImportedEvent>(*(new SourceHistogramImportedEventListener(view, model)));
     
     class IsTwoDetectorEventListener : public EventHandler<IsTwoDetectorEvent> {
       public:
@@ -126,7 +149,9 @@ void SWCalculatorPresenter::onFitSpectrumClicked(){
                 
         TH1F* kaptonHist = model->getSourceHist();
         if (kaptonHist){
-            modelProvider->initSourcePdf(kaptonHist, 0.12, kTRUE);
+            RooRealVar* sourceContribution = model->getSourceContribution();
+            RooFormulaVar* sourceContributionNorm = new RooFormulaVar("sourceContributionNorm", "sCN", "@0/100", RooArgList(*sourceContribution));
+            modelProvider->initSourcePdf(kaptonHist, sourceContributionNorm);
         }
         
         if (model->isTwoDetector()){

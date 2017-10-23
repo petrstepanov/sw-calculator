@@ -93,6 +93,7 @@ MYHEADERS=event/Event.h \
           event/Object.h \
 	  event/events/HistogramImportedEvent.h \
 	  event/events/IsTwoDetectorEvent.h \
+	  event/events/SourceHistogramImportedEvent.h \
 	  model/Constants.h \
           model/Model.h \
           roofit/AbstractModelProvider.h \
@@ -120,6 +121,8 @@ MYHEADERS=event/Event.h \
           widgets/importSpectrumWidget/ImportSourceSpectrumView.h \
           widgets/importSpectrumWidget/ImportSpectrumPresenter.h \
           widgets/importSpectrumWidget/ImportSpectrumView.h \
+          widgets/rooRealVarWidget/RooRealVarPresenter.h \
+          widgets/rooRealVarWidget/RooRealVarView.h \
           widgets/swCalculatorWidget/SWCalculatorPresenter.h \
           widgets/swCalculatorWidget/SWCalculatorView.h \
           widgets/AbstractPresenter.h \
@@ -129,6 +132,7 @@ MYHEADERS=event/Event.h \
 MYSOURCES=event/EventBus.cpp \
 	  event/events/HistogramImportedEvent.cpp \
 	  event/events/IsTwoDetectorEvent.cpp \
+	  event/events/SourceHistogramImportedEvent.cpp \
 	  model/Constants.cpp \
           model/Model.cpp \
           roofit/AbstractModelProvider.cpp \
@@ -156,6 +160,8 @@ MYSOURCES=event/EventBus.cpp \
           widgets/importSpectrumWidget/ImportSourceSpectrumView.cpp \
           widgets/importSpectrumWidget/ImportSpectrumPresenter.cpp \
           widgets/importSpectrumWidget/ImportSpectrumView.cpp \
+          widgets/rooRealVarWidget/RooRealVarPresenter.cpp \
+          widgets/rooRealVarWidget/RooRealVarView.cpp \
           widgets/swCalculatorWidget/SWCalculatorPresenter.cpp \
           widgets/swCalculatorWidget/SWCalculatorView.cpp \
 	  widgets/MainView.cpp\

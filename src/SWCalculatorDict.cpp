@@ -45,6 +45,7 @@ namespace std {} using namespace std;
 #include "event/Object.h"
 #include "event/events/HistogramImportedEvent.h"
 #include "event/events/IsTwoDetectorEvent.h"
+#include "event/events/SourceHistogramImportedEvent.h"
 #include "model/Constants.h"
 #include "model/Model.h"
 #include "roofit/AbstractModelProvider.h"
@@ -72,6 +73,8 @@ namespace std {} using namespace std;
 #include "widgets/importSpectrumWidget/ImportSourceSpectrumView.h"
 #include "widgets/importSpectrumWidget/ImportSpectrumPresenter.h"
 #include "widgets/importSpectrumWidget/ImportSpectrumView.h"
+#include "widgets/rooRealVarWidget/RooRealVarPresenter.h"
+#include "widgets/rooRealVarWidget/RooRealVarView.h"
 #include "widgets/swCalculatorWidget/SWCalculatorPresenter.h"
 #include "widgets/swCalculatorWidget/SWCalculatorView.h"
 #include "widgets/AbstractPresenter.h"
@@ -123,6 +126,47 @@ namespace ROOT {
 } // end of namespace ROOT
 
 namespace ROOT {
+   static TClass *RooRealVarView_Dictionary();
+   static void RooRealVarView_TClassManip(TClass*);
+   static void delete_RooRealVarView(void *p);
+   static void deleteArray_RooRealVarView(void *p);
+   static void destruct_RooRealVarView(void *p);
+
+   // Function generating the singleton type initializer
+   static TGenericClassInfo *GenerateInitInstanceLocal(const ::RooRealVarView*)
+   {
+      ::RooRealVarView *ptr = 0;
+      static ::TVirtualIsAProxy* isa_proxy = new ::TIsAProxy(typeid(::RooRealVarView));
+      static ::ROOT::TGenericClassInfo 
+         instance("RooRealVarView", "widgets/swCalculatorWidget/../rooRealVarWidget/RooRealVarView.h", 26,
+                  typeid(::RooRealVarView), ::ROOT::Internal::DefineBehavior(ptr, ptr),
+                  &RooRealVarView_Dictionary, isa_proxy, 0,
+                  sizeof(::RooRealVarView) );
+      instance.SetDelete(&delete_RooRealVarView);
+      instance.SetDeleteArray(&deleteArray_RooRealVarView);
+      instance.SetDestructor(&destruct_RooRealVarView);
+      return &instance;
+   }
+   TGenericClassInfo *GenerateInitInstance(const ::RooRealVarView*)
+   {
+      return GenerateInitInstanceLocal((::RooRealVarView*)0);
+   }
+   // Static variable to force the class initialization
+   static ::ROOT::TGenericClassInfo *_R__UNIQUE_(Init) = GenerateInitInstanceLocal((const ::RooRealVarView*)0x0); R__UseDummy(_R__UNIQUE_(Init));
+
+   // Dictionary for non-ClassDef classes
+   static TClass *RooRealVarView_Dictionary() {
+      TClass* theClass =::ROOT::GenerateInitInstanceLocal((const ::RooRealVarView*)0x0)->GetClass();
+      RooRealVarView_TClassManip(theClass);
+   return theClass;
+   }
+
+   static void RooRealVarView_TClassManip(TClass* ){
+   }
+
+} // end of namespace ROOT
+
+namespace ROOT {
    static TClass *SWCalculatorView_Dictionary();
    static void SWCalculatorView_TClassManip(TClass*);
    static void *new_SWCalculatorView(void *p = 0);
@@ -137,7 +181,7 @@ namespace ROOT {
       ::SWCalculatorView *ptr = 0;
       static ::TVirtualIsAProxy* isa_proxy = new ::TIsAProxy(typeid(::SWCalculatorView));
       static ::ROOT::TGenericClassInfo 
-         instance("SWCalculatorView", "widgets/swCalculatorWidget/SWCalculatorView.h", 41,
+         instance("SWCalculatorView", "widgets/swCalculatorWidget/SWCalculatorView.h", 42,
                   typeid(::SWCalculatorView), ::ROOT::Internal::DefineBehavior(ptr, ptr),
                   &SWCalculatorView_Dictionary, isa_proxy, 0,
                   sizeof(::SWCalculatorView) );
@@ -182,6 +226,20 @@ namespace ROOT {
 } // end of namespace ROOT for class ::AbstractImportSpectrumView
 
 namespace ROOT {
+   // Wrapper around operator delete
+   static void delete_RooRealVarView(void *p) {
+      delete ((::RooRealVarView*)p);
+   }
+   static void deleteArray_RooRealVarView(void *p) {
+      delete [] ((::RooRealVarView*)p);
+   }
+   static void destruct_RooRealVarView(void *p) {
+      typedef ::RooRealVarView current_t;
+      ((current_t*)p)->~current_t();
+   }
+} // end of namespace ROOT for class ::RooRealVarView
+
+namespace ROOT {
    // Wrappers around operator new
    static void *new_SWCalculatorView(void *p) {
       return  p ? new(p) ::SWCalculatorView : new ::SWCalculatorView;
@@ -212,6 +270,7 @@ namespace {
 "event/Object.h",
 "event/events/HistogramImportedEvent.h",
 "event/events/IsTwoDetectorEvent.h",
+"event/events/SourceHistogramImportedEvent.h",
 "model/Constants.h",
 "model/Model.h",
 "roofit/AbstractModelProvider.h",
@@ -239,6 +298,8 @@ namespace {
 "widgets/importSpectrumWidget/ImportSourceSpectrumView.h",
 "widgets/importSpectrumWidget/ImportSpectrumPresenter.h",
 "widgets/importSpectrumWidget/ImportSpectrumView.h",
+"widgets/rooRealVarWidget/RooRealVarPresenter.h",
+"widgets/rooRealVarWidget/RooRealVarView.h",
 "widgets/swCalculatorWidget/SWCalculatorPresenter.h",
 "widgets/swCalculatorWidget/SWCalculatorView.h",
 "widgets/AbstractPresenter.h",
@@ -260,6 +321,7 @@ namespace {
 #pragma clang diagnostic ignored "-Wreturn-type-c-linkage"
 extern int __Cling_Autoloading_Map;
 class __attribute__((annotate("$clingAutoload$widgets/importSpectrumWidget/AbstractImportSpectrumView.h")))  AbstractImportSpectrumView;
+class __attribute__((annotate("$clingAutoload$widgets/rooRealVarWidget/RooRealVarView.h")))  RooRealVarView;
 class __attribute__((annotate("$clingAutoload$widgets/swCalculatorWidget/SWCalculatorPresenter.h")))  SWCalculatorView;
 )DICTFWDDCLS";
     static const char* payloadCode = R"DICTPAYLOAD(
@@ -277,6 +339,7 @@ class __attribute__((annotate("$clingAutoload$widgets/swCalculatorWidget/SWCalcu
 #include "event/Object.h"
 #include "event/events/HistogramImportedEvent.h"
 #include "event/events/IsTwoDetectorEvent.h"
+#include "event/events/SourceHistogramImportedEvent.h"
 #include "model/Constants.h"
 #include "model/Model.h"
 #include "roofit/AbstractModelProvider.h"
@@ -304,6 +367,8 @@ class __attribute__((annotate("$clingAutoload$widgets/swCalculatorWidget/SWCalcu
 #include "widgets/importSpectrumWidget/ImportSourceSpectrumView.h"
 #include "widgets/importSpectrumWidget/ImportSpectrumPresenter.h"
 #include "widgets/importSpectrumWidget/ImportSpectrumView.h"
+#include "widgets/rooRealVarWidget/RooRealVarPresenter.h"
+#include "widgets/rooRealVarWidget/RooRealVarView.h"
 #include "widgets/swCalculatorWidget/SWCalculatorPresenter.h"
 #include "widgets/swCalculatorWidget/SWCalculatorView.h"
 #include "widgets/AbstractPresenter.h"
@@ -315,6 +380,7 @@ class __attribute__((annotate("$clingAutoload$widgets/swCalculatorWidget/SWCalcu
 )DICTPAYLOAD";
     static const char* classesHeaders[]={
 "AbstractImportSpectrumView", payloadCode, "@",
+"RooRealVarView", payloadCode, "@",
 "SWCalculatorView", payloadCode, "@",
 nullptr};
 
