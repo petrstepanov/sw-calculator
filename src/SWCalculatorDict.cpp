@@ -85,25 +85,25 @@ namespace std {} using namespace std;
 // Header files passed via #pragma extra_include
 
 namespace ROOT {
-   static TClass *AbstractImportSpectrumView_Dictionary();
-   static void AbstractImportSpectrumView_TClassManip(TClass*);
    static void delete_AbstractImportSpectrumView(void *p);
    static void deleteArray_AbstractImportSpectrumView(void *p);
    static void destruct_AbstractImportSpectrumView(void *p);
+   static void streamer_AbstractImportSpectrumView(TBuffer &buf, void *obj);
 
    // Function generating the singleton type initializer
    static TGenericClassInfo *GenerateInitInstanceLocal(const ::AbstractImportSpectrumView*)
    {
       ::AbstractImportSpectrumView *ptr = 0;
-      static ::TVirtualIsAProxy* isa_proxy = new ::TIsAProxy(typeid(::AbstractImportSpectrumView));
+      static ::TVirtualIsAProxy* isa_proxy = new ::TInstrumentedIsAProxy< ::AbstractImportSpectrumView >(0);
       static ::ROOT::TGenericClassInfo 
-         instance("AbstractImportSpectrumView", "widgets/importSpectrumWidget/AbstractImportSpectrumView.h", 32,
+         instance("AbstractImportSpectrumView", ::AbstractImportSpectrumView::Class_Version(), "widgets/importSpectrumWidget/AbstractImportSpectrumView.h", 32,
                   typeid(::AbstractImportSpectrumView), ::ROOT::Internal::DefineBehavior(ptr, ptr),
-                  &AbstractImportSpectrumView_Dictionary, isa_proxy, 0,
+                  &::AbstractImportSpectrumView::Dictionary, isa_proxy, 16,
                   sizeof(::AbstractImportSpectrumView) );
       instance.SetDelete(&delete_AbstractImportSpectrumView);
       instance.SetDeleteArray(&deleteArray_AbstractImportSpectrumView);
       instance.SetDestructor(&destruct_AbstractImportSpectrumView);
+      instance.SetStreamerFunc(&streamer_AbstractImportSpectrumView);
       return &instance;
    }
    TGenericClassInfo *GenerateInitInstance(const ::AbstractImportSpectrumView*)
@@ -112,39 +112,28 @@ namespace ROOT {
    }
    // Static variable to force the class initialization
    static ::ROOT::TGenericClassInfo *_R__UNIQUE_(Init) = GenerateInitInstanceLocal((const ::AbstractImportSpectrumView*)0x0); R__UseDummy(_R__UNIQUE_(Init));
-
-   // Dictionary for non-ClassDef classes
-   static TClass *AbstractImportSpectrumView_Dictionary() {
-      TClass* theClass =::ROOT::GenerateInitInstanceLocal((const ::AbstractImportSpectrumView*)0x0)->GetClass();
-      AbstractImportSpectrumView_TClassManip(theClass);
-   return theClass;
-   }
-
-   static void AbstractImportSpectrumView_TClassManip(TClass* ){
-   }
-
 } // end of namespace ROOT
 
 namespace ROOT {
-   static TClass *RooRealVarView_Dictionary();
-   static void RooRealVarView_TClassManip(TClass*);
    static void delete_RooRealVarView(void *p);
    static void deleteArray_RooRealVarView(void *p);
    static void destruct_RooRealVarView(void *p);
+   static void streamer_RooRealVarView(TBuffer &buf, void *obj);
 
    // Function generating the singleton type initializer
    static TGenericClassInfo *GenerateInitInstanceLocal(const ::RooRealVarView*)
    {
       ::RooRealVarView *ptr = 0;
-      static ::TVirtualIsAProxy* isa_proxy = new ::TIsAProxy(typeid(::RooRealVarView));
+      static ::TVirtualIsAProxy* isa_proxy = new ::TInstrumentedIsAProxy< ::RooRealVarView >(0);
       static ::ROOT::TGenericClassInfo 
-         instance("RooRealVarView", "widgets/swCalculatorWidget/../rooRealVarWidget/RooRealVarView.h", 26,
+         instance("RooRealVarView", ::RooRealVarView::Class_Version(), "widgets/swCalculatorWidget/../rooRealVarWidget/RooRealVarView.h", 26,
                   typeid(::RooRealVarView), ::ROOT::Internal::DefineBehavior(ptr, ptr),
-                  &RooRealVarView_Dictionary, isa_proxy, 0,
+                  &::RooRealVarView::Dictionary, isa_proxy, 16,
                   sizeof(::RooRealVarView) );
       instance.SetDelete(&delete_RooRealVarView);
       instance.SetDeleteArray(&deleteArray_RooRealVarView);
       instance.SetDestructor(&destruct_RooRealVarView);
+      instance.SetStreamerFunc(&streamer_RooRealVarView);
       return &instance;
    }
    TGenericClassInfo *GenerateInitInstance(const ::RooRealVarView*)
@@ -153,43 +142,32 @@ namespace ROOT {
    }
    // Static variable to force the class initialization
    static ::ROOT::TGenericClassInfo *_R__UNIQUE_(Init) = GenerateInitInstanceLocal((const ::RooRealVarView*)0x0); R__UseDummy(_R__UNIQUE_(Init));
-
-   // Dictionary for non-ClassDef classes
-   static TClass *RooRealVarView_Dictionary() {
-      TClass* theClass =::ROOT::GenerateInitInstanceLocal((const ::RooRealVarView*)0x0)->GetClass();
-      RooRealVarView_TClassManip(theClass);
-   return theClass;
-   }
-
-   static void RooRealVarView_TClassManip(TClass* ){
-   }
-
 } // end of namespace ROOT
 
 namespace ROOT {
-   static TClass *SWCalculatorView_Dictionary();
-   static void SWCalculatorView_TClassManip(TClass*);
    static void *new_SWCalculatorView(void *p = 0);
    static void *newArray_SWCalculatorView(Long_t size, void *p);
    static void delete_SWCalculatorView(void *p);
    static void deleteArray_SWCalculatorView(void *p);
    static void destruct_SWCalculatorView(void *p);
+   static void streamer_SWCalculatorView(TBuffer &buf, void *obj);
 
    // Function generating the singleton type initializer
    static TGenericClassInfo *GenerateInitInstanceLocal(const ::SWCalculatorView*)
    {
       ::SWCalculatorView *ptr = 0;
-      static ::TVirtualIsAProxy* isa_proxy = new ::TIsAProxy(typeid(::SWCalculatorView));
+      static ::TVirtualIsAProxy* isa_proxy = new ::TInstrumentedIsAProxy< ::SWCalculatorView >(0);
       static ::ROOT::TGenericClassInfo 
-         instance("SWCalculatorView", "widgets/swCalculatorWidget/SWCalculatorView.h", 42,
+         instance("SWCalculatorView", ::SWCalculatorView::Class_Version(), "widgets/swCalculatorWidget/SWCalculatorView.h", 42,
                   typeid(::SWCalculatorView), ::ROOT::Internal::DefineBehavior(ptr, ptr),
-                  &SWCalculatorView_Dictionary, isa_proxy, 0,
+                  &::SWCalculatorView::Dictionary, isa_proxy, 16,
                   sizeof(::SWCalculatorView) );
       instance.SetNew(&new_SWCalculatorView);
       instance.SetNewArray(&newArray_SWCalculatorView);
       instance.SetDelete(&delete_SWCalculatorView);
       instance.SetDeleteArray(&deleteArray_SWCalculatorView);
       instance.SetDestructor(&destruct_SWCalculatorView);
+      instance.SetStreamerFunc(&streamer_SWCalculatorView);
       return &instance;
    }
    TGenericClassInfo *GenerateInitInstance(const ::SWCalculatorView*)
@@ -198,18 +176,120 @@ namespace ROOT {
    }
    // Static variable to force the class initialization
    static ::ROOT::TGenericClassInfo *_R__UNIQUE_(Init) = GenerateInitInstanceLocal((const ::SWCalculatorView*)0x0); R__UseDummy(_R__UNIQUE_(Init));
-
-   // Dictionary for non-ClassDef classes
-   static TClass *SWCalculatorView_Dictionary() {
-      TClass* theClass =::ROOT::GenerateInitInstanceLocal((const ::SWCalculatorView*)0x0)->GetClass();
-      SWCalculatorView_TClassManip(theClass);
-   return theClass;
-   }
-
-   static void SWCalculatorView_TClassManip(TClass* ){
-   }
-
 } // end of namespace ROOT
+
+//______________________________________________________________________________
+atomic_TClass_ptr AbstractImportSpectrumView::fgIsA(0);  // static to hold class pointer
+
+//______________________________________________________________________________
+const char *AbstractImportSpectrumView::Class_Name()
+{
+   return "AbstractImportSpectrumView";
+}
+
+//______________________________________________________________________________
+const char *AbstractImportSpectrumView::ImplFileName()
+{
+   return ::ROOT::GenerateInitInstanceLocal((const ::AbstractImportSpectrumView*)0x0)->GetImplFileName();
+}
+
+//______________________________________________________________________________
+int AbstractImportSpectrumView::ImplFileLine()
+{
+   return ::ROOT::GenerateInitInstanceLocal((const ::AbstractImportSpectrumView*)0x0)->GetImplFileLine();
+}
+
+//______________________________________________________________________________
+TClass *AbstractImportSpectrumView::Dictionary()
+{
+   fgIsA = ::ROOT::GenerateInitInstanceLocal((const ::AbstractImportSpectrumView*)0x0)->GetClass();
+   return fgIsA;
+}
+
+//______________________________________________________________________________
+TClass *AbstractImportSpectrumView::Class()
+{
+   if (!fgIsA.load()) { R__LOCKGUARD2(gInterpreterMutex); fgIsA = ::ROOT::GenerateInitInstanceLocal((const ::AbstractImportSpectrumView*)0x0)->GetClass(); }
+   return fgIsA;
+}
+
+//______________________________________________________________________________
+atomic_TClass_ptr RooRealVarView::fgIsA(0);  // static to hold class pointer
+
+//______________________________________________________________________________
+const char *RooRealVarView::Class_Name()
+{
+   return "RooRealVarView";
+}
+
+//______________________________________________________________________________
+const char *RooRealVarView::ImplFileName()
+{
+   return ::ROOT::GenerateInitInstanceLocal((const ::RooRealVarView*)0x0)->GetImplFileName();
+}
+
+//______________________________________________________________________________
+int RooRealVarView::ImplFileLine()
+{
+   return ::ROOT::GenerateInitInstanceLocal((const ::RooRealVarView*)0x0)->GetImplFileLine();
+}
+
+//______________________________________________________________________________
+TClass *RooRealVarView::Dictionary()
+{
+   fgIsA = ::ROOT::GenerateInitInstanceLocal((const ::RooRealVarView*)0x0)->GetClass();
+   return fgIsA;
+}
+
+//______________________________________________________________________________
+TClass *RooRealVarView::Class()
+{
+   if (!fgIsA.load()) { R__LOCKGUARD2(gInterpreterMutex); fgIsA = ::ROOT::GenerateInitInstanceLocal((const ::RooRealVarView*)0x0)->GetClass(); }
+   return fgIsA;
+}
+
+//______________________________________________________________________________
+atomic_TClass_ptr SWCalculatorView::fgIsA(0);  // static to hold class pointer
+
+//______________________________________________________________________________
+const char *SWCalculatorView::Class_Name()
+{
+   return "SWCalculatorView";
+}
+
+//______________________________________________________________________________
+const char *SWCalculatorView::ImplFileName()
+{
+   return ::ROOT::GenerateInitInstanceLocal((const ::SWCalculatorView*)0x0)->GetImplFileName();
+}
+
+//______________________________________________________________________________
+int SWCalculatorView::ImplFileLine()
+{
+   return ::ROOT::GenerateInitInstanceLocal((const ::SWCalculatorView*)0x0)->GetImplFileLine();
+}
+
+//______________________________________________________________________________
+TClass *SWCalculatorView::Dictionary()
+{
+   fgIsA = ::ROOT::GenerateInitInstanceLocal((const ::SWCalculatorView*)0x0)->GetClass();
+   return fgIsA;
+}
+
+//______________________________________________________________________________
+TClass *SWCalculatorView::Class()
+{
+   if (!fgIsA.load()) { R__LOCKGUARD2(gInterpreterMutex); fgIsA = ::ROOT::GenerateInitInstanceLocal((const ::SWCalculatorView*)0x0)->GetClass(); }
+   return fgIsA;
+}
+
+//______________________________________________________________________________
+void AbstractImportSpectrumView::Streamer(TBuffer &R__b)
+{
+   // Stream an object of class AbstractImportSpectrumView.
+
+   ::Error("AbstractImportSpectrumView::Streamer", "version id <=0 in ClassDef, dummy Streamer() called"); if (R__b.IsReading()) { }
+}
 
 namespace ROOT {
    // Wrapper around operator delete
@@ -223,7 +303,19 @@ namespace ROOT {
       typedef ::AbstractImportSpectrumView current_t;
       ((current_t*)p)->~current_t();
    }
+   // Wrapper around a custom streamer member function.
+   static void streamer_AbstractImportSpectrumView(TBuffer &buf, void *obj) {
+      ((::AbstractImportSpectrumView*)obj)->::AbstractImportSpectrumView::Streamer(buf);
+   }
 } // end of namespace ROOT for class ::AbstractImportSpectrumView
+
+//______________________________________________________________________________
+void RooRealVarView::Streamer(TBuffer &R__b)
+{
+   // Stream an object of class RooRealVarView.
+
+   ::Error("RooRealVarView::Streamer", "version id <=0 in ClassDef, dummy Streamer() called"); if (R__b.IsReading()) { }
+}
 
 namespace ROOT {
    // Wrapper around operator delete
@@ -237,7 +329,19 @@ namespace ROOT {
       typedef ::RooRealVarView current_t;
       ((current_t*)p)->~current_t();
    }
+   // Wrapper around a custom streamer member function.
+   static void streamer_RooRealVarView(TBuffer &buf, void *obj) {
+      ((::RooRealVarView*)obj)->::RooRealVarView::Streamer(buf);
+   }
 } // end of namespace ROOT for class ::RooRealVarView
+
+//______________________________________________________________________________
+void SWCalculatorView::Streamer(TBuffer &R__b)
+{
+   // Stream an object of class SWCalculatorView.
+
+   ::Error("SWCalculatorView::Streamer", "version id <=0 in ClassDef, dummy Streamer() called"); if (R__b.IsReading()) { }
+}
 
 namespace ROOT {
    // Wrappers around operator new
@@ -257,6 +361,10 @@ namespace ROOT {
    static void destruct_SWCalculatorView(void *p) {
       typedef ::SWCalculatorView current_t;
       ((current_t*)p)->~current_t();
+   }
+   // Wrapper around a custom streamer member function.
+   static void streamer_SWCalculatorView(TBuffer &buf, void *obj) {
+      ((::SWCalculatorView*)obj)->::SWCalculatorView::Streamer(buf);
    }
 } // end of namespace ROOT for class ::SWCalculatorView
 

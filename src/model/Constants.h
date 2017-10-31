@@ -36,6 +36,7 @@ class Constants {
     static TColor* colorPrimary;
     static TColor* colorWarning;
     static TColor* colorGray;
+    static TColor* colorAppWindow;    
     
     static const Int_t colorSet[7];
 };

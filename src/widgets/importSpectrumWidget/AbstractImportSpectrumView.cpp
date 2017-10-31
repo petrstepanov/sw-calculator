@@ -12,6 +12,8 @@
 #include "../../model/Constants.h"
 #include "../../util/UiHelper.h"
 
+ClassImp(AbstractImportSpectrumView)  
+
 AbstractImportSpectrumView::AbstractImportSpectrumView(const TGWindow* w) : AbstractView<AbstractImportSpectrumPresenter>(w){    
     initUI();
 }
@@ -45,6 +47,7 @@ void AbstractImportSpectrumView::initUI(){
 
     // File browser
     txtFileBrowser = new TGTextView(this);
+    txtFileBrowser->SetBackgroundColor(Constants::colorAppWindow->GetPixel());
 //    txtFileBrowser->AddLine("no file loaded");
 //    txtFileBrowser->ChangeOptions(0);
     AddFrame(txtFileBrowser, new TGLayoutHints(kLHintsExpandX | kLHintsExpandY, 0, 0, dy, dy));

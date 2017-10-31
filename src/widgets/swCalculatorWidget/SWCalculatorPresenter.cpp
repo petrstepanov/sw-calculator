@@ -20,6 +20,8 @@
 #include "../../util/RootHelper.h"
 #include "../../util/HistProcessor.h"
 #include "../../util/GraphicsHelper.h"
+#include "../../util/StringUtils.h"
+#include "../../util/UiHelper.h"
 #include "../../roofit/CompositeModelProvider.h"
 #include "../../model/Constants.h"
 #include <RooFit.h>
@@ -381,3 +383,45 @@ void SWCalculatorPresenter::onFitSpectrumClicked(){
     RootHelper::stopAndPrintTimer();
 }
 
+void SWCalculatorPresenter::onSaveImageClicked() {
+    Model* model = getModel();
+    SWCalculatorView* view = getView();
+    
+    // Create image file names
+    TString* filePath = model->getFileName();
+    TString* filePathNoExtension = StringUtils::stripFileExtension(filePath);
+    if (model->getSourceHist()){
+        *filePathNoExtension += "-no-kapton";
+    }
+    TString pngFilePath = *filePathNoExtension + ".png";
+    TString pdfFilePath = *filePathNoExtension + ".pdf";
+
+    // Save raster and vector images
+    TCanvas* canvas = view->getCanvas();
+    TImage *image = TImage::Create();
+    image->FromPad(canvas);
+    image->WriteImage(pngFilePath.Data()); // raster
+    canvas->Print(pdfFilePath.Data());     // vector
+
+    // Show ok dialog
+    TString message = "Files saved: ";
+    message += *filePathNoExtension + "(.png|.pdf)";
+    UiHelper::showOkDialog(message.Data());
+}
+
+void SWCalculatorPresenter::onSaveResultsClicked() {
+    Model* model = getModel();
+    SWCalculatorView* view = getView();
+    
+    // Create image file names
+    TString* filePath = model->getFileName();
+    TString* filePathNoExtension = StringUtils::stripFileExtension(filePath);
+    TString resultsFilename = *filePathNoExtension + "-results.txt";
+    
+    view->saveFitResults(&resultsFilename);
+}
+
+void SWCalculatorPresenter::onClearResultsClicked() {
+    SWCalculatorView* view = getView();
+    view->clearFitResults();
+}

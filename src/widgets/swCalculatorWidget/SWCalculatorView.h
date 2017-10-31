@@ -40,61 +40,6 @@
 class SWCalculatorPresenter;
 
 class SWCalculatorView : public AbstractView<SWCalculatorPresenter> {
-//class SWCalculatorView : public TGMainFrame {
-  public:
-    SWCalculatorView(const TGWindow *w = 0);
-    virtual ~SWCalculatorView();
-    
-    // Override base class virtual functions
-    SWCalculatorPresenter* instantinatePresenter();
-
-    // Calls from Presenter
-    RooRealVarView* getSourceContributionView();
-    void setTabEnabled(Int_t, Bool_t);
-    Int_t getFitMinValue();
-    void setFitMinMaxRange(Int_t min, Int_t max);
-    void setFitMinMaxValues(Bool_t isTwoDetector);
-    Int_t getFitMaxValue();
-    Double_t getSWidth();
-    Double_t getWWidth();
-    Double_t getWShift();
-    Int_t getConvolutionType();
-    Bool_t hasParabola();
-    Int_t getNumGauss();
-    Int_t getNumExp();
-    Int_t getNumDampExp();
-    Double_t getResolutionFWHM();
-    Bool_t isResolutionFixed();
-    TPad* getPadData();
-    TPad* getPadChi2();
-    void setToolbarEnabled(Bool_t isEnabled);
-    void updateRegionLabels(Bool_t isTwoDetector);
-    void displayFilename(TString* fileName);
-    void displayFitParameters(RooFitResult* fitResult);
-    void displayIndirectParameters(std::list<Variable*> parameters);
-    void displayIntensities(std::list<std::pair<const char*, Double_t>> intensities);
-    void displayChi2(Double_t sumChi2, Int_t freeParameters, Int_t degreesFreedom);
-    void displaySW(std::pair<Double_t, Double_t> sValueError, std::pair<Double_t, Double_t> wValueError);
-    void updateCanvas();
-    void setDisplayLimits(Float_t min, Float_t max);
-    // Calls to Presenter
-    void onNumFitMinChanged();
-    void onNumFitMaxChanged();
-    void onFitSpectrumClicked();
-    void onApplyZoomClicked();
-    void onResetZoomClicked();
-    void onSaveDataClicked();
-    void onSaveImageClicked();   
-    //    void CloseWindow();
-    void initRooPlots(RooPlot* fitFrame, RooPlot* chiFrame);
-    
-    // Update display range functions
-    void onDisplayMinChange(char* c);
-    void onDisplayMaxChange(char* c);
-    void onSliderChange();      
-    void updateCanvasLimits(Double_t min, Double_t max);
-    void setSourceContributionFrameVisible(Bool_t isVisible);
-    
   protected:
     void initUI();
     
@@ -136,9 +81,11 @@ class SWCalculatorView : public AbstractView<SWCalculatorPresenter> {
     // Fit
     TGTextButton* btnFitSpectrum;
     TGTextEdit* txtFitResult;  
-
+    TGTextButton* btnClearResult;
+    TGTextButton* btnSaveResult;    
+    
     // Plot and display params
-    TGTextButton* btnSaveData;
+//    TGTextButton* btnSaveData;
     TGTextButton* btnSaveImage;
     TCanvas* canvasPlot;
     TGDoubleHSlider* zoomSlider;
@@ -156,6 +103,69 @@ class SWCalculatorView : public AbstractView<SWCalculatorPresenter> {
     RooPlot* chiFrame;
     TPad* padData;
     TPad* padChi2;
+    
+  public:
+    SWCalculatorView(const TGWindow *w = 0);
+    virtual ~SWCalculatorView();
+    
+    // Override base class virtual functions
+    SWCalculatorPresenter* instantinatePresenter();
+
+    // Calls from Presenter
+    RooRealVarView* getSourceContributionView();
+    void setTabEnabled(Int_t, Bool_t);
+    Int_t getFitMinValue();
+    void setFitMinMaxRange(Int_t min, Int_t max);
+    void setFitMinMaxValues(Bool_t isTwoDetector);
+    Int_t getFitMaxValue();
+    Double_t getSWidth();
+    Double_t getWWidth();
+    Double_t getWShift();
+    Int_t getConvolutionType();
+    Bool_t hasParabola();
+    Int_t getNumGauss();
+    Int_t getNumExp();
+    Int_t getNumDampExp();
+    Double_t getResolutionFWHM();
+    Bool_t isResolutionFixed();
+    TPad* getPadData();
+    TPad* getPadChi2();
+    void setToolbarEnabled(Bool_t isEnabled);
+    void updateRegionLabels(Bool_t isTwoDetector);
+    void displayFilename(TString* fileName);
+    void displayFitParameters(RooFitResult* fitResult);
+    void displayIndirectParameters(std::list<Variable*> parameters);
+    void displayIntensities(std::list<std::pair<const char*, Double_t>> intensities);
+    void displayChi2(Double_t sumChi2, Int_t freeParameters, Int_t degreesFreedom);
+    void displaySW(std::pair<Double_t, Double_t> sValueError, std::pair<Double_t, Double_t> wValueError);
+    void updateCanvas();
+    void setDisplayLimits(Float_t min, Float_t max);
+    TCanvas* getCanvas();
+    void saveFitResults(TString* fileName);
+    void clearFitResults();
+    
+    // Calls to Presenter
+    void onNumFitMinChanged();
+    void onNumFitMaxChanged();
+    void onFitSpectrumClicked();
+    void onApplyZoomClicked();
+    void onResetZoomClicked();
+//    void onSaveDataClicked();
+    void onSaveImageClicked();   
+    void onSaveResultsClicked(); 
+    void onClearResultsClicked(); 
+    
+    //    void CloseWindow();
+    void initRooPlots(RooPlot* fitFrame, RooPlot* chiFrame);
+    
+    // Update display range functions
+    void onDisplayMinChange(char* c);
+    void onDisplayMaxChange(char* c);
+    void onSliderChange();      
+    void updateCanvasLimits(Double_t min, Double_t max);
+    void setSourceContributionFrameVisible(Bool_t isVisible);
+    
+    ClassDef(SWCalculatorView,0);
 };
 
 #endif /* SWCALCULATORVIEW_H */

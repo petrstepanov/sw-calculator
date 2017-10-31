@@ -30,6 +30,16 @@
 class AbstractImportSpectrumPresenter;
 
 class AbstractImportSpectrumView : public AbstractView<AbstractImportSpectrumPresenter> {
+  private:
+    // Ui components
+    TGTextButton* btnOpenFile;
+    TGLabel* lblFileName;
+    TGTextView* txtFileBrowser;
+    TGNumberEntry* numEnergyColumn;    
+    TGNumberEntry* numCountsColumn;
+    TGTextButton* btnImportSpectrum;    
+    TCanvas* canvasHist;
+
   public:
     AbstractImportSpectrumView(const TGWindow *w);
 
@@ -51,15 +61,7 @@ class AbstractImportSpectrumView : public AbstractView<AbstractImportSpectrumPre
     void onImportSpectrumClicked();    
     virtual Int_t getHistogramColor();
     
-  private:
-    // Ui components
-    TGTextButton* btnOpenFile;
-    TGLabel* lblFileName;
-    TGTextView* txtFileBrowser;
-    TGNumberEntry* numEnergyColumn;    
-    TGNumberEntry* numCountsColumn;
-    TGTextButton* btnImportSpectrum;    
-    TCanvas* canvasHist;
+    ClassDef(AbstractImportSpectrumView,0);  
 };
 
 #endif /* ABSTRACTIMPORTSPECTRUMVIEW_H */

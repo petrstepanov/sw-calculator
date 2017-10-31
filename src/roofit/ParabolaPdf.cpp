@@ -13,6 +13,7 @@
 
 #include "ParabolaPdf.h"
 #include "../model/Constants.h"
+#include <iostream>
 
 ParabolaPdf::ParabolaPdf(const char *name, const char *title,
 	RooAbsReal& _x,

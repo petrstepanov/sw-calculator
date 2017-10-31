@@ -23,7 +23,14 @@
 #include <TGNumberEntry.h>
 #include <TGButton.h>
 
-class RooRealVarView : public AbstractView<RooRealVarPresenter> {
+class RooRealVarView : public AbstractView<RooRealVarPresenter> {  
+private:
+    TGLabel* description;
+    TGNumberEntry* value;
+    TGNumberEntry* minValue;
+    TGNumberEntry* maxValue;
+    TGCheckButton* fixed;
+
 public:
     RooRealVarView(const TGWindow *w);    
     virtual ~RooRealVarView();
@@ -46,12 +53,7 @@ public:
     void onMaximumChange(char* c);
     void onSetConstant(Bool_t isConstant);
     
-private:
-    TGLabel* description;
-    TGNumberEntry* value;
-    TGNumberEntry* minValue;
-    TGNumberEntry* maxValue;
-    TGCheckButton* fixed;
+    ClassDef(RooRealVarView,0);    
 };
 
 #endif /* ROOREALVARVIEW_H */

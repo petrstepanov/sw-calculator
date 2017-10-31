@@ -14,7 +14,8 @@
 #include "Model.h"
 
 Model::Model(){
-    sourceContribution = new RooRealVar("sourceContribution", "Source contribution", 12., 8., 16., "%");
+    sourceContribution = new RooRealVar("sourceContribution", "Source contribution", 11.38, 8., 16., "%");
+    sourceContribution->setConstant(kTRUE);
 };
 
 Model* Model::instance = NULL;

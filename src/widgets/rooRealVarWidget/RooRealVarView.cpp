@@ -15,6 +15,8 @@
 #include "RooRealVarPresenter.h"
 #include <RooRealVar.h>
 
+ClassImp(RooRealVarView)
+
 RooRealVarView::RooRealVarView(const TGWindow* w) : AbstractView<RooRealVarPresenter>(w){
     initUI();
 }

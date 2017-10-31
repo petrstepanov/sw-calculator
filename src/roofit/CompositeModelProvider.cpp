@@ -41,7 +41,7 @@ CompositeModelProvider::CompositeModelProvider(RooRealVar* x, RooRealVar* x0) : 
 
 void CompositeModelProvider::initSourcePdf(TH1F* sourceHist, RooAbsReal* sourceContrib) {
     RooDataHist* sourceDataHist = new RooDataHist("sourceDataHist", "Source Data Hist", RooArgList(*observable), RooFit::Import(*sourceHist));
-    this->sourcePdf = new RooHistPdf("sourcePdf", "Source contribution", *observable, *sourceDataHist, 0);
+    this->sourcePdf = new RooHistPdf("sourcePdf", "Source contribution", *observable, *sourceDataHist, 1);
     this->sourceContribution = sourceContrib;
 }
 
@@ -62,7 +62,7 @@ void CompositeModelProvider::initModel(Bool_t hasParabola, const Int_t numGauss,
     // Define parabola
     if (hasParabola){
             RootHelper::deleteObject("parabolaRoot");
-            RooRealVar* parabolaRoot = new RooRealVar("parabolaRoot", "Coefficient at -x^2 + r*2", 3.5, 0.1, 10);
+            RooRealVar* parabolaRoot = new RooRealVar("parabolaRoot", "Coefficient at -x^2 + r*2", 3.5, 1, 5); // 3.4579); = Al 
             RootHelper::deleteObject("parabola");
             ParabolaPdf* parabola = new ParabolaPdf("parabola", "Fermi gas", *observable, *E_0, *parabolaRoot);
             RootHelper::deleteObject("parabolaCoeff");
@@ -189,7 +189,7 @@ void CompositeModelProvider::initBackground(Double_t backgroundFraction){
 void CompositeModelProvider::initResolutionFunction(Int_t convType, Double_t convFWHM, Bool_t isConvFixed) {
     // Resolution Function
     RootHelper::deleteObject("zero");        
-    RooRealVar* zero = new RooRealVar("zero", "zero", 0);
+    RooRealVar* resFunctMean = sourcePdf ? new RooRealVar("resFunctMean", "Resolution mean", 0, -2, 2, "keV") : new RooRealVar("zero", "zero", 0, "keV");
     RootHelper::deleteObject("resFunctFWHM");       
     RooRealVar* resFunctFWHM = isConvFixed ? 
         new RooRealVar("resFunctFWHM", "Resolution function FWHM", convFWHM, "keV") :
@@ -198,7 +198,7 @@ void CompositeModelProvider::initResolutionFunction(Int_t convType, Double_t con
     RooFormulaVar* resFunctSigma = new RooFormulaVar("resFunctSigma", "@0*@1", RooArgList(*resFunctFWHM, *fwhm2sigma));
     RootHelper::deleteObject("resFunct");
     if (convType){
-        resolutionFunction = new RooGaussian("resFunct", "Resolution Function", *observable, *zero, *resFunctSigma);
+        resolutionFunction = new RooGaussian("resFunct", "Resolution Function", *observable, *resFunctMean, *resFunctSigma);
     }
     else {
         resolutionFunction = nullptr;
@@ -220,12 +220,12 @@ void CompositeModelProvider::initResolutionFunction(Int_t convType, Double_t con
             break;
         case 2:         // Numeric
             sumModelConvoluted = new RooNumConvPdf("sumModelConvoluted", "Convoluted Model", *observable, *model, *resolutionFunction);
-            ((RooNumConvPdf*) sumModelConvoluted)->setConvolutionWindow(*zero,*resFunctSigma,4);
+            ((RooNumConvPdf*) sumModelConvoluted)->setConvolutionWindow(*resFunctMean,*resFunctSigma,4);
             this->convolutedModel = sumModelConvoluted;
             break;
         case 3:         // Custom
             sumModelConvoluted = new ChannelConvolutionPdf("sumModelConvoluted", "Convoluted Model", *observable, *model, *resolutionFunction);
-            ((ChannelConvolutionPdf*) sumModelConvoluted)->setConvolutionWindow(*zero,*resFunctFWHM,2);
+            ((ChannelConvolutionPdf*) sumModelConvoluted)->setConvolutionWindow(*resFunctMean,*resFunctFWHM,2);
             this->convolutedModel = sumModelConvoluted;
             break;
     }    

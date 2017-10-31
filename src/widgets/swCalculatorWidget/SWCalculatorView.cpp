@@ -20,7 +20,9 @@
 #include "../../util/StringUtils.h"
 #include <TGFrame.h>
 #include <TGTextBuffer.h>
-
+#include <TGText.h>
+#include <TGDimension.h>
+#include "../../util/UiHelper.h"
 #include <map>
 #include <sstream>
 #include <TRootEmbeddedCanvas.h>
@@ -28,6 +30,8 @@
 #include "../../roofit/CompositeModelProvider.h"
 
 using namespace RooFit;
+
+ClassImp(SWCalculatorView)
 
 //SWCalculatorView::SWCalculatorView(const TGWindow* w) : TGMainFrame(w, Constants::windowWidth, Constants::windowHeight){
 SWCalculatorView::SWCalculatorView(const TGWindow* w) : AbstractView<SWCalculatorPresenter>(w){
@@ -135,7 +139,7 @@ void SWCalculatorView::initUI(){
     comboConvolutionType->Resize(75, 20);        
     checkboxResFixed = new TGCheckButton(convolutionParamsFrame, "fixed");
     checkboxResFixed->SetOn();              
-    numResolutionFWHM = new TGNumberEntry(convolutionParamsFrame, 1.7, 3, -1, TGNumberFormat::kNESRealOne,
+    numResolutionFWHM = new TGNumberEntry(convolutionParamsFrame, 1.75, 4, -1, TGNumberFormat::kNESRealTwo,
             TGNumberFormat::kNEANonNegative,
             TGNumberFormat::kNELLimitMinMax,
             0.5, 4.0);
@@ -199,8 +203,19 @@ void SWCalculatorView::initUI(){
 
     // Fit Result TextBox
     txtFitResult = new TGTextEdit(tabFit);
+    txtFitResult->SetBackgroundColor(Constants::colorAppWindow->GetPixel());
     tabFit->AddFrame(txtFitResult, new TGLayoutHints(kLHintsExpandX | kLHintsExpandY, dx, dx, dy, dy));
+    
+    TGHorizontalFrame* splitFrame = new TGHorizontalFrame(tabFit);
 
+    btnClearResult = new TGTextButton(splitFrame, "Clear file");
+    btnClearResult->Connect("Clicked()", "SWCalculatorView", this, "onClearResultsClicked()");
+    splitFrame->AddFrame(btnClearResult, new TGLayoutHints(kLHintsLeft | kLHintsTop | kLHintsExpandX, 0, dx/2));
+    btnSaveResult = new TGTextButton(splitFrame, "Save results");
+    btnSaveResult->Connect("Clicked()", "SWCalculatorView", this, "onSaveResultsClicked()");
+    splitFrame->AddFrame(btnSaveResult, new TGLayoutHints(kLHintsLeft | kLHintsTop | kLHintsExpandX, dx/2));
+    tabFit->AddFrame(splitFrame, new TGLayoutHints(kLHintsLeft | kLHintsTop | kLHintsExpandX, dx, dx, dy, 2*dy));
+    
     // Attach Tabs Widget
     tabsWidget->SetTab(0);
     setTabEnabled(1, false);    
@@ -263,10 +278,10 @@ void SWCalculatorView::initUI(){
 //    tbMax->AddText(0, buf);
 
     // Save data file button
-    btnSaveData = new TGTextButton(frameExportButtons, "Export Fit Data");
-    btnSaveData->Connect("Clicked()", "SWCalculatorView", this, "onSaveDataClicked()");
-    btnSaveData->SetEnabled(false);
-    frameExportButtons->AddFrame(btnSaveData, new TGLayoutHints(kLHintsRight | kLHintsTop, 0, 0, 0, 0));  // left, right, top, bottom
+//    btnSaveData = new TGTextButton(frameExportButtons, "Export Fit Data");
+//    btnSaveData->Connect("Clicked()", "SWCalculatorView", this, "onSaveDataClicked()");
+//    btnSaveData->SetEnabled(false);
+//    frameExportButtons->AddFrame(btnSaveData, new TGLayoutHints(kLHintsRight | kLHintsTop, 0, 0, 0, 0));  // left, right, top, bottom
 
     // Save image button
     btnSaveImage = new TGTextButton(frameExportButtons, "Save Image");
@@ -449,7 +464,7 @@ void SWCalculatorView::setToolbarEnabled(Bool_t isEnabled){
 //    btnApplyZoom->SetEnabled(isEnabled);
 //    btnResetZoom->SetEnabled(isEnabled);
     btnSaveImage->SetEnabled(isEnabled);
-    btnSaveData->SetEnabled(isEnabled);
+//    btnSaveData->SetEnabled(isEnabled);
 //    numDisplayMin->SetState(isEnabled);
 //    numDisplayMax->SetState(isEnabled);
     displayMin->SetState(isEnabled);
@@ -459,6 +474,10 @@ void SWCalculatorView::setToolbarEnabled(Bool_t isEnabled){
 void SWCalculatorView::setSourceContributionFrameVisible(Bool_t isVisible) {
     if (isVisible) tabFit->ShowFrame(sourceContributionFrame);
     else tabFit->HideFrame(sourceContributionFrame);
+}
+
+TCanvas* SWCalculatorView::getCanvas() {
+    return canvasPlot;
 }
 
 
@@ -555,12 +574,35 @@ void SWCalculatorView::onResetZoomClicked(){
     std::cout << "SWCalculatorView::onResetZoomClicked()" << std::endl;    
 }
 
-void SWCalculatorView::onSaveDataClicked(){
-    std::cout << "SWCalculatorView::onSaveDataClicked()" << std::endl;        
+void SWCalculatorView::onSaveResultsClicked() {
+    SWCalculatorPresenter* presenter = getPresenter();
+    presenter->onSaveResultsClicked();
 }
 
+void SWCalculatorView::onClearResultsClicked() {
+    SWCalculatorPresenter* presenter = getPresenter();
+    presenter->onClearResultsClicked();
+}
+
+void SWCalculatorView::saveFitResults(TString* fileName) {
+    Bool_t ok = txtFitResult->SaveFile(fileName->Data());
+    UiHelper::showOkDialog(ok ? "Results saved successfully" : "Error saving results file");
+}
+
+void SWCalculatorView::clearFitResults() {
+    txtFitResult->SetText(new TGText(""));
+    TGLongPosition* pos = new TGLongPosition(0, 0);
+    txtFitResult->ScrollToPosition(*pos);
+}
+
+
+//void SWCalculatorView::onSaveDataClicked(){
+//    std::cout << "SWCalculatorView::onSaveDataClicked()" << std::endl;        
+//}
+
 void SWCalculatorView::onSaveImageClicked(){
-    std::cout << "SWCalculatorView::onSaveImageClicked()" << std::endl;    
+    SWCalculatorPresenter* presenter = getPresenter();
+    presenter->onSaveImageClicked();
 }
 
 SWCalculatorView::~SWCalculatorView() {
@@ -583,7 +625,7 @@ SWCalculatorView::~SWCalculatorView() {
     delete numDampExponent;
     delete btnFitSpectrum;
     delete txtFitResult;
-    delete btnSaveData;
+//    delete btnSaveData;
     delete btnSaveImage;
     delete canvasPlot;
 //    if(numDisplayMin){numDisplayMin->Delete(); delete numDisplayMin;}

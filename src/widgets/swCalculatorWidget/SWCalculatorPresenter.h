@@ -31,7 +31,9 @@ public:
     // View functions
     
     void onFitSpectrumClicked();
-    
+    void onSaveImageClicked();
+    void onSaveResultsClicked();
+    void onClearResultsClicked();
     void onInitModel();
 };
 
