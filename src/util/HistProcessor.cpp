@@ -94,6 +94,30 @@ TH1* HistProcessor::subtractCurve(TH1* hist, RooCurve* curve){
 	return histMinusCurve;
 }
 
+TH1* HistProcessor::getResidualHist(TH1* hist, RooCurve* curve) {
+	Double_t xMin = hist->GetXaxis()->GetXmin();
+	Double_t xMax = hist->GetXaxis()->GetXmax();
+	Double_t nBins = hist->GetXaxis()->GetNbins();
+
+        RootHelper::deleteObject("resHist");
+	TH1* resHist = new TH1F("resHist", "Chi2 Histogram", nBins, xMin, xMax);
+	for (int i = 1; i <= nBins; i++){
+		Double_t count = hist->GetBinContent(i);
+		Double_t error = sqrt(count);//hist -> GetBinError(i);
+		Double_t theor = curve->Eval(hist->GetXaxis()->GetBinCenter(i));
+                // We want the chi^2 to be positive and negative
+                Double_t res = (count - theor) / error;
+                if(std::isfinite(res)) {
+                    resHist->SetBinContent(i, res);
+                }
+                else {
+                    resHist->SetBinContent(i, 0);                    
+                    std::cout << "Histogram at E=" << hist->GetBinCenter(i) << " (bin " << i << ") has count " << count << std::endl;
+                }
+	}
+	return resHist;
+}
+
 TH1* HistProcessor::getChi2Hist(TH1* hist, RooCurve* curve){
 	Double_t xMin = hist->GetXaxis()->GetXmin();
 	Double_t xMax = hist->GetXaxis()->GetXmax();

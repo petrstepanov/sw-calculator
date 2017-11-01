@@ -62,7 +62,7 @@ void CompositeModelProvider::initModel(Bool_t hasParabola, const Int_t numGauss,
     // Define parabola
     if (hasParabola){
             RootHelper::deleteObject("parabolaRoot");
-            RooRealVar* parabolaRoot = new RooRealVar("parabolaRoot", "Coefficient at -x^2 + r*2", 3.5, 1, 5); // 3.4579); = Al 
+            RooRealVar* parabolaRoot = new RooRealVar("parabolaRoot", "Coefficient at -x^2 + r*2", 3.5, 3, 6); // 3.4579); = Al 
             RootHelper::deleteObject("parabola");
             ParabolaPdf* parabola = new ParabolaPdf("parabola", "Fermi gas", *observable, *E_0, *parabolaRoot);
             RootHelper::deleteObject("parabolaCoeff");

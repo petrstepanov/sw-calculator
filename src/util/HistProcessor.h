@@ -26,6 +26,7 @@ public:
     TH1* cutHist(TH1*, Int_t, Int_t);
     RooCurve* subtractCurves(RooCurve*, RooCurve*);
     TH1* subtractCurve(TH1*, RooCurve*);
+    TH1* getResidualHist(TH1*, RooCurve*);
     TH1* getChi2Hist(TH1*, RooCurve*);
     Double_t getTotalCounts(TH1*);
     Bool_t hasBackground(TH1*);

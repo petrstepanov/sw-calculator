@@ -319,15 +319,15 @@ void SWCalculatorPresenter::onFitSpectrumClicked(){
     fitFrame->GetYaxis()->SetRangeUser(yAxisMin, yAxisMax);
     
     // Plot Bottom Frame with Fit Goodness
-    TH1F* chiHist = (TH1F*) histProcessor->getChi2Hist(fitHist, curveFit);
-    RooDataHist* chi2DataHist = new RooDataHist("chi2DataHist", "Chi2", RooArgSet(*e), chiHist);
+    TH1F* resHist = (TH1F*) histProcessor->getResidualHist(fitHist, curveFit);
+    RooDataHist* chi2DataHist = new RooDataHist("chi2DataHist", "Chi2", RooArgSet(*e), resHist);
 
     // Create RooPlot for chi^2 
     RooPlot* chiFrame = e->frame();
     chiFrame->SetTitle("");                                  // Set Empty Graph Title
     chiFrame->GetXaxis()->SetRangeUser(fitMin, fitMax);      // Do we need this?
     graphicsHelper->setupAxis(chiFrame->GetXaxis(), "", 2.5, 0.05); // Title, Title offset, Label offset
-    graphicsHelper->setupAxis(chiFrame->GetYaxis(), "#chi^{2}", 1.6, 0.012);
+    graphicsHelper->setupAxis(chiFrame->GetYaxis(), "Residuals", 1.6, 0.012); // "#chi^{2}"
 
     chi2DataHist->plotOn(chiFrame, RooFit::LineColor(kGray + 3), RooFit::XErrorSize(0), RooFit::DataError(RooAbsData::None), 
         RooFit::MarkerSize(0.5), RooFit::MarkerColor(kGray + 3));
