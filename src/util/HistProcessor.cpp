@@ -215,27 +215,31 @@ std::pair<Double_t, Double_t> HistProcessor::calcIntegral(TH1* hist, Double_t mi
 	return std::make_pair(sum, error);
 }
 
-std::pair<Double_t, Double_t> HistProcessor::getSParameter(TH1* hist, Double_t sWidth, Double_t mean) {
+std::pair<Double_t, Double_t> HistProcessor::getSParameter(TH1* hist, Double_t sWidth, Double_t mean, Bool_t isTwoDetector) {
     // Calculate full histogram integral
+    if (isTwoDetector) sWidth*=2;
+    std::cout << "Calculating S parameter. Mean " << mean << ", sWidth " <<  sWidth << std::endl;
     std::pair<Double_t, Double_t> fullInt;    
     fullInt.first = hist->IntegralAndError(1, hist->GetXaxis()->GetNbins(), fullInt.second, "width");
-    // std::cout << "Full Integral: " << fullInt.first << " ± " << fullInt.second << std::endl;
+    std::cout << "Full Integral: " << fullInt.first << " ± " << fullInt.second << std::endl;
     std::pair<Double_t, Double_t> sInt = calcIntegral(hist, mean - sWidth/2, mean + sWidth/2);
-    // std::cout << "S Integral: " << sInt.first << " ± " << sInt.second << std::endl;
+    std::cout << "S Integral: " << sInt.first << " ± " << sInt.second << std::endl;
     Double_t S = sInt.first / fullInt.first;
     Double_t dS = sqrt(pow((1 / fullInt.first)*(sInt.second), 2) + pow((sInt.first / fullInt.first / fullInt.first*fullInt.second), 2));
     return std::make_pair(S, dS);
 }
 
-std::pair<Double_t, Double_t> HistProcessor::getWParameter(TH1* hist, Double_t wWidth, Double_t wShift, Double_t mean) {
+std::pair<Double_t, Double_t> HistProcessor::getWParameter(TH1* hist, Double_t wWidth, Double_t wShift, Double_t mean, Bool_t isTwoDetector) {
     // Calculate full histogram integral
-    std::pair<Double_t, Double_t> fullInt;    
+    if (isTwoDetector){ wWidth*=2; wShift*=2; }
+    std::cout << "Calculating W parameter. Mean " << mean << ", wWidth " <<  wWidth << ", wShift " << wShift << std::endl;    
+    std::pair<Double_t, Double_t> fullInt;
     fullInt.first = hist->IntegralAndError(1, hist->GetXaxis()->GetNbins(), fullInt.second, "width");
-    // std::cout << "Full Integral: " << fullInt.first << " ± " << fullInt.second << std::endl;
+    std::cout << "Full Integral: " << fullInt.first << " ± " << fullInt.second << std::endl;
     std::pair<Double_t, Double_t> w1Int = calcIntegral(hist, mean - wShift - wWidth, mean - wShift);
-    // std::cout << "W1 Integral: " << w1Int.first << " ± " << w1Int.second << std::endl;
+    std::cout << "W1 Integral: " << w1Int.first << " ± " << w1Int.second << std::endl;
     std::pair<Double_t, Double_t> w2Int = calcIntegral(hist, mean + wShift, mean + wShift + wWidth);
-    // std::cout << "W2 Integral: " << w2Int.first << " ± " << w2Int.second << std::endl;
+    std::cout << "W2 Integral: " << w2Int.first << " ± " << w2Int.second << std::endl;
     Double_t W = (w1Int.first + w2Int.first) / fullInt.first;
     Double_t dW = sqrt(pow((1 / fullInt.first)*(w1Int.second), 2) + pow((1 / fullInt.first)*(w2Int.second), 2) + pow(((w1Int.first + w2Int.first) / fullInt.first / fullInt.first*fullInt.second), 2));
     return std::make_pair(W, dW);

@@ -372,8 +372,9 @@ void SWCalculatorPresenter::onFitSpectrumClicked(){
         Double_t sWidth = view->getSWidth();
         Double_t wWidth = view->getWWidth();
         Double_t wShift = view->getWShift();
-        std::pair<Double_t, Double_t> sValueError = histProcessor->getSParameter(fitHistNoBg, sWidth, mean);
-        std::pair<Double_t, Double_t> wValueError = histProcessor->getWParameter(fitHistNoBg, wWidth, wShift, mean);
+        Bool_t isTwoDetector = model->isTwoDetector();
+        std::pair<Double_t, Double_t> sValueError = histProcessor->getSParameter(fitHistNoBg, sWidth, mean, isTwoDetector);
+        std::pair<Double_t, Double_t> wValueError = histProcessor->getWParameter(fitHistNoBg, wWidth, wShift, mean, isTwoDetector);
         view->displaySW(sValueError, wValueError);
     }
 
