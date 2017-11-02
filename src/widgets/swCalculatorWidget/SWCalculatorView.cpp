@@ -586,7 +586,8 @@ void SWCalculatorView::onClearResultsClicked() {
 
 void SWCalculatorView::saveFitResults(TString* fileName) {
     Bool_t ok = txtFitResult->SaveFile(fileName->Data());
-    UiHelper::showOkDialog(ok ? "Results saved successfully" : "Error saving results file");
+    UiHelper* uiHelper = UiHelper::getInstance();
+    uiHelper->showOkDialog(ok ? "Results saved successfully" : "Error saving results file");
 }
 
 void SWCalculatorView::clearFitResults() {

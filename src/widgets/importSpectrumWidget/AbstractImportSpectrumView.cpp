@@ -39,6 +39,12 @@ void AbstractImportSpectrumView::initUI(){
         lblFileName = new TGLabel(frameOpenFile, "no file loaded");
         lblFileName->SetTextJustify(kTextLeft);
         lblFileName->Disable(kTRUE);
+        lblFileName->ChangeOptions(lblFileName->GetOptions() | kFixedSize);
+//        ULong_t bcolor;
+//        gClient->GetColorByName("blue", bcolor);
+//        lblFileName->SetBackgroundColor(bcolor);
+//        lblFileName->Resize(Constants::leftPanelWidth-btnOpenFile->GetWidth()-10, lblFileName->GetHeight());        
+        
 //        lblFileName->SetTextColor(Constants::colorGray);
 //        UiHelper::setLabelColor(lblFileName, "gray");
         frameOpenFile->AddFrame(lblFileName, new TGLayoutHints(kLHintsLeft | kLHintsTop | kLHintsExpandX, dx, 0, dy*3/5)); // left right top bottom

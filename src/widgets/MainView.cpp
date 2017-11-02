@@ -14,12 +14,17 @@
 #include "MainView.h"
 #include <TApplication.h>
 #include "../model/Constants.h"
+#include "../util/UiHelper.h"
+#include <iostream>
 
 MainView::MainView(const TGWindow* w) : TGMainFrame(w, Constants::windowWidth, Constants::windowHeight) {
     SetCleanup(kDeepCleanup);
     SetWindowName(Constants::applicationName);
     Connect("CloseWindow()", "TApplication", gApplication, "Terminate()");
     DontCallClose();
+    // Pass TGMainFrame to UiHelper for centering the dialogs
+    UiHelper* uiHelper = UiHelper::getInstance();
+    uiHelper->setMainFrame(this);
 }
 
 MainView::~MainView(){

@@ -15,6 +15,14 @@
         </file>
     </editor-bookmarks>
     <open-files xmlns="http://www.netbeans.org/ns/projectui-open-files/2">
-        <group/>
+        <group>
+            <file>file:/Users/petrstepanov/Development/NetBeansProjects/sw-calculator/src/widgets/swCalculatorWidget/SWCalculatorPresenter.cpp</file>
+            <file>file:/Users/petrstepanov/Development/NetBeansProjects/sw-calculator/src/main.cc</file>
+            <file>file:/Users/petrstepanov/Development/NetBeansProjects/sw-calculator/src/util/UiHelper.cpp</file>
+            <file>file:/Users/petrstepanov/Development/NetBeansProjects/sw-calculator/src/util/UiHelper.h</file>
+            <file>file:/Users/petrstepanov/Development/NetBeansProjects/sw-calculator/src/widgets/MainView.cpp</file>
+            <file>file:/Users/petrstepanov/Development/NetBeansProjects/sw-calculator/src/util/GraphicsHelper.cpp</file>
+            <file>file:/Users/petrstepanov/Development/NetBeansProjects/sw-calculator/src/widgets/MainView.h</file>
+        </group>
     </open-files>
 </project-private>

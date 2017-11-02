@@ -52,10 +52,10 @@ Contributor(s):
         <gdb_interceptlist>
           <gdbinterceptoptions gdb_all="false" gdb_unhandled="true" gdb_unexpected="true"/>
         </gdb_interceptlist>
-        <gdb_signals>
-        </gdb_signals>
         <gdb_options>
           <DebugOptions>
+            <option name="gdb_source_dirs"
+                    value="../../../root-6.10.08-source:../../../root-6.10.08-source/gui/gui/src"/>
           </DebugOptions>
         </gdb_options>
         <gdb_buildfirst gdb_buildfirst_overriden="false" gdb_buildfirst_old="false"/>
@@ -78,6 +78,7 @@ Contributor(s):
           <variable name="ROOTSYS" value="/Applications/root_v6.06.02"/>
           <variable name="LD_LIBRARY_PATH" value="/Applications/root_v6.06.02/lib"/>
           <variable name="DYLD_LIBRARY_PATH" value="/Applications/root_v6.06.02/lib"/>
+          <variable name="Env.ROOTSYS" value="/Applications/root_v6.06.02"/>
         </environment>
       </runprofile>
     </conf>

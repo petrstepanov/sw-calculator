@@ -397,7 +397,7 @@ void SWCalculatorPresenter::onSaveImageClicked() {
     TString* filePath = model->getFileName();
     TString* filePathNoExtension = StringUtils::stripFileExtension(filePath);
     if (model->getSourceHist()){
-        *filePathNoExtension += "-no-kapton";
+        *filePathNoExtension += "-kapton";
     }
     TString pngFilePath = *filePathNoExtension + ".png";
     TString pdfFilePath = *filePathNoExtension + ".pdf";
@@ -410,9 +410,8 @@ void SWCalculatorPresenter::onSaveImageClicked() {
     canvas->Print(pdfFilePath.Data());     // vector
 
     // Show ok dialog
-    TString message = "Files saved: ";
-    message += *filePathNoExtension + "(.png|.pdf)";
-    UiHelper::showOkDialog(message.Data());
+    UiHelper* uiHelper = UiHelper::getInstance();
+    uiHelper->showOkDialog("PNG and PDF images saved.");
 }
 
 void SWCalculatorPresenter::onSaveResultsClicked() {
@@ -422,6 +421,9 @@ void SWCalculatorPresenter::onSaveResultsClicked() {
     // Create image file names
     TString* filePath = model->getFileName();
     TString* filePathNoExtension = StringUtils::stripFileExtension(filePath);
+    if (model->getSourceHist()){
+        *filePathNoExtension += "-kapton";
+    }    
     TString resultsFilename = *filePathNoExtension + "-results.txt";
     
     view->saveFitResults(&resultsFilename);

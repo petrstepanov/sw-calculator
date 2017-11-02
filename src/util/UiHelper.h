@@ -16,18 +16,21 @@
 
 #include <TGFileDialog.h>
 #include <TGLabel.h>
+#include <TGWindow.h>
 
 class UiHelper {
-public:
-    UiHelper();
-    UiHelper(const UiHelper& orig);
-    virtual ~UiHelper();
-    
-    static TGFileInfo* getFileFromDialog(const TGWindow* main);
-    static void showOkDialog(const char* message);
+public:   
+    static UiHelper* getInstance();
     static void setLabelColor(TGLabel* label, const char* color);
-private:
 
+    int showOkDialog(const char* message);
+    TGFileInfo* getFileFromDialog();
+    void setMainFrame(TGWindow* window);
+        
+private:
+    UiHelper();
+    static UiHelper* instance;
+    TGWindow* mainFrame = nullptr;
 };
 
 #endif /* UIHELPER_H */

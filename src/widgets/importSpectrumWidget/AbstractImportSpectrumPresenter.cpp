@@ -19,7 +19,8 @@ void AbstractImportSpectrumPresenter::onOpenFileClicked(){
     AbstractImportSpectrumView* view = getView();
     
     // Get FileInfo from open file dialog
-    TGFileInfo* fileInfo = UiHelper::getFileFromDialog(view->GetParent());
+    UiHelper* uiHelper = UiHelper::getInstance();
+    TGFileInfo* fileInfo = uiHelper->getFileFromDialog();
     if (!fileInfo->fFilename){
         return;
     }
