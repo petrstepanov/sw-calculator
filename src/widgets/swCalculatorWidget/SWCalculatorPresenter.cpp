@@ -113,7 +113,7 @@ void SWCalculatorPresenter::onFitSpectrumClicked(){
     Model* model = getModel();
     TH1F* originalHist = model->getHist();
     HistProcessor* histProcessor = HistProcessor::getInstance();
-    TH1F* fitHist = (TH1F*) histProcessor->cutHist(originalHist, fitMin, fitMax);
+    TH1F* fitHist = (TH1F*) histProcessor->cutHist("fitHist", originalHist, fitMin, fitMax);
     
     // Define energy axis
     RooRealVar* e = new RooRealVar("e", "Energy axis", fitHist->GetXaxis()->GetXmin(), fitHist->GetXaxis()->GetXmax(), "keV");
@@ -209,10 +209,15 @@ void SWCalculatorPresenter::onFitSpectrumClicked(){
     // Evaluate Counts axis limits
     Double_t yAxisMin, yAxisMax;
     if (model->isTwoDetector()){
-        yAxisMin=0.1;
-        while (yAxisMin * 10 < fitHist->GetBinContent(fitHist->GetMinimumBin()) + 1) yAxisMin *= 10;        
+//        yAxisMin=0.1;
+//        while (yAxisMin * 10 < fitHist->GetBinContent(fitHist->GetMinimumBin()) + 1) yAxisMin *= 10;        
+//        Double_t logYAxisMax = 1.15 * TMath::Log10(fitHist->GetBinContent(fitHist->GetMaximumBin())); // Max limit is 15% larger hist maximum
+//        yAxisMax = pow(10, logYAxisMax);  
+        Double_t histMin = fitHist->GetBinContent(fitHist->GetMinimumBin());
+        yAxisMin=histMin < 0 ? 0 : histMin;        
         Double_t logYAxisMax = 1.15 * TMath::Log10(fitHist->GetBinContent(fitHist->GetMaximumBin())); // Max limit is 15% larger hist maximum
         yAxisMax = pow(10, logYAxisMax);  
+
     }
     else {
         Double_t logMin = TMath::Log10(fitHist->GetBinContent(fitHist->GetMinimumBin()));
@@ -300,7 +305,7 @@ void SWCalculatorPresenter::onFitSpectrumClicked(){
         // RooCurve* curveFitNoBg = histProcessor->subtractCurves(curveFit, curveBg);
 	// curveFitNoBg->SetLineColor(kGray);
 	// curveFitNoBg->SetLineWidth(2);
-	fitHistNoBg = (TH1F*) histProcessor->subtractCurve(fitHist, curveBg);
+	fitHistNoBg = (TH1F*) histProcessor->subtractCurve("fitHistNoBg", fitHist, curveBg);
         RooDataHist* dataNoBg = new RooDataHist("dataNoBg", "Dataset with e (no background)", RooArgSet(*e), RooFit::Import(*fitHistNoBg));
         dataNoBg->plotOn(fitFrame, RooFit::XErrorSize(0), RooFit::MarkerSize(0.5), 
             RooFit::DataError(RooAbsData::None), RooFit::MarkerColor(kGray), RooFit::Name("dataNoBg"));
@@ -319,7 +324,7 @@ void SWCalculatorPresenter::onFitSpectrumClicked(){
     fitFrame->GetYaxis()->SetRangeUser(yAxisMin, yAxisMax);
     
     // Plot Bottom Frame with Fit Goodness
-    TH1F* resHist = (TH1F*) histProcessor->getResidualHist(fitHist, curveFit);
+    TH1F* resHist = (TH1F*) histProcessor->getResidualHist("resHist", fitHist, curveFit);
     RooDataHist* chi2DataHist = new RooDataHist("chi2DataHist", "Chi2", RooArgSet(*e), resHist);
 
     // Create RooPlot for chi^2 

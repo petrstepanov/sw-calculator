@@ -31,29 +31,60 @@ HistProcessor* HistProcessor::getInstance(){
 	return instance;
 }
 
-TH1* HistProcessor::cutHist(TH1* fullHist, Int_t xMin, Int_t xMax){
-	Int_t minBin = fullHist->FindBin(xMin);
-	Int_t maxBin = fullHist->FindBin(xMax);
+TH1* HistProcessor::cutHistBasement(const char *newname, TH1* hist, Int_t xMin, Int_t xMax){
+	Int_t minBin = hist->FindBin(xMin);
+	Int_t maxBin = hist->FindBin(xMax);
+        if (minBin <= 1) minBin = 1;
+        if (maxBin >= hist->GetXaxis()->GetNbins()) maxBin = hist->GetXaxis()->GetNbins();
 	Int_t nBins = maxBin - minBin + 1;
 
+        Double_t leftVal = hist->GetBinContent(minBin);
+        Double_t rightVal = hist->GetBinContent(maxBin);
+        Double_t baseVal = (leftVal + rightVal)/2;
+        
 	//std::cout << "reduceHist: miBin - " << minBin << ", maxBin - " << maxBin << std::endl;
 
 	// Construct new histogram
-	Double_t lowEdge = fullHist->GetXaxis()->GetBinLowEdge(minBin);
-	Double_t upEdge = fullHist->GetXaxis()->GetBinUpEdge(maxBin);
+	Double_t lowEdge = hist->GetXaxis()->GetBinLowEdge(minBin);
+	Double_t upEdge = hist->GetXaxis()->GetBinUpEdge(maxBin);
 
 	//std::cout << "reduceHist: lowEdge - " << lowEdge << ", upEdge - " << upEdge << std::endl;
-        RootHelper::deleteObject("subHist");
-	TH1* subHist = new TH1F("subHist", "Counts Histogram", nBins, lowEdge, upEdge);
+//        RootHelper::deleteObject(newname);
+	TH1* subHist = new TH1F(newname, "Histogram with cutted basement", nBins, lowEdge, upEdge);
 	for (int j = minBin; j <= maxBin; j++){
-		subHist->SetBinContent(j - minBin + 1, fullHist->GetBinContent(j));
-		subHist->SetBinError(j - minBin + 1, fullHist->GetBinError(j));
+            Double_t val = hist->GetBinContent(j) - baseVal;
+            subHist->SetBinContent(j - minBin + 1, val < 0 ? 0 : val);
+            subHist->SetBinError(j - minBin + 1, sqrt(val));
 	}
 	return subHist;
 }
 
-RooCurve* HistProcessor::subtractCurves(RooCurve* curveFit, RooCurve* curveBg){
-	RooCurve* c = (RooCurve*)curveFit->Clone("FitNoBg");
+TH1* HistProcessor::cutHist(const char *newname, TH1* hist, Int_t xMin, Int_t xMax){
+	Int_t minBin = hist->FindBin(xMin);
+	Int_t maxBin = hist->FindBin(xMax);
+        if (minBin <= 1) minBin = 1;
+        if (maxBin >= hist->GetXaxis()->GetNbins()) maxBin = hist->GetXaxis()->GetNbins();
+	Int_t nBins = maxBin - minBin + 1;
+        
+	//std::cout << "reduceHist: miBin - " << minBin << ", maxBin - " << maxBin << std::endl;
+
+	// Construct new histogram
+	Double_t lowEdge = hist->GetXaxis()->GetBinLowEdge(minBin);
+	Double_t upEdge = hist->GetXaxis()->GetBinUpEdge(maxBin);
+
+	//std::cout << "reduceHist: lowEdge - " << lowEdge << ", upEdge - " << upEdge << std::endl;
+//        RootHelper::deleteObject(newname);
+	TH1* subHist = new TH1F(newname, "Cutted histogram", nBins, lowEdge, upEdge);
+	for (int j = minBin; j <= maxBin; j++){
+		subHist->SetBinContent(j - minBin + 1, hist->GetBinContent(j));
+		subHist->SetBinError(j - minBin + 1, hist->GetBinError(j));
+	}
+	return subHist;
+}
+
+RooCurve* HistProcessor::subtractCurves(const char *newname, RooCurve* curveFit, RooCurve* curveBg){
+//        RootHelper::deleteObject(newname);    
+	RooCurve* c = (RooCurve*)curveFit->Clone(newname);
 	// std::cout << "Curve No Bg:" << std::endl;
 	for (Int_t i = 0; i < curveFit->GetN(); i++){
 		Double_t energy;
@@ -73,13 +104,13 @@ RooCurve* HistProcessor::subtractCurves(RooCurve* curveFit, RooCurve* curveBg){
 	return c;
 }
 
-TH1* HistProcessor::subtractCurve(TH1* hist, RooCurve* curve){
+TH1* HistProcessor::subtractCurve(const char *newname, TH1* hist, RooCurve* curve){
 	Double_t xMin = hist->GetXaxis()->GetXmin();
 	Double_t xMax = hist->GetXaxis()->GetXmax();
 	Double_t nBins = hist->GetXaxis()->GetNbins();
 
-        RootHelper::deleteObject("histMinusCurve");
-	TH1* histMinusCurve = new TH1F("histMinusCurve", "Histogram Minus Curve", nBins, xMin, xMax);
+//        RootHelper::deleteObject("histMinusCurve");
+	TH1* histMinusCurve = new TH1F(newname, "Histogram minus curve", nBins, xMin, xMax);
 	for (int i = 1; i <= nBins; i++){
 		Double_t bg = (curve == NULL) ? 0.0 : curve->Eval(hist->GetXaxis()->GetBinCenter(i));
 		if (hist->GetBinContent(i) - bg >= 0) {
@@ -94,13 +125,13 @@ TH1* HistProcessor::subtractCurve(TH1* hist, RooCurve* curve){
 	return histMinusCurve;
 }
 
-TH1* HistProcessor::getResidualHist(TH1* hist, RooCurve* curve) {
+TH1* HistProcessor::getResidualHist(const char *newname, TH1* hist, RooCurve* curve) {
 	Double_t xMin = hist->GetXaxis()->GetXmin();
 	Double_t xMax = hist->GetXaxis()->GetXmax();
 	Double_t nBins = hist->GetXaxis()->GetNbins();
 
-        RootHelper::deleteObject("resHist");
-	TH1* resHist = new TH1F("resHist", "Chi2 Histogram", nBins, xMin, xMax);
+        RootHelper::deleteObject(newname);
+	TH1* resHist = new TH1F(newname, "Residual histogram", nBins, xMin, xMax);
 	for (int i = 1; i <= nBins; i++){
 		Double_t count = hist->GetBinContent(i);
 		Double_t error = sqrt(count);//hist -> GetBinError(i);
@@ -118,13 +149,13 @@ TH1* HistProcessor::getResidualHist(TH1* hist, RooCurve* curve) {
 	return resHist;
 }
 
-TH1* HistProcessor::getChi2Hist(TH1* hist, RooCurve* curve){
+TH1* HistProcessor::getChi2Hist(const char *newname, TH1* hist, RooCurve* curve){
 	Double_t xMin = hist->GetXaxis()->GetXmin();
 	Double_t xMax = hist->GetXaxis()->GetXmax();
 	Double_t nBins = hist->GetXaxis()->GetNbins();
 
-        RootHelper::deleteObject("chiHist");
-	TH1* chiHist = new TH1F("chiHist", "Chi2 Histogram", nBins, xMin, xMax);
+//        RootHelper::deleteObject(newname);
+	TH1* chiHist = new TH1F(newname, "Chi2 histogram", nBins, xMin, xMax);
 	for (int i = 1; i <= nBins; i++){
 		Double_t count = hist->GetBinContent(i);
 		Double_t error = sqrt(count);//hist -> GetBinError(i);

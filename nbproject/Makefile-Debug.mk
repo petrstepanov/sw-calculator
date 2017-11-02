@@ -14,14 +14,14 @@ GREP=grep
 NM=nm
 CCADMIN=CCadmin
 RANLIB=ranlib
-CC=gcc
-CCC=g++
-CXX=g++
+CC=clang
+CCC=clang++
+CXX=clang++
 FC=gfortran
 AS=as
 
 # Macros
-CND_PLATFORM=GNU-MacOSX
+CND_PLATFORM=CLang-MacOSX
 CND_DLIB_EXT=dylib
 CND_CONF=Debug
 CND_DISTDIR=dist
@@ -88,7 +88,7 @@ FFLAGS=
 ASFLAGS=
 
 # Link Libraries and Options
-LDLIBSOPTIONS=-L/Applications/root_v6.06.02/lib lib/sw-calculator.so
+LDLIBSOPTIONS=-L/Applications/root_v6.06.02/lib/ -L./ lib/sw-calculator.so
 
 # Build Targets
 .build-conf: ${BUILD_SUBPROJECTS}
@@ -100,7 +100,7 @@ ${CND_DISTDIR}/${CND_CONF}/${CND_PLATFORM}/sw-calculator: lib/sw-calculator.so
 
 ${CND_DISTDIR}/${CND_CONF}/${CND_PLATFORM}/sw-calculator: ${OBJECTFILES}
 	${MKDIR} -p ${CND_DISTDIR}/${CND_CONF}/${CND_PLATFORM}
-	g++ -o ${CND_DISTDIR}/${CND_CONF}/${CND_PLATFORM}/sw-calculator ${OBJECTFILES} ${LDLIBSOPTIONS} -lGui -lCore -lRIO -lNet -lHist -lGraf -lGraf3d -lGpad -lTree -lRint -lPostscript -lMatrix -lPhysics -lMathCore -lThread -lMultiProc -lpthread -stdlib=libc++ -lm -ldl -lRooFit -lRooFitCore -lHtml -lMinuit -lFumili
+	clang++ -o ${CND_DISTDIR}/${CND_CONF}/${CND_PLATFORM}/sw-calculator ${OBJECTFILES} ${LDLIBSOPTIONS} -lGui -lCore -lRIO -lNet -lHist -lGraf -lGraf3d -lGpad -lTree -lRint -lPostscript -lMatrix -lPhysics -lMathCore -lThread -lMultiProc -lpthread -stdlib=libc++ -lm -ldl -lRooFit -lRooFitCore -lHtml -lMinuit -lFumili
 
 ${OBJECTDIR}/SWCalculatorFrameLinkDef.h.gch: SWCalculatorFrameLinkDef.h
 	${MKDIR} -p ${OBJECTDIR}

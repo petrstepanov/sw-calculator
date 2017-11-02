@@ -180,7 +180,7 @@ build: .build-post
 
 	@echo Generating shared library: sw-calculator.so
 	$(CD) src; \
-	g++ -shared -o sw-calculator.so $(MYCFLAGS) $(MYLIBS) SWCalculatorDict.cpp $(MYSOURCES)
+	clang++ -shared -o sw-calculator.so $(MYCFLAGS) $(MYLIBS) SWCalculatorDict.cpp $(MYSOURCES)
 
 	@echo Move shared library './src/sw-calculator.so' to './lib/...'
 	$(MV) ./src/sw-calculator.so ./lib/sw-calculator.so

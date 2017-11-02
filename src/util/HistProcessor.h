@@ -23,11 +23,12 @@ class HistProcessor {
 public:
     static HistProcessor* getInstance();
 
-    TH1* cutHist(TH1*, Int_t, Int_t);
-    RooCurve* subtractCurves(RooCurve*, RooCurve*);
-    TH1* subtractCurve(TH1*, RooCurve*);
-    TH1* getResidualHist(TH1*, RooCurve*);
-    TH1* getChi2Hist(TH1*, RooCurve*);
+    TH1* cutHist(const char *newname, TH1* hist, Int_t, Int_t);
+    TH1* cutHistBasement(const char *newname, TH1* hist, Int_t, Int_t);
+    RooCurve* subtractCurves(const char *newname, RooCurve*, RooCurve*);
+    TH1* subtractCurve(const char *newname, TH1*, RooCurve*);
+    TH1* getResidualHist(const char *newname, TH1*, RooCurve*);
+    TH1* getChi2Hist(const char *newname, TH1*, RooCurve*);
     Double_t getTotalCounts(TH1*);
     Bool_t hasBackground(TH1*);
     Bool_t hasAtan(TH1*);

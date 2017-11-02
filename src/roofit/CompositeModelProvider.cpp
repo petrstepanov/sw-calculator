@@ -19,6 +19,7 @@
 #include "OrthogonalPdf.h"
 #include "../util/RootHelper.h"
 #include "../model/Constants.h"
+#include "../util/HistProcessor.h"
 #include "ChannelConvolutionPdf.h"
 #include "BackgroundPdf.h"
 #include <RooFormulaVar.h>
@@ -40,7 +41,22 @@ CompositeModelProvider::CompositeModelProvider(RooRealVar* x, RooRealVar* x0) : 
 }
 
 void CompositeModelProvider::initSourcePdf(TH1F* sourceHist, RooAbsReal* sourceContrib) {
-    RooDataHist* sourceDataHist = new RooDataHist("sourceDataHist", "Source Data Hist", RooArgList(*observable), RooFit::Import(*sourceHist));
+    Double_t histMin = sourceHist->GetXaxis()->GetXmin();
+    Double_t histMax = sourceHist->GetXaxis()->GetXmax();
+    Double_t observableMin = observable->getMin();
+    Double_t observableMax = observable->getMax();
+//    std::cout << "histMin: " << histMin << ". histMax:" << histMax << std::endl;
+//    std::cout << "observableMin: " << observableMin << ". observableMax:" << observableMax << std::endl;
+    RooDataHist* sourceDataHist;
+    if (histMin < observableMin || histMax > observableMax){
+        HistProcessor* histProcessor = HistProcessor::getInstance();
+        TH1F* cutSourceHist = (TH1F*)histProcessor->cutHist("cutSourceHist", sourceHist, observableMin, observableMax);
+        sourceDataHist = new RooDataHist("sourceDataHist", "Source Data Hist", RooArgList(*observable), RooFit::Import(*cutSourceHist));        
+    }
+    else {
+        sourceDataHist = new RooDataHist("sourceDataHist", "Source Data Hist", RooArgList(*observable), RooFit::Import(*sourceHist));
+    }
+//     = new RooDataHist("sourceDataHist", "Source Data Hist", RooArgList(*observable), RooFit::Import(*sourceHist));
     this->sourcePdf = new RooHistPdf("sourcePdf", "Source contribution", *observable, *sourceDataHist, 1);
     this->sourceContribution = sourceContrib;
 }
