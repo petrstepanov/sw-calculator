@@ -294,7 +294,7 @@ void SWCalculatorPresenter::onFitSpectrumClicked(){
     // This histogram is used for calculating S and W parameters
     TH1F* fitHistNoBg = fitHist;
     
-    // Single-dimentional experiment case
+    // Single-dimentional experiment case - plot background
     if (!model->isTwoDetector()){
         // Plot Convoluted Model background (its added after convolution graph because otherwise it changes backgroud)
         fittingNonConvolutedModel->plotOn(fitFrame, RooFit::Components(*(modelProvider->getBgComponents())), 

@@ -20,7 +20,7 @@ class MainView : public TGMainFrame {
 public:
     MainView(const TGWindow* w);
     virtual ~MainView();
-    
+
     void mapAndResize();
 };
 

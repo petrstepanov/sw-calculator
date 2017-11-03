@@ -628,13 +628,9 @@ SWCalculatorView::~SWCalculatorView() {
     delete txtFitResult;
 //    delete btnSaveData;
     delete btnSaveImage;
-    delete canvasPlot;
-//    if(numDisplayMin){numDisplayMin->Delete(); delete numDisplayMin;}
-//    if(numDisplayMax){numDisplayMax->Delete(); delete numDisplayMax;}
-//    if(btnApplyZoom){btnApplyZoom->Delete(); delete btnApplyZoom;}
-//    if(btnResetZoom){btnResetZoom->Delete(); delete btnResetZoom;}
-    if(fitFrame){fitFrame->Delete(); delete fitFrame;}
-    if(chiFrame){chiFrame->Delete(); delete chiFrame;}
-    if(padData){padData->Delete(); delete padData;}
-    if(padChi2){padChi2->Delete(); delete padChi2;}
+    delete fitFrame;
+    delete chiFrame;
+    delete padData;
+    delete padChi2;
+    delete canvasPlot;    
 }
