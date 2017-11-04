@@ -2,7 +2,7 @@
 
 Program calculates S and W parameters of the 511 annihilation peak of the annihilation radiation. It is possible to estimate the binding electron energies by fitting the CDB spectrum with the contributions from e+ annihilation on electrons with different wave functions. Electrons from conduction band contribute into the spectrum as an inverted parabola. Upon the shape of the parabola we calculate Fermi energy. Check our [research group website SelimLab](http://physics.bgsu.edu/~faselim/).
 
-<img src="http://physics.bgsu.edu/selimlab/wp-content/uploads/2016/12/tlist-processor-screenshot.png" alt="SW Calculator desktop application" style="width: 200px;"/>
+<img src="http://physics.bgsu.edu/selimlab/wp-content/uploads/2016/12/swcalculator-screenshot.png" alt="SW Calculator desktop application" style="width: 100%;"/>
 
 # Setup instructions
 
@@ -68,3 +68,7 @@ xcode-select --install
 ```bash
 export ROOT_INCLUDE_PATH=/path/to/your/application/folder:$ROOT_INCLUDE_PATH
 ```
+
+---
+
+Shoot me an email with feedback and questions: [mailto:petrs@bgsu.edu](petrs@bgsu.edu)
