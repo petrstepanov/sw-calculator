@@ -35,7 +35,7 @@ nbproject/
 .dep.inc
 build/
 dist/
-sw-calculator-dict.cpp
+*dict.cpp
 *.pcm
 *.so
 Makefile-netbeans
