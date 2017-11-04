@@ -5,11 +5,12 @@ OBJ_DIR=build
 BIN_DIR=dist
 
 APP_NAME=sw-calculator
-DICT_FILENAME=SWDictionary.cpp
-DICT_PCM_FILENAME=SWDictionary_rdict.pcm
+DICT_FILENAME=sw-dict.cpp
+DICT_PCM_FILENAME=sw-dict_rdict.pcm
 
 # Variables
 CXXFLAGS=`root-config --cflags` # -pthread -stdlib=libc++ -std=c++11 -m64 -I/Applications/root_v6.06.02/include
+LDFLAGS=`root-config --ldflags`
 GLIBS=`root-config --glibs` -lRooFit -lRooFitCore -lHtml -lMinuit -lFumili
 HEADERS=src/event/Event.h \
         src/event/EventBus.h \
@@ -124,17 +125,18 @@ $(OBJ_DIR)/%.o: $(SRC_DIR)/%.cpp
 # just compile
 	$(CXX) $(CXXFLAGS) -c $< -o $@
 
-$(SHARED_LIBRARY): $(DICTIONARY)
-	$(CXX) -shared -o $@ $(CXXFLAGS) $(GLIBS) $< $(SOURCES)
+# https://root.cern.ch/interacting-shared-libraries-rootcint
+$(SHARED_LIBRARY): $(DICTIONARY) $(OBJECTS)
+	$(CXX) -shared -o $@ $(LDFLAGS) $(CXXFLAGS) $<
 
 $(DICTIONARY):
 	rootcling -f $@ -c $(CXXFLAGS) -p $(HEADERS) $(SRC_DIR)/SWCalculatorLinkDef.h
 
 clean:
-	rm -r $(OBJ_DIR)
-	rm -r $(BIN_DIR)
-	rm $(DICTIONARY)
-	rm *.pcm
+	rm -f -r $(OBJ_DIR)
+	rm -f -r $(BIN_DIR)
+	rm -f $(DICTIONARY)
+	rm -f *.pcm
 
 directories:
 	mkdir -p $(OBJ_DIR)

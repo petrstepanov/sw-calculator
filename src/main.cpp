@@ -1,4 +1,4 @@
-   #include <TROOT.h>
+#include <TROOT.h>
 #include <TApplication.h>
 #include <TGFrame.h>
 #include "widgets/swCalculatorWidget/SWCalculatorView.h"

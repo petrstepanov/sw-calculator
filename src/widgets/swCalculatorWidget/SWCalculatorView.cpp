@@ -13,7 +13,7 @@
 
 #include "SWCalculatorView.h"
 #include "SWCalculatorPresenter.h"
-#include "../../SWCalculatorLinkDef.h"
+#include "../../LinkDef.h"
 #include "../../model/Constants.h"
 #include "../importSpectrumWidget/ImportSpectrumView.h"
 #include "../importSpectrumWidget/ImportSourceSpectrumView.h"
