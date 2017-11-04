@@ -71,4 +71,4 @@ export ROOT_INCLUDE_PATH=/path/to/your/application/folder:$ROOT_INCLUDE_PATH
 
 ---
 
-Shoot me an email with feedback and questions: [mailto:petrs@bgsu.edu](petrs@bgsu.edu)
+Shoot me an email with feedback and questions: [petrs@bgsu.edu](mailto:petrs@bgsu.edu)
