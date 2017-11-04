@@ -53,8 +53,7 @@ HEADERS=src/event/Event.h \
         src/widgets/swCalculatorWidget/SWCalculatorView.h \
         src/widgets/AbstractPresenter.h \
         src/widgets/AbstractView.h \
-        src/widgets/MainView.h \
-        src/main.h
+        src/widgets/MainView.h
 FILES=event/EventBus.cpp \
       event/events/HistogramImportedEvent.cpp \
       event/events/IsTwoDetectorEvent.cpp \
@@ -115,6 +114,12 @@ $(EXECUTABLE): $(OBJECTS) $(SHARED_LIBRARY)
 	# move dictionary to the bin folder - they say you have to
 	mv $(DICT_PCM_FILENAME) $(BIN_DIR)/$(DICT_PCM_FILENAME)
 
+$(DICTIONARY): $(HEADERS) $(SRC_DIR)/LinkDef.h
+	rootcling -f $@ -c $(CXXFLAGS) -p $^
+
+# https://root.cern.ch/interacting-shared-libraries-rootcint (they forgot $(GLIBS) damn)
+$(SHARED_LIBRARY): $(DICTIONARY) $(SOURCES)
+	$(CXX) -shared -o $@ $(LDFLAGS) $(CXXFLAGS) $(GLIBS) $^
 
 $(OBJ_DIR)/%.o: $(SRC_DIR)/%.cpp
 	@echo "Compiling "$@
@@ -125,12 +130,6 @@ $(OBJ_DIR)/%.o: $(SRC_DIR)/%.cpp
 # just compile
 	$(CXX) $(CXXFLAGS) -c $< -o $@
 
-# https://root.cern.ch/interacting-shared-libraries-rootcint
-$(SHARED_LIBRARY): $(DICTIONARY) $(OBJECTS)
-	$(CXX) -shared -o $@ $(LDFLAGS) $(CXXFLAGS) $<
-
-$(DICTIONARY):
-	rootcling -f $@ -c $(CXXFLAGS) -p $(HEADERS) $(SRC_DIR)/SWCalculatorLinkDef.h
 
 clean:
 	rm -f -r $(OBJ_DIR)
