@@ -31,5 +31,13 @@
 *.app
 
 # Netbeans
-nbproject/private/
+nbproject/
+.dep.inc
 build/
+dist/
+*.cpp
+*.pcm
+*.so
+Makefile-netbeans
+Makefile-my
+Makefile
