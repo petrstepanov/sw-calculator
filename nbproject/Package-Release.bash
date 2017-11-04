@@ -6,7 +6,7 @@
 
 # Macros
 TOP=`pwd`
-CND_PLATFORM=GNU-MacOSX
+CND_PLATFORM=CLang-MacOSX
 CND_CONF=Release
 CND_DISTDIR=dist
 CND_BUILDDIR=build
@@ -59,6 +59,10 @@ rm -rf ${NBTMPDIR}
 mkdir -p ${NBTMPDIR}
 
 # Copy files and create directories and links
+cd "${TOP}"
+makeDirectory "${NBTMPDIR}/sw-calculator/bin"
+copyFileToTmpDir "${CND_DISTDIR}/${CND_CONF}/${CND_PLATFORM}/sw-calculator.so" "${NBTMPDIR}/${PACKAGE_TOP_DIR}bin/sw-calculator.so" 0755
+
 cd "${TOP}"
 makeDirectory "${NBTMPDIR}/sw-calculator/bin"
 copyFileToTmpDir "${OUTPUT_PATH}" "${NBTMPDIR}/${PACKAGE_TOP_DIR}bin/${OUTPUT_BASENAME}" 0755

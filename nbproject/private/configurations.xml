@@ -109,7 +109,8 @@ Contributor(s):
         </runcommandpicklist>
         <runcommand>"${OUTPUT_PATH}" "arg 1" "arg 2" "arg 3" "arg 4"</runcommand>
         <rundir></rundir>
-        <buildfirst>true</buildfirst>
+        <buildfirst>false</buildfirst>
+        <console-type>1</console-type>
         <terminal-type>0</terminal-type>
         <remove-instrumentation>0</remove-instrumentation>
         <environment>

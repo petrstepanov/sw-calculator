@@ -14,14 +14,14 @@ GREP=grep
 NM=nm
 CCADMIN=CCadmin
 RANLIB=ranlib
-CC=gcc
-CCC=g++
-CXX=g++
+CC=clang
+CCC=clang++
+CXX=clang++
 FC=gfortran
 AS=as
 
 # Macros
-CND_PLATFORM=GNU-MacOSX
+CND_PLATFORM=CLang-MacOSX
 CND_DLIB_EXT=dylib
 CND_CONF=Release
 CND_DISTDIR=dist
@@ -78,8 +78,8 @@ OBJECTFILES= \
 CFLAGS=
 
 # CC Compiler Flags
-CCFLAGS=
-CXXFLAGS=
+CCFLAGS=-pthread -stdlib=libc++ -std=c++11 -m64
+CXXFLAGS=-pthread -stdlib=libc++ -std=c++11 -m64
 
 # Fortran Compiler Flags
 FFLAGS=
@@ -88,200 +88,204 @@ FFLAGS=
 ASFLAGS=
 
 # Link Libraries and Options
-LDLIBSOPTIONS=
+LDLIBSOPTIONS=-L/Applications/root_v6.06.02/lib/ -L./ lib/sw-calculator.so
 
 # Build Targets
 .build-conf: ${BUILD_SUBPROJECTS}
 	"${MAKE}"  -f nbproject/Makefile-${CND_CONF}.mk ${CND_DISTDIR}/${CND_CONF}/${CND_PLATFORM}/sw-calculator
+	${CP} lib/sw-calculator.so ${CND_DISTDIR}/${CND_CONF}/${CND_PLATFORM}
+	-install_name_tool -change sw-calculator.so @executable_path/sw-calculator.so ${CND_DISTDIR}/${CND_CONF}/${CND_PLATFORM}/sw-calculator
+
+${CND_DISTDIR}/${CND_CONF}/${CND_PLATFORM}/sw-calculator: lib/sw-calculator.so
 
 ${CND_DISTDIR}/${CND_CONF}/${CND_PLATFORM}/sw-calculator: ${OBJECTFILES}
 	${MKDIR} -p ${CND_DISTDIR}/${CND_CONF}/${CND_PLATFORM}
-	${LINK.cc} -o ${CND_DISTDIR}/${CND_CONF}/${CND_PLATFORM}/sw-calculator ${OBJECTFILES} ${LDLIBSOPTIONS}
+	${LINK.cc} -o ${CND_DISTDIR}/${CND_CONF}/${CND_PLATFORM}/sw-calculator ${OBJECTFILES} ${LDLIBSOPTIONS} -lGui -lCore -lRIO -lNet -lHist -lGraf -lGraf3d -lGpad -lTree -lRint -lPostscript -lMatrix -lPhysics -lMathCore -lThread -lMultiProc -lpthread -stdlib=libc++ -lm -ldl -lRooFit -lRooFitCore -lHtml -lMinuit -lFumili
 
 ${OBJECTDIR}/src/event/EventBus.o: src/event/EventBus.cpp
 	${MKDIR} -p ${OBJECTDIR}/src/event
 	${RM} "$@.d"
-	$(COMPILE.cc) -O2 -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/src/event/EventBus.o src/event/EventBus.cpp
+	$(COMPILE.cc) -O2 -I/Applications/root_v6.06.02/include -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/src/event/EventBus.o src/event/EventBus.cpp
 
 ${OBJECTDIR}/src/event/events/HistogramImportedEvent.o: src/event/events/HistogramImportedEvent.cpp
 	${MKDIR} -p ${OBJECTDIR}/src/event/events
 	${RM} "$@.d"
-	$(COMPILE.cc) -O2 -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/src/event/events/HistogramImportedEvent.o src/event/events/HistogramImportedEvent.cpp
+	$(COMPILE.cc) -O2 -I/Applications/root_v6.06.02/include -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/src/event/events/HistogramImportedEvent.o src/event/events/HistogramImportedEvent.cpp
 
 ${OBJECTDIR}/src/event/events/IsTwoDetectorEvent.o: src/event/events/IsTwoDetectorEvent.cpp
 	${MKDIR} -p ${OBJECTDIR}/src/event/events
 	${RM} "$@.d"
-	$(COMPILE.cc) -O2 -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/src/event/events/IsTwoDetectorEvent.o src/event/events/IsTwoDetectorEvent.cpp
+	$(COMPILE.cc) -O2 -I/Applications/root_v6.06.02/include -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/src/event/events/IsTwoDetectorEvent.o src/event/events/IsTwoDetectorEvent.cpp
 
 ${OBJECTDIR}/src/event/events/SourceHistogramImportedEvent.o: src/event/events/SourceHistogramImportedEvent.cpp
 	${MKDIR} -p ${OBJECTDIR}/src/event/events
 	${RM} "$@.d"
-	$(COMPILE.cc) -O2 -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/src/event/events/SourceHistogramImportedEvent.o src/event/events/SourceHistogramImportedEvent.cpp
+	$(COMPILE.cc) -O2 -I/Applications/root_v6.06.02/include -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/src/event/events/SourceHistogramImportedEvent.o src/event/events/SourceHistogramImportedEvent.cpp
 
 ${OBJECTDIR}/src/main.o: src/main.cc
 	${MKDIR} -p ${OBJECTDIR}/src
 	${RM} "$@.d"
-	$(COMPILE.cc) -O2 -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/src/main.o src/main.cc
+	$(COMPILE.cc) -O2 -I/Applications/root_v6.06.02/include -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/src/main.o src/main.cc
 
 ${OBJECTDIR}/src/model/Constants.o: src/model/Constants.cpp
 	${MKDIR} -p ${OBJECTDIR}/src/model
 	${RM} "$@.d"
-	$(COMPILE.cc) -O2 -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/src/model/Constants.o src/model/Constants.cpp
+	$(COMPILE.cc) -O2 -I/Applications/root_v6.06.02/include -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/src/model/Constants.o src/model/Constants.cpp
 
 ${OBJECTDIR}/src/model/Model.o: src/model/Model.cpp
 	${MKDIR} -p ${OBJECTDIR}/src/model
 	${RM} "$@.d"
-	$(COMPILE.cc) -O2 -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/src/model/Model.o src/model/Model.cpp
+	$(COMPILE.cc) -O2 -I/Applications/root_v6.06.02/include -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/src/model/Model.o src/model/Model.cpp
 
 ${OBJECTDIR}/src/roofit/AbstractModelProvider.o: src/roofit/AbstractModelProvider.cpp
 	${MKDIR} -p ${OBJECTDIR}/src/roofit
 	${RM} "$@.d"
-	$(COMPILE.cc) -O2 -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/src/roofit/AbstractModelProvider.o src/roofit/AbstractModelProvider.cpp
+	$(COMPILE.cc) -O2 -I/Applications/root_v6.06.02/include -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/src/roofit/AbstractModelProvider.o src/roofit/AbstractModelProvider.cpp
 
 ${OBJECTDIR}/src/roofit/BackgroundPdf.o: src/roofit/BackgroundPdf.cpp
 	${MKDIR} -p ${OBJECTDIR}/src/roofit
 	${RM} "$@.d"
-	$(COMPILE.cc) -O2 -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/src/roofit/BackgroundPdf.o src/roofit/BackgroundPdf.cpp
+	$(COMPILE.cc) -O2 -I/Applications/root_v6.06.02/include -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/src/roofit/BackgroundPdf.o src/roofit/BackgroundPdf.cpp
 
 ${OBJECTDIR}/src/roofit/ChannelConvolutionPdf.o: src/roofit/ChannelConvolutionPdf.cpp
 	${MKDIR} -p ${OBJECTDIR}/src/roofit
 	${RM} "$@.d"
-	$(COMPILE.cc) -O2 -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/src/roofit/ChannelConvolutionPdf.o src/roofit/ChannelConvolutionPdf.cpp
+	$(COMPILE.cc) -O2 -I/Applications/root_v6.06.02/include -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/src/roofit/ChannelConvolutionPdf.o src/roofit/ChannelConvolutionPdf.cpp
 
 ${OBJECTDIR}/src/roofit/CompositeModelProvider.o: src/roofit/CompositeModelProvider.cpp
 	${MKDIR} -p ${OBJECTDIR}/src/roofit
 	${RM} "$@.d"
-	$(COMPILE.cc) -O2 -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/src/roofit/CompositeModelProvider.o src/roofit/CompositeModelProvider.cpp
+	$(COMPILE.cc) -O2 -I/Applications/root_v6.06.02/include -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/src/roofit/CompositeModelProvider.o src/roofit/CompositeModelProvider.cpp
 
 ${OBJECTDIR}/src/roofit/DampLorentzPdf.o: src/roofit/DampLorentzPdf.cpp
 	${MKDIR} -p ${OBJECTDIR}/src/roofit
 	${RM} "$@.d"
-	$(COMPILE.cc) -O2 -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/src/roofit/DampLorentzPdf.o src/roofit/DampLorentzPdf.cpp
+	$(COMPILE.cc) -O2 -I/Applications/root_v6.06.02/include -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/src/roofit/DampLorentzPdf.o src/roofit/DampLorentzPdf.cpp
 
 ${OBJECTDIR}/src/roofit/GaussianPdf.o: src/roofit/GaussianPdf.cpp
 	${MKDIR} -p ${OBJECTDIR}/src/roofit
 	${RM} "$@.d"
-	$(COMPILE.cc) -O2 -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/src/roofit/GaussianPdf.o src/roofit/GaussianPdf.cpp
+	$(COMPILE.cc) -O2 -I/Applications/root_v6.06.02/include -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/src/roofit/GaussianPdf.o src/roofit/GaussianPdf.cpp
 
 ${OBJECTDIR}/src/roofit/IndirectParamPdf.o: src/roofit/IndirectParamPdf.cpp
 	${MKDIR} -p ${OBJECTDIR}/src/roofit
 	${RM} "$@.d"
-	$(COMPILE.cc) -O2 -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/src/roofit/IndirectParamPdf.o src/roofit/IndirectParamPdf.cpp
+	$(COMPILE.cc) -O2 -I/Applications/root_v6.06.02/include -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/src/roofit/IndirectParamPdf.o src/roofit/IndirectParamPdf.cpp
 
 ${OBJECTDIR}/src/roofit/LorentzianPdf.o: src/roofit/LorentzianPdf.cpp
 	${MKDIR} -p ${OBJECTDIR}/src/roofit
 	${RM} "$@.d"
-	$(COMPILE.cc) -O2 -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/src/roofit/LorentzianPdf.o src/roofit/LorentzianPdf.cpp
+	$(COMPILE.cc) -O2 -I/Applications/root_v6.06.02/include -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/src/roofit/LorentzianPdf.o src/roofit/LorentzianPdf.cpp
 
 ${OBJECTDIR}/src/roofit/OrthogonalPdf.o: src/roofit/OrthogonalPdf.cpp
 	${MKDIR} -p ${OBJECTDIR}/src/roofit
 	${RM} "$@.d"
-	$(COMPILE.cc) -O2 -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/src/roofit/OrthogonalPdf.o src/roofit/OrthogonalPdf.cpp
+	$(COMPILE.cc) -O2 -I/Applications/root_v6.06.02/include -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/src/roofit/OrthogonalPdf.o src/roofit/OrthogonalPdf.cpp
 
 ${OBJECTDIR}/src/roofit/ParabolaGaussModelProvider.o: src/roofit/ParabolaGaussModelProvider.cpp
 	${MKDIR} -p ${OBJECTDIR}/src/roofit
 	${RM} "$@.d"
-	$(COMPILE.cc) -O2 -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/src/roofit/ParabolaGaussModelProvider.o src/roofit/ParabolaGaussModelProvider.cpp
+	$(COMPILE.cc) -O2 -I/Applications/root_v6.06.02/include -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/src/roofit/ParabolaGaussModelProvider.o src/roofit/ParabolaGaussModelProvider.cpp
 
 ${OBJECTDIR}/src/roofit/ParabolaLorentzianModelProvider.o: src/roofit/ParabolaLorentzianModelProvider.cpp
 	${MKDIR} -p ${OBJECTDIR}/src/roofit
 	${RM} "$@.d"
-	$(COMPILE.cc) -O2 -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/src/roofit/ParabolaLorentzianModelProvider.o src/roofit/ParabolaLorentzianModelProvider.cpp
+	$(COMPILE.cc) -O2 -I/Applications/root_v6.06.02/include -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/src/roofit/ParabolaLorentzianModelProvider.o src/roofit/ParabolaLorentzianModelProvider.cpp
 
 ${OBJECTDIR}/src/roofit/ParabolaPdf.o: src/roofit/ParabolaPdf.cpp
 	${MKDIR} -p ${OBJECTDIR}/src/roofit
 	${RM} "$@.d"
-	$(COMPILE.cc) -O2 -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/src/roofit/ParabolaPdf.o src/roofit/ParabolaPdf.cpp
+	$(COMPILE.cc) -O2 -I/Applications/root_v6.06.02/include -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/src/roofit/ParabolaPdf.o src/roofit/ParabolaPdf.cpp
 
 ${OBJECTDIR}/src/util/FileUtils.o: src/util/FileUtils.cpp
 	${MKDIR} -p ${OBJECTDIR}/src/util
 	${RM} "$@.d"
-	$(COMPILE.cc) -O2 -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/src/util/FileUtils.o src/util/FileUtils.cpp
+	$(COMPILE.cc) -O2 -I/Applications/root_v6.06.02/include -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/src/util/FileUtils.o src/util/FileUtils.cpp
 
 ${OBJECTDIR}/src/util/GraphicsHelper.o: src/util/GraphicsHelper.cpp
 	${MKDIR} -p ${OBJECTDIR}/src/util
 	${RM} "$@.d"
-	$(COMPILE.cc) -O2 -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/src/util/GraphicsHelper.o src/util/GraphicsHelper.cpp
+	$(COMPILE.cc) -O2 -I/Applications/root_v6.06.02/include -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/src/util/GraphicsHelper.o src/util/GraphicsHelper.cpp
 
 ${OBJECTDIR}/src/util/HistProcessor.o: src/util/HistProcessor.cpp
 	${MKDIR} -p ${OBJECTDIR}/src/util
 	${RM} "$@.d"
-	$(COMPILE.cc) -O2 -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/src/util/HistProcessor.o src/util/HistProcessor.cpp
+	$(COMPILE.cc) -O2 -I/Applications/root_v6.06.02/include -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/src/util/HistProcessor.o src/util/HistProcessor.cpp
 
 ${OBJECTDIR}/src/util/RootHelper.o: src/util/RootHelper.cpp
 	${MKDIR} -p ${OBJECTDIR}/src/util
 	${RM} "$@.d"
-	$(COMPILE.cc) -O2 -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/src/util/RootHelper.o src/util/RootHelper.cpp
+	$(COMPILE.cc) -O2 -I/Applications/root_v6.06.02/include -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/src/util/RootHelper.o src/util/RootHelper.cpp
 
 ${OBJECTDIR}/src/util/StringUtils.o: src/util/StringUtils.cpp
 	${MKDIR} -p ${OBJECTDIR}/src/util
 	${RM} "$@.d"
-	$(COMPILE.cc) -O2 -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/src/util/StringUtils.o src/util/StringUtils.cpp
+	$(COMPILE.cc) -O2 -I/Applications/root_v6.06.02/include -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/src/util/StringUtils.o src/util/StringUtils.cpp
 
 ${OBJECTDIR}/src/util/UiHelper.o: src/util/UiHelper.cpp
 	${MKDIR} -p ${OBJECTDIR}/src/util
 	${RM} "$@.d"
-	$(COMPILE.cc) -O2 -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/src/util/UiHelper.o src/util/UiHelper.cpp
+	$(COMPILE.cc) -O2 -I/Applications/root_v6.06.02/include -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/src/util/UiHelper.o src/util/UiHelper.cpp
 
 ${OBJECTDIR}/src/util/Variable.o: src/util/Variable.cpp
 	${MKDIR} -p ${OBJECTDIR}/src/util
 	${RM} "$@.d"
-	$(COMPILE.cc) -O2 -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/src/util/Variable.o src/util/Variable.cpp
+	$(COMPILE.cc) -O2 -I/Applications/root_v6.06.02/include -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/src/util/Variable.o src/util/Variable.cpp
 
 ${OBJECTDIR}/src/widgets/MainView.o: src/widgets/MainView.cpp
 	${MKDIR} -p ${OBJECTDIR}/src/widgets
 	${RM} "$@.d"
-	$(COMPILE.cc) -O2 -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/src/widgets/MainView.o src/widgets/MainView.cpp
+	$(COMPILE.cc) -O2 -I/Applications/root_v6.06.02/include -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/src/widgets/MainView.o src/widgets/MainView.cpp
 
 ${OBJECTDIR}/src/widgets/importSpectrumWidget/AbstractImportSpectrumPresenter.o: src/widgets/importSpectrumWidget/AbstractImportSpectrumPresenter.cpp
 	${MKDIR} -p ${OBJECTDIR}/src/widgets/importSpectrumWidget
 	${RM} "$@.d"
-	$(COMPILE.cc) -O2 -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/src/widgets/importSpectrumWidget/AbstractImportSpectrumPresenter.o src/widgets/importSpectrumWidget/AbstractImportSpectrumPresenter.cpp
+	$(COMPILE.cc) -O2 -I/Applications/root_v6.06.02/include -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/src/widgets/importSpectrumWidget/AbstractImportSpectrumPresenter.o src/widgets/importSpectrumWidget/AbstractImportSpectrumPresenter.cpp
 
 ${OBJECTDIR}/src/widgets/importSpectrumWidget/AbstractImportSpectrumView.o: src/widgets/importSpectrumWidget/AbstractImportSpectrumView.cpp
 	${MKDIR} -p ${OBJECTDIR}/src/widgets/importSpectrumWidget
 	${RM} "$@.d"
-	$(COMPILE.cc) -O2 -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/src/widgets/importSpectrumWidget/AbstractImportSpectrumView.o src/widgets/importSpectrumWidget/AbstractImportSpectrumView.cpp
+	$(COMPILE.cc) -O2 -I/Applications/root_v6.06.02/include -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/src/widgets/importSpectrumWidget/AbstractImportSpectrumView.o src/widgets/importSpectrumWidget/AbstractImportSpectrumView.cpp
 
 ${OBJECTDIR}/src/widgets/importSpectrumWidget/ImportSourceSpectrumPresenter.o: src/widgets/importSpectrumWidget/ImportSourceSpectrumPresenter.cpp
 	${MKDIR} -p ${OBJECTDIR}/src/widgets/importSpectrumWidget
 	${RM} "$@.d"
-	$(COMPILE.cc) -O2 -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/src/widgets/importSpectrumWidget/ImportSourceSpectrumPresenter.o src/widgets/importSpectrumWidget/ImportSourceSpectrumPresenter.cpp
+	$(COMPILE.cc) -O2 -I/Applications/root_v6.06.02/include -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/src/widgets/importSpectrumWidget/ImportSourceSpectrumPresenter.o src/widgets/importSpectrumWidget/ImportSourceSpectrumPresenter.cpp
 
 ${OBJECTDIR}/src/widgets/importSpectrumWidget/ImportSourceSpectrumView.o: src/widgets/importSpectrumWidget/ImportSourceSpectrumView.cpp
 	${MKDIR} -p ${OBJECTDIR}/src/widgets/importSpectrumWidget
 	${RM} "$@.d"
-	$(COMPILE.cc) -O2 -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/src/widgets/importSpectrumWidget/ImportSourceSpectrumView.o src/widgets/importSpectrumWidget/ImportSourceSpectrumView.cpp
+	$(COMPILE.cc) -O2 -I/Applications/root_v6.06.02/include -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/src/widgets/importSpectrumWidget/ImportSourceSpectrumView.o src/widgets/importSpectrumWidget/ImportSourceSpectrumView.cpp
 
 ${OBJECTDIR}/src/widgets/importSpectrumWidget/ImportSpectrumPresenter.o: src/widgets/importSpectrumWidget/ImportSpectrumPresenter.cpp
 	${MKDIR} -p ${OBJECTDIR}/src/widgets/importSpectrumWidget
 	${RM} "$@.d"
-	$(COMPILE.cc) -O2 -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/src/widgets/importSpectrumWidget/ImportSpectrumPresenter.o src/widgets/importSpectrumWidget/ImportSpectrumPresenter.cpp
+	$(COMPILE.cc) -O2 -I/Applications/root_v6.06.02/include -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/src/widgets/importSpectrumWidget/ImportSpectrumPresenter.o src/widgets/importSpectrumWidget/ImportSpectrumPresenter.cpp
 
 ${OBJECTDIR}/src/widgets/importSpectrumWidget/ImportSpectrumView.o: src/widgets/importSpectrumWidget/ImportSpectrumView.cpp
 	${MKDIR} -p ${OBJECTDIR}/src/widgets/importSpectrumWidget
 	${RM} "$@.d"
-	$(COMPILE.cc) -O2 -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/src/widgets/importSpectrumWidget/ImportSpectrumView.o src/widgets/importSpectrumWidget/ImportSpectrumView.cpp
+	$(COMPILE.cc) -O2 -I/Applications/root_v6.06.02/include -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/src/widgets/importSpectrumWidget/ImportSpectrumView.o src/widgets/importSpectrumWidget/ImportSpectrumView.cpp
 
 ${OBJECTDIR}/src/widgets/rooRealVarWidget/RooRealVarPresenter.o: src/widgets/rooRealVarWidget/RooRealVarPresenter.cpp
 	${MKDIR} -p ${OBJECTDIR}/src/widgets/rooRealVarWidget
 	${RM} "$@.d"
-	$(COMPILE.cc) -O2 -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/src/widgets/rooRealVarWidget/RooRealVarPresenter.o src/widgets/rooRealVarWidget/RooRealVarPresenter.cpp
+	$(COMPILE.cc) -O2 -I/Applications/root_v6.06.02/include -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/src/widgets/rooRealVarWidget/RooRealVarPresenter.o src/widgets/rooRealVarWidget/RooRealVarPresenter.cpp
 
 ${OBJECTDIR}/src/widgets/rooRealVarWidget/RooRealVarView.o: src/widgets/rooRealVarWidget/RooRealVarView.cpp
 	${MKDIR} -p ${OBJECTDIR}/src/widgets/rooRealVarWidget
 	${RM} "$@.d"
-	$(COMPILE.cc) -O2 -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/src/widgets/rooRealVarWidget/RooRealVarView.o src/widgets/rooRealVarWidget/RooRealVarView.cpp
+	$(COMPILE.cc) -O2 -I/Applications/root_v6.06.02/include -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/src/widgets/rooRealVarWidget/RooRealVarView.o src/widgets/rooRealVarWidget/RooRealVarView.cpp
 
 ${OBJECTDIR}/src/widgets/swCalculatorWidget/SWCalculatorPresenter.o: src/widgets/swCalculatorWidget/SWCalculatorPresenter.cpp
 	${MKDIR} -p ${OBJECTDIR}/src/widgets/swCalculatorWidget
 	${RM} "$@.d"
-	$(COMPILE.cc) -O2 -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/src/widgets/swCalculatorWidget/SWCalculatorPresenter.o src/widgets/swCalculatorWidget/SWCalculatorPresenter.cpp
+	$(COMPILE.cc) -O2 -I/Applications/root_v6.06.02/include -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/src/widgets/swCalculatorWidget/SWCalculatorPresenter.o src/widgets/swCalculatorWidget/SWCalculatorPresenter.cpp
 
 ${OBJECTDIR}/src/widgets/swCalculatorWidget/SWCalculatorView.o: src/widgets/swCalculatorWidget/SWCalculatorView.cpp
 	${MKDIR} -p ${OBJECTDIR}/src/widgets/swCalculatorWidget
 	${RM} "$@.d"
-	$(COMPILE.cc) -O2 -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/src/widgets/swCalculatorWidget/SWCalculatorView.o src/widgets/swCalculatorWidget/SWCalculatorView.cpp
+	$(COMPILE.cc) -O2 -I/Applications/root_v6.06.02/include -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/src/widgets/swCalculatorWidget/SWCalculatorView.o src/widgets/swCalculatorWidget/SWCalculatorView.cpp
 
 # Subprojects
 .build-subprojects:
@@ -289,6 +293,8 @@ ${OBJECTDIR}/src/widgets/swCalculatorWidget/SWCalculatorView.o: src/widgets/swCa
 # Clean Targets
 .clean-conf: ${CLEAN_SUBPROJECTS}
 	${RM} -r ${CND_BUILDDIR}/${CND_CONF}
+	${RM} -r ${CND_DISTDIR}/${CND_CONF}/${CND_PLATFORM}/sw-calculator.so
+	${RM} ${CND_DISTDIR}/${CND_CONF}/${CND_PLATFORM}/sw-calculator
 
 # Subprojects
 .clean-subprojects:

@@ -414,6 +414,18 @@ Contributor(s):
                             perm="755"
                             owner="root"
                             group="bin"/>
+          <packFileListElem type="File"
+                            to="${PACKAGE_TOP_DIR}bin/sw-calculator.so"
+                            from="${CND_DISTDIR}/${CND_CONF}/${CND_PLATFORM}/sw-calculator.so"
+                            perm="755"
+                            owner="root"
+                            group="bin"/>
+          <packFileListElem type="File"
+                            to="${PACKAGE_TOP_DIR}bin/${OUTPUT_BASENAME}"
+                            from="${OUTPUT_PATH}"
+                            perm="755"
+                            owner="root"
+                            group="bin"/>
         </packFileList>
       </packaging>
       <item path="SWCalculatorFrameLinkDef.h" ex="false" tool="1" flavor2="0">
@@ -686,7 +698,7 @@ Contributor(s):
     </conf>
     <conf name="Release" type="1">
       <toolsSet>
-        <compilerSet>default</compilerSet>
+        <compilerSet>CLang|CLang</compilerSet>
         <dependencyChecking>true</dependencyChecking>
         <rebuildPropChanged>false</rebuildPropChanged>
       </toolsSet>
@@ -696,6 +708,10 @@ Contributor(s):
         </cTool>
         <ccTool>
           <developmentMode>5</developmentMode>
+          <incDir>
+            <pElem>/Applications/root_v6.06.02/include</pElem>
+          </incDir>
+          <commandLine>-pthread -stdlib=libc++ -std=c++11 -m64</commandLine>
         </ccTool>
         <fortranCompilerTool>
           <developmentMode>5</developmentMode>
@@ -704,11 +720,37 @@ Contributor(s):
           <developmentMode>5</developmentMode>
         </asmTool>
         <linkerTool>
+          <linkerAddLib>
+            <pElem>/Applications/root_v6.06.02/lib/</pElem>
+            <pElem>./</pElem>
+          </linkerAddLib>
           <linkerDynSerch>
             <pElem>.</pElem>
           </linkerDynSerch>
+          <linkerDepDynSerchKind>3</linkerDepDynSerchKind>
+          <linkerLibItems>
+            <linkerLibFileItem>lib/sw-calculator.so</linkerLibFileItem>
+          </linkerLibItems>
+          <commandLine>-lGui -lCore -lRIO -lNet -lHist -lGraf -lGraf3d -lGpad -lTree -lRint -lPostscript -lMatrix -lPhysics -lMathCore -lThread -lMultiProc -lpthread -stdlib=libc++ -lm -ldl -lRooFit -lRooFitCore -lHtml -lMinuit -lFumili</commandLine>
         </linkerTool>
       </compileType>
+      <packaging>
+        <packType>Tar</packType>
+        <packFileList>
+          <packFileListElem type="File"
+                            to="${PACKAGE_TOP_DIR}bin/sw-calculator.so"
+                            from="${CND_DISTDIR}/${CND_CONF}/${CND_PLATFORM}/sw-calculator.so"
+                            perm="755"
+                            owner="root"
+                            group="bin"/>
+          <packFileListElem type="File"
+                            to="${PACKAGE_TOP_DIR}bin/${OUTPUT_BASENAME}"
+                            from="${OUTPUT_PATH}"
+                            perm="755"
+                            owner="root"
+                            group="bin"/>
+        </packFileList>
+      </packaging>
       <item path="SWCalculatorFrameLinkDef.h" ex="false" tool="3" flavor2="0">
       </item>
       <item path="src/event/Event.h" ex="false" tool="3" flavor2="0">
