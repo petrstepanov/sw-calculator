@@ -61,7 +61,7 @@ xcode-select --install
 
 10. Open Terminal, navigate into the unpacked folder in Terminal and type `make`.
 
-9. Some GUI ROOT apps require X server. Not sure if this program really needs it but anyway. Download and install xQuartz from [https://www.xquartz.org](https://www.xquartz.org)
+11. Some GUI ROOT apps require X server. Not sure if this program really needs it but anyway. Download and install xQuartz from [https://www.xquartz.org](https://www.xquartz.org)
 
 12. Cern ROOT apps sometimes require sources at runtime. Declare `ROOT_INCLUDE_PATH` environment variable containing the path to the software's unpacked folder. Again open `.bash_profile` and add following line:
 
@@ -69,6 +69,25 @@ xcode-select --install
 export ROOT_INCLUDE_PATH=/path/to/your/application/folder:$ROOT_INCLUDE_PATH
 ```
 
+## Creating the launcher
+
+13. Open `Automator` macOS application. Select `Application` and click `Choose` button on the bottom right.
+
+14. In the list of action locate and drag `Run AppleScript` to the right actions panel.
+
+15. Enter following text into the AppleScript textarea
+
+```bash
+on run {input, parameters}
+  tell application "Terminal"
+    activate
+    do script with command "cd /path/to/executable/dist/folder/;./sw-calculator"
+  end tell
+end run
+```
+
+16. Save the script and give it a desired name `SW Calculator`? Next in order to change the application icon locate your app in Finder under `/Applications/` folder, right click and select `Show Package Contents`. Go to `Contents/Resources`. Replace `AutomatorApplet.icns` with an `.icns` file from the `resources` folder in GitHub repo but keep the name `AutomatorApplet.icns`. Voila now you can see a neat icon in Spotlight. Dang cool.
+
 ---
 
-Shoot me an email with feedback and questions: [petrs@bgsu.edu](mailto:petrs@bgsu.edu)
+Shoot me an email with feedback or questions: [petrs@bgsu.edu](mailto:petrs@bgsu.edu)
