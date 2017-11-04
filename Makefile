@@ -1,248 +1,150 @@
-#
-# Copyright (c) 2009-2010, Oracle and/or its affiliates. All rights reserved.
-#
-# Redistribution and use in source and binary forms, with or without
-# modification, are permitted provided that the following conditions are met:
-#
-# * Redistributions of source code must retain the above copyright notice,
-#   this list of conditions and the following disclaimer.
-#
-# * Redistributions in binary form must reproduce the above copyright notice,
-#   this list of conditions and the following disclaimer in the documentation
-#   and/or other materials provided with the distribution.
-#
-# * Neither the name of Oracle nor the names of its contributors
-#   may be used to endorse or promote products derived from this software without
-#   specific prior written permission.
-#
-# THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
-# AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
-# IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
-# ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT OWNER OR CONTRIBUTORS BE
-# LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
-# CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF
-# SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS
-# INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN
-# CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
-# ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF
-# THE POSSIBILITY OF SUCH DAMAGE.
-#
-#  There exist several targets which are by default empty and which can be 
-#  used for execution of your targets. These targets are usually executed 
-#  before and after some main targets. They are: 
-#
-#     .build-pre:              called before 'build' target
-#     .build-post:             called after 'build' target
-#     .clean-pre:              called before 'clean' target
-#     .clean-post:             called after 'clean' target
-#     .clobber-pre:            called before 'clobber' target
-#     .clobber-post:           called after 'clobber' target
-#     .all-pre:                called before 'all' target
-#     .all-post:               called after 'all' target
-#     .help-pre:               called before 'help' target
-#     .help-post:              called after 'help' target
-#
-#  Targets beginning with '.' are not intended to be called on their own.
-#
-#  Main targets can be executed directly, and they are:
-#  
-#     build                    build a specific configuration
-#     clean                    remove built files from a configuration
-#     clobber                  remove all built files
-#     all                      build all configurations
-#     help                     print help mesage
-#  
-#  Targets .build-impl, .clean-impl, .clobber-impl, .all-impl, and
-#  .help-impl are implemented in nbproject/makefile-impl.mk.
-#
-#  Available make variables:
-#
-#     CND_BASEDIR                base directory for relative paths
-#     CND_DISTDIR                default top distribution directory (build artifacts)
-#     CND_BUILDDIR               default top build directory (object files, ...)
-#     CONF                       name of current configuration
-#     CND_PLATFORM_${CONF}       platform name (current configuration)
-#     CND_ARTIFACT_DIR_${CONF}   directory of build artifact (current configuration)
-#     CND_ARTIFACT_NAME_${CONF}  name of build artifact (current configuration)
-#     CND_ARTIFACT_PATH_${CONF}  path to build artifact (current configuration)
-#     CND_PACKAGE_DIR_${CONF}    directory of package (current configuration)
-#     CND_PACKAGE_NAME_${CONF}   name of package (current configuration)
-#     CND_PACKAGE_PATH_${CONF}   path to package (current configuration)
-#
-# NOCDDL
+# Environment
+CXX=clang++
+SRC_DIR=src
+OBJ_DIR=build
+BIN_DIR=dist
+
+APP_NAME=sw-calculator
+DICT_FILENAME=SWDictionary.cpp
+DICT_PCM_FILENAME=SWDictionary_rdict.pcm
+
+# Variables
+CXXFLAGS=`root-config --cflags` # -pthread -stdlib=libc++ -std=c++11 -m64 -I/Applications/root_v6.06.02/include
+GLIBS=`root-config --glibs` -lRooFit -lRooFitCore -lHtml -lMinuit -lFumili
+HEADERS=src/event/Event.h \
+        src/event/EventBus.h \
+        src/event/EventHandler.h \
+        src/event/HandlerRegistration.h \
+        src/event/Object.h \
+        src/event/events/HistogramImportedEvent.h \
+        src/event/events/IsTwoDetectorEvent.h \
+        src/event/events/SourceHistogramImportedEvent.h \
+        src/model/Constants.h \
+        src/model/Model.h \
+        src/roofit/AbstractModelProvider.h \
+        src/roofit/BackgroundPdf.h \
+        src/roofit/ChannelConvolutionPdf.h \
+        src/roofit/CompositeModelProvider.h \
+        src/roofit/DampLorentzPdf.h \
+        src/roofit/GaussianPdf.h \
+        src/roofit/IndirectParamPdf.h \
+        src/roofit/LorentzianPdf.h \
+        src/roofit/OrthogonalPdf.h \
+        src/roofit/ParabolaGaussModelProvider.h \
+        src/roofit/ParabolaLorentzianModelProvider.h \
+        src/roofit/ParabolaPdf.h \
+        src/util/FileUtils.h \
+        src/util/GraphicsHelper.h \
+        src/util/HistProcessor.h \
+        src/util/RootHelper.h \
+        src/util/StringUtils.h \
+        src/util/UiHelper.h \
+        src/util/Variable.h \
+        src/widgets/importSpectrumWidget/AbstractImportSpectrumPresenter.h \
+        src/widgets/importSpectrumWidget/AbstractImportSpectrumView.h \
+        src/widgets/importSpectrumWidget/ImportSourceSpectrumPresenter.h \
+        src/widgets/importSpectrumWidget/ImportSourceSpectrumView.h \
+        src/widgets/importSpectrumWidget/ImportSpectrumPresenter.h \
+        src/widgets/importSpectrumWidget/ImportSpectrumView.h \
+        src/widgets/rooRealVarWidget/RooRealVarPresenter.h \
+        src/widgets/rooRealVarWidget/RooRealVarView.h \
+        src/widgets/swCalculatorWidget/SWCalculatorPresenter.h \
+        src/widgets/swCalculatorWidget/SWCalculatorView.h \
+        src/widgets/AbstractPresenter.h \
+        src/widgets/AbstractView.h \
+        src/widgets/MainView.h \
+        src/main.h
+FILES=event/EventBus.cpp \
+      event/events/HistogramImportedEvent.cpp \
+      event/events/IsTwoDetectorEvent.cpp \
+      event/events/SourceHistogramImportedEvent.cpp \
+      model/Constants.cpp \
+      model/Model.cpp \
+      roofit/AbstractModelProvider.cpp \
+      roofit/BackgroundPdf.cpp \
+      roofit/ChannelConvolutionPdf.cpp \
+      roofit/CompositeModelProvider.cpp \
+      roofit/DampLorentzPdf.cpp \
+      roofit/GaussianPdf.cpp \
+      roofit/IndirectParamPdf.cpp \
+      roofit/LorentzianPdf.cpp \
+      roofit/OrthogonalPdf.cpp \
+      roofit/ParabolaGaussModelProvider.cpp \
+      roofit/ParabolaLorentzianModelProvider.cpp \
+      roofit/ParabolaPdf.cpp \
+      util/FileUtils.cpp \
+      util/GraphicsHelper.cpp \
+      util/HistProcessor.cpp \
+      util/RootHelper.cpp \
+      util/StringUtils.cpp \
+      util/UiHelper.cpp \
+      util/Variable.cpp \
+      widgets/importSpectrumWidget/AbstractImportSpectrumPresenter.cpp \
+      widgets/importSpectrumWidget/AbstractImportSpectrumView.cpp \
+      widgets/importSpectrumWidget/ImportSourceSpectrumPresenter.cpp \
+      widgets/importSpectrumWidget/ImportSourceSpectrumView.cpp \
+      widgets/importSpectrumWidget/ImportSpectrumPresenter.cpp \
+      widgets/importSpectrumWidget/ImportSpectrumView.cpp \
+      widgets/rooRealVarWidget/RooRealVarPresenter.cpp \
+      widgets/rooRealVarWidget/RooRealVarView.cpp \
+      widgets/swCalculatorWidget/SWCalculatorPresenter.cpp \
+      widgets/swCalculatorWidget/SWCalculatorView.cpp \
+      widgets/MainView.cpp \
+      main.cpp
+
+SOURCES=$(addprefix $(SRC_DIR)/,$(FILES))
+OBJECTS_TEMP=$(SOURCES:.cpp=.o)
+OBJECTS=$(patsubst $(SRC_DIR)/%,$(OBJ_DIR)/%,$(OBJECTS_TEMP))
+EXECUTABLE=$(BIN_DIR)/$(APP_NAME)
+DICTIONARY=$(DICT_FILENAME)
+SHARED_LIBRARY=$(APP_NAME).so
+# List of special targets that do not generate files
+.PHONY: directories
+
+# Empty target ensures that list of all 'end products' are called
+all: directories $(DICTIONARY) $(SHARED_LIBRARY) $(OBJECTS) $(EXECUTABLE)
+
+$(EXECUTABLE): $(OBJECTS) $(SHARED_LIBRARY)
+	@echo "Linking "$@
+	$(CXX) -o $@ $(OBJECTS) $(SHARED_LIBRARY) $(GLIBS)
+	# move .so library to bin folder
+	mv $(SHARED_LIBRARY) $(BIN_DIR)/$(SHARED_LIBRARY)
+	# change search location of the .so library to the executable directory of the app
+	install_name_tool -change $(APP_NAME).so @executable_path/$(APP_NAME).so $(EXECUTABLE)
+	# move dictionary to the bin folder - they say you have to
+	mv $(DICT_PCM_FILENAME) $(BIN_DIR)/$(DICT_PCM_FILENAME)
 
 
-# Environment 
-MKDIR=mkdir
-CP=cp
-MV=mv
-CD=cd
-CCADMIN=CCadmin
-RANLIB=ranlib
+$(OBJ_DIR)/%.o: $(SRC_DIR)/%.cpp
+	@echo "Compiling "$@
+# compile with dependency files - why?
+#	$(CXX) $(CXXFLAGS) -c -g -MMD -MP -MF "$@.d" -o $@ $<
+# compile with debug symbols
+#	$(CXX) $(CXXFLAGS) -c -g $< -o $@
+# just compile
+	$(CXX) $(CXXFLAGS) -c $< -o $@
 
-# My variables
-MYCFLAGS=-pthread -stdlib=libc++ -std=c++11 -m64 -I/Applications/root_v6.06.02/include
-MYLDFLAGS=-m64
-MYGLIBS=-L/Applications/root_v6.06.02/lib -lGui -lCore -lRIO -lNet -lHist -lGraf -lGraf3d -lGpad -lTree -lRint -lPostscript -lMatrix -lPhysics -lMathCore -lThread -lMultiProc -lpthread -stdlib=libc++ -lm -ldl
-MYLIBS=-L/Applications/root_v6.06.02/lib -lGui -lCore -lRIO -lNet -lHist -lGraf -lGraf3d -lGpad -lTree -lRint -lPostscript -lMatrix -lPhysics -lMathCore -lThread -lMultiProc -lpthread -stdlib=libc++ -lm -ldl -lRooFit -lRooFitCore -lHtml -lMinuit -lFumili
-MYROOTSYS=/Applications/root_v6.06.02
-MYHEADERS=event/Event.h \
-          event/EventBus.h \
-          event/EventHandler.h \
-          event/HandlerRegistration.h \
-          event/Object.h \
-	  event/events/HistogramImportedEvent.h \
-	  event/events/IsTwoDetectorEvent.h \
-	  event/events/SourceHistogramImportedEvent.h \
-	  model/Constants.h \
-          model/Model.h \
-          roofit/AbstractModelProvider.h \
-          roofit/BackgroundPdf.h \
-          roofit/ChannelConvolutionPdf.h \
-          roofit/CompositeModelProvider.h \
-          roofit/DampLorentzPdf.h \
-	  roofit/GaussianPdf.h \
-          roofit/IndirectParamPdf.h \
-          roofit/LorentzianPdf.h \
-          roofit/OrthogonalPdf.h \
-          roofit/ParabolaGaussModelProvider.h \
-          roofit/ParabolaLorentzianModelProvider.h \
-          roofit/ParabolaPdf.h \
-          util/FileUtils.h \
-          util/GraphicsHelper.h \
-          util/HistProcessor.h \
-          util/RootHelper.h \
-          util/StringUtils.h \
-          util/UiHelper.h \
-          util/Variable.h \
-          widgets/importSpectrumWidget/AbstractImportSpectrumPresenter.h \
-          widgets/importSpectrumWidget/AbstractImportSpectrumView.h \
-          widgets/importSpectrumWidget/ImportSourceSpectrumPresenter.h \
-          widgets/importSpectrumWidget/ImportSourceSpectrumView.h \
-          widgets/importSpectrumWidget/ImportSpectrumPresenter.h \
-          widgets/importSpectrumWidget/ImportSpectrumView.h \
-          widgets/rooRealVarWidget/RooRealVarPresenter.h \
-          widgets/rooRealVarWidget/RooRealVarView.h \
-          widgets/swCalculatorWidget/SWCalculatorPresenter.h \
-          widgets/swCalculatorWidget/SWCalculatorView.h \
-          widgets/AbstractPresenter.h \
-          widgets/AbstractView.h \
-          widgets/MainView.h \
-          main.h
-MYSOURCES=event/EventBus.cpp \
-	  event/events/HistogramImportedEvent.cpp \
-	  event/events/IsTwoDetectorEvent.cpp \
-	  event/events/SourceHistogramImportedEvent.cpp \
-	  model/Constants.cpp \
-          model/Model.cpp \
-          roofit/AbstractModelProvider.cpp \
-          roofit/BackgroundPdf.cpp \
-          roofit/ChannelConvolutionPdf.cpp \
-          roofit/CompositeModelProvider.cpp \
-          roofit/DampLorentzPdf.cpp \
-	  roofit/GaussianPdf.cpp \
-          roofit/IndirectParamPdf.cpp \
-          roofit/LorentzianPdf.cpp \
-          roofit/OrthogonalPdf.cpp \
-          roofit/ParabolaGaussModelProvider.cpp \
-          roofit/ParabolaLorentzianModelProvider.cpp \
-          roofit/ParabolaPdf.cpp \
-          util/FileUtils.cpp \
-          util/GraphicsHelper.cpp \
-          util/HistProcessor.cpp \
-          util/RootHelper.cpp \
-          util/StringUtils.cpp \
-          util/UiHelper.cpp \
-          util/Variable.cpp \
-          widgets/importSpectrumWidget/AbstractImportSpectrumPresenter.cpp \
-          widgets/importSpectrumWidget/AbstractImportSpectrumView.cpp \
-          widgets/importSpectrumWidget/ImportSourceSpectrumPresenter.cpp \
-          widgets/importSpectrumWidget/ImportSourceSpectrumView.cpp \
-          widgets/importSpectrumWidget/ImportSpectrumPresenter.cpp \
-          widgets/importSpectrumWidget/ImportSpectrumView.cpp \
-          widgets/rooRealVarWidget/RooRealVarPresenter.cpp \
-          widgets/rooRealVarWidget/RooRealVarView.cpp \
-          widgets/swCalculatorWidget/SWCalculatorPresenter.cpp \
-          widgets/swCalculatorWidget/SWCalculatorView.cpp \
-	  widgets/MainView.cpp\
-	  main.cc
+$(SHARED_LIBRARY): $(DICTIONARY)
+	$(CXX) -shared -o $@ $(CXXFLAGS) $(GLIBS) $< $(SOURCES)
 
-# build
-build: .build-post
+$(DICTIONARY):
+	rootcling -f $@ -c $(CXXFLAGS) -p $(HEADERS) $(SRC_DIR)/SWCalculatorLinkDef.h
 
-.build-pre:
-# Add your pre 'build' code here...
-# https://root.cern.ch/interacting-shared-libraries-rootcint
+clean:
+	rm -r $(OBJ_DIR)
+	rm -r $(BIN_DIR)
+	rm $(DICTIONARY)
+	rm *.pcm
 
-	@echo Generating dictionary: SWCalculatorFrameDict.cpp
-	$(CD) src; \
-	rootcling -f SWCalculatorDict.cpp -c $(MYCFLAGS) -p $(MYHEADERS) SWCalculatorLinkDef.h
-
-	@echo Generating shared library: sw-calculator.so
-	$(CD) src; \
-	clang++ -shared -o sw-calculator.so $(MYCFLAGS) $(MYLIBS) SWCalculatorDict.cpp $(MYSOURCES)
-
-	@echo Move shared library './src/sw-calculator.so' to './lib/...'
-	$(MV) ./src/sw-calculator.so ./lib/sw-calculator.so
-	$(MV) ./src/SWCalculatorDict_rdict.pcm ./lib/SWCalculatorDict_rdict.pcm
-
-.build-post: .build-impl
-# Add your post 'build' code here...
-
-
-lib/sw-calculator.so:
-	@echo Generating shared library: sw-calculator.so
-
-	
-# clean
-clean: .clean-post
-
-.clean-pre:
-# Add your pre 'clean' code here...
-	@echo Cleaning shared libraries
-	rm -f ./sw-*.so
-
-	@echo Cleaning dictionaries
-	rm -f ./src/*Dict.cpp
-	rm -f ./src/*Dict_rdict.pcm
-
-.clean-post: .clean-impl
-# Add your post 'clean' code here...
-
-
-# clobber
-clobber: .clobber-post
-
-.clobber-pre:
-# Add your pre 'clobber' code here...
-
-.clobber-post: .clobber-impl
-# Add your post 'clobber' code here...
-
-
-# all
-all: .all-post
-
-.all-pre:
-# Add your pre 'all' code here...
-
-.all-post: .all-impl
-# Add your post 'all' code here...
-
-
-# help
-help: .help-post
-
-.help-pre:
-# Add your pre 'help' code here...
-
-.help-post: .help-impl
-# Add your post 'help' code here...
-
-
-
-# include project implementation makefile
-include nbproject/Makefile-impl.mk
-
-# include project make variables
-include nbproject/Makefile-variables.mk
+directories:
+	mkdir -p $(OBJ_DIR)
+	mkdir -p $(BIN_DIR)
+	mkdir -p $(OBJ_DIR)/event
+	mkdir -p $(OBJ_DIR)/event/events
+	mkdir -p $(OBJ_DIR)/model
+	mkdir -p $(OBJ_DIR)/roofit
+	mkdir -p $(OBJ_DIR)/util
+	mkdir -p $(OBJ_DIR)/widgets
+	mkdir -p $(OBJ_DIR)/widgets/importSpectrumWidget
+	mkdir -p $(OBJ_DIR)/widgets/rooRealVarWidget
+	mkdir -p $(OBJ_DIR)/widgets/swCalculatorWidget
