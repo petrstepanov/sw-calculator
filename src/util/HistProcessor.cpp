@@ -72,7 +72,7 @@ TH1* HistProcessor::cutHist(const char *newname, TH1* hist, Int_t xMin, Int_t xM
 	Double_t lowEdge = hist->GetXaxis()->GetBinLowEdge(minBin);
 	Double_t upEdge = hist->GetXaxis()->GetBinUpEdge(maxBin);
 
-        cout << "lowEdge: " << lowEdge << "; " << "upEdge: " << upEdge << std::endl;
+        std::cout << "lowEdge: " << lowEdge << "; " << "upEdge: " << upEdge << std::endl;
         
 	//std::cout << "reduceHist: lowEdge - " << lowEdge << ", upEdge - " << upEdge << std::endl;
 //        RootHelper::deleteObject(newname);
