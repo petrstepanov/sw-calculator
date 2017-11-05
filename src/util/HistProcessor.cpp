@@ -61,9 +61,11 @@ TH1* HistProcessor::cutHistBasement(const char *newname, TH1* hist, Int_t xMin, 
 
 TH1* HistProcessor::cutHist(const char *newname, TH1* hist, Int_t xMin, Int_t xMax){
 	Int_t minBin = hist->FindBin(xMin);
+        if (hist->GetXaxis()->GetBinLowEdge(minBin) < xMin) minBin++;
 	Int_t maxBin = hist->FindBin(xMax);
-        if (minBin <= 1) minBin = 1;
-        if (maxBin >= hist->GetXaxis()->GetNbins()) maxBin = hist->GetXaxis()->GetNbins();
+        if (hist->GetXaxis()->GetBinHiEdge(maxBin) > xMax) maxBin--;
+
+
 	Int_t nBins = maxBin - minBin + 1;
         
 	//std::cout << "reduceHist: miBin - " << minBin << ", maxBin - " << maxBin << std::endl;
