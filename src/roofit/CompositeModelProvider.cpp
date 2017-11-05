@@ -45,18 +45,21 @@ void CompositeModelProvider::initSourcePdf(TH1F* sourceHist, RooAbsReal* sourceC
     Double_t histMax = sourceHist->GetXaxis()->GetXmax();
     Double_t observableMin = observable->getMin();
     Double_t observableMax = observable->getMax();
-//    std::cout << "histMin: " << histMin << ". histMax:" << histMax << std::endl;
-//    std::cout << "observableMin: " << observableMin << ". observableMax:" << observableMax << std::endl;
+    std::cout << "histMin: " << histMin << ". histMax:" << histMax << std::endl;
+    std::cout << "observableMin: " << observableMin << ". observableMax:" << observableMax << std::endl;
     RooDataHist* sourceDataHist;
     if (histMin < observableMin || histMax > observableMax){
         HistProcessor* histProcessor = HistProcessor::getInstance();
         TH1F* cutSourceHist = (TH1F*)histProcessor->cutHist("cutSourceHist", sourceHist, observableMin, observableMax);
+        Double_t min = cutSourceHist->GetXaxis()->GetXmin();
+        Double_t max = cutSourceHist->GetXaxis()->GetXmax();
+        std::cout << "cutSourceHistMin: " << min << ". cutSourceHistMax:" << max << std::endl;
+
         sourceDataHist = new RooDataHist("sourceDataHist", "Source Data Hist", RooArgList(*observable), RooFit::Import(*cutSourceHist));        
     }
     else {
         sourceDataHist = new RooDataHist("sourceDataHist", "Source Data Hist", RooArgList(*observable), RooFit::Import(*sourceHist));
     }
-//     = new RooDataHist("sourceDataHist", "Source Data Hist", RooArgList(*observable), RooFit::Import(*sourceHist));
     this->sourcePdf = new RooHistPdf("sourcePdf", "Source contribution", *observable, *sourceDataHist, 1);
     this->sourceContribution = sourceContrib;
 }
@@ -328,7 +331,7 @@ Double_t* CompositeModelProvider::getDefaultGaussAs(const Int_t numGauss){
             As = (Double_t[2]){0.5, 0.1};
             break;
         case 3:
-            As = (Double_t[3]){1.0, 0.5, 0.1};
+            As = (Double_t[3]){0.6, 0.3, 0.1};
             break;
         default:
             As = (Double_t[4]){1.0, 0.5, 0.2, 0.05};
