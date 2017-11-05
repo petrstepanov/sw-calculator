@@ -60,11 +60,9 @@ TH1* HistProcessor::cutHistBasement(const char *newname, TH1* hist, Int_t xMin, 
 }
 
 TH1* HistProcessor::cutHist(const char *newname, TH1* hist, Int_t xMin, Int_t xMax){
-	Int_t minBin = hist->FindBin(xMin);
-        if (hist->GetXaxis()->GetBinLowEdge(minBin) < xMin) minBin++;
-	Int_t maxBin = hist->FindBin(xMax);
-        if (hist->GetXaxis()->GetBinUpEdge(maxBin) > xMax) maxBin--;
-
+	Int_t minBin, maxBin;
+        for(minBin=1; hist->GetXaxis()->GetBinLowEdge(minBin) < xMin; minBin++){;}
+        for(maxBin=hist->GetXaxis()->GetNbins(); hist->GetXaxis()->GetBinUpEdge(maxBin)>xMax; maxBin--){;}
 
 	Int_t nBins = maxBin - minBin + 1;
         
@@ -74,6 +72,8 @@ TH1* HistProcessor::cutHist(const char *newname, TH1* hist, Int_t xMin, Int_t xM
 	Double_t lowEdge = hist->GetXaxis()->GetBinLowEdge(minBin);
 	Double_t upEdge = hist->GetXaxis()->GetBinUpEdge(maxBin);
 
+        cout << "lowEdge: " << lowEdge << "; " << "upEdge: " << upEdge << std::endl;
+        
 	//std::cout << "reduceHist: lowEdge - " << lowEdge << ", upEdge - " << upEdge << std::endl;
 //        RootHelper::deleteObject(newname);
 	TH1* subHist = new TH1F(newname, "Cutted histogram", nBins, lowEdge, upEdge);
