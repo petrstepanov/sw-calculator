@@ -58,7 +58,7 @@ mkdir build
 cd build
 cmake -Dfftw3=ON -DFFTW_LIBRARY=/usr/local/lib/libfftw3.a -DFFTW_INCLUDE_DIR=/usr/local/include -Droofit=ON /path/to/your/root/source/directory
 ```
-Also double check that your paths to `libfftw3.a` and `libfftw3.h` are correct. Next,
+Here we turn on support for `fftw3` and `roofit`. Double check that your paths to `libfftw3.a` and `libfftw3.h` are correct. Next,
 
 ```bash
 make -j8
@@ -82,12 +82,12 @@ Instructions for other platforms can be found here [https://root.cern.ch/root/En
 
 Now you should be able to run ROOT by typing `root` in Terminal.
 
-### Running the ROOT application
+### Building the ROOT application
 Optional. Some GUI ROOT apps require X server. Not sure if this program really needs it but anyway. Download and install xQuartz from [https://www.xquartz.org](https://www.xquartz.org)
 
 Download and unpack source package from this page. Green button `Clone or download` on the top right of the page.
 
-Open Terminal, navigate into the unpacked folder in Terminal and type `make`.
+Open Terminal, navigate into the unpacked folder in Terminal and type `make`. Your executable will show up under `dist/` folder.
 
 Cern ROOT apps sometimes require sources at runtime. Declare `ROOT_INCLUDE_PATH` environment variable containing the path to the software's unpacked folder. Again open `nano ~/.bash_profile` and add following line:
 
