@@ -4,7 +4,7 @@ Program calculates S and W parameters of the 511 annihilation peak of the annihi
 
 <img src="http://physics.bgsu.edu/selimlab/wp-content/uploads/2016/12/swcalculator-screenshot.png" alt="SW Calculator desktop application" style="width: 100%;"/>
 
-# Setup instructions
+## Setup instructions
 
 Application is written in C++ with CERN ROOT libraries and GUI. In order to run the app first we need to install ROOT libraries. Unfortunately it is impossible to do static link your applications object files with the ROOT libraries as well as build their static versions. Moreover, sometimes source headers should be available at runtime.
 
@@ -12,16 +12,54 @@ Currently it is possible to run application either on macOS or Linux. I will try
 
 Below find the instructions for macOS setup. Linux users should be able to
 
-## Installing ROOT
+### Installing xCode
 
-1. Download and install the correct package (.dmg) with respect to your OSX version here [https://root.cern.ch/downloading-root](https://root.cern.ch/downloading-root)
-2. Setup ROOT environment variables. Open Terminal and edit .bash_profile in your home folder:
+6. Download xCode here [https://developer.apple.com/xcode/downloads/](https://developer.apple.com/xcode/downloads/).Note. I've tested new xCode 9 on macOS Sierra on Nov 4, 2017 and it turned out that it throws some compilation errors. As a temporary workaround I recommend downloading older xCode versions here [https://developer.apple.com/download/more/](https://developer.apple.com/download/more/). I used 8.3.3
+
+7. Accept xCode license. Open Terminal and enter:
+
+```bash
+sudo xcodebuild -license
+```
+
+8. Install xCode command-line tools from Terminal
+
+```bash
+xcode-select --install
+```
+
+### Installing ROOT
+
+#### Method 1. Binary distribution
+Download and install the correct package (.dmg) for your macOS version here [https://root.cern.ch/downloading-root](https://root.cern.ch/downloading-root)
+
+#### Method 2. Compile from source
+Sometimes the binary distribution on the ROOT website might not yet be avaliable if you are running a recent release of macOS. In this case you have to build ROOT from source.
+
+Current software requires ROOT to be built with [http://www.fftw.org/](FFTW libraries). First, [http://www.fftw.org/download.html](download) and unpack FFTW sources to your computer. Navigate to the correspondent folder and run:
+
+```./configure
+make
+sudo make install
+```
+Next download ROOT sources that can be built on yor system. Tip: if you are running macOS High Sierra 10.13 you can go only with ROOT 10.11.02 and newer. I've succeeded building it with xCode 9. Unpack your ROOT sources and do:
+
+```mkdir build
+cd build
+cmake -Dfftw3=ON -DFFTW_LIBRARY=/usr/local/lib/libfftw3.a -DFFTW_INCLUDE_DIR=/usr/local/include -Droofit=ON /path/to/your/root/source/directory
+```
+Also double check that your paths to `libfftw3.a` and `libfftw3.h` are correct. Next,
+
+```make -j8
+```
+
+#### Setup ROOT environment variables
+Open Terminal and edit `.bash_profile` in your home folder. On linux it is `.bash.rc`
 
 ```bash
 nano ~/.bash_profile
 ```
-
-3. Specify **ROOTSYS** variable and add it to **$PATH**. In order to be able to dynamically link your executables with ROOT libraries set **DYLD_LIBRARY_PATH**:
+Set **ROOTSYS** variable and add it to **$PATH**. In order to be able to dynamically link your executables with ROOT libraries set **DYLD_LIBRARY_PATH**:
 
 ```bash
 export ROOTSYS=/Applications/root_v6.10.06/
@@ -39,23 +77,7 @@ source ~/.bash_profile
 
 5. Now you should be able to run ROOT by typing `root` in Terminal.
 
-## Installing xCode
-
-6. Download xCode here [https://developer.apple.com/xcode/downloads/](https://developer.apple.com/xcode/downloads/). Important – I've tested new xCode 9 today (Nov 4, 2017) and it turned out that it throws some compilation errors. As a temporary workaround I recommend downloading version 8.3.3 here [https://developer.apple.com/download/more/](https://developer.apple.com/download/more/).
-
-7. Accept xCode license. Open Terminal and enter:
-
-```bash
-sudo xcodebuild -license
-```
-
-8. Install xCode command-line tools from Terminal
-
-```bash
-xcode-select --install
-```
-
-## Running the ROOT application
+### Running the ROOT application
 
 9. Download and unpack source package from this page. Green button `Clone or download` on the top right of the page.
 
@@ -69,7 +91,7 @@ xcode-select --install
 export ROOT_INCLUDE_PATH=/path/to/your/application/folder:$ROOT_INCLUDE_PATH
 ```
 
-## Creating the launcher
+### Creating the launcher
 
 13. Open `Automator` macOS application. Select `Application` and click `Choose` button on the bottom right.
 

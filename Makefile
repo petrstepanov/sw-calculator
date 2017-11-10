@@ -9,7 +9,7 @@ DICT_FILENAME=sw-dict.cpp
 DICT_PCM_FILENAME=sw-dict_rdict.pcm
 
 # Variables
-CXXFLAGS=`root-config --cflags` # -pthread -stdlib=libc++ -std=c++11 -m64 -I/Applications/root_v6.06.02/include
+CXXFLAGS=-O3 `root-config --cflags` # -pthread -stdlib=libc++ -std=c++11 -m64 -I/Applications/root_v6.06.02/include
 LDFLAGS=`root-config --ldflags`
 GLIBS=`root-config --glibs` -lRooFit -lRooFitCore -lHtml -lMinuit -lFumili
 HEADERS=src/event/Event.h \
