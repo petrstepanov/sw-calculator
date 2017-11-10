@@ -44,7 +44,7 @@ PATH=$PATH:/Applications/CMake.app/Contents/bin
 export PATH
 ```
 
-Current software requires ROOT to be built with [http://www.fftw.org/](FFTW libraries). First, [http://www.fftw.org/download.html](download) and unpack FFTW sources to your computer. Navigate to the correspondent folder and run:
+Current software requires ROOT to be built with FFTW libraries. First, [http://www.fftw.org/download.html](download) and unpack FFTW sources to your computer. Navigate to the correspondent folder and run:
 
 ```bash
 ./configure
