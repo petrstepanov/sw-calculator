@@ -41,3 +41,12 @@ dist/
 Makefile-netbeans
 Makefile-my
 Makefile
+
+# Eclipse
+.project
+.cproject
+.settings/
+Debug/
+
+# macOS
+.DS_store
