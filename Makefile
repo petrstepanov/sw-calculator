@@ -14,7 +14,7 @@ DICT_FILENAME=sw-dict.cpp
 DICT_PCM_FILENAME=sw-dict_rdict.pcm
 
 # Variables
-CXXFLAGS=-O3 `root-config --cflags` # -pthread -stdlib=libc++ -std=c++11 -m64 -I/Applications/root_v6.06.02/include
+CXXFLAGS=-O3 `root-config --cflags` -fPIC # -pthread -stdlib=libc++ -std=c++11 -m64 -I/Applications/root_v6.06.02/include
 LDFLAGS=`root-config --ldflags`
 GLIBS=`root-config --glibs` -lRooFit -lRooFitCore -lHtml -lMinuit -lFumili
 HEADERS=src/event/Event.h \
@@ -114,7 +114,7 @@ $(EXECUTABLE): $(OBJECTS) $(SHARED_LIBRARY)
 	$(CXX) -o $@ $(OBJECTS) $(SHARED_LIBRARY) $(GLIBS)
 	# move .so library to bin folder
 	mv $(SHARED_LIBRARY) $(BIN_DIR)/$(SHARED_LIBRARY)
-	# change search location of the .so library to the executable directory of the app
+	# change search location of the .so library to the executable directory of the app (macOS only)
 ifeq ($(OS),Darwin)
 	install_name_tool -change $(APP_NAME).so @executable_path/$(APP_NAME).so $(EXECUTABLE)
 endif

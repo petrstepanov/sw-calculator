@@ -4,10 +4,10 @@
  * and open the template in the editor.
  */
 
-/* 
+/*
  * File:   CompositeModelProvider.cpp
  * Author: petrstepanov
- * 
+ *
  * Created on August 15, 2017, 9:59 PM
  */
 
@@ -55,7 +55,7 @@ void CompositeModelProvider::initSourcePdf(TH1F* sourceHist, RooAbsReal* sourceC
         Double_t max = cutSourceHist->GetXaxis()->GetXmax();
         std::cout << "cutSourceHistMin: " << min << ". cutSourceHistMax:" << max << std::endl;
 
-        sourceDataHist = new RooDataHist("sourceDataHist", "Source Data Hist", RooArgList(*observable), RooFit::Import(*cutSourceHist));        
+        sourceDataHist = new RooDataHist("sourceDataHist", "Source Data Hist", RooArgList(*observable), RooFit::Import(*cutSourceHist));
     }
     else {
         sourceDataHist = new RooDataHist("sourceDataHist", "Source Data Hist", RooArgList(*observable), RooFit::Import(*sourceHist));
@@ -77,7 +77,7 @@ void CompositeModelProvider::initModel(Bool_t hasParabola, const Int_t numGauss,
             components->add(*sourcePdf);
         }
     }
-    
+
     // Define parabola
     if (hasParabola){
             RootHelper::deleteObject("parabolaRoot");
@@ -107,19 +107,19 @@ void CompositeModelProvider::initModel(Bool_t hasParabola, const Int_t numGauss,
         pdfList->add(*gauss[i]);
         components->add(*gauss[i]);
         coeffList->add(*I_gauss[i]);
-    }  
+    }
 
     // Composite Lorentz PDFs
     RooRealVar** a2 = new RooRealVar*[numLorentzSum];
     DampLorentzPdf** lorentz2 = new DampLorentzPdf*[numLorentzSum];
     RooRealVar** I_lorentz2 = new RooRealVar*[numLorentzSum];
     for (int i = 0; i < numLorentzSum; i++){
-            RootHelper::deleteObject(TString::Format("sl%dA", i + 1));         
+            RootHelper::deleteObject(TString::Format("sl%dA", i + 1));
             a2[i] = new RooRealVar(TString::Format("sl%dA", i + 1), TString::Format("Sum Lorentz%d a", i + 1), getDefaultDampLorentzAs(numLorentzSum)[i], aMin, aMax, "A"); // 5 0.5 10
             // a2[i] = new RooRealVar(TString::Format("sl%dA", i + 1), TString::Format("Sum Lorentz%d a", i + 1), getDefaultLorentzAs(numLorentzSum)[i], getDefaultLorentzAs(numLorentzSum)[i], getDefaultLorentzAs(numLorentzSum)[i], "A");
-            RootHelper::deleteObject(TString::Format("sumlorentz%d", i + 1)); 
+            RootHelper::deleteObject(TString::Format("sumlorentz%d", i + 1));
             lorentz2[i] = new DampLorentzPdf(TString::Format("sumlorentz%d", i + 1), TString::Format("Damping exponent%d", i + 1), *observable, *E_0, *a2[i]);
-            RootHelper::deleteObject(TString::Format("sl1%dInt", i + 1)); 
+            RootHelper::deleteObject(TString::Format("sl1%dInt", i + 1));
             I_lorentz2[i] = new RooRealVar(TString::Format("sl1%dInt", i + 1), TString::Format("Sum Lorentz%d intensity", i + 1), 0.8, 0.0, 1.0);
             pdfList->add(*lorentz2[i]);
             components->add(*lorentz2[i]);
@@ -131,11 +131,11 @@ void CompositeModelProvider::initModel(Bool_t hasParabola, const Int_t numGauss,
     LorentzianPdf** lorentz = new LorentzianPdf*[numLorentz];
     RooRealVar** I_lorentz = new RooRealVar*[numLorentz];
     for (int i = 0; i < numLorentz; i++){
-        RootHelper::deleteObject(TString::Format("l%dA", i + 1));           
+        RootHelper::deleteObject(TString::Format("l%dA", i + 1));
         a[i] = new RooRealVar(TString::Format("l%dA", i + 1), TString::Format("Lorentz%d a", i + 1), getDefaultLorentzAs(numLorentz)[i], aMin, aMax, "A"); // 5 0.5 10
-        RootHelper::deleteObject(TString::Format("lorentz%d", i + 1));           
+        RootHelper::deleteObject(TString::Format("lorentz%d", i + 1));
         lorentz[i] = new LorentzianPdf(TString::Format("lorentz%d", i + 1), TString::Format("Exponent%d Component", i + 1), *observable, *E_0, *a[i]);
-        RootHelper::deleteObject(TString::Format("l1%dInt", i + 1));           
+        RootHelper::deleteObject(TString::Format("l1%dInt", i + 1));
         I_lorentz[i] = new RooRealVar(TString::Format("l1%dInt", i + 1), TString::Format("Lorentz%d intensity", i + 1), 0.8, 0.0, 1.0);
         pdfList->add(*lorentz[i]);
         components->add(*lorentz[i]);
@@ -144,13 +144,13 @@ void CompositeModelProvider::initModel(Bool_t hasParabola, const Int_t numGauss,
 
     // Orthogonal PDF
     // if (hasOrthogonal){
-    //     RootHelper::deleteObject("a1");            
+    //     RootHelper::deleteObject("a1");
     //     RooRealVar* a1 = new RooRealVar("a1", "a1 coeff", 1, 1E-2, 1E2, "A");
-    //     RootHelper::deleteObject("a2");            
+    //     RootHelper::deleteObject("a2");
     //     RooRealVar* a2 = new RooRealVar("a2", "a2 coeff", 1, 1E-2, 1E2, "A");
-    //     RootHelper::deleteObject("orthogonal");            
+    //     RootHelper::deleteObject("orthogonal");
     //     OrthogonalPdf* orthogonalPdf = new OrthogonalPdf("orthogonal", "Orthogonal Pdf", *x, *x0, *a1, *a2);
-    //     RootHelper::deleteObject("oInt"); 
+    //     RootHelper::deleteObject("oInt");
     //     RooRealVar* I_ortho = new RooRealVar("oInt", "Orthogonal intensity", 0.3, 0.0, 1.0);
     //     pdfList->add(*orthogonalPdf);
     //     components->add(*orthogonalPdf);
@@ -160,7 +160,7 @@ void CompositeModelProvider::initModel(Bool_t hasParabola, const Int_t numGauss,
     // Remove last coefficient for a recursive sum
     TIterator* coeffIter = coeffList->createIterator();
     TObject* tempObj=0;
-    TObject* prevObj=0;        
+    TObject* prevObj=0;
     do {
         prevObj = tempObj;
     } while((tempObj = coeffIter->Next()));
@@ -193,24 +193,24 @@ void CompositeModelProvider::initBackground(Double_t backgroundFraction){
     RooPolynomial* constBg = new RooPolynomial("constBg", "y=1", *observable, RooArgSet());
     RooRealVar* I_const = new RooRealVar("IConst", "Const background", backgroundFraction/2, 0, 0.2);
     bgComponents->add(*constBg);
-    
+
     // Atan background
     RooGenericPdf* atanBg = new RooGenericPdf("atanBg", "Atan background", "@2/2 + (-1)*atan((@0 - @1))", RooArgList(*observable, *E_0, *pi));
     RooRealVar* I_atan = new RooRealVar("IAtan", "Atan Intensity", 0.002, 0.0, 0.1); //backgroundFraction/2, 0, 0.2);
     bgComponents->add(*atanBg);
-    
+
 //    RooAddPdf* sumModelAndBg = new RooAddPdf("sumModelAndBg", "Sum of components and Background", *constBg, *model, *I_const);
     RooAddPdf* sumModelAndBg = new RooAddPdf("sumModelAndBg", "Sum of components and Background", RooArgList(*atanBg, *constBg, *model), RooArgList(*I_atan, *I_const));
-    
+
     this->model = sumModelAndBg;
 }
 
 void CompositeModelProvider::initResolutionFunction(Int_t convType, Double_t convFWHM, Bool_t isConvFixed) {
     // Resolution Function
-    RootHelper::deleteObject("zero");        
+    RootHelper::deleteObject("zero");
     RooRealVar* resFunctMean = sourcePdf ? new RooRealVar("resFunctMean", "Resolution mean", 0, -2, 2, "keV") : new RooRealVar("zero", "zero", 0, "keV");
-    RootHelper::deleteObject("resFunctFWHM");       
-    RooRealVar* resFunctFWHM = isConvFixed ? 
+    RootHelper::deleteObject("resFunctFWHM");
+    RooRealVar* resFunctFWHM = isConvFixed ?
         new RooRealVar("resFunctFWHM", "Resolution function FWHM", convFWHM, "keV") :
         new RooRealVar("resFunctFWHM", "Resolution function FWHM", convFWHM, convFWHM/4, convFWHM * 4, "keV");
     RootHelper::deleteObject("resFunctSigma");
@@ -222,7 +222,7 @@ void CompositeModelProvider::initResolutionFunction(Int_t convType, Double_t con
     else {
         resolutionFunction = nullptr;
     }
-    
+
     // Convolution
     RootHelper::deleteObject("sumModelConvoluted");
     RooAbsPdf* sumModelConvoluted = nullptr;
@@ -235,7 +235,7 @@ void CompositeModelProvider::initResolutionFunction(Int_t convType, Double_t con
             sumModelConvoluted = new RooFFTConvPdf("sumModelConvoluted", "Convoluted Model", *observable, *model, *resolutionFunction);
             ((RooFFTConvPdf*) sumModelConvoluted)->setBufferFraction(0);
             // sumModelConvoluted->setBufferStrategy(RooFFTConvPdf::Flat);
-            this->convolutedModel = sumModelConvoluted;                
+            this->convolutedModel = sumModelConvoluted;
             break;
         case 2:         // Numeric
             sumModelConvoluted = new RooNumConvPdf("sumModelConvoluted", "Convoluted Model", *observable, *model, *resolutionFunction);
@@ -247,7 +247,7 @@ void CompositeModelProvider::initResolutionFunction(Int_t convType, Double_t con
             ((ChannelConvolutionPdf*) sumModelConvoluted)->setConvolutionWindow(*resFunctMean,*resFunctFWHM,2);
             this->convolutedModel = sumModelConvoluted;
             break;
-    }    
+    }
 }
 
 
@@ -261,7 +261,7 @@ void CompositeModelProvider::initSingleDetector(Bool_t hasParabola, const Int_t 
     isTwoDetector = kFALSE;
     initModel(hasParabola, numGauss, numLorentz, numLorentzSum);
     initBackground(bgFraction);
-    initResolutionFunction(convType, convFWHM, isConvFixed);    
+    initResolutionFunction(convType, convFWHM, isConvFixed);
 }
 
 std::list<Variable*> CompositeModelProvider::getIndirectParameters(){
@@ -297,7 +297,7 @@ std::list<std::pair<const char*, Double_t>> CompositeModelProvider::getIntensiti
     TObject* tempObj=0;
 //    std::cout << "getIntensities: Iterating PDFs" << std::endl;
 //    RooAbsReal* fullInt = getModel()->createIntegral(*observable);
-    Double_t previousCoeff = 1;  
+    Double_t previousCoeff = 1;
     while((tempObj=it->Next())){
         RooAbsPdf* absPdf = dynamic_cast<RooAbsPdf*>(tempObj);
         if(absPdf != NULL){
@@ -312,7 +312,7 @@ std::list<std::pair<const char*, Double_t>> CompositeModelProvider::getIntensiti
             }
             else {
                 actualCoeff = previousCoeff;
-            } 
+            }
             std::cout << absPdf->GetName() << " " << actualCoeff << std::endl;
             std::pair<const char*, Double_t> p = std::make_pair(absPdf->GetTitle(), actualCoeff);
             intensities.push_back(p);
@@ -325,16 +325,20 @@ Double_t* CompositeModelProvider::getDefaultGaussAs(const Int_t numGauss){
     Double_t* As;
     switch ( numGauss ) {
         case 1:
-            As = (Double_t[1]){0.1};
+            static Double_t arr1[1] = {0.1};
+            As = &arr1[0];
             break;
         case 2:
-            As = (Double_t[2]){0.5, 0.1};
+            static Double_t arr2[2] = {0.5, 0.1};
+            As = &arr2[0];
             break;
         case 3:
-            As = (Double_t[3]){0.6, 0.3, 0.1};
+            static Double_t arr3[3] = {0.6, 0.3, 0.1};
+            As = &arr3[0];
             break;
         default:
-            As = (Double_t[4]){1.0, 0.5, 0.2, 0.05};
+            static Double_t arr4[4] = {1.0, 0.5, 0.2, 0.05};
+            As = &arr4[0];
             break;
     }
     return As;
@@ -344,18 +348,22 @@ Double_t* CompositeModelProvider::getDefaultLorentzAs(const Int_t numLorentz){
     Double_t* As;
     switch ( numLorentz ) {
         case 1:
-            As = (Double_t[1]){0.18};
+            static Double_t arr1[1] = {0.18};
+            As = &arr1[0];
             break;
         case 2:
-            As = (Double_t[2]){0.16, 0.5};
+            static Double_t arr2[2] = {0.16, 0.5};
+            As = &arr2[0];
 //            As = (Double_t[2]){Constants::a_B*TMath::Sqrt(Constants::Ry/73), Constants::a_B*TMath::Sqrt(Constants::Ry/117)};
             break;
         case 3:
-            As = (Double_t[3]){0.05, 0.1, 0.5};
+            static Double_t arr3[3] = {0.05, 0.1, 0.5};
+            As = &arr3[0];
 //            As = (Double_t[3]){Constants::a_B*TMath::Sqrt(Constants::Ry/73), Constants::a_B*TMath::Sqrt(Constants::Ry/117), Constants::a_B*TMath::Sqrt(Constants::Ry/1559)};
             break;
         default:
-            As = (Double_t[4]){0.05, 0.1, 0.5, 1};
+            static Double_t arr4[4] = {0.05, 0.1, 0.5, 1};
+            As = &arr4[0];
             break;
     }
     return As;
@@ -365,16 +373,20 @@ Double_t* CompositeModelProvider::getDefaultDampLorentzAs(const Int_t numLorentz
     Double_t* As;
     switch ( numLorentz ) {
         case 1:
-            As = (Double_t[1]){0.1};
+            static Double_t arr1[1] = {0.1};
+            As = &arr1[0];
             break;
         case 2:
-            As = (Double_t[2]){0.1, 0.4}; // 70, 6 eV
+            static Double_t arr2[2] = {0.1, 0.4};
+            As = &arr2[0];
             break;
         case 3:
-            As = (Double_t[3]){0.05, 0.1, 0.5};
+            static Double_t arr3[3] = {0.05, 0.1, 0.5};
+            As = &arr3[0];
             break;
         default:
-            As = (Double_t[4]){0.05, 0.1, 0.5, 1};
+            static Double_t arr4[4] = {0.05, 0.1, 0.5, 1};
+            As = &arr4[0];
             break;
     }
     return As;
