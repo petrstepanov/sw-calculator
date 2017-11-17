@@ -1,5 +1,10 @@
 # Environment
-CXX=clang++
+OS:=$(shell uname)
+ifeq ($(OS),Darwin)
+  CXX=clang++
+else
+  CXX=g++
+endif
 SRC_DIR=src
 OBJ_DIR=build
 BIN_DIR=dist
@@ -110,7 +115,9 @@ $(EXECUTABLE): $(OBJECTS) $(SHARED_LIBRARY)
 	# move .so library to bin folder
 	mv $(SHARED_LIBRARY) $(BIN_DIR)/$(SHARED_LIBRARY)
 	# change search location of the .so library to the executable directory of the app
+ifeq ($(OS),Darwin)
 	install_name_tool -change $(APP_NAME).so @executable_path/$(APP_NAME).so $(EXECUTABLE)
+endif
 	# move dictionary to the bin folder - they say you have to
 	mv $(DICT_PCM_FILENAME) $(BIN_DIR)/$(DICT_PCM_FILENAME)
 
