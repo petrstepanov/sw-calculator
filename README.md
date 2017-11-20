@@ -8,7 +8,7 @@ Application is written in C++ with CERN ROOT libraries and GUI. In order to run 
 
 Currently it is possible to run application either on macOS or Linux. I will try to compile the windows binary whenever the native Windows ROOT 6 build will be released.
 
-## Setup instructions
+## Setup instructions (macOS)
 
 ### Installing xCode
 
