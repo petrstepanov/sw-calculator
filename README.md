@@ -12,15 +12,15 @@ Currently it is possible to run application either on macOS or Linux. I will try
 
 ### Installing xCode
 
-6. Download xCode here [https://developer.apple.com/xcode/downloads/](https://developer.apple.com/xcode/downloads/).Note. I've tested new xCode 9 on macOS Sierra on Nov 4, 2017 and it turned out that it throws some compilation errors. As a temporary workaround I recommend downloading older xCode versions here [https://developer.apple.com/download/more/](https://developer.apple.com/download/more/). I used 8.3.3
+Download xCode here [https://developer.apple.com/xcode/downloads/](https://developer.apple.com/xcode/downloads/).Note. I've tested new xCode 9 on macOS Sierra on Nov 4, 2017 and it turned out that it throws some compilation errors. As a temporary workaround I recommend downloading older xCode versions here [https://developer.apple.com/download/more/](https://developer.apple.com/download/more/). I used 8.3.3
 
-7. Accept xCode license. Open Terminal and enter:
+Accept xCode license. Open Terminal and enter:
 
 ```bash
 sudo xcodebuild -license
 ```
 
-8. Install xCode command-line tools from Terminal
+Install xCode command-line tools from Terminal
 
 ```bash
 xcode-select --install
@@ -134,6 +134,50 @@ In order to run the application you need to navigate to the `/dist` folder first
 ```bash
 cd dist/ && ./sw-calculator
 ```
+
+### Creating a launcher
+
+We can create a launcher and have `TLIST Processor` in the Ubuntu application list. One of the ways to do it is following. First create a script to launch the application. It is an ok practice to keep scripts under `~/bin` directory in home folder.
+```bash
+mkdir ~/bin; cd ~/bin
+nano ./sw-calculator.sh
+```
+
+The script will navigate to the application folder and run it. Also this is gonna be a separate bash instance so we need to re-declare the `LD_LIBRARY_PATH` environment variable in order for the session to access ROOT shared libraries.
+```bash
+#!/bin/bash
+export ROOTSYS=/home/your-user-name/path-to-your-ROOT-folder
+export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:$ROOTSYS/lib
+
+cd /home/your-user-name/path-to-your-application-folder/dist
+./sw-calculator
+exec bash
+```
+
+Next, we save script and make it executable `chmod +x ./sw-calculator.sh`. Add your `~/bin` folder to `PATH`. Also, add `~/bin` to PATH variable in `~/.bashrc`:
+
+```bash
+export PATH=$PATH:/home/your-user-name/bin
+```
+
+Now we will create an application launcher. Open Terminal and type `nano ~/.local/share/applications/sw-calculator.desktop`. Insert following content:
+
+```bash
+[Desktop Entry]
+Type=Application
+Name=SW Calculator
+Comment=Doppler spectra processor
+Exec=sw-calculator.sh
+Icon=/home/your-user-name/path-to-your-application-folder/resources/sw-calculator.png
+Categories=Utility
+Keywords=sw;doppler;positron;calculator;
+```
+
+Tip. If you want to have the terminal output window as well, set `Exec=gnome-terminal -e "sw-calculator.sh"` on Ubuntu or `Exec=pantheon-terminal -e "sw-calculator.sh"` on systems with Pantheon desktop environment like elementary OS.
+
+Save file and make it executable `chmod +x ~/.local/share/applications/sw-calculator.desktop`.
+
+Now the SW Calculator icon appear under the applications menu on your system. You can run it from there.
 
 ---
 
