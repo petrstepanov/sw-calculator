@@ -96,7 +96,7 @@ void CompositeModelProvider::initModel(Bool_t hasParabola, const Int_t numGauss,
     GaussianPdf** gauss = new GaussianPdf*[numGauss];
     RooRealVar** I_gauss = new RooRealVar*[numGauss];
     Double_t aMin = 0.01; // [KeV]
-    Double_t aMax = 2; // [KeV]
+    Double_t aMax = 50; // [KeV]
     for (int i = 0; i < numGauss; i++){
         RootHelper::deleteObject(TString::Format("gauss%d_A", i + 1));
         gaussA[i] = new RooRealVar(TString::Format("gauss%d_A", i + 1), TString::Format("Gauss%d A", i + 1), getDefaultGaussAs(numGauss)[i], aMin, aMax, "A"); // 5 0.5 10
