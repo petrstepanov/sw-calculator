@@ -207,8 +207,9 @@ void CompositeModelProvider::initBackground(Double_t backgroundFraction){
 
 void CompositeModelProvider::initResolutionFunction(Int_t convType, Double_t convFWHM, Bool_t isConvFixed) {
     // Resolution Function
-    RootHelper::deleteObject("zero");
-    RooRealVar* resFunctMean = sourcePdf ? new RooRealVar("resFunctMean", "Resolution mean", 0, -2, 2, "keV") : new RooRealVar("zero", "zero", 0, "keV");
+    RootHelper::deleteObject("resFunctMean");
+//    RooRealVar* resFunctMean = sourcePdf ? new RooRealVar("resFunctMean", "Resolution mean", 0, -2, 2, "keV") : new RooRealVar("zero", "zero", 0, "keV");
+    RooRealVar* resFunctMean = new RooRealVar("resFunctMean", "Resolution mean", 0, "keV");
     RootHelper::deleteObject("resFunctFWHM");
     RooRealVar* resFunctFWHM = isConvFixed ?
         new RooRealVar("resFunctFWHM", "Resolution function FWHM", convFWHM, "keV") :
