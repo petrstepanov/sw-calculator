@@ -120,6 +120,7 @@ ifeq ($(OS),Darwin)
 endif
 	# move dictionary to the bin folder - they say you have to
 	mv $(DICT_PCM_FILENAME) $(BIN_DIR)/$(DICT_PCM_FILENAME)
+	rm $(DICT_FILENAME)
 
 $(DICTIONARY): $(HEADERS) $(SRC_DIR)/LinkDef.h
 	rootcling -f $@ -c $(CXXFLAGS) -p $^
