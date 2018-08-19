@@ -139,7 +139,7 @@ void SWCalculatorView::initUI(){
     comboConvolutionType->Resize(75, 20);        
     checkboxResFixed = new TGCheckButton(convolutionParamsFrame, "fixed");
     checkboxResFixed->SetOn();              
-    numResolutionFWHM = new TGNumberEntry(convolutionParamsFrame, 1.75, 4, -1, TGNumberFormat::kNESRealTwo,
+    numResolutionFWHM = new TGNumberEntry(convolutionParamsFrame, 2.0, 4, -1, TGNumberFormat::kNESRealTwo,
             TGNumberFormat::kNEANonNegative,
             TGNumberFormat::kNELLimitMinMax,
             0.5, 4.0);

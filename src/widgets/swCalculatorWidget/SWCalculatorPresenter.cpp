@@ -376,7 +376,6 @@ void SWCalculatorPresenter::onFitSpectrumClicked(){
         // Output S and W values
 //        Double_t mean = histProcessor->getPdfMaximumX(fittingModel, RooArgList(*e));
 
-        // TODO: check centering!
         Double_t sWidth = view->getSWidth();
         Double_t wWidth = view->getWWidth();
         Double_t wShift = view->getWShift();
