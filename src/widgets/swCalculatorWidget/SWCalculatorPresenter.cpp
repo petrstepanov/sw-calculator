@@ -227,13 +227,14 @@ void SWCalculatorPresenter::onFitSpectrumClicked(){
     }
     std::cout << "Counts axis limits: " << yAxisMin << ", " << yAxisMax << std::endl;
 
+//    Double_t modelMean = histProcessor->getPdfMaximumX(fittingModel, RooArgList(*e));
+    Double_t modelMean = modelProvider->getPeakCenter()->getValV();
     {
         // Draw S, W regions
         Double_t sWidth = view->getSWidth();
         Double_t wWidth = view->getWWidth();
         Double_t wShift = view->getWShift();
         // Energy value of the maximum of the convoluted model
-        Double_t modelMean = histProcessor->getPdfMaximumX(fittingModel, RooArgList(*e));
         Bool_t isTwoDetector = model->isTwoDetector();
         
         graphicsHelper->drawSWRegions(fitFrame, sWidth, wWidth, wShift, modelMean, yAxisMin, yAxisMax, isTwoDetector);
@@ -376,14 +377,12 @@ void SWCalculatorPresenter::onFitSpectrumClicked(){
 //        Double_t mean = histProcessor->getPdfMaximumX(fittingModel, RooArgList(*e));
 
         // TODO: check centering!
-        Double_t mean = modelProvider->getPeakCenter()->getValV()/2;
-
         Double_t sWidth = view->getSWidth();
         Double_t wWidth = view->getWWidth();
         Double_t wShift = view->getWShift();
         Bool_t isTwoDetector = model->isTwoDetector();
-        std::pair<Double_t, Double_t> sValueError = histProcessor->getSParameter(fitHistNoBg, sWidth, mean, isTwoDetector);
-        std::pair<Double_t, Double_t> wValueError = histProcessor->getWParameter(fitHistNoBg, wWidth, wShift, mean, isTwoDetector);
+        std::pair<Double_t, Double_t> sValueError = histProcessor->getSParameter(fitHistNoBg, sWidth, modelMean, isTwoDetector);
+        std::pair<Double_t, Double_t> wValueError = histProcessor->getWParameter(fitHistNoBg, wWidth, wShift, modelMean, isTwoDetector);
         view->displaySW(sValueError, wValueError);
     }
 
