@@ -373,7 +373,11 @@ void SWCalculatorPresenter::onFitSpectrumClicked(){
         view->displayChi2(sumChi2AndDegreesFreedom.first, fittingNonConvolutedModel->getVariables()->getSize(), sumChi2AndDegreesFreedom.second);
         
         // Output S and W values
-        Double_t mean = histProcessor->getPdfMaximumX(fittingModel, RooArgList(*e));
+//        Double_t mean = histProcessor->getPdfMaximumX(fittingModel, RooArgList(*e));
+
+        // TODO: check centering!
+        Double_t mean = modelProvider->getPeakCenter()->getValV()/2;
+
         Double_t sWidth = view->getSWidth();
         Double_t wWidth = view->getWWidth();
         Double_t wShift = view->getWShift();

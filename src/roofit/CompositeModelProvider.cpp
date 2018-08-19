@@ -40,6 +40,7 @@ CompositeModelProvider::CompositeModelProvider(RooRealVar* x, RooRealVar* x0) : 
     observable = x;
 }
 
+// Add source contribution pdf to the model
 void CompositeModelProvider::initSourcePdf(TH1F* sourceHist, RooAbsReal* sourceContrib) {
     Double_t histMin = sourceHist->GetXaxis()->GetXmin();
     Double_t histMax = sourceHist->GetXaxis()->GetXmax();
@@ -80,15 +81,15 @@ void CompositeModelProvider::initModel(Bool_t hasParabola, const Int_t numGauss,
 
     // Define parabola
     if (hasParabola){
-            RootHelper::deleteObject("parabolaRoot");
-            RooRealVar* parabolaRoot = new RooRealVar("parabolaRoot", "Coefficient at -x^2 + r*2", 3.5, 2.5, 8); // 3.4579 = Al (11.7)
-            RootHelper::deleteObject("parabola");
-            ParabolaPdf* parabola = new ParabolaPdf("parabola", "Fermi gas", *observable, *E_0, *parabolaRoot);
-            RootHelper::deleteObject("parabolaCoeff");
-            RooRealVar* parabolaCoeff = new RooRealVar("parabolaCoeff", "Parabola intensity", 0.8, 0.0, 1.0);
-            pdfList->add(*parabola);
-            coeffList->add(*parabolaCoeff);
-            components->add(*parabola);
+        RootHelper::deleteObject("parabolaRoot");
+        RooRealVar* parabolaRoot = new RooRealVar("parabolaRoot", "Coefficient at -x^2 + r*2", 3.5, 2.5, 8); // 3.4579 = Al (11.7)
+        RootHelper::deleteObject("parabola");
+        ParabolaPdf* parabola = new ParabolaPdf("parabola", "Fermi gas", *observable, *E_0, *parabolaRoot);
+        RootHelper::deleteObject("parabolaCoeff");
+        RooRealVar* parabolaCoeff = new RooRealVar("parabolaCoeff", "Parabola intensity", 0.8, 0.0, 1.0);
+        pdfList->add(*parabola);
+        coeffList->add(*parabolaCoeff);
+        components->add(*parabola);
     }
 
     // Gauss PDFs
@@ -207,9 +208,10 @@ void CompositeModelProvider::initBackground(Double_t backgroundFraction){
 
 void CompositeModelProvider::initResolutionFunction(Int_t convType, Double_t convFWHM, Bool_t isConvFixed) {
     // Resolution Function
-    RootHelper::deleteObject("resFunctMean");
+//    RootHelper::deleteObject("resFunctMean");
 //    RooRealVar* resFunctMean = sourcePdf ? new RooRealVar("resFunctMean", "Resolution mean", 0, -2, 2, "keV") : new RooRealVar("zero", "zero", 0, "keV");
-    RooRealVar* resFunctMean = new RooRealVar("resFunctMean", "Resolution mean", 0, "keV");
+//    RooRealVar* resFunctMean = new RooRealVar("resFunctMean", "Resolution mean", 0, "keV");
+    RooRealVar* resFunctMean = E_0;
     RootHelper::deleteObject("resFunctFWHM");
     RooRealVar* resFunctFWHM = isConvFixed ?
         new RooRealVar("resFunctFWHM", "Resolution function FWHM", convFWHM, "keV") :
@@ -232,12 +234,24 @@ void CompositeModelProvider::initResolutionFunction(Int_t convType, Double_t con
             this->convolutedModel = nullptr;
             break;
         case 1:         // FFT3
-            observable->setBins(10000, "cache");
-            sumModelConvoluted = new RooFFTConvPdf("sumModelConvoluted", "Convoluted Model", *observable, *model, *resolutionFunction);
-            ((RooFFTConvPdf*) sumModelConvoluted)->setBufferFraction(0);
-            // sumModelConvoluted->setBufferStrategy(RooFFTConvPdf::Flat);
+        {   // https://stackoverflow.com/questions/92396/why-cant-variables-be-declared-in-a-switch-statement
+            RooArgList* convPdfList = new RooArgList();
+            TIterator* pdfIter = pdfList->createIterator();
+            while (TObject* tempObj = pdfIter->Next()){
+                RooAbsPdf* absPdf = dynamic_cast<RooAbsPdf*>(tempObj);
+                if (absPdf != NULL){
+                    Int_t i = pdfList->index(absPdf);
+                    RootHelper::deleteObject(TString::Format("convAbsPdf%d", i + 1));
+                    RooFFTConvPdf* convAbsPdf = new RooFFTConvPdf(TString::Format("convAbsPdf%d", i + 1), "convoluted_pdf", *observable, *absPdf, *resolutionFunction);
+                    convPdfList->add(*convAbsPdf);
+                }
+            };
+            std::cout << "convPdfList" << std::endl;
+            convPdfList->Print();
+            sumModelConvoluted = new RooAddPdf("sumModelConvoluted", "Sum of components", *convPdfList, *coeffList, kTRUE);
             this->convolutedModel = sumModelConvoluted;
             break;
+        }
         case 2:         // Numeric
             sumModelConvoluted = new RooNumConvPdf("sumModelConvoluted", "Convoluted Model", *observable, *model, *resolutionFunction);
             ((RooNumConvPdf*) sumModelConvoluted)->setConvolutionWindow(*resFunctMean,*resFunctSigma,4);
