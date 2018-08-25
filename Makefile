@@ -5,6 +5,7 @@ ifeq ($(OS),Darwin)
 else
   CXX=g++
 endif
+
 SRC_DIR=src
 OBJ_DIR=build
 BIN_DIR=dist
@@ -12,102 +13,32 @@ BIN_DIR=dist
 APP_NAME=sw-calculator
 DICT_FILENAME=sw-dict.cpp
 DICT_PCM_FILENAME=sw-dict_rdict.pcm
+DSYM_DIR=sw-calculator.so.dSYM
 
 # Variables
 CXXFLAGS=-O3 `root-config --cflags` -fPIC # -pthread -stdlib=libc++ -std=c++11 -m64 -I/Applications/root_v6.06.02/include
 LDFLAGS=`root-config --ldflags`
 GLIBS=`root-config --glibs` -lRooFit -lRooFitCore -lHtml -lMinuit -lFumili
-HEADERS=src/event/Event.h \
-        src/event/EventBus.h \
-        src/event/EventHandler.h \
-        src/event/HandlerRegistration.h \
-        src/event/Object.h \
-        src/event/events/HistogramImportedEvent.h \
-        src/event/events/IsTwoDetectorEvent.h \
-        src/event/events/SourceHistogramImportedEvent.h \
-        src/model/Constants.h \
-        src/model/Model.h \
-        src/roofit/AbstractModelProvider.h \
-        src/roofit/BackgroundPdf.h \
-        src/roofit/ChannelConvolutionPdf.h \
-        src/roofit/CompositeModelProvider.h \
-        src/roofit/DampLorentzPdf.h \
-        src/roofit/GaussianPdf.h \
-        src/roofit/IndirectParamPdf.h \
-        src/roofit/LorentzianPdf.h \
-        src/roofit/OrthogonalPdf.h \
-        src/roofit/ParabolaGaussModelProvider.h \
-        src/roofit/ParabolaLorentzianModelProvider.h \
-        src/roofit/ParabolaPdf.h \
-        src/util/FileUtils.h \
-        src/util/GraphicsHelper.h \
-        src/util/HistProcessor.h \
-        src/util/RootHelper.h \
-        src/util/StringUtils.h \
-        src/util/UiHelper.h \
-        src/util/Variable.h \
-        src/widgets/importSpectrumWidget/AbstractImportSpectrumPresenter.h \
-        src/widgets/importSpectrumWidget/AbstractImportSpectrumView.h \
-        src/widgets/importSpectrumWidget/ImportSourceSpectrumPresenter.h \
-        src/widgets/importSpectrumWidget/ImportSourceSpectrumView.h \
-        src/widgets/importSpectrumWidget/ImportSpectrumPresenter.h \
-        src/widgets/importSpectrumWidget/ImportSpectrumView.h \
-        src/widgets/rooRealVarWidget/RooRealVarPresenter.h \
-        src/widgets/rooRealVarWidget/RooRealVarView.h \
-        src/widgets/swCalculatorWidget/SWCalculatorPresenter.h \
-        src/widgets/swCalculatorWidget/SWCalculatorView.h \
-        src/widgets/AbstractPresenter.h \
-        src/widgets/AbstractView.h \
-        src/widgets/MainView.h
-FILES=event/EventBus.cpp \
-      event/events/HistogramImportedEvent.cpp \
-      event/events/IsTwoDetectorEvent.cpp \
-      event/events/SourceHistogramImportedEvent.cpp \
-      model/Constants.cpp \
-      model/Model.cpp \
-      roofit/AbstractModelProvider.cpp \
-      roofit/BackgroundPdf.cpp \
-      roofit/ChannelConvolutionPdf.cpp \
-      roofit/CompositeModelProvider.cpp \
-      roofit/DampLorentzPdf.cpp \
-      roofit/GaussianPdf.cpp \
-      roofit/IndirectParamPdf.cpp \
-      roofit/LorentzianPdf.cpp \
-      roofit/OrthogonalPdf.cpp \
-      roofit/ParabolaGaussModelProvider.cpp \
-      roofit/ParabolaLorentzianModelProvider.cpp \
-      roofit/ParabolaPdf.cpp \
-      util/FileUtils.cpp \
-      util/GraphicsHelper.cpp \
-      util/HistProcessor.cpp \
-      util/RootHelper.cpp \
-      util/StringUtils.cpp \
-      util/UiHelper.cpp \
-      util/Variable.cpp \
-      widgets/importSpectrumWidget/AbstractImportSpectrumPresenter.cpp \
-      widgets/importSpectrumWidget/AbstractImportSpectrumView.cpp \
-      widgets/importSpectrumWidget/ImportSourceSpectrumPresenter.cpp \
-      widgets/importSpectrumWidget/ImportSourceSpectrumView.cpp \
-      widgets/importSpectrumWidget/ImportSpectrumPresenter.cpp \
-      widgets/importSpectrumWidget/ImportSpectrumView.cpp \
-      widgets/rooRealVarWidget/RooRealVarPresenter.cpp \
-      widgets/rooRealVarWidget/RooRealVarView.cpp \
-      widgets/swCalculatorWidget/SWCalculatorPresenter.cpp \
-      widgets/swCalculatorWidget/SWCalculatorView.cpp \
-      widgets/MainView.cpp \
-      main.cpp
+H_EXT = h
+HEADERS = $(shell find $(SRC_DIR) -type f -name *.$(H_EXT))
 
-SOURCES=$(addprefix $(SRC_DIR)/,$(FILES))
-OBJECTS_TEMP=$(SOURCES:.cpp=.o)
-OBJECTS=$(patsubst $(SRC_DIR)/%,$(OBJ_DIR)/%,$(OBJECTS_TEMP))
+SRC_EXT = cpp
+SOURCES = $(shell find $(SRC_DIR) -type f -name *.$(SRC_EXT))
+
+OBJECTS_TEMP = $(SOURCES:.cpp=.o)
+OBJECTS = $(patsubst $(SRC_DIR)/%,$(OBJ_DIR)/%,$(OBJECTS_TEMP))
+
 EXECUTABLE=$(BIN_DIR)/$(APP_NAME)
 DICTIONARY=$(DICT_FILENAME)
 SHARED_LIBRARY=$(APP_NAME).so
-# List of special targets that do not generate files
-.PHONY: directories
 
 # Empty target ensures that list of all 'end products' are called
-all: directories $(DICTIONARY) $(SHARED_LIBRARY) $(OBJECTS) $(EXECUTABLE)
+all: executable
+
+debug: CXXFLAGS += -g #-ggdb -DDEBUG -g
+debug: executable
+
+executable: directories $(DICTIONARY) $(SHARED_LIBRARY) $(OBJECTS) $(EXECUTABLE)
 
 $(EXECUTABLE): $(OBJECTS) $(SHARED_LIBRARY)
 	@echo "Linking "$@
@@ -157,3 +88,10 @@ directories:
 	mkdir -p $(OBJ_DIR)/widgets/importSpectrumWidget
 	mkdir -p $(OBJ_DIR)/widgets/rooRealVarWidget
 	mkdir -p $(OBJ_DIR)/widgets/swCalculatorWidget
+
+echo:
+	$(info SOURCES: $(SOURCES))
+	$(info HEADERS: $(HEADERS))
+
+# List of special targets that do not generate files
+.PHONY: directories echo
