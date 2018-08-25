@@ -53,7 +53,7 @@ endif
 	mv $(DICT_PCM_FILENAME) $(BIN_DIR)/$(DICT_PCM_FILENAME)
 	rm $(DICT_FILENAME)
 
-$(DICTIONARY): $(HEADERS) $(SRC_DIR)/LinkDef.h
+$(DICTIONARY): $(HEADERS) $(SRC_DIR)/LinkDef.hpp
 	rootcling -f $@ -c $(CXXFLAGS) -p $^
 
 # https://root.cern.ch/interacting-shared-libraries-rootcint (they forgot $(GLIBS) damn)

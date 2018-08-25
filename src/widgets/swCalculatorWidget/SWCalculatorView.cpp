@@ -4,16 +4,16 @@
  * and open the template in the editor.
  */
 
-/* 
+/*
  * File:   SWCalculatorFrame.cpp
  * Author: petrstepanov
- * 
+ *
  * Created on August 1, 2017, 5:02 PM
  */
 
 #include "SWCalculatorView.h"
 #include "SWCalculatorPresenter.h"
-#include "../../LinkDef.h"
+// #include "../../LinkDef.h"
 #include "../../model/Constants.h"
 #include "../importSpectrumWidget/ImportSpectrumView.h"
 #include "../importSpectrumWidget/ImportSourceSpectrumView.h"
@@ -44,9 +44,9 @@ SWCalculatorPresenter* SWCalculatorView::instantinatePresenter(){
     return new SWCalculatorPresenter(this);
 }
 
-void SWCalculatorView::initUI(){    
+void SWCalculatorView::initUI(){
     SetLayoutManager(new TGHorizontalLayout(this));
-    
+
     // Tabs widget
     tabsWidget = new TGTab(this, Constants::leftPanelWidth);
 
@@ -59,7 +59,7 @@ void SWCalculatorView::initUI(){
     TGCompositeFrame *tabImportKapton = tabsWidget->AddTab("Kapton Spectrum");
     tabImportKapton->SetLayoutManager(new TGVerticalLayout(tabImportKapton));
     tabImportKapton->AddFrame(new ImportSourceSpectrumView(tabImportKapton), new TGLayoutHints(kLHintsExpandX | kLHintsExpandY, dx, dx, dy*2, dy*2));
-    
+
     // Fit Data tab
     tabFit = tabsWidget->AddTab("Fit Data");
     tabFit->SetLayoutManager(new TGVerticalLayout(tabFit));
@@ -136,19 +136,19 @@ void SWCalculatorView::initUI(){
         comboConvolutionType->AddEntry((it->second).Data(), it->first);
     }
     comboConvolutionType->Select(1);
-    comboConvolutionType->Resize(75, 20);        
+    comboConvolutionType->Resize(75, 20);
     checkboxResFixed = new TGCheckButton(convolutionParamsFrame, "fixed");
-    checkboxResFixed->SetOn();              
+    checkboxResFixed->SetOn();
     numResolutionFWHM = new TGNumberEntry(convolutionParamsFrame, 2.0, 4, -1, TGNumberFormat::kNESRealTwo,
             TGNumberFormat::kNEANonNegative,
             TGNumberFormat::kNELLimitMinMax,
             0.5, 4.0);
-    convolutionParamsFrame->AddFrame(new TGLabel(convolutionParamsFrame, "Convolution"), 
+    convolutionParamsFrame->AddFrame(new TGLabel(convolutionParamsFrame, "Convolution"),
                                      new TGLayoutHints(kLHintsLeft | kLHintsTop, 0, dx, 4*dy/5, 0));
     convolutionParamsFrame->AddFrame(comboConvolutionType, new TGLayoutHints(kLHintsLeft | kLHintsTop, 0, 0, dy/5, 0));
     convolutionParamsFrame->AddFrame(checkboxResFixed, new TGLayoutHints(kLHintsRight | kLHintsTop, 0, 0, 3*dy/5, 0));
     convolutionParamsFrame->AddFrame(numResolutionFWHM, new TGLayoutHints(kLHintsRight | kLHintsTop, 0, dx, dy/5, 0));
-    convolutionParamsFrame->AddFrame(new TGLabel(convolutionParamsFrame, "Resolution FWHM, keV"), 
+    convolutionParamsFrame->AddFrame(new TGLabel(convolutionParamsFrame, "Resolution FWHM, keV"),
                                      new TGLayoutHints(kLHintsRight | kLHintsTop, 0, dx, 4*dy/5, 0));
     tabFit->AddFrame(convolutionParamsFrame, new TGLayoutHints(kLHintsExpandX, dx, dx, dy, dy));
 
@@ -161,7 +161,7 @@ void SWCalculatorView::initUI(){
     sourceContributionFrame->AddFrame(sourceContributionView, new TGLayoutHints(kLHintsExpandX, dx, dx, dy, dy));
     sourceContributionFrame->AddFrame(new TGHorizontal3DLine(sourceContributionFrame), new TGLayoutHints(kLHintsExpandX, dx, dx, dy, dy));
     tabFit->AddFrame(sourceContributionFrame, new TGLayoutHints(kLHintsLeft | kLHintsTop | kLHintsExpandX));
-    
+
     // Model parameters
     TGHorizontalFrame* modelParamsFrame = new TGHorizontalFrame(tabFit);
     //	modelParamsFrame->AddFrame(new TGLabel(modelParamsFrame, "Model details:"), new TGLayoutHints(kLHintsNormal, 0, 30, 5, 0));
@@ -172,7 +172,7 @@ void SWCalculatorView::initUI(){
             TGNumberFormat::kNEANonNegative,
             TGNumberFormat::kNELLimitMinMax,
             0, 5);
-    modelParamsFrame->AddFrame(numGauss, new TGLayoutHints(kLHintsNormal, 0, dx, 2*dy/5, 0));        
+    modelParamsFrame->AddFrame(numGauss, new TGLayoutHints(kLHintsNormal, 0, dx, 2*dy/5, 0));
     modelParamsFrame->AddFrame(new TGLabel(modelParamsFrame, "Gauss"), new TGLayoutHints(kLHintsNormal, 0, 3*dx, dy, 0));
 
     numExponent = new TGNumberEntry(modelParamsFrame, 0, 1, -1, TGNumberFormat::kNESInteger,
@@ -190,7 +190,7 @@ void SWCalculatorView::initUI(){
     modelParamsFrame->AddFrame(new TGLabel(modelParamsFrame, "Damping Exp"), new TGLayoutHints(kLHintsNormal, 0, 3*dx, dy, 0));
 
     //	hasOrtho = new TGCheckButton(modelParamsFrame, "Ortho Exps", -1);
-    //	modelParamsFrme->AddFrame(hasOrtho, new TGLayoutHints(kLHintsNormal, 0, 20, 4, 0));        
+    //	modelParamsFrme->AddFrame(hasOrtho, new TGLayoutHints(kLHintsNormal, 0, 20, 4, 0));
 
     tabFit->AddFrame(modelParamsFrame, new TGLayoutHints(kLHintsExpandX, dx, dx, dy, dy));
 
@@ -205,7 +205,7 @@ void SWCalculatorView::initUI(){
     txtFitResult = new TGTextEdit(tabFit);
     txtFitResult->SetBackgroundColor(Constants::colorAppWindow->GetPixel());
     tabFit->AddFrame(txtFitResult, new TGLayoutHints(kLHintsExpandX | kLHintsExpandY, dx, dx, dy, dy));
-    
+
     TGHorizontalFrame* splitFrame = new TGHorizontalFrame(tabFit);
 
     btnClearResult = new TGTextButton(splitFrame, "Clear file");
@@ -215,10 +215,10 @@ void SWCalculatorView::initUI(){
     btnSaveResult->Connect("Clicked()", "SWCalculatorView", this, "onSaveResultsClicked()");
     splitFrame->AddFrame(btnSaveResult, new TGLayoutHints(kLHintsLeft | kLHintsTop | kLHintsExpandX, dx/2));
     tabFit->AddFrame(splitFrame, new TGLayoutHints(kLHintsLeft | kLHintsTop | kLHintsExpandX, dx, dx, dy, 2*dy));
-    
+
     // Attach Tabs Widget
     tabsWidget->SetTab(0);
-    setTabEnabled(1, false);    
+    setTabEnabled(1, false);
     setTabEnabled(2, false);
     tabsWidget->SetWidth(Constants::leftPanelWidth); // Resize(tabsWidget->GetDefaultSize());
     AddFrame(tabsWidget, new TGLayoutHints(kLHintsLeft | kLHintsTop | kLHintsExpandY, dx, dx, 2*dy, 2*dy));
@@ -268,7 +268,7 @@ void SWCalculatorView::initUI(){
     frameExportButtons->AddFrame(displayMax, new TGLayoutHints(kLHintsLeft | kLHintsTop, 0, dx, 0, 0));
 //    tbMin->AddText(0, "0.0");
 //    tbMax->AddText(0, "0.0");
-//    
+//
 //    char buf[32];
 //    sprintf(buf, "%.1f", zoomSlider->GetMinPosition());
 //    tbMin->Clear();
@@ -300,11 +300,11 @@ void SWCalculatorView::initUI(){
 
     AddFrame(frameRightVertical, new TGLayoutHints(kLHintsLeft | kLHintsTop | kLHintsExpandX | kLHintsExpandY, 0, 0, 0, dx));
 
-//    MapSubwindows();  
-    // You should call, for example HideFrame(TGFrame *f), only after the frames have been laid out and the sub windows 
+//    MapSubwindows();
+    // You should call, for example HideFrame(TGFrame *f), only after the frames have been laid out and the sub windows
     // of the composite frame have been mapped via method MapSubwindows()
 //    setSourceContributionFrameVisible(kFALSE);
-    
+
     // Plot Canvas Settings
     padData = new TPad("padData", "Pad for data", 0.0, 0.3, 1.0, 1.0, kWhite); // x_low, y_low, x_hi, y_hi
     padData->SetMargin(Constants::padMargin[0], Constants::padMargin[1], Constants::padMargin[2], Constants::padMargin[3]);
@@ -327,11 +327,11 @@ void SWCalculatorView::setTabEnabled(Int_t tabNumber, Bool_t isEnabled){
 }
 
 Int_t SWCalculatorView::getFitMinValue(){
-    return numFitMin->GetNumber();    
+    return numFitMin->GetNumber();
 }
 
 Int_t SWCalculatorView::getFitMaxValue(){
-    return numFitMax->GetNumber();    
+    return numFitMax->GetNumber();
 }
 
 void SWCalculatorView::setFitMinMaxRange(Int_t min, Int_t max){
@@ -344,20 +344,20 @@ void SWCalculatorView::setFitMinMaxValues(Bool_t isTwoDetector){
         // Set fit values
         Int_t leftLimitMin = TMath::Abs(numFitMin->GetNumMin());
         Int_t rightLimitMax = TMath::Abs(numFitMax->GetNumMax());
-        
+
         Int_t limit = TMath::Min(leftLimitMin, rightLimitMax);
         if (numFitMin->GetNumber() < -limit) numFitMin->SetNumber(-limit);
         if (numFitMax->GetNumber() > limit) numFitMax->SetNumber(limit);
     }
     else {
         numFitMin->SetNumber(496);
-        numFitMax->SetNumber(526);       
+        numFitMax->SetNumber(526);
     }
 }
 
 void SWCalculatorView::setDisplayLimits(Float_t min, Float_t max) {
     // Update slider position
-    zoomSlider->SetRange(min,max);    
+    zoomSlider->SetRange(min,max);
     zoomSlider->SetPosition(min, max);
     // Update text boxes' values
     displayMin->SetLimitValues(min, max);
@@ -379,7 +379,7 @@ void SWCalculatorView::updateCanvasLimits(Double_t min, Double_t max) {
 void SWCalculatorView::onDisplayMinChange(char* c) {
     Double_t min = displayMin->GetNumber();
     Double_t max = zoomSlider->GetMaxPosition();
-    zoomSlider->SetPosition(min, max);    
+    zoomSlider->SetPosition(min, max);
     updateCanvasLimits(min, max);
 }
 
@@ -392,7 +392,7 @@ void SWCalculatorView::onDisplayMaxChange(char* c) {
 
 void SWCalculatorView::onSliderChange() {
 //   char buf[32];
-   
+
 //   sprintf(buf, "%.1f", zoomSlider->GetMinPosition());
 //   tbMin->Clear();
 //   tbMin->AddText(0, buf);
@@ -417,11 +417,11 @@ Double_t SWCalculatorView::getSWidth(){
 }
 
 Double_t SWCalculatorView::getWWidth(){
-    return numWWidth->GetNumber();    
+    return numWWidth->GetNumber();
 }
 
 Double_t SWCalculatorView::getWShift(){
-    return numWShift->GetNumber();    
+    return numWShift->GetNumber();
 }
 
 Int_t SWCalculatorView::getConvolutionType(){
@@ -490,7 +490,7 @@ void SWCalculatorView::updateRegionLabels(Bool_t isTwoDetector){
 void SWCalculatorView::displayFilename(TString* fileName) {
     txtFitResult->AddLineFast("");
     TString* onlyFileName = StringUtils::stripFileName(fileName);
-    txtFitResult->AddLineFast(Form("    %s", onlyFileName->Data()));    
+    txtFitResult->AddLineFast(Form("    %s", onlyFileName->Data()));
 }
 
 void SWCalculatorView::displayFitParameters(RooFitResult* fitResult) {
@@ -503,7 +503,7 @@ void SWCalculatorView::displayFitParameters(RooFitResult* fitResult) {
     }
     while (std::getline(iss, str)){
             txtFitResult->AddLineFast(str.c_str());
-    }    
+    }
 }
 
 void SWCalculatorView::displayIndirectParameters(std::list<Variable*> parameters) {
@@ -558,7 +558,7 @@ void SWCalculatorView::onNumFitMinChanged(){
 }
 
 void SWCalculatorView::onNumFitMaxChanged(){
-    std::cout << "SWCalculatorView::onNumFitMaxChanged()" << std::endl;    
+    std::cout << "SWCalculatorView::onNumFitMaxChanged()" << std::endl;
 }
 
 void SWCalculatorView::onFitSpectrumClicked(){
@@ -567,11 +567,11 @@ void SWCalculatorView::onFitSpectrumClicked(){
 }
 
 void SWCalculatorView::onApplyZoomClicked(){
-    std::cout << "SWCalculatorView::onApplyZoomClicked()" << std::endl;    
+    std::cout << "SWCalculatorView::onApplyZoomClicked()" << std::endl;
 }
 
 void SWCalculatorView::onResetZoomClicked(){
-    std::cout << "SWCalculatorView::onResetZoomClicked()" << std::endl;    
+    std::cout << "SWCalculatorView::onResetZoomClicked()" << std::endl;
 }
 
 void SWCalculatorView::onSaveResultsClicked() {
@@ -598,7 +598,7 @@ void SWCalculatorView::clearFitResults() {
 
 
 //void SWCalculatorView::onSaveDataClicked(){
-//    std::cout << "SWCalculatorView::onSaveDataClicked()" << std::endl;        
+//    std::cout << "SWCalculatorView::onSaveDataClicked()" << std::endl;
 //}
 
 void SWCalculatorView::onSaveImageClicked(){
@@ -632,5 +632,5 @@ SWCalculatorView::~SWCalculatorView() {
     delete chiFrame;
     delete padData;
     delete padChi2;
-    delete canvasPlot;    
+    delete canvasPlot;
 }
