@@ -32,6 +32,9 @@ EXECUTABLE=$(BIN_DIR)/$(APP_NAME)
 DICTIONARY=$(DICT_FILENAME)
 SHARED_LIBRARY=$(APP_NAME).so
 
+# convenience variable for making directories
+dir_guard=@mkdir -p $(@D)
+
 # Empty target ensures that list of all 'end products' are called
 all: executable
 
@@ -61,6 +64,7 @@ $(SHARED_LIBRARY): $(DICTIONARY) $(SOURCES)
 	$(CXX) -shared -o $@ $(LDFLAGS) $(CXXFLAGS) $(GLIBS) $^
 
 $(OBJ_DIR)/%.o: $(SRC_DIR)/%.cpp
+	$(dir_guard)
 	@echo "Compiling "$@
 # compile with dependency files - why?
 #	$(CXX) $(CXXFLAGS) -c -g -MMD -MP -MF "$@.d" -o $@ $<
@@ -79,15 +83,6 @@ clean:
 directories:
 	mkdir -p $(OBJ_DIR)
 	mkdir -p $(BIN_DIR)
-	mkdir -p $(OBJ_DIR)/event
-	mkdir -p $(OBJ_DIR)/event/events
-	mkdir -p $(OBJ_DIR)/model
-	mkdir -p $(OBJ_DIR)/roofit
-	mkdir -p $(OBJ_DIR)/util
-	mkdir -p $(OBJ_DIR)/widgets
-	mkdir -p $(OBJ_DIR)/widgets/importSpectrumWidget
-	mkdir -p $(OBJ_DIR)/widgets/rooRealVarWidget
-	mkdir -p $(OBJ_DIR)/widgets/swCalculatorWidget
 
 echo:
 	$(info SOURCES: $(SOURCES))

@@ -4,10 +4,10 @@
  * and open the template in the editor.
  */
 
-/* 
+/*
  * File:   RootHelper.cpp
  * Author: petrstepanov
- * 
+ *
  * Created on August 24, 2017, 8:16 PM
  */
 
@@ -28,18 +28,16 @@ void RootHelper::deleteObject(TObject* obj){
 }
 
 Int_t RootHelper::getNumCpu(){
-    // Get number of CPUs
     SysInfo_t sysInfo;
-    TSystem* tSystem = new TUnixSystem();
-    tSystem->GetSysInfo(&sysInfo);
-    std::cout << "NumCpu: " << sysInfo.fCpus << std::endl;
+    gSystem->GetSysInfo(&sysInfo);
+    std::cout << "RootHelper::getNumCpu: sysInfo.fCpus = " << sysInfo.fCpus << std::endl;
     return (sysInfo.fCpus >= 0) ? sysInfo.fCpus : 1;
 }
 
 TStopwatch* RootHelper::watch = new TStopwatch();
 
 void RootHelper::startTimer(){
-    watch->Start();    
+    watch->Start();
 }
 
 void RootHelper::stopAndPrintTimer(){
