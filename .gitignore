@@ -38,9 +38,6 @@ dist/
 *dict.cpp
 *.pcm
 *.so
-Makefile-netbeans
-Makefile-my
-Makefile
 
 # Eclipse
 .project
