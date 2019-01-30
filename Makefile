@@ -1,4 +1,4 @@
-# Environment
+# Select compiler command depending on environment
 OS:=$(shell uname)
 ifeq ($(OS),Darwin)
   CXX=clang++
@@ -6,21 +6,28 @@ else
   CXX=g++
 endif
 
+# Define variables for directories
 SRC_DIR=src
 OBJ_DIR=build
 BIN_DIR=dist
 
+# Replace with your application name
 APP_NAME=sw-calculator
-DICT_FILENAME=sw-dict.cpp
-DICT_PCM_FILENAME=sw-dict_rdict.pcm
-DSYM_DIR=sw-calculator.so.dSYM
 
-# Variables
-CXXFLAGS=-O3 `root-config --cflags` -fPIC # -pthread -stdlib=libc++ -std=c++11 -m64 -I/Applications/root_v6.06.02/include
+DICT_NAME=$(APP_NAME)-dictionary
+DICT_FILENAME=$(DICT_NAME).cxx             # app-dictionary.cxx
+DICT_PCM_FILENAME=$(DICT_NAME)_rdict.pcm   # app-dictionary_rdict.pcm
+# DSYM_DIR=sw-calculator.so.dSYM
+
+# Compiler flags, library search paths and ROOT shared libraries names
+CXXFLAGS=-O3 `root-config --cflags` -fPIC
 LDFLAGS=`root-config --ldflags`
 GLIBS=`root-config --glibs` -lRooFit -lRooFitCore -lHtml -lMinuit -lFumili
+
+# Build lists of header, source and object files
 H_EXT = h
 HEADERS = $(shell find $(SRC_DIR) -type f -name *.$(H_EXT))
+HEADERS := $(filter-out $(SRC_DIR)/LinkDef.h,$(HEADERS))
 
 SRC_EXT = cpp
 SOURCES = $(shell find $(SRC_DIR) -type f -name *.$(SRC_EXT))
@@ -28,9 +35,9 @@ SOURCES = $(shell find $(SRC_DIR) -type f -name *.$(SRC_EXT))
 OBJECTS_TEMP = $(SOURCES:.cpp=.o)
 OBJECTS = $(patsubst $(SRC_DIR)/%,$(OBJ_DIR)/%,$(OBJECTS_TEMP))
 
-EXECUTABLE=$(BIN_DIR)/$(APP_NAME)
-DICTIONARY=$(DICT_FILENAME)
-SHARED_LIBRARY=$(APP_NAME).so
+# Executable and shared library files path and name
+EXECUTABLE=$(BIN_DIR)/$(APP_NAME)       # src/app
+SHARED_LIBRARY=$(APP_NAME)-library.so   # app-library.so
 
 # convenience variable for making directories
 dir_guard=@mkdir -p $(@D)
@@ -41,7 +48,7 @@ all: executable
 debug: CXXFLAGS += -g #-ggdb -DDEBUG -g
 debug: executable
 
-executable: directories $(DICTIONARY) $(SHARED_LIBRARY) $(OBJECTS) $(EXECUTABLE)
+executable: directories $(DICT_FILENAME) $(SHARED_LIBRARY) $(OBJECTS) $(EXECUTABLE)
 
 $(EXECUTABLE): $(OBJECTS) $(SHARED_LIBRARY)
 	@echo "Linking "$@
@@ -52,15 +59,15 @@ $(EXECUTABLE): $(OBJECTS) $(SHARED_LIBRARY)
 ifeq ($(OS),Darwin)
 	install_name_tool -change $(APP_NAME).so @executable_path/$(APP_NAME).so $(EXECUTABLE)
 endif
-	# move dictionary to the bin folder - they say you have to
+	# move dictionary .pcm next to the app executable, remove dictionary .cxx
 	mv $(DICT_PCM_FILENAME) $(BIN_DIR)/$(DICT_PCM_FILENAME)
 	rm $(DICT_FILENAME)
 
-$(DICTIONARY): $(HEADERS) $(SRC_DIR)/LinkDef.hpp
+$(DICT_FILENAME): $(HEADERS) $(SRC_DIR)/LinkDef.h
 	rootcling -f $@ -c $(CXXFLAGS) -p $^
 
-# https://root.cern.ch/interacting-shared-libraries-rootcint (they forgot $(GLIBS) damn)
-$(SHARED_LIBRARY): $(DICTIONARY) $(SOURCES)
+# https://root.cern.ch/interacting-shared-libraries-rootcling (they forgot $(GLIBS) damn)
+$(SHARED_LIBRARY): $(DICT_FILENAME) $(SOURCES)
 	$(CXX) -shared -o $@ $(LDFLAGS) $(CXXFLAGS) $(GLIBS) $^
 
 $(OBJ_DIR)/%.o: $(SRC_DIR)/%.cpp
@@ -73,12 +80,11 @@ $(OBJ_DIR)/%.o: $(SRC_DIR)/%.cpp
 # just compile
 	$(CXX) $(CXXFLAGS) -c $< -o $@
 
-
 clean:
 	rm -f -r $(OBJ_DIR)
 	rm -f -r $(BIN_DIR)
-	rm -f $(DICTIONARY)
-	rm -f *.pcm
+	rm -f $(DICT_FILENAME)
+	rm -f $(SHARED_LIBRARY)
 
 directories:
 	mkdir -p $(OBJ_DIR)
