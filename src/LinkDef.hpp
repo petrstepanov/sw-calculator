@@ -1,3 +1,8 @@
-#pragma link C++ class AbstractImportSpectrumView;
-#pragma link C++ class RooRealVarView;
-#pragma link C++ class SWCalculatorView;
+#ifdef __CINT__
+#pragma link off all globals;
+#pragma link off all classes;
+#pragma link off all functions;
+#pragma link C++ nestedclasses;
+
+#pragma link C++ class MyMainFrame;
+#endif

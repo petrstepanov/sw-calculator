@@ -4,25 +4,26 @@
  * and open the template in the editor.
  */
 
-/* 
- * File:   MainView.h
+/*
+ * File:   MyMainFrame.h
  * Author: petrstepanov
  *
  * Created on October 15, 2017, 1:47 AM
  */
 
-#ifndef MAINVIEW_H
-#define MAINVIEW_H
+#ifndef MYMAINFRAME_H
+#define MYMAINFRAME_H
 
 #include <TGFrame.h>
 
-class MainView : public TGMainFrame {
+class MyMainFrame : public TGMainFrame {
 public:
-    MainView(const TGWindow* w);
-    virtual ~MainView();
+    MyMainFrame(const TGWindow* w);
+    virtual ~MyMainFrame();
 
     void mapAndResize();
+
+    ClassDef(MyMainFrame, 0);
 };
 
-#endif /* MAINVIEW_H */
-
+#endif /* MyMainFrameW_H */

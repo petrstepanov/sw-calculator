@@ -4,10 +4,10 @@
  * and open the template in the editor.
  */
 
-/* 
+/*
  * File:   RooRealVarView.cpp
  * Author: petrstepanov
- * 
+ *
  * Created on October 23, 2017, 1:22 AM
  */
 
@@ -15,7 +15,7 @@
 #include "RooRealVarPresenter.h"
 #include <RooRealVar.h>
 
-ClassImp(RooRealVarView)
+// ClassImp(RooRealVarView)
 
 RooRealVarView::RooRealVarView(const TGWindow* w) : AbstractView<RooRealVarPresenter>(w){
     initUI();
@@ -43,27 +43,27 @@ void RooRealVarView::initUI() {
                 TGNumberFormat::kNEANonNegative,
                 TGNumberFormat::kNELLimitMinMax,
                 -100, 100);
-    value->GetNumberEntry()->Connect("TextChanged(char*)", "RooRealVarView", this, "onValueChange(char*)");    
+    value->GetNumberEntry()->Connect("TextChanged(char*)", "RooRealVarView", this, "onValueChange(char*)");
     AddFrame(value, new TGLayoutHints(kLHintsLeft | kLHintsTop, dx, dx));
-      
+
     // Minimum value
     minValue = new TGNumberEntry(this, 0, 5, -1, TGNumberFormat::kNESRealTwo,
                 TGNumberFormat::kNEANonNegative,
                 TGNumberFormat::kNELLimitMax,
                 -100, 100);
-    minValue->GetNumberEntry()->Connect("TextChanged(char*)", "RooRealVarView", this, "onMinimumChange(char*)");    
-    AddFrame(minValue, new TGLayoutHints(kLHintsLeft | kLHintsTop, dx, dx));    
-    
+    minValue->GetNumberEntry()->Connect("TextChanged(char*)", "RooRealVarView", this, "onMinimumChange(char*)");
+    AddFrame(minValue, new TGLayoutHints(kLHintsLeft | kLHintsTop, dx, dx));
+
     // Dash label
     AddFrame(new TGLabel(this, "-"), new TGLayoutHints(kLHintsLeft | kLHintsTop, 0, 0, 3*dy/5));
-    
+
     // Minimum value
     maxValue = new TGNumberEntry(this, 0, 5, -1, TGNumberFormat::kNESRealTwo,
                 TGNumberFormat::kNEANonNegative,
                 TGNumberFormat::kNELLimitMin,
                 -100, 100);
-    maxValue->GetNumberEntry()->Connect("TextChanged(char*)", "RooRealVarView", this, "onMaximumChange(char*)");    
-    AddFrame(maxValue, new TGLayoutHints(kLHintsLeft | kLHintsTop, dx, dx));    
+    maxValue->GetNumberEntry()->Connect("TextChanged(char*)", "RooRealVarView", this, "onMaximumChange(char*)");
+    AddFrame(maxValue, new TGLayoutHints(kLHintsLeft | kLHintsTop, dx, dx));
 
     // Fixed checkbox
     fixed = new TGCheckButton(this, "fixed");
@@ -120,7 +120,7 @@ void RooRealVarView::onSetConstant(Bool_t isConstant) {
     isConstant = fixed->IsOn();
     presenter->onSetConstant(isConstant);
     minValue->SetState(isConstant ? kFALSE : kTRUE);
-    maxValue->SetState(isConstant ? kFALSE : kTRUE);    
+    maxValue->SetState(isConstant ? kFALSE : kTRUE);
 }
 
 void RooRealVarView::onValueChange(char* c) {

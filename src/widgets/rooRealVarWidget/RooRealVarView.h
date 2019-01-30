@@ -4,7 +4,7 @@
  * and open the template in the editor.
  */
 
-/* 
+/*
  * File:   RooRealVarView.h
  * Author: petrstepanov
  *
@@ -23,7 +23,7 @@
 #include <TGNumberEntry.h>
 #include <TGButton.h>
 
-class RooRealVarView : public AbstractView<RooRealVarPresenter> {  
+class RooRealVarView : public AbstractView<RooRealVarPresenter> {
 private:
     TGLabel* description;
     TGNumberEntry* value;
@@ -32,29 +32,28 @@ private:
     TGCheckButton* fixed;
 
 public:
-    RooRealVarView(const TGWindow *w);    
+    RooRealVarView(const TGWindow *w);
     virtual ~RooRealVarView();
-    
+
     // Override base class virtual functions
-    void initUI();    
+    void initUI();
 
     RooRealVarPresenter* instantinatePresenter();
-    
+
     // Calls from presenter
     void setDescription(TString* str);
     void setValue(Double_t value);
     void setMinimum(Double_t min);
     void setMaximum(Double_t max);
     void setConstant(Bool_t isConstant);
-    
+
     // Calls to presenter
     void onValueChange(char* c);
     void onMinimumChange(char* c);
     void onMaximumChange(char* c);
     void onSetConstant(Bool_t isConstant);
-    
-    ClassDef(RooRealVarView,0);    
+
+    // ClassDef(RooRealVarView,0);    
 };
 
 #endif /* ROOREALVARVIEW_H */
-

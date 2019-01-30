@@ -4,7 +4,7 @@
  * and open the template in the editor.
  */
 
-/* 
+/*
  * File:   SWCalculatorFrame.h
  * Author: petrstepanov
  *
@@ -42,7 +42,7 @@ class SWCalculatorPresenter;
 class SWCalculatorView : public AbstractView<SWCalculatorPresenter> {
   protected:
     void initUI();
-    
+
 //      #if defined(__ROOTCLING__)
 //	  ClassDef(SWCalculatorFrame, 1);
 //      #endif
@@ -52,7 +52,7 @@ class SWCalculatorView : public AbstractView<SWCalculatorPresenter> {
     TGTab* tabsWidget;
     TGNumberEntry* numPeakPosition;
     TGCompositeFrame *tabFit;
-    
+
     // Fit and W,S ranges
     TGNumberEntry* numFitMin;
     TGNumberEntry* numFitMax;
@@ -71,19 +71,19 @@ class SWCalculatorView : public AbstractView<SWCalculatorPresenter> {
     // Source contribution view
     RooRealVarView* sourceContributionView;
     TGVerticalFrame* sourceContributionFrame;
-    
+
     // Fitting function
     TGCheckButton* checkboxHasParabola;
     TGNumberEntry* numGauss;
     TGNumberEntry* numExponent;
     TGNumberEntry* numDampExponent;
-    
+
     // Fit
     TGTextButton* btnFitSpectrum;
-    TGTextEdit* txtFitResult;  
+    TGTextEdit* txtFitResult;
     TGTextButton* btnClearResult;
-    TGTextButton* btnSaveResult;    
-    
+    TGTextButton* btnSaveResult;
+
     // Plot and display params
 //    TGTextButton* btnSaveData;
     TGTextButton* btnSaveImage;
@@ -98,16 +98,16 @@ class SWCalculatorView : public AbstractView<SWCalculatorPresenter> {
 //    TGNumberEntry* numDisplayMax;
 //    TGCheckButton* hasOrtho;
 //    TGTextButton*  btnApplyZoom;
-//    TGTextButton*  btnResetZoom;              
+//    TGTextButton*  btnResetZoom;
     RooPlot* fitFrame;
     RooPlot* chiFrame;
     TPad* padData;
     TPad* padChi2;
-    
+
   public:
     SWCalculatorView(const TGWindow *w = 0);
     virtual ~SWCalculatorView();
-    
+
     // Override base class virtual functions
     SWCalculatorPresenter* instantinatePresenter();
 
@@ -143,7 +143,7 @@ class SWCalculatorView : public AbstractView<SWCalculatorPresenter> {
     TCanvas* getCanvas();
     void saveFitResults(TString* fileName);
     void clearFitResults();
-    
+
     // Calls to Presenter
     void onNumFitMinChanged();
     void onNumFitMaxChanged();
@@ -151,22 +151,21 @@ class SWCalculatorView : public AbstractView<SWCalculatorPresenter> {
     void onApplyZoomClicked();
     void onResetZoomClicked();
 //    void onSaveDataClicked();
-    void onSaveImageClicked();   
-    void onSaveResultsClicked(); 
-    void onClearResultsClicked(); 
-    
+    void onSaveImageClicked();
+    void onSaveResultsClicked();
+    void onClearResultsClicked();
+
     //    void CloseWindow();
     void initRooPlots(RooPlot* fitFrame, RooPlot* chiFrame);
-    
+
     // Update display range functions
     void onDisplayMinChange(char* c);
     void onDisplayMaxChange(char* c);
-    void onSliderChange();      
+    void onSliderChange();
     void updateCanvasLimits(Double_t min, Double_t max);
     void setSourceContributionFrameVisible(Bool_t isVisible);
-    
-    ClassDef(SWCalculatorView,0);
+
+    // ClassDef(SWCalculatorView,0);
 };
 
 #endif /* SWCALCULATORVIEW_H */
-

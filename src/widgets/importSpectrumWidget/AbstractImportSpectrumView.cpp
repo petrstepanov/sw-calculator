@@ -12,9 +12,9 @@
 #include "../../model/Constants.h"
 #include "../../util/UiHelper.h"
 
-ClassImp(AbstractImportSpectrumView)  
+// ClassImp(AbstractImportSpectrumView)  
 
-AbstractImportSpectrumView::AbstractImportSpectrumView(const TGWindow* w) : AbstractView<AbstractImportSpectrumPresenter>(w){    
+AbstractImportSpectrumView::AbstractImportSpectrumView(const TGWindow* w) : AbstractView<AbstractImportSpectrumPresenter>(w){
     initUI();
 }
 
@@ -43,8 +43,8 @@ void AbstractImportSpectrumView::initUI(){
 //        ULong_t bcolor;
 //        gClient->GetColorByName("blue", bcolor);
 //        lblFileName->SetBackgroundColor(bcolor);
-//        lblFileName->Resize(Constants::leftPanelWidth-btnOpenFile->GetWidth()-10, lblFileName->GetHeight());        
-        
+//        lblFileName->Resize(Constants::leftPanelWidth-btnOpenFile->GetWidth()-10, lblFileName->GetHeight());
+
 //        lblFileName->SetTextColor(Constants::colorGray);
 //        UiHelper::setLabelColor(lblFileName, "gray");
         frameOpenFile->AddFrame(lblFileName, new TGLayoutHints(kLHintsLeft | kLHintsTop | kLHintsExpandX, dx, 0, dy*3/5)); // left right top bottom
@@ -95,7 +95,7 @@ void AbstractImportSpectrumView::initUI(){
     canvasHist = embedHist->GetCanvas();
     canvasHist->SetMargin(0.09, 0.04, 0.14, 0.1);
     canvasHist->SetLogy();
-    AddFrame(embedHist, new TGLayoutHints(kLHintsExpandX | kLHintsExpandY, 0, 0, dy, 0));   
+    AddFrame(embedHist, new TGLayoutHints(kLHintsExpandX | kLHintsExpandY, 0, 0, dy, 0));
 }
 
 AbstractImportSpectrumPresenter* AbstractImportSpectrumView::instantinatePresenter() {
@@ -108,13 +108,13 @@ void AbstractImportSpectrumView::onOpenFileClicked(){
     AbstractImportSpectrumPresenter* presenter = this->getPresenter();
     presenter->onOpenFileClicked();
 }
-    
+
 void AbstractImportSpectrumView::onImportSpectrumClicked(){
     AbstractImportSpectrumPresenter* presenter = this->getPresenter();
     presenter->onImportSpectrumClicked();
 }
 
-// Calls from Presenter 
+// Calls from Presenter
 void AbstractImportSpectrumView::loadFile(TString* fileNamePath){
     // Load file contents to FileBrowser
     txtFileBrowser->LoadFile(fileNamePath->Data());
@@ -143,7 +143,7 @@ void AbstractImportSpectrumView::drawHistogram(TH1F* hist){
     GraphicsHelper* graphicsHelper = GraphicsHelper::getInstance();
     canvasHist->cd();
     hist->SetLineColor(getHistogramColor());
-    hist->SetFillColorAlpha(getHistogramColor(), 0.2);   
+    hist->SetFillColorAlpha(getHistogramColor(), 0.2);
     hist->GetXaxis()->SetLabelOffset(0.03);
     hist->GetYaxis()->SetLabelOffset(0.015);
     hist->Draw();

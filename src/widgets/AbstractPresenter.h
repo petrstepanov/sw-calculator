@@ -4,7 +4,7 @@
  * and open the template in the editor.
  */
 
-/* 
+/*
  * File:   AbstractPresenter.h
  * Author: petrstepanov
  *
@@ -16,15 +16,13 @@
 
 #include <iostream>
 
-template <class M, class V>
-
-class AbstractPresenter {
+template <class M, class V> class AbstractPresenter {
   public:
     AbstractPresenter(V* v){
         model = nullptr;
         view = v;
     }
-    
+
     ~AbstractPresenter(){
         delete model;
 //        delete view;
@@ -37,26 +35,25 @@ class AbstractPresenter {
     M* getModel(){
         if (!model){
             model = instantinateModel();
-            onInitModel();            
-        }          
+            onInitModel();
+        }
         return model;
     }
 
     void setModel(M* m){
-        std::cout << "AbstractPresenter::setModel" << std::endl;        
+        std::cout << "AbstractPresenter::setModel" << std::endl;
         model = m;
         onInitModel();
     }
-    
+
   private:
     M* model;
     V* view;
-    
+
   protected:
     virtual M* instantinateModel()=0;
     virtual void addEventListeners(){}
-    virtual void onInitModel(){}    
+    virtual void onInitModel(){}
 };
 
 #endif /* ABSTRACTPRESENTER_H */
-

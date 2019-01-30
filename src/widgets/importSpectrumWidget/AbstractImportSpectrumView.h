@@ -4,7 +4,7 @@
  * and open the template in the editor.
  */
 
-/* 
+/*
  * File:   IImportSpectrumView.h
  * Author: petrstepanov
  *
@@ -35,18 +35,18 @@ class AbstractImportSpectrumView : public AbstractView<AbstractImportSpectrumPre
     TGTextButton* btnOpenFile;
     TGLabel* lblFileName;
     TGTextView* txtFileBrowser;
-    TGNumberEntry* numEnergyColumn;    
+    TGNumberEntry* numEnergyColumn;
     TGNumberEntry* numCountsColumn;
-    TGTextButton* btnImportSpectrum;    
+    TGTextButton* btnImportSpectrum;
     TCanvas* canvasHist;
 
   public:
     AbstractImportSpectrumView(const TGWindow *w);
 
     virtual ~AbstractImportSpectrumView();
-    
+
     // Override base class virtual functions
-    void initUI();    
+    void initUI();
 
     AbstractImportSpectrumPresenter* instantinatePresenter();
 
@@ -58,10 +58,10 @@ class AbstractImportSpectrumView : public AbstractView<AbstractImportSpectrumPre
     void drawHistogram(TH1F* hist);
     // Calls to Presenter
     void onOpenFileClicked();
-    void onImportSpectrumClicked();    
+    void onImportSpectrumClicked();
     virtual Int_t getHistogramColor();
-    
-    ClassDef(AbstractImportSpectrumView,0);  
+
+    // ClassDef(AbstractImportSpectrumView,0);  
 };
 
 #endif /* ABSTRACTIMPORTSPECTRUMVIEW_H */

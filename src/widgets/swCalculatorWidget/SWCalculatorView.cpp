@@ -31,7 +31,7 @@
 
 using namespace RooFit;
 
-ClassImp(SWCalculatorView)
+// ClassImp(SWCalculatorView)
 
 //SWCalculatorView::SWCalculatorView(const TGWindow* w) : TGMainFrame(w, Constants::windowWidth, Constants::windowHeight){
 SWCalculatorView::SWCalculatorView(const TGWindow* w) : AbstractView<SWCalculatorPresenter>(w){

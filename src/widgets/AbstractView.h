@@ -4,7 +4,7 @@
  * and open the template in the editor.
  */
 
-/* 
+/*
  * File:   IView.h
  * Author: petrstepanov
  *
@@ -23,36 +23,34 @@ enum Padding {
    d3x = 3*dx
 };
 
-template <class P>
-class AbstractView : public TGCompositeFrame {
+template <class P> class AbstractView : public TGCompositeFrame {
   public:
     AbstractView(const TGWindow *w=0) : TGCompositeFrame(w){
         presenter = NULL;
     }
-        
+
     ~AbstractView(){
         delete presenter;
     }
-    
+
     P* getPresenter(){
         if (presenter == NULL){
             presenter = instantinatePresenter();
         }
         return presenter;
     }
-    
+
 //    TGCompositeFrame* GetParentComposite(){
 //        return parentCompositeFrame;
 //    }
 
   private:
     P* presenter;
-//    TGCompositeFrame* parentCompositeFrame;    
-    
+//    TGCompositeFrame* parentCompositeFrame;
+
   protected:
     virtual P* instantinatePresenter()=0;
     virtual void initUI()=0;
 };
 
 #endif /* ABSTRACTVIEW_H */
-
