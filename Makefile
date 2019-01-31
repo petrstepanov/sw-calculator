@@ -20,7 +20,7 @@ DICT_PCM_FILENAME=$(DICT_NAME)_rdict.pcm   # app-dictionary_rdict.pcm
 # DSYM_DIR=sw-calculator.so.dSYM
 
 # Compiler flags, library search paths and ROOT shared libraries names
-CXXFLAGS=-O3 `root-config --cflags` -fPIC
+CXXFLAGS=`root-config --cflags` -fPIC
 LDFLAGS=`root-config --ldflags`
 GLIBS=`root-config --glibs` -lRooFit -lRooFitCore -lHtml -lMinuit -lFumili
 
@@ -43,9 +43,14 @@ SHARED_LIBRARY=$(APP_NAME)-library.so   # app-library.so
 dir_guard=@mkdir -p $(@D)
 
 # Empty target ensures that list of all 'end products' are called
-all: executable
+all: release
 
-debug: CXXFLAGS += -g #-ggdb -DDEBUG -g
+# Add -O3 optimization level for the release
+release: CXXFLAGS+=-O3
+release: executable
+
+# Also might add flags for debug optimizations: -Og -ggdb -DDEBUG
+debug: CXXFLAGS+=-g
 debug: executable
 
 executable: directories $(DICT_FILENAME) $(SHARED_LIBRARY) $(OBJECTS) $(EXECUTABLE)
