@@ -35,7 +35,7 @@ nbproject/
 .dep.inc
 build/
 dist/
-*dict.cpp
+*dictionary.cxx
 *.pcm
 *.so
 

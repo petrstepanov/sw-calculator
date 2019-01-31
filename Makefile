@@ -52,13 +52,17 @@ executable: directories $(DICT_FILENAME) $(SHARED_LIBRARY) $(OBJECTS) $(EXECUTAB
 
 $(EXECUTABLE): $(OBJECTS) $(SHARED_LIBRARY)
 	@echo "Linking "$@
+ifeq ($(OS),Darwin)
+	# for macOS just link against the shared library
 	$(CXX) -o $@ $(OBJECTS) $(SHARED_LIBRARY) $(GLIBS)
+	# then change search location of the .so library in the executable - set as same directory (macOS only)
+	install_name_tool -change $(SHARED_LIBRARY) @executable_path/$(SHARED_LIBRARY) $(EXECUTABLE)
+else
+	# for Linux add runtime shared library search path ./ same directory as executable (gcc only)
+	$(CXX) -o $@ $(OBJECTS) $(SHARED_LIBRARY) $(GLIBS) -Wl,-rpath=.
+endif
 	# move .so library to bin folder
 	mv $(SHARED_LIBRARY) $(BIN_DIR)/$(SHARED_LIBRARY)
-	# change search location of the .so library to the executable directory of the app (macOS only)
-ifeq ($(OS),Darwin)
-	install_name_tool -change $(APP_NAME).so @executable_path/$(APP_NAME).so $(EXECUTABLE)
-endif
 	# move dictionary .pcm next to the app executable, remove dictionary .cxx
 	mv $(DICT_PCM_FILENAME) $(BIN_DIR)/$(DICT_PCM_FILENAME)
 	rm $(DICT_FILENAME)
