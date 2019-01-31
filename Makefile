@@ -58,8 +58,9 @@ ifeq ($(OS),Darwin)
 	# then change search location of the .so library in the executable - set as same directory (macOS only)
 	install_name_tool -change $(SHARED_LIBRARY) @executable_path/$(SHARED_LIBRARY) $(EXECUTABLE)
 else
-	# for Linux add runtime shared library search path ./ same directory as executable (gcc only)
-	$(CXX) -o $@ $(OBJECTS) $(SHARED_LIBRARY) $(GLIBS) -Wl,-rpath=.
+	# for Linux add runtime shared library search path ./ relative to the executable (gcc only)
+	# https://stackoverflow.com/questions/38058041/correct-usage-of-rpath-relative-vs-absolute
+	$(CXX) -o $@ $(OBJECTS) $(SHARED_LIBRARY) $(GLIBS) -Wl,-rpath,'$$ORIGIN'
 endif
 	# move .so library to bin folder
 	mv $(SHARED_LIBRARY) $(BIN_DIR)/$(SHARED_LIBRARY)
