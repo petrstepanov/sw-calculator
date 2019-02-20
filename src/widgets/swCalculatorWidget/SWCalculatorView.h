@@ -68,6 +68,10 @@ class SWCalculatorView : public AbstractView<SWCalculatorPresenter> {
     TGNumberEntry* numResolutionFWHM;
     TGCheckButton* checkboxResFixed;
 
+    // Resolution Function view
+    RooRealVarView* sourceContributionView;
+    TGVerticalFrame* sourceContributionFrame;
+
     // Source contribution view
     RooRealVarView* sourceContributionView;
     TGVerticalFrame* sourceContributionFrame;

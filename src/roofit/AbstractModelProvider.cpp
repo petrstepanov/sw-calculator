@@ -20,9 +20,10 @@ AbstractModelProvider::AbstractModelProvider(RooRealVar* E_0){
 	this->pi = new RooConstVar("pi", "pi", TMath::Pi());
 	this->model = NULL;
 	this->convolutedModel = NULL;
-	this->components = new RooArgSet();
-	this->bgComponents = new RooArgSet();
-        this->convolutionPoints = 10000;
+	this->components = new RooArgList();
+	this->bgComponents = new RooArgList();
+    this->convolutionPoints = 10000;
+    this->resolutionFunction = NULL;
 }
 
 RooAbsPdf* AbstractModelProvider::getModel(){
@@ -41,10 +42,10 @@ RooRealVar* AbstractModelProvider::getPeakCenter(){
 	return E_0;
 }
 
-RooArgSet* AbstractModelProvider::getComponents(){
+RooArgList* AbstractModelProvider::getComponents(){
 	return components;
 }
 
-RooArgSet* AbstractModelProvider::getBgComponents(){
+RooArgList* AbstractModelProvider::getBgComponents(){
 	return bgComponents;
 }

@@ -143,9 +143,11 @@ void SWCalculatorPresenter::onFitSpectrumClicked(){
         Int_t numGauss = view->getNumGauss();
         Int_t numExp = view->getNumExp();
         Int_t numDampExp = view->getNumDampExp();
-        Int_t convType = view->getConvolutionType();
-        Double_t resFWHM = view->getResolutionFWHM();
-        Bool_t isResFixed = view->isResolutionFixed();
+        Double_t fwhm = view->getResolutionFWHM();
+    	RootHelper::deleteObject("resFunctFWHM");
+        RooRealVar* fwhmRealVar = new RooRealVar("resFunctFWHM", "Resolution function FWHM", fwhm, fwhm / 4, fwhm * 4, "keV");
+        fwhmRealVar->setConstant(view->isResolutionFixed());
+        if (view->getConvolutionType() == 0) fwhmRealVar = NULL;
 
         modelProvider = new CompositeModelProvider(e, e0);
                 
@@ -157,10 +159,10 @@ void SWCalculatorPresenter::onFitSpectrumClicked(){
         }
         
         if (model->isTwoDetector()){
-            modelProvider->initTwoDetector(hasParabola, numGauss, numExp, numDampExp, convType, resFWHM, isResFixed);
+            modelProvider->initTwoDetector(hasParabola, numGauss, numExp, numDampExp, fwhmRealVar);
         } else {
             Double_t bgFraction = histProcessor->calcBackgroundFraction(fitHist);
-            modelProvider->initSingleDetector(hasParabola, numGauss, numExp, numDampExp, convType, resFWHM, isResFixed, bgFraction);                
+            modelProvider->initSingleDetector(hasParabola, numGauss, numExp, numDampExp, fwhmRealVar, bgFraction);
         }
     }
     
@@ -367,7 +369,7 @@ void SWCalculatorPresenter::onFitSpectrumClicked(){
         // Output indirect model parameters
         view->displayIndirectParameters(modelProvider->getIndirectParameters());
         // Output components intensities
-        view->displayIntensities(modelProvider->getIntensities());
+//        view->displayIntensities(modelProvider->getIntensities());
 
         // Output Integral Chi^2
         std::pair<Double_t, Int_t> sumChi2AndDegreesFreedom = histProcessor->getChi2(fitHist, curveFit, fittingNonConvolutedModel);

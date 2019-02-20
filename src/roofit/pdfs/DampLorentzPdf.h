@@ -18,35 +18,35 @@
 #include <RooAbsReal.h>
 #include <RooRealProxy.h>
 #include <TString.h>
-#include "IndirectParamPdf.h"
-#include "../util/Variable.h"
+#include "../IndirectParamPdf.h"
+#include "../../util/Variable.h"
 
-class DampLorentzPdf : public RooAbsPdf, public IndirectParamPdf {
+class DampLorentzPdf: public RooAbsPdf, public IndirectParamPdf {
 public:
-	DampLorentzPdf();;
-	DampLorentzPdf(const char *name, const char *title,
-		RooAbsReal& _x,
-		RooAbsReal& _mean,
-		RooAbsReal& _a);
+	DampLorentzPdf(){};
+	DampLorentzPdf(const char *name, const char *title, RooAbsReal& _x, RooAbsReal& _mean, RooAbsReal& _a);
 	DampLorentzPdf(const DampLorentzPdf& other, const char* name = 0);
-	virtual TObject* clone(const char* newname) const { return new DampLorentzPdf(*this, newname); }
-	inline virtual ~DampLorentzPdf() { }
+	virtual TObject* clone(const char* newname) const {
+		return new DampLorentzPdf(*this, newname);
+	}
+	inline virtual ~DampLorentzPdf(){}
+
 	Int_t getAnalyticalIntegral(RooArgSet& allVars, RooArgSet& analVars, const char* rangeName = 0) const;
 	Double_t analyticalIntegral(Int_t code, const char* rangeName = 0) const;
 
-        std::list<Variable*> getParameters(Bool_t isTwoDetector);
-        
+	std::list<Variable*> getParameters(Bool_t isTwoDetector);
+
 //protected:
-    RooRealProxy x;
-    RooRealProxy mean;
-    RooRealProxy a;
+	RooRealProxy x;
+	RooRealProxy mean;
+	RooRealProxy a;
 
 protected:
-    Double_t indefiniteIntegral(Double_t _x) const;
-    Double_t evaluate() const;
+	Double_t indefiniteIntegral(Double_t _x) const;
+	Double_t evaluate() const;
 
 private:
-	//ClassDef(DampLorentzPdf, 1) // Your description goes here...
+ClassDef(DampLorentzPdf, 1)
 };
 
 #endif /* DAMPLORENTZPDF_H */

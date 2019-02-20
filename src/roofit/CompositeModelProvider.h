@@ -28,7 +28,6 @@ public:
 //    virtual ~CompositeModelProvider();
 
     std::list<Variable*> getIndirectParameters();
-    std::list<std::pair<const char*, Double_t>> getIntensities();
     
     static std::map<Int_t, TString> getConvolutionTypes(void);
     
@@ -38,29 +37,30 @@ public:
     void initSourcePdf(TH1F* sourceHist, RooAbsReal* sourceContrib);
     
 private:
-    RooArgList* pdfList;
-    RooArgList* coeffList;
+    RooArgList* pdfsToBeConvoluted;
+//    RooArgList* coeffList;
     RooRealVar* observable;
     RooHistPdf* sourcePdf = nullptr;
     RooAbsReal* sourceContribution = nullptr;
     Bool_t isTwoDetector;
     
     static std::map<Int_t, TString> createConvolutionType(){
-        std::map<Int_t, TString> m = {{1, TString("None")}, {2, TString("FFT3")}, {3, TString("Numeric")}, {4, TString("Custom")}};
+        std::map<Int_t, TString> m = {{1, TString("None")}, {2, TString("FFT3")}};
         return m;
     }; 
+
     static std::map<Int_t, TString> convolutionType;
     
-    void initModel(Bool_t hasParabola, const Int_t, const Int_t numLorentz, const Int_t numLorentzSum);
+    void initModel(Bool_t hasParabola, const Int_t, const Int_t numLorentz, const Int_t numLorentzSum, RooRealVar* fwhm);
     void initBackground(Double_t backgroundFraction);
-    void initResolutionFunction(Int_t convType, Double_t convFWHM, Bool_t isConvFixed);
     
     Double_t* getDefaultGaussAs(Int_t numGauss);
     Double_t* getDefaultLorentzAs(Int_t numGauss);
     Double_t* getDefaultDampLorentzAs(Int_t numGauss);
 
     void deleteObject();
-    
+
+    RooAbsPdf* getConvolutedPdf(RooAbsPdf* pdf, RooRealVar* fwhm);
 };
 
 #endif /* COMPOSITEMODELPROVIDER_H */

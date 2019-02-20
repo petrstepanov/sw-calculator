@@ -17,32 +17,32 @@
 #include <RooAbsPdf.h>
 #include <RooAbsReal.h>
 #include <RooRealProxy.h>
-#include "IndirectParamPdf.h"
+#include "../IndirectParamPdf.h"
 
-class ParabolaPdf : public RooAbsPdf, public IndirectParamPdf {
+class ParabolaPdf: public RooAbsPdf, public IndirectParamPdf {
 public:
 	ParabolaPdf() {};
-	ParabolaPdf(const char *name, const char *title,
-		RooAbsReal& _x,
-		RooAbsReal& _mean,
-		RooAbsReal& _r);
+	ParabolaPdf(const char *name, const char *title, RooAbsReal& _x, RooAbsReal& _mean, RooAbsReal& _r);
 	ParabolaPdf(const ParabolaPdf& other, const char* name = 0);
-	virtual TObject* clone(const char* newname) const { return new ParabolaPdf(*this, newname); }
-	inline virtual ~ParabolaPdf() { }
+	virtual TObject* clone(const char* newname) const {
+		return new ParabolaPdf(*this, newname);
+	}
+	inline virtual ~ParabolaPdf() {}
+
 	Int_t getAnalyticalIntegral(RooArgSet& allVars, RooArgSet& analVars, const char* rangeName = 0) const;
 	Double_t analyticalIntegral(Int_t code, const char* rangeName = 0) const;
 
-        std::list<Variable*> getParameters(Bool_t isTwoDetector);
-        
+	std::list<Variable*> getParameters(Bool_t isTwoDetector);
+
 protected:
 	RooRealProxy x;
 	RooRealProxy mean;
-	RooRealProxy r;      
-        
+	RooRealProxy r;
+
 	Double_t evaluate() const;
 
 private:
-	//ClassDef(SimpleParabolaPdf, 1) // Your description goes here...
+ClassDef(ParabolaPdf, 1)
 };
 
 #endif /* PARABOLAPDF_H */

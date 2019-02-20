@@ -12,16 +12,17 @@
  */
 
 #include "CompositeModelProvider.h"
-#include "ParabolaPdf.h"
-#include "GaussianPdf.h"
-#include "LorentzianPdf.h"
-#include "DampLorentzPdf.h"
-#include "OrthogonalPdf.h"
+#include "pdfs/ParabolaPdf.h"
+#include "pdfs/GaussianPdf.h"
+#include "pdfs/LorentzianPdf.h"
+#include "pdfs/DampLorentzPdf.h"
+#include "pdfs/OrthogonalPdf.h"
+#include "pdfs/BackgroundPdf.h"
 #include "../util/RootHelper.h"
 #include "../model/Constants.h"
 #include "../util/HistProcessor.h"
-#include "ChannelConvolutionPdf.h"
-#include "BackgroundPdf.h"
+#include "../util/StringUtils.h"
+//#include "ChannelConvolutionPdf.h"
 #include <RooFormulaVar.h>
 #include <RooPolynomial.h>
 #include <RooGaussian.h>
@@ -36,151 +37,127 @@
 #include <TMath.h>
 #include <TH1F.h>
 
-CompositeModelProvider::CompositeModelProvider(RooRealVar* x, RooRealVar* x0) : AbstractModelProvider(x0){
-    observable = x;
+CompositeModelProvider::CompositeModelProvider(RooRealVar* x, RooRealVar* x0) :
+		AbstractModelProvider(x0) {
+	observable = x;
 }
 
 // Add source contribution pdf to the model
 void CompositeModelProvider::initSourcePdf(TH1F* sourceHist, RooAbsReal* sourceContrib) {
-    Double_t histMin = sourceHist->GetXaxis()->GetXmin();
-    Double_t histMax = sourceHist->GetXaxis()->GetXmax();
-    Double_t observableMin = observable->getMin();
-    Double_t observableMax = observable->getMax();
-    std::cout << "histMin: " << histMin << ". histMax:" << histMax << std::endl;
-    std::cout << "observableMin: " << observableMin << ". observableMax:" << observableMax << std::endl;
-    RooDataHist* sourceDataHist;
-    if (histMin < observableMin || histMax > observableMax){
-        HistProcessor* histProcessor = HistProcessor::getInstance();
-        TH1F* cutSourceHist = (TH1F*)histProcessor->cutHist("cutSourceHist", sourceHist, observableMin, observableMax);
-        Double_t min = cutSourceHist->GetXaxis()->GetXmin();
-        Double_t max = cutSourceHist->GetXaxis()->GetXmax();
-        std::cout << "cutSourceHistMin: " << min << ". cutSourceHistMax:" << max << std::endl;
+	Double_t histMin = sourceHist->GetXaxis()->GetXmin();
+	Double_t histMax = sourceHist->GetXaxis()->GetXmax();
+	Double_t observableMin = observable->getMin();
+	Double_t observableMax = observable->getMax();
+	std::cout << "histMin: " << histMin << ". histMax:" << histMax << std::endl;
+	std::cout << "observableMin: " << observableMin << ". observableMax:" << observableMax << std::endl;
+	RooDataHist* sourceDataHist;
+	if (histMin < observableMin || histMax > observableMax) {
+		HistProcessor* histProcessor = HistProcessor::getInstance();
+		TH1F* cutSourceHist = (TH1F*) histProcessor->cutHist("cutSourceHist", sourceHist, observableMin, observableMax);
+		Double_t min = cutSourceHist->GetXaxis()->GetXmin();
+		Double_t max = cutSourceHist->GetXaxis()->GetXmax();
+		std::cout << "cutSourceHistMin: " << min << ". cutSourceHistMax:" << max << std::endl;
 
-        sourceDataHist = new RooDataHist("sourceDataHist", "Source Data Hist", RooArgList(*observable), RooFit::Import(*cutSourceHist));
-    }
-    else {
-        sourceDataHist = new RooDataHist("sourceDataHist", "Source Data Hist", RooArgList(*observable), RooFit::Import(*sourceHist));
-    }
-    this->sourcePdf = new RooHistPdf("sourcePdf", "Source contribution", *observable, *sourceDataHist, 1);
-    this->sourceContribution = sourceContrib;
+		sourceDataHist = new RooDataHist("sourceDataHist", "Source Data Hist", RooArgList(*observable), RooFit::Import(*cutSourceHist));
+	} else {
+		sourceDataHist = new RooDataHist("sourceDataHist", "Source Data Hist", RooArgList(*observable), RooFit::Import(*sourceHist));
+	}
+	this->sourcePdf = new RooHistPdf("sourcePdf", "Source contribution", *observable, *sourceDataHist, 1);
+	this->sourceContribution = sourceContrib;
 }
 
+void CompositeModelProvider::initModel(Bool_t hasParabola, const Int_t numGauss, const Int_t numLorentz, const Int_t numLorentzSum, RooRealVar* fwhm) {
+	pdfsToBeConvoluted = new RooArgList();
+	// Check source contribution
+	if (sourcePdf) {
+		if (sourceContribution->getVal() != 0) {
+			components->add(*sourcePdf);
+		}
+	}
 
-void CompositeModelProvider::initModel(Bool_t hasParabola, const Int_t numGauss, const Int_t numLorentz, const Int_t numLorentzSum){
-    pdfList = new RooArgList();
-    coeffList = new RooArgList();
+	// Define parabola
+	if (hasParabola) {
+		RootHelper::deleteObject("parabolaRoot");
+		RooRealVar* parabolaRoot = new RooRealVar("parabolaRoot", "Coefficient at -x^2 + r*2", 3.5, 2.5, 8); // 3.4579 = Al (11.7)
+		RootHelper::deleteObject("parabola");
+		ParabolaPdf* parabola = new ParabolaPdf("parabola", "Fermi gas", *observable, *E_0, *parabolaRoot);
+		components->add(*parabola);
+		pdfsToBeConvoluted->add(*parabola);
+	}
 
-    // Check source contribution
-    if (sourcePdf) {
-        if (sourceContribution->getVal()!=0){
-            pdfList->add(*sourcePdf);
-            coeffList->add(*sourceContribution);
-            components->add(*sourcePdf);
-        }
-    }
+	// Gauss PDFs
+	RooRealVar** gaussA = new RooRealVar*[numGauss];
+	GaussianPdf** gauss = new GaussianPdf*[numGauss];
+	RooRealVar** I_gauss = new RooRealVar*[numGauss];
+	Double_t aMin = 0.01; // [KeV]
+	Double_t aMax = 50; // [KeV]
+	for (int i = 0; i < numGauss; i++) {
+		RootHelper::deleteObject(Form("gauss%d_A", i + 1));
+		gaussA[i] = new RooRealVar(Form("gauss%d_A", i + 1), Form("Gauss%d A", i + 1), getDefaultGaussAs(numGauss)[i], aMin, aMax, "A"); // 5 0.5 10
 
-    // Define parabola
-    if (hasParabola){
-        RootHelper::deleteObject("parabolaRoot");
-        RooRealVar* parabolaRoot = new RooRealVar("parabolaRoot", "Coefficient at -x^2 + r*2", 3.5, 2.5, 8); // 3.4579 = Al (11.7)
-        RootHelper::deleteObject("parabola");
-        ParabolaPdf* parabola = new ParabolaPdf("parabola", "Fermi gas", *observable, *E_0, *parabolaRoot);
-        RootHelper::deleteObject("parabolaCoeff");
-        RooRealVar* parabolaCoeff = new RooRealVar("parabolaCoeff", "Parabola intensity", 0.8, 0.0, 1.0);
-        pdfList->add(*parabola);
-        coeffList->add(*parabolaCoeff);
-        components->add(*parabola);
-    }
+		const char* name = StringUtils::suffix("gauss", i + 1)->Data();
+		RootHelper::deleteObject(name);
+		gauss[i] = new GaussianPdf(name, StringUtils::ordinal("gauss", i + 1)->Data(), *observable, *E_0, *gaussA[i]);
+		components->add(*gauss[i]);
+		pdfsToBeConvoluted->add(*gauss[i]);
+	}
 
-    // Gauss PDFs
-    RooRealVar** gaussA = new RooRealVar*[numGauss];
-    GaussianPdf** gauss = new GaussianPdf*[numGauss];
-    RooRealVar** I_gauss = new RooRealVar*[numGauss];
-    Double_t aMin = 0.01; // [KeV]
-    Double_t aMax = 50; // [KeV]
-    for (int i = 0; i < numGauss; i++){
-        RootHelper::deleteObject(TString::Format("gauss%d_A", i + 1));
-        gaussA[i] = new RooRealVar(TString::Format("gauss%d_A", i + 1), TString::Format("Gauss%d A", i + 1), getDefaultGaussAs(numGauss)[i], aMin, aMax, "A"); // 5 0.5 10
-        RootHelper::deleteObject(TString::Format("gauss%d", i + 1));
-        gauss[i] = new GaussianPdf(TString::Format("gauss%d", i + 1), TString::Format("Gauss%d Component", i + 1), *observable, *E_0, *gaussA[i]);
-        RootHelper::deleteObject(TString::Format("gauss%d_coeff", i + 1));
-        I_gauss[i] = new RooRealVar(TString::Format("gauss%d_coeff", i + 1), TString::Format("Gauss%d intensity", i + 1), 0.8, 0.0, 1.0);
-        pdfList->add(*gauss[i]);
-        components->add(*gauss[i]);
-        coeffList->add(*I_gauss[i]);
-    }
+	// Composite Lorentz PDFs
+	RooRealVar** a2 = new RooRealVar*[numLorentzSum];
+	DampLorentzPdf** lorentz2 = new DampLorentzPdf*[numLorentzSum];
+	RooRealVar** I_lorentz2 = new RooRealVar*[numLorentzSum];
+	for (int i = 0; i < numLorentzSum; i++) {
+		RootHelper::deleteObject(Form("sl%dA", i + 1));
+		a2[i] = new RooRealVar(Form("sl%dA", i + 1), Form("Sum Lorentz%d a", i + 1), getDefaultDampLorentzAs(numLorentzSum)[i], aMin, aMax, "A"); // 5 0.5 10
 
-    // Composite Lorentz PDFs
-    RooRealVar** a2 = new RooRealVar*[numLorentzSum];
-    DampLorentzPdf** lorentz2 = new DampLorentzPdf*[numLorentzSum];
-    RooRealVar** I_lorentz2 = new RooRealVar*[numLorentzSum];
-    for (int i = 0; i < numLorentzSum; i++){
-            RootHelper::deleteObject(TString::Format("sl%dA", i + 1));
-            a2[i] = new RooRealVar(TString::Format("sl%dA", i + 1), TString::Format("Sum Lorentz%d a", i + 1), getDefaultDampLorentzAs(numLorentzSum)[i], aMin, aMax, "A"); // 5 0.5 10
-            // a2[i] = new RooRealVar(TString::Format("sl%dA", i + 1), TString::Format("Sum Lorentz%d a", i + 1), getDefaultLorentzAs(numLorentzSum)[i], getDefaultLorentzAs(numLorentzSum)[i], getDefaultLorentzAs(numLorentzSum)[i], "A");
-            RootHelper::deleteObject(TString::Format("sumlorentz%d", i + 1));
-            lorentz2[i] = new DampLorentzPdf(TString::Format("sumlorentz%d", i + 1), TString::Format("Damping exponent%d", i + 1), *observable, *E_0, *a2[i]);
-            RootHelper::deleteObject(TString::Format("sl1%dInt", i + 1));
-            I_lorentz2[i] = new RooRealVar(TString::Format("sl1%dInt", i + 1), TString::Format("Sum Lorentz%d intensity", i + 1), 0.8, 0.0, 1.0);
-            pdfList->add(*lorentz2[i]);
-            components->add(*lorentz2[i]);
-            coeffList->add(*I_lorentz2[i]);
-    }
+		const char* name = StringUtils::suffix("dampLorentz", i + 1)->Data();
+		RootHelper::deleteObject(name);
+		lorentz2[i] = new DampLorentzPdf(name, StringUtils::ordinal("damping lorentzian", i + 1)->Data(), *observable, *E_0, *a2[i]);
+		components->add(*lorentz2[i]);
+		pdfsToBeConvoluted->add(*lorentz2[i]);
+	}
 
-    // Lorentz PDFs
-    RooRealVar** a = new RooRealVar*[numLorentz];
-    LorentzianPdf** lorentz = new LorentzianPdf*[numLorentz];
-    RooRealVar** I_lorentz = new RooRealVar*[numLorentz];
-    for (int i = 0; i < numLorentz; i++){
-        RootHelper::deleteObject(TString::Format("l%dA", i + 1));
-        a[i] = new RooRealVar(TString::Format("l%dA", i + 1), TString::Format("Lorentz%d a", i + 1), getDefaultLorentzAs(numLorentz)[i], aMin, aMax, "A"); // 5 0.5 10
-        RootHelper::deleteObject(TString::Format("lorentz%d", i + 1));
-        lorentz[i] = new LorentzianPdf(TString::Format("lorentz%d", i + 1), TString::Format("Exponent%d Component", i + 1), *observable, *E_0, *a[i]);
-        RootHelper::deleteObject(TString::Format("l1%dInt", i + 1));
-        I_lorentz[i] = new RooRealVar(TString::Format("l1%dInt", i + 1), TString::Format("Lorentz%d intensity", i + 1), 0.8, 0.0, 1.0);
-        pdfList->add(*lorentz[i]);
-        components->add(*lorentz[i]);
-        coeffList->add(*I_lorentz[i]);
-    }
+	// Lorentz PDFs
+	RooRealVar** a = new RooRealVar*[numLorentz];
+	LorentzianPdf** lorentz = new LorentzianPdf*[numLorentz];
+	RooRealVar** I_lorentz = new RooRealVar*[numLorentz];
+	for (int i = 0; i < numLorentz; i++) {
+		RootHelper::deleteObject(Form("l%dA", i + 1));
+		a[i] = new RooRealVar(Form("l%dA", i + 1), Form("Lorentz%d a", i + 1), getDefaultLorentzAs(numLorentz)[i], aMin, aMax, "A"); // 5 0.5 10
 
-    // Orthogonal PDF
-    // if (hasOrthogonal){
-    //     RootHelper::deleteObject("a1");
-    //     RooRealVar* a1 = new RooRealVar("a1", "a1 coeff", 1, 1E-2, 1E2, "A");
-    //     RootHelper::deleteObject("a2");
-    //     RooRealVar* a2 = new RooRealVar("a2", "a2 coeff", 1, 1E-2, 1E2, "A");
-    //     RootHelper::deleteObject("orthogonal");
-    //     OrthogonalPdf* orthogonalPdf = new OrthogonalPdf("orthogonal", "Orthogonal Pdf", *x, *x0, *a1, *a2);
-    //     RootHelper::deleteObject("oInt");
-    //     RooRealVar* I_ortho = new RooRealVar("oInt", "Orthogonal intensity", 0.3, 0.0, 1.0);
-    //     pdfList->add(*orthogonalPdf);
-    //     components->add(*orthogonalPdf);
-    //     coeffList->add(*I_ortho);
-    // }
+		const char* name = StringUtils::suffix("lorentz", i + 1)->Data();
+		RootHelper::deleteObject(name);
+		lorentz[i] = new LorentzianPdf(name, StringUtils::ordinal("lorentzian", i + 1)->Data(), *observable, *E_0, *a[i]);
+		components->add(*lorentz[i]);
+		pdfsToBeConvoluted->add(*lorentz[i]);
+	}
 
-    // Remove last coefficient for a recursive sum
-    TIterator* coeffIter = coeffList->createIterator();
-    TObject* tempObj=0;
-    TObject* prevObj=0;
-    do {
-        prevObj = tempObj;
-    } while((tempObj = coeffIter->Next()));
-    RooAbsArg* prevAbsArg = dynamic_cast<RooAbsArg*>(prevObj);
-    if (prevAbsArg != NULL){
-        coeffList->remove(*prevAbsArg);
-    }
-    std::cout << "coeffList" << std::endl;
-    coeffList->Print();
+	// Orthogonal PDF
+	// if (hasOrthogonal){
+	//     RootHelper::deleteObject("a1");
+	//     RooRealVar* a1 = new RooRealVar("a1", "a1 coeff", 1, 1E-2, 1E2, "A");
+	//     RootHelper::deleteObject("a2");
+	//     RooRealVar* a2 = new RooRealVar("a2", "a2 coeff", 1, 1E-2, 1E2, "A");
+	//     RootHelper::deleteObject("orthogonal");
+	//     OrthogonalPdf* orthogonalPdf = new OrthogonalPdf("orthogonal", "Orthogonal Pdf", *x, *x0, *a1, *a2);
+	//     components->add(*orthogonalPdf);
+	// }
 
-    // If we sum values recursively than bg~1E-5, parabola~0.9, lorentz coefficients~0.9 (needs kTRUE)
-    RootHelper::deleteObject("sumModel");
-    RooAddPdf* sumModel = new RooAddPdf("sumModel", "Sum of components", *pdfList, *coeffList, kTRUE);
+	//
+	if (fwhm != NULL){
 
-    this->model = sumModel;
+	}
+	else {
+
+	}
+	RootHelper::deleteObject("sumModel");
+	RooAddPdf* sumModel = ReverseAddPdf::add(*components, *coeffList, kTRUE);
+
+	this->model = sumModel;
 }
 
-void CompositeModelProvider::initBackground(Double_t backgroundFraction){
-    // Ore-Powell background
+void CompositeModelProvider::initBackground(Double_t backgroundFraction) {
+	// Ore-Powell background
 //    RooRealVar* threeGammaInt = new RooRealVar("threeGammaInt", "Three Gamma fraction", 10, 1, 100);
 //    BackgroundPdf* bgPdf = new BackgroundPdf("bgPdf", "Ore-Powell background", *observable, *threeGammaInt);
 //    RooRealVar* bgPdfFraction = new RooRealVar("bgPdfFraction", "Background fraction", backgroundFraction, backgroundFraction/10, 1.);
@@ -189,220 +166,185 @@ void CompositeModelProvider::initBackground(Double_t backgroundFraction){
 //    pdfList->add(*bgPdf);
 //    coeffList->add(*bgPdfFraction);
 
-    // Constant background
-    // RooGenericPdf* constBg = new RooGenericPdf("constBg", "1", *observable);
-    RooPolynomial* constBg = new RooPolynomial("constBg", "y=1", *observable, RooArgSet());
-    RooRealVar* I_const = new RooRealVar("IConst", "Const background", backgroundFraction/2, 0, 0.2);
-    bgComponents->add(*constBg);
+	// Constant background
+	// RooGenericPdf* constBg = new RooGenericPdf("constBg", "1", *observable);
+	RooPolynomial* constBg = new RooPolynomial("constBg", "y=1", *observable, RooArgSet());
+	RooRealVar* I_const = new RooRealVar("IConst", "Const background", backgroundFraction / 2, 0, 0.2);
+	bgComponents->add(*constBg);
 
-    // Atan background
-    RooGenericPdf* atanBg = new RooGenericPdf("atanBg", "Atan background", "@2/2 + (-1)*atan((@0 - @1))", RooArgList(*observable, *E_0, *pi));
-    RooRealVar* I_atan = new RooRealVar("IAtan", "Atan Intensity", 0.002, 0.0, 0.1); //backgroundFraction/2, 0, 0.2);
-    bgComponents->add(*atanBg);
+	// Atan background
+	RooGenericPdf* atanBg = new RooGenericPdf("atanBg", "Atan background", "@2/2 + (-1)*atan((@0 - @1))", RooArgList(*observable, *E_0, *pi));
+	RooRealVar* I_atan = new RooRealVar("IAtan", "Atan Intensity", 0.002, 0.0, 0.1); //backgroundFraction/2, 0, 0.2);
+	bgComponents->add(*atanBg);
 
 //    RooAddPdf* sumModelAndBg = new RooAddPdf("sumModelAndBg", "Sum of components and Background", *constBg, *model, *I_const);
-    RooAddPdf* sumModelAndBg = new RooAddPdf("sumModelAndBg", "Sum of components and Background", RooArgList(*atanBg, *constBg, *model), RooArgList(*I_atan, *I_const));
+	RooAddPdf* sumModelAndBg = new RooAddPdf("sumModelAndBg", "Sum of components and Background", RooArgList(*atanBg, *constBg, *model), RooArgList(*I_atan, *I_const));
 
-    this->model = sumModelAndBg;
+	this->model = sumModelAndBg;
 }
 
-void CompositeModelProvider::initResolutionFunction(Int_t convType, Double_t convFWHM, Bool_t isConvFixed) {
-    // Resolution Function
-//    RootHelper::deleteObject("resFunctMean");
-//    RooRealVar* resFunctMean = sourcePdf ? new RooRealVar("resFunctMean", "Resolution mean", 0, -2, 2, "keV") : new RooRealVar("zero", "zero", 0, "keV");
-//    RooRealVar* resFunctMean = new RooRealVar("resFunctMean", "Resolution mean", 0, "keV");
-    RooRealVar* resFunctMean = E_0;
-    RootHelper::deleteObject("resFunctFWHM");
-    RooRealVar* resFunctFWHM = isConvFixed ?
-        new RooRealVar("resFunctFWHM", "Resolution function FWHM", convFWHM, "keV") :
-        new RooRealVar("resFunctFWHM", "Resolution function FWHM", convFWHM, convFWHM/4, convFWHM * 4, "keV");
-    RootHelper::deleteObject("resFunctSigma");
-    RooFormulaVar* resFunctSigma = new RooFormulaVar("resFunctSigma", "@0*@1", RooArgList(*resFunctFWHM, *fwhm2sigma));
-    RootHelper::deleteObject("resFunct");
-    if (convType){
-        resolutionFunction = new RooGaussian("resFunct", "Resolution Function", *observable, *resFunctMean, *resFunctSigma);
-    }
-    else {
-        resolutionFunction = nullptr;
-    }
+RooAbsPdf* CompositeModelProvider::getConvolutedPdf(RooAbsPdf* pdf, RooRealVar* fwhm){
 
-    // Convolution
-    RootHelper::deleteObject("sumModelConvoluted");
-    RooAbsPdf* sumModelConvoluted = nullptr;
-    switch(convType){
-        case 0:         // No convolution
-            this->convolutedModel = nullptr;
-            break;
-        case 1:         // FFT3
-        {   // https://stackoverflow.com/questions/92396/why-cant-variables-be-declared-in-a-switch-statement
-            RooArgList* convPdfList = new RooArgList();
-            TIterator* pdfIter = pdfList->createIterator();
-            while (TObject* tempObj = pdfIter->Next()){
-                RooAbsPdf* absPdf = dynamic_cast<RooAbsPdf*>(tempObj);
-                if (absPdf != NULL){
-                    Int_t i = pdfList->index(absPdf);
-                    RootHelper::deleteObject(TString::Format("convAbsPdf%d", i + 1));
-                    RooFFTConvPdf* convAbsPdf = new RooFFTConvPdf(TString::Format("convAbsPdf%d", i + 1), "convoluted_pdf", *observable, *absPdf, *resolutionFunction);
-                    convPdfList->add(*convAbsPdf);
-                }
-            };
-            std::cout << "convPdfList" << std::endl;
-            convPdfList->Print();
-            sumModelConvoluted = new RooAddPdf("sumModelConvoluted", "Sum of components", *convPdfList, *coeffList, kTRUE);
-            this->convolutedModel = sumModelConvoluted;
-            break;
-        }
-        case 2:         // Numeric
-            sumModelConvoluted = new RooNumConvPdf("sumModelConvoluted", "Convoluted Model", *observable, *model, *resolutionFunction);
-            ((RooNumConvPdf*) sumModelConvoluted)->setConvolutionWindow(*resFunctMean,*resFunctSigma,4);
-            this->convolutedModel = sumModelConvoluted;
-            break;
-        case 3:         // Custom
-            sumModelConvoluted = new ChannelConvolutionPdf("sumModelConvoluted", "Convoluted Model", *observable, *model, *resolutionFunction);
-            ((ChannelConvolutionPdf*) sumModelConvoluted)->setConvolutionWindow(*resFunctMean,*resFunctFWHM,2);
-            this->convolutedModel = sumModelConvoluted;
-            break;
-    }
 }
 
+void CompositeModelProvider::initResolutionFunction(RooRealVar* fwhm) {
+	// Resolution Function
+	RooRealVar* resFunctMean = E_0;
+	RootHelper::deleteObject("resFunctSigma");
+	RooFormulaVar* resFunctSigma = new RooFormulaVar("resFunctSigma", "@0*@1", RooArgList(*fwhm, *fwhm2sigma));
+	RootHelper::deleteObject("resFunct");
+	if () {
+		resolutionFunction = fwhm != NULL ?
+				NULL
+				new RooGaussian("resFunct", "Resolution Function", *observable, *resFunctMean, *resFunctSigma);
+	} else {
+		resolutionFunction = nullptr;
+	}
 
-void CompositeModelProvider::initTwoDetector(Bool_t hasParabola, const Int_t numGauss, const Int_t numLorentz, const Int_t numLorentzSum, Int_t convType, Double_t convFWHM, Bool_t isConvFixed) {
-    isTwoDetector = kTRUE;
-    initModel(hasParabola, numGauss, numLorentz, numLorentzSum);
-    initResolutionFunction(convType, convFWHM, isConvFixed);
+	// Convolution
+	RootHelper::deleteObject("sumModelConvoluted");
+	switch (convType) {
+	case 0:         // No convolution
+		this->convolutedModel = nullptr;
+		break;
+	case 1:         // FFT3
+	{   // https://stackoverflow.com/questions/92396/why-cant-variables-be-declared-in-a-switch-statement
+		RooArgList* convPdfList = new RooArgList();
+		TIterator* pdfIter = components->createIterator();
+		while (TObject* tempObj = pdfIter->Next()) {
+			RooAbsPdf* absPdf = dynamic_cast<RooAbsPdf*>(tempObj);
+			if (absPdf != NULL) {
+				Int_t i = pdfList->index(absPdf);
+				RootHelper::deleteObject(Form("convAbsPdf%d", i + 1));
+				RooFFTConvPdf* convAbsPdf = new RooFFTConvPdf(Form("convAbsPdf%d", i + 1), "convoluted_pdf", *observable, *absPdf, *resolutionFunction);
+				convPdfList->add(*convAbsPdf);
+			}
+		};
+		std::cout << "convPdfList" << std::endl;
+		convPdfList->Print();
+		this->convolutedModel = new RooAddPdf("sumModelConvoluted", "Sum of components", *convPdfList, *coeffList, kTRUE);
+		break;
+	}
+//	case 2:         // Numeric
+//		sumModelConvoluted = new RooNumConvPdf("sumModelConvoluted", "Convoluted Model", *observable, *model, *resolutionFunction);
+//		((RooNumConvPdf*) sumModelConvoluted)->setConvolutionWindow(*resFunctMean, *resFunctSigma, 4);
+//		this->convolutedModel = sumModelConvoluted;
+//		break;
+//	case 3:         // Custom
+//		sumModelConvoluted = new ChannelConvolutionPdf("sumModelConvoluted", "Convoluted Model", *observable, *model, *resolutionFunction);
+//		((ChannelConvolutionPdf*) sumModelConvoluted)->setConvolutionWindow(*resFunctMean,*resFunctFWHM,2);
+//		this->convolutedModel = sumModelConvoluted;
+//		break;
+	}
 }
 
-void CompositeModelProvider::initSingleDetector(Bool_t hasParabola, const Int_t numGauss, const Int_t numLorentz, const Int_t numLorentzSum, Int_t convType, Double_t convFWHM, Bool_t isConvFixed, Double_t bgFraction){
-    isTwoDetector = kFALSE;
-    initModel(hasParabola, numGauss, numLorentz, numLorentzSum);
-    initBackground(bgFraction);
-    initResolutionFunction(convType, convFWHM, isConvFixed);
+void CompositeModelProvider::initTwoDetector(Bool_t hasParabola, const Int_t numGauss, const Int_t numLorentz, const Int_t numLorentzSum, RooRealVar* fwhm) {
+	isTwoDetector = kTRUE;
+	initModel(hasParabola, numGauss, numLorentz, numLorentzSum, fwhm);
 }
 
-std::list<Variable*> CompositeModelProvider::getIndirectParameters(){
-    std::list<Variable*> parameters;
-    TIterator* it = pdfList->createIterator();
-    TObject* tempObj=0;
+void CompositeModelProvider::initSingleDetector(Bool_t hasParabola, const Int_t numGauss, const Int_t numLorentz, const Int_t numLorentzSum, RooRealVar* fwhm, Double_t bgFraction) {
+	isTwoDetector = kFALSE;
+	initModel(hasParabola, numGauss, numLorentz, numLorentzSum, fwhm);
+	initBackground(bgFraction);
+}
+
+std::list<Variable*> CompositeModelProvider::getIndirectParameters() {
+	std::list<Variable*> parameters;
+	TIterator* it = pdfList->createIterator();
+	TObject* tempObj = 0;
 //    std::cout << "getIndirectParameters: Iterating PDFs" << std::endl;
-    while((tempObj=it->Next())){
+	while ((tempObj = it->Next())) {
 //        tempObj->Print();
-        IndirectParamPdf* paramPdf = dynamic_cast<IndirectParamPdf*>(tempObj);
-        if(paramPdf != NULL){
-            std::list<Variable*> list = paramPdf->getParameters(isTwoDetector);
-            std::list<Variable*>::iterator iter;
-            for (iter = list.begin(); iter != list.end(); iter++) {
-                Variable* v = *iter;
+		IndirectParamPdf* paramPdf = dynamic_cast<IndirectParamPdf*>(tempObj);
+		if (paramPdf != NULL) {
+			std::list<Variable*> list = paramPdf->getParameters(isTwoDetector);
+			std::list<Variable*>::iterator iter;
+			for (iter = list.begin(); iter != list.end(); iter++) {
+				Variable* v = *iter;
 //                v->print();
-                parameters.push_back(v);
-            }
-        }
-    }
-    return parameters;
+				parameters.push_back(v);
+			}
+		}
+	}
+	return parameters;
 }
 
-std::map<Int_t, TString> CompositeModelProvider::convolutionType =  CompositeModelProvider::createConvolutionType();
+std::map<Int_t, TString> CompositeModelProvider::convolutionType = CompositeModelProvider::createConvolutionType();
 
-std::map<Int_t, TString> CompositeModelProvider::getConvolutionTypes(void){
-    return convolutionType;
+std::map<Int_t, TString> CompositeModelProvider::getConvolutionTypes(void) {
+	return convolutionType;
 }
 
-std::list<std::pair<const char*, Double_t>> CompositeModelProvider::getIntensities(){
-    std::list<std::pair<const char*, Double_t>> intensities;
-    TIterator* it = pdfList->createIterator();
-    TObject* tempObj=0;
-//    std::cout << "getIntensities: Iterating PDFs" << std::endl;
-//    RooAbsReal* fullInt = getModel()->createIntegral(*observable);
-    Double_t previousCoeff = 1;
-    while((tempObj=it->Next())){
-        RooAbsPdf* absPdf = dynamic_cast<RooAbsPdf*>(tempObj);
-        if(absPdf != NULL){
-            Int_t componentIndex = pdfList->index(absPdf);
-            RooAbsArg* arg = coeffList->at(componentIndex);
-            RooAbsReal* absReal = dynamic_cast<RooAbsReal*>(arg);
-            Double_t actualCoeff;
-            if (absReal!=0){
-                Double_t pdfCoeff = absReal->getVal();
-                actualCoeff = previousCoeff*pdfCoeff;
-                previousCoeff *= (1-pdfCoeff);
-            }
-            else {
-                actualCoeff = previousCoeff;
-            }
-            std::cout << absPdf->GetName() << " " << actualCoeff << std::endl;
-            std::pair<const char*, Double_t> p = std::make_pair(absPdf->GetTitle(), actualCoeff);
-            intensities.push_back(p);
-        }
-    }
-    return intensities;
+Double_t* CompositeModelProvider::getDefaultGaussAs(const Int_t numGauss) {
+	Double_t* As;
+	switch (numGauss) {
+	case 1:
+		static Double_t arr1[1] = { 0.1 };
+		As = &arr1[0];
+		break;
+	case 2:
+		static Double_t arr2[2] = { 0.5, 0.1 };
+		As = &arr2[0];
+		break;
+	case 3:
+		static Double_t arr3[3] = { 0.6, 0.3, 0.1 };
+		As = &arr3[0];
+		break;
+	default:
+		static Double_t arr4[4] = { 1.0, 0.5, 0.2, 0.05 };
+		As = &arr4[0];
+		break;
+	}
+	return As;
 }
 
-Double_t* CompositeModelProvider::getDefaultGaussAs(const Int_t numGauss){
-    Double_t* As;
-    switch ( numGauss ) {
-        case 1:
-            static Double_t arr1[1] = {0.1};
-            As = &arr1[0];
-            break;
-        case 2:
-            static Double_t arr2[2] = {0.5, 0.1};
-            As = &arr2[0];
-            break;
-        case 3:
-            static Double_t arr3[3] = {0.6, 0.3, 0.1};
-            As = &arr3[0];
-            break;
-        default:
-            static Double_t arr4[4] = {1.0, 0.5, 0.2, 0.05};
-            As = &arr4[0];
-            break;
-    }
-    return As;
-}
-
-Double_t* CompositeModelProvider::getDefaultLorentzAs(const Int_t numLorentz){
-    Double_t* As;
-    switch ( numLorentz ) {
-        case 1:
-            static Double_t arr1[1] = {0.18};
-            As = &arr1[0];
-            break;
-        case 2:
-            static Double_t arr2[2] = {0.16, 0.5};
-            As = &arr2[0];
+Double_t* CompositeModelProvider::getDefaultLorentzAs(const Int_t numLorentz) {
+	Double_t* As;
+	switch (numLorentz) {
+	case 1:
+		static Double_t arr1[1] = { 0.18 };
+		As = &arr1[0];
+		break;
+	case 2:
+		static Double_t arr2[2] = { 0.16, 0.5 };
+		As = &arr2[0];
 //            As = (Double_t[2]){Constants::a_B*TMath::Sqrt(Constants::Ry/73), Constants::a_B*TMath::Sqrt(Constants::Ry/117)};
-            break;
-        case 3:
-            static Double_t arr3[3] = {0.05, 0.1, 0.5};
-            As = &arr3[0];
+		break;
+	case 3:
+		static Double_t arr3[3] = { 0.05, 0.1, 0.5 };
+		As = &arr3[0];
 //            As = (Double_t[3]){Constants::a_B*TMath::Sqrt(Constants::Ry/73), Constants::a_B*TMath::Sqrt(Constants::Ry/117), Constants::a_B*TMath::Sqrt(Constants::Ry/1559)};
-            break;
-        default:
-            static Double_t arr4[4] = {0.05, 0.1, 0.5, 1};
-            As = &arr4[0];
-            break;
-    }
-    return As;
-};
+		break;
+	default:
+		static Double_t arr4[4] = { 0.05, 0.1, 0.5, 1 };
+		As = &arr4[0];
+		break;
+	}
+	return As;
+}
+;
 
-Double_t* CompositeModelProvider::getDefaultDampLorentzAs(const Int_t numLorentz){
-    Double_t* As;
-    switch ( numLorentz ) {
-        case 1:
-            static Double_t arr1[1] = {0.1};
-            As = &arr1[0];
-            break;
-        case 2:
-            static Double_t arr2[2] = {0.1, 0.4};
-            As = &arr2[0];
-            break;
-        case 3:
-            static Double_t arr3[3] = {0.05, 0.1, 0.5};
-            As = &arr3[0];
-            break;
-        default:
-            static Double_t arr4[4] = {0.05, 0.1, 0.5, 1};
-            As = &arr4[0];
-            break;
-    }
-    return As;
-};
+Double_t* CompositeModelProvider::getDefaultDampLorentzAs(const Int_t numLorentz) {
+	Double_t* As;
+	switch (numLorentz) {
+	case 1:
+		static Double_t arr1[1] = { 0.1 };
+		As = &arr1[0];
+		break;
+	case 2:
+		static Double_t arr2[2] = { 0.1, 0.4 };
+		As = &arr2[0];
+		break;
+	case 3:
+		static Double_t arr3[3] = { 0.05, 0.1, 0.5 };
+		As = &arr3[0];
+		break;
+	default:
+		static Double_t arr4[4] = { 0.05, 0.1, 0.5, 1 };
+		As = &arr4[0];
+		break;
+	}
+	return As;
+}
+;
