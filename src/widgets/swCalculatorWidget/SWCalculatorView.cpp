@@ -129,31 +129,38 @@ void SWCalculatorView::initUI(){
     tabFit->AddFrame(new TGHorizontal3DLine(tabFit), new TGLayoutHints(kLHintsExpandX, dx, dx, dy, dy));
 
     // Resolution Function Parameters
-    TGHorizontalFrame* convolutionParamsFrame = new TGHorizontalFrame(tabFit);
-    comboConvolutionType = new TGComboBox(convolutionParamsFrame, 0);
-    std::map<Int_t, TString> convTypes = CompositeModelProvider::getConvolutionTypes();
-    for (std::map<Int_t, TString>::iterator it=convTypes.begin(); it!=convTypes.end(); ++it){
-        comboConvolutionType->AddEntry((it->second).Data(), it->first);
-    }
-    comboConvolutionType->Select(1);
-    comboConvolutionType->Resize(75, 20);
-    checkboxResFixed = new TGCheckButton(convolutionParamsFrame, "fixed");
-    checkboxResFixed->SetOn();
-    numResolutionFWHM = new TGNumberEntry(convolutionParamsFrame, 2.0, 4, -1, TGNumberFormat::kNESRealTwo,
-            TGNumberFormat::kNEANonNegative,
-            TGNumberFormat::kNELLimitMinMax,
-            0.5, 4.0);
-    convolutionParamsFrame->AddFrame(new TGLabel(convolutionParamsFrame, "Convolution"),
-                                     new TGLayoutHints(kLHintsLeft | kLHintsTop, 0, dx, 4*dy/5, 0));
-    convolutionParamsFrame->AddFrame(comboConvolutionType, new TGLayoutHints(kLHintsLeft | kLHintsTop, 0, 0, dy/5, 0));
-    convolutionParamsFrame->AddFrame(checkboxResFixed, new TGLayoutHints(kLHintsRight | kLHintsTop, 0, 0, 3*dy/5, 0));
-    convolutionParamsFrame->AddFrame(numResolutionFWHM, new TGLayoutHints(kLHintsRight | kLHintsTop, 0, dx, dy/5, 0));
-    convolutionParamsFrame->AddFrame(new TGLabel(convolutionParamsFrame, "Resolution FWHM, keV"),
-                                     new TGLayoutHints(kLHintsRight | kLHintsTop, 0, dx, 4*dy/5, 0));
-    tabFit->AddFrame(convolutionParamsFrame, new TGLayoutHints(kLHintsExpandX, dx, dx, dy, dy));
+//    TGHorizontalFrame* convolutionParamsFrame = new TGHorizontalFrame(tabFit);
+//    comboConvolutionType = new TGComboBox(convolutionParamsFrame, 0);
+//    std::map<Int_t, TString> convTypes = CompositeModelProvider::getConvolutionTypes();
+//    for (std::map<Int_t, TString>::iterator it=convTypes.begin(); it!=convTypes.end(); ++it){
+//        comboConvolutionType->AddEntry((it->second).Data(), it->first);
+//    }
+//    comboConvolutionType->Select(1);
+//    comboConvolutionType->Resize(75, 20);
+//    checkboxResFixed = new TGCheckButton(convolutionParamsFrame, "fixed");
+//    checkboxResFixed->SetOn();
+//    numResolutionFWHM = new TGNumberEntry(convolutionParamsFrame, 2.0, 4, -1, TGNumberFormat::kNESRealTwo,
+//            TGNumberFormat::kNEANonNegative,
+//            TGNumberFormat::kNELLimitMinMax,
+//            0.5, 4.0);
+//    convolutionParamsFrame->AddFrame(new TGLabel(convolutionParamsFrame, "Convolution"),
+//                                     new TGLayoutHints(kLHintsLeft | kLHintsTop, 0, dx, 4*dy/5, 0));
+//    convolutionParamsFrame->AddFrame(comboConvolutionType, new TGLayoutHints(kLHintsLeft | kLHintsTop, 0, 0, dy/5, 0));
+//    convolutionParamsFrame->AddFrame(checkboxResFixed, new TGLayoutHints(kLHintsRight | kLHintsTop, 0, 0, 3*dy/5, 0));
+//    convolutionParamsFrame->AddFrame(numResolutionFWHM, new TGLayoutHints(kLHintsRight | kLHintsTop, 0, dx, dy/5, 0));
+//    convolutionParamsFrame->AddFrame(new TGLabel(convolutionParamsFrame, "Resolution FWHM, keV"),
+//                                     new TGLayoutHints(kLHintsRight | kLHintsTop, 0, dx, 4*dy/5, 0));
+//    tabFit->AddFrame(convolutionParamsFrame, new TGLayoutHints(kLHintsExpandX, dx, dx, dy, dy));
 
     // Separator
-    tabFit->AddFrame(new TGHorizontal3DLine(tabFit), new TGLayoutHints(kLHintsExpandX, dx, dx, dy, dy));
+//    tabFit->AddFrame(new TGHorizontal3DLine(tabFit), new TGLayoutHints(kLHintsExpandX, dx, dx, dy, dy));
+
+    // Add source contribution frame
+    resolutionFunctionFrame = new TGVerticalFrame(tabFit);
+    resolutionFunctionView = new RooRealVarView(resolutionFunctionFrame);
+    resolutionFunctionFrame->AddFrame(resolutionFunctionView, new TGLayoutHints(kLHintsExpandX, dx, dx, dy, dy));
+    resolutionFunctionFrame->AddFrame(new TGHorizontal3DLine(sourceContributionFrame), new TGLayoutHints(kLHintsExpandX, dx, dx, dy, dy));
+    tabFit->AddFrame(resolutionFunctionFrame, new TGLayoutHints(kLHintsLeft | kLHintsTop | kLHintsExpandX));
 
     // Add source contribution frame
     sourceContributionFrame = new TGVerticalFrame(tabFit);

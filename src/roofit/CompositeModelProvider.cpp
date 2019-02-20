@@ -67,14 +67,6 @@ void CompositeModelProvider::initSourcePdf(TH1F* sourceHist, RooAbsReal* sourceC
 }
 
 void CompositeModelProvider::initModel(Bool_t hasParabola, const Int_t numGauss, const Int_t numLorentz, const Int_t numLorentzSum, RooRealVar* fwhm) {
-	pdfsToBeConvoluted = new RooArgList();
-	// Check source contribution
-	if (sourcePdf) {
-		if (sourceContribution->getVal() != 0) {
-			components->add(*sourcePdf);
-		}
-	}
-
 	// Define parabola
 	if (hasParabola) {
 		RootHelper::deleteObject("parabolaRoot");
@@ -102,21 +94,6 @@ void CompositeModelProvider::initModel(Bool_t hasParabola, const Int_t numGauss,
 		pdfsToBeConvoluted->add(*gauss[i]);
 	}
 
-	// Composite Lorentz PDFs
-	RooRealVar** a2 = new RooRealVar*[numLorentzSum];
-	DampLorentzPdf** lorentz2 = new DampLorentzPdf*[numLorentzSum];
-	RooRealVar** I_lorentz2 = new RooRealVar*[numLorentzSum];
-	for (int i = 0; i < numLorentzSum; i++) {
-		RootHelper::deleteObject(Form("sl%dA", i + 1));
-		a2[i] = new RooRealVar(Form("sl%dA", i + 1), Form("Sum Lorentz%d a", i + 1), getDefaultDampLorentzAs(numLorentzSum)[i], aMin, aMax, "A"); // 5 0.5 10
-
-		const char* name = StringUtils::suffix("dampLorentz", i + 1)->Data();
-		RootHelper::deleteObject(name);
-		lorentz2[i] = new DampLorentzPdf(name, StringUtils::ordinal("damping lorentzian", i + 1)->Data(), *observable, *E_0, *a2[i]);
-		components->add(*lorentz2[i]);
-		pdfsToBeConvoluted->add(*lorentz2[i]);
-	}
-
 	// Lorentz PDFs
 	RooRealVar** a = new RooRealVar*[numLorentz];
 	LorentzianPdf** lorentz = new LorentzianPdf*[numLorentz];
@@ -130,6 +107,21 @@ void CompositeModelProvider::initModel(Bool_t hasParabola, const Int_t numGauss,
 		lorentz[i] = new LorentzianPdf(name, StringUtils::ordinal("lorentzian", i + 1)->Data(), *observable, *E_0, *a[i]);
 		components->add(*lorentz[i]);
 		pdfsToBeConvoluted->add(*lorentz[i]);
+	}
+
+	// Composite Lorentz PDFs
+	RooRealVar** a2 = new RooRealVar*[numLorentzSum];
+	DampLorentzPdf** lorentz2 = new DampLorentzPdf*[numLorentzSum];
+	RooRealVar** I_lorentz2 = new RooRealVar*[numLorentzSum];
+	for (int i = 0; i < numLorentzSum; i++) {
+		RootHelper::deleteObject(Form("sl%dA", i + 1));
+		a2[i] = new RooRealVar(Form("sl%dA", i + 1), Form("Sum Lorentz%d a", i + 1), getDefaultDampLorentzAs(numLorentzSum)[i], aMin, aMax, "A"); // 5 0.5 10
+
+		const char* name = StringUtils::suffix("dampLorentz", i + 1)->Data();
+		RootHelper::deleteObject(name);
+		lorentz2[i] = new DampLorentzPdf(name, StringUtils::ordinal("damping lorentzian", i + 1)->Data(), *observable, *E_0, *a2[i]);
+		components->add(*lorentz2[i]);
+		pdfsToBeConvoluted->add(*lorentz2[i]);
 	}
 
 	// Orthogonal PDF
@@ -154,6 +146,17 @@ void CompositeModelProvider::initModel(Bool_t hasParabola, const Int_t numGauss,
 	RooAddPdf* sumModel = ReverseAddPdf::add(*components, *coeffList, kTRUE);
 
 	this->model = sumModel;
+
+	// Check source contribution
+	if (sourcePdf) {
+		if (sourceContribution->getVal() != 0) {
+			components->add(*sourcePdf);
+		}
+	}
+}
+
+void CompositeModelProvider::initSourceContribution(RooRealVar* iSource) {
+
 }
 
 void CompositeModelProvider::initBackground(Double_t backgroundFraction) {
