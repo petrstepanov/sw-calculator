@@ -32,7 +32,6 @@
 #include <TGDoubleSlider.h>
 #include <TGTextEntry.h>
 #include <TGTextBuffer.h>
-#include "../../util/Variable.h"
 #include "../AbstractView.h"
 #include "SWCalculatorPresenter.h"
 #include "../rooRealVarWidget/RooRealVarView.h"
@@ -134,8 +133,8 @@ class SWCalculatorView : public AbstractView<SWCalculatorPresenter> {
     void updateRegionLabels(Bool_t isTwoDetector);
     void displayFilename(TString* fileName);
     void displayFitParameters(RooFitResult* fitResult);
-    void displayIndirectParameters(std::list<Variable*> parameters);
-    void displayIntensities(std::list<std::pair<const char*, Double_t>> intensities);
+    void displayIndirectParameters(RooArgList* parameters);
+    void displayIntensities(RooArgList* intensities);
     void displayChi2(Double_t sumChi2, Int_t freeParameters, Int_t degreesFreedom);
     void displaySW(std::pair<Double_t, Double_t> sValueError, std::pair<Double_t, Double_t> wValueError);
     void updateCanvas();

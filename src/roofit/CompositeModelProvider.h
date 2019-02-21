@@ -17,7 +17,6 @@
 #include "AbstractModelProvider.h"
 #include <RooRealVar.h>
 #include <RooHistPdf.h>
-#include "../util/Variable.h"
 
 class CompositeModelProvider : public AbstractModelProvider {
 public:
@@ -27,21 +26,22 @@ public:
     CompositeModelProvider(RooRealVar* x, RooRealVar* x0);
 //    virtual ~CompositeModelProvider();
 
-    std::list<Variable*> getIndirectParameters();
+    RooArgList* getIndirectParameters();
+    RooArgList* getIntensities();
     
     static std::map<Int_t, TString> getConvolutionTypes(void);
     
-    void initTwoDetector(Bool_t hasParabola = kTRUE, const Int_t numGauss = 1, const Int_t numLorentz = 1, const Int_t numLorentzSum = 1, /*Bool_t hasOrthogonal = kFALSE,*/ Int_t convType = 0, Double_t convFWHM = 1.7, Bool_t isConvFixed = kFALSE);
-    void initSingleDetector(Bool_t hasParabola = kTRUE, const Int_t numGauss = 1, const Int_t numLorentz = 1, const Int_t numLorentzSum = 1, /*Bool_t hasOrthogonal = kFALSE,*/ Int_t convType = 0, Double_t convFWHM = 1.7, Bool_t isConvFixed = kFALSE, Double_t bgFraction = 0.1);
+    void initTwoDetector(Bool_t hasParabola = kTRUE, const Int_t numGauss = 1, const Int_t numLorentz = 1, const Int_t numLorentzSum = 1, /*Bool_t hasOrthogonal = kFALSE,*/ RooRealVar* fwhm = nullptr);
+    void initSingleDetector(Bool_t hasParabola = kTRUE, const Int_t numGauss = 1, const Int_t numLorentz = 1, const Int_t numLorentzSum = 1, /*Bool_t hasOrthogonal = kFALSE,*/ RooRealVar* fwhm = nullptr, Double_t bgFraction = 0.1);
     
     void initSourcePdf(TH1F* sourceHist, RooAbsReal* sourceContrib);
     
 private:
-    RooArgList* pdfsToBeConvoluted;
-//    RooArgList* coeffList;
+    RooArgList* pdfsInMaterial;            // list of pdfs to be convoluted
+    RooArgList* coeffsInMaterial;          // list of coefficients of pdfs in material
     RooRealVar* observable;
     RooHistPdf* sourcePdf = nullptr;
-    RooAbsReal* sourceContribution = nullptr;
+    RooAbsReal* Int_sourcePdf = nullptr;
     Bool_t isTwoDetector;
     
     static std::map<Int_t, TString> createConvolutionType(){
@@ -51,7 +51,8 @@ private:
 
     static std::map<Int_t, TString> convolutionType;
     
-    void initModel(Bool_t hasParabola, const Int_t, const Int_t numLorentz, const Int_t numLorentzSum, RooRealVar* fwhm);
+    void initModel(Bool_t hasParabola, const Int_t, const Int_t numLorentz, const Int_t numLorentzSum);
+    void initConvolutedModel(RooRealVar* fwhm);
     void initBackground(Double_t backgroundFraction);
     
     Double_t* getDefaultGaussAs(Int_t numGauss);

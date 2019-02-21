@@ -230,7 +230,7 @@ void SWCalculatorPresenter::onFitSpectrumClicked(){
     std::cout << "Counts axis limits: " << yAxisMin << ", " << yAxisMax << std::endl;
 
 //    Double_t modelMean = histProcessor->getPdfMaximumX(fittingModel, RooArgList(*e));
-    Double_t modelMean = modelProvider->getPeakCenter()->getValV();
+    Double_t modelMean = modelProvider->getMean()->getValV();
     {
         // Draw S, W regions
         Double_t sWidth = view->getSWidth();
@@ -369,7 +369,7 @@ void SWCalculatorPresenter::onFitSpectrumClicked(){
         // Output indirect model parameters
         view->displayIndirectParameters(modelProvider->getIndirectParameters());
         // Output components intensities
-//        view->displayIntensities(modelProvider->getIntensities());
+        view->displayIntensities(modelProvider->getIntensities());
 
         // Output Integral Chi^2
         std::pair<Double_t, Int_t> sumChi2AndDegreesFreedom = histProcessor->getChi2(fitHist, curveFit, fittingNonConvolutedModel);

@@ -63,7 +63,7 @@ Double_t ParabolaPdf::analyticalIntegral(Int_t code, const char* rangeName) cons
 	return 0;
 }
 
-std::list<Variable*> ParabolaPdf::getParameters(Bool_t isTwoDetector) {
+RooArgList* ParabolaPdf::getParameters(Bool_t isTwoDetector) {
 	// _PAS.pdf, (63)
 	// Here parameter should be the parabola root
 	Double_t _r = r * 1E3; // eV
@@ -78,8 +78,8 @@ std::list<Variable*> ParabolaPdf::getParameters(Bool_t isTwoDetector) {
 		de = isTwoDetector ? _r / (mc2) * dr : 4 * _r / mc2 * dr;
 	}
 	// Build list and return vars
-	Variable* v1 = new Variable(e, de, "Fermi energy", "eV");
-	std::list<Variable*> list;
-	list.push_back(v1);
+	RooRealVar* v1 = new RooRealVar(e, de, "Fermi energy", "eV");
+	RooArgList* list = new RooArgList();
+	list->add(*v1);
 	return list;
 }

@@ -61,7 +61,7 @@ Double_t DampLorentzPdf::indefiniteIntegral(Double_t _x) const {
 	return (k * _x * (139 + 211 * k * k * _x * _x + 165 * pow(k * _x, 4) + 45 * pow(k * _x, 6)) + 45 * pow(1 + k * k * _x * _x, 4) * atan(k * _x)) / (8 * k * pow(1 + k * k * _x * _x, 4));
 }
 
-std::list<Variable*> DampLorentzPdf::getParameters(Bool_t isTwoDetector) {
+RooArgList* DampLorentzPdf::getParameters(Bool_t isTwoDetector) {
 	// Energy value
 	Double_t Ry = Constants::Ry; // eV
 	Double_t a_B = Constants::a_B; // A
@@ -77,8 +77,8 @@ std::list<Variable*> DampLorentzPdf::getParameters(Bool_t isTwoDetector) {
 	}
 	// Build list and return vars
 	TString str = TString::Format("Binding E %s", this->GetName());
-	Variable* v1 = new Variable(e, de, str.Data(), "eV");
-	std::list<Variable*> list;
-	list.push_back(v1);
+	RooRealVar* v1 = new RooRealVar(e, de, str.Data(), "eV");
+	RooArgList* list = new RooArgList();
+	list->add(*v1);
 	return list;
 }

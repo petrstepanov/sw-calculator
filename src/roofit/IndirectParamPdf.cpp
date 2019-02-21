@@ -17,14 +17,6 @@
 IndirectParamPdf::IndirectParamPdf() {
 }
 
-//IndirectParamPdf::IndirectParamPdf(RooRealVar* param) {
-//    this->param = param;
-//}
-//
-//IndirectParamPdf::IndirectParamPdf(RooAbsReal& param) {
-//    this->param = &param;
-//}
-
 IndirectParamPdf::IndirectParamPdf(const IndirectParamPdf& orig) {
 }
 

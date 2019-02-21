@@ -16,6 +16,7 @@
 
 #include <TROOT.h>
 #include <TColor.h>
+#include <RooConstVar.h>
 
 class Constants {
   public:
@@ -39,6 +40,9 @@ class Constants {
     static TColor* colorAppWindow;    
     
     static const Int_t colorSet[7];
+
+    static RooConstVar* fwhm2sigma;
+    static RooConstVar* pi;
 };
 
 #endif /* CONSTANTS_H */

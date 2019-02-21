@@ -32,7 +32,7 @@ public:
 	Int_t getAnalyticalIntegral(RooArgSet& allVars, RooArgSet& analVars, const char* rangeName = 0) const;
 	Double_t analyticalIntegral(Int_t code, const char* rangeName = 0) const;
 
-	std::list<Variable*> getParameters(Bool_t isTwoDetector);
+	RooArgList* getParameters(Bool_t isTwoDetector);
 
 protected:
 	RooRealProxy x;

@@ -129,38 +129,32 @@ void SWCalculatorView::initUI(){
     tabFit->AddFrame(new TGHorizontal3DLine(tabFit), new TGLayoutHints(kLHintsExpandX, dx, dx, dy, dy));
 
     // Resolution Function Parameters
-//    TGHorizontalFrame* convolutionParamsFrame = new TGHorizontalFrame(tabFit);
-//    comboConvolutionType = new TGComboBox(convolutionParamsFrame, 0);
-//    std::map<Int_t, TString> convTypes = CompositeModelProvider::getConvolutionTypes();
-//    for (std::map<Int_t, TString>::iterator it=convTypes.begin(); it!=convTypes.end(); ++it){
-//        comboConvolutionType->AddEntry((it->second).Data(), it->first);
-//    }
-//    comboConvolutionType->Select(1);
-//    comboConvolutionType->Resize(75, 20);
-//    checkboxResFixed = new TGCheckButton(convolutionParamsFrame, "fixed");
-//    checkboxResFixed->SetOn();
-//    numResolutionFWHM = new TGNumberEntry(convolutionParamsFrame, 2.0, 4, -1, TGNumberFormat::kNESRealTwo,
-//            TGNumberFormat::kNEANonNegative,
-//            TGNumberFormat::kNELLimitMinMax,
-//            0.5, 4.0);
-//    convolutionParamsFrame->AddFrame(new TGLabel(convolutionParamsFrame, "Convolution"),
-//                                     new TGLayoutHints(kLHintsLeft | kLHintsTop, 0, dx, 4*dy/5, 0));
-//    convolutionParamsFrame->AddFrame(comboConvolutionType, new TGLayoutHints(kLHintsLeft | kLHintsTop, 0, 0, dy/5, 0));
-//    convolutionParamsFrame->AddFrame(checkboxResFixed, new TGLayoutHints(kLHintsRight | kLHintsTop, 0, 0, 3*dy/5, 0));
-//    convolutionParamsFrame->AddFrame(numResolutionFWHM, new TGLayoutHints(kLHintsRight | kLHintsTop, 0, dx, dy/5, 0));
-//    convolutionParamsFrame->AddFrame(new TGLabel(convolutionParamsFrame, "Resolution FWHM, keV"),
-//                                     new TGLayoutHints(kLHintsRight | kLHintsTop, 0, dx, 4*dy/5, 0));
-//    tabFit->AddFrame(convolutionParamsFrame, new TGLayoutHints(kLHintsExpandX, dx, dx, dy, dy));
+    TGHorizontalFrame* convolutionParamsFrame = new TGHorizontalFrame(tabFit);
+    comboConvolutionType = new TGComboBox(convolutionParamsFrame, 0);
+    std::map<Int_t, TString> convTypes = CompositeModelProvider::getConvolutionTypes();
+    for (std::map<Int_t, TString>::iterator it=convTypes.begin(); it!=convTypes.end(); ++it){
+        comboConvolutionType->AddEntry((it->second).Data(), it->first);
+    }
+    comboConvolutionType->Select(1);
+    comboConvolutionType->Resize(75, 20);
+    checkboxResFixed = new TGCheckButton(convolutionParamsFrame, "fixed");
+    checkboxResFixed->SetOn();
+    numResolutionFWHM = new TGNumberEntry(convolutionParamsFrame, 2.0, 4, -1, TGNumberFormat::kNESRealTwo,
+            TGNumberFormat::kNEANonNegative,
+            TGNumberFormat::kNELLimitMinMax,
+            0.5, 4.0);
+    convolutionParamsFrame->AddFrame(new TGLabel(convolutionParamsFrame, "Convolution"),
+                                     new TGLayoutHints(kLHintsLeft | kLHintsTop, 0, dx, 4*dy/5, 0));
+    convolutionParamsFrame->AddFrame(comboConvolutionType, new TGLayoutHints(kLHintsLeft | kLHintsTop, 0, 0, dy/5, 0));
+    convolutionParamsFrame->AddFrame(checkboxResFixed, new TGLayoutHints(kLHintsRight | kLHintsTop, 0, 0, 3*dy/5, 0));
+    convolutionParamsFrame->AddFrame(numResolutionFWHM, new TGLayoutHints(kLHintsRight | kLHintsTop, 0, dx, dy/5, 0));
+    convolutionParamsFrame->AddFrame(new TGLabel(convolutionParamsFrame, "Resolution FWHM, keV"),
+                                     new TGLayoutHints(kLHintsRight | kLHintsTop, 0, dx, 4*dy/5, 0));
+    tabFit->AddFrame(convolutionParamsFrame, new TGLayoutHints(kLHintsExpandX, dx, dx, dy, dy));
 
     // Separator
 //    tabFit->AddFrame(new TGHorizontal3DLine(tabFit), new TGLayoutHints(kLHintsExpandX, dx, dx, dy, dy));
 
-    // Add source contribution frame
-    resolutionFunctionFrame = new TGVerticalFrame(tabFit);
-    resolutionFunctionView = new RooRealVarView(resolutionFunctionFrame);
-    resolutionFunctionFrame->AddFrame(resolutionFunctionView, new TGLayoutHints(kLHintsExpandX, dx, dx, dy, dy));
-    resolutionFunctionFrame->AddFrame(new TGHorizontal3DLine(sourceContributionFrame), new TGLayoutHints(kLHintsExpandX, dx, dx, dy, dy));
-    tabFit->AddFrame(resolutionFunctionFrame, new TGLayoutHints(kLHintsLeft | kLHintsTop | kLHintsExpandX));
 
     // Add source contribution frame
     sourceContributionFrame = new TGVerticalFrame(tabFit);
@@ -513,26 +507,28 @@ void SWCalculatorView::displayFitParameters(RooFitResult* fitResult) {
     }
 }
 
-void SWCalculatorView::displayIndirectParameters(std::list<Variable*> parameters) {
-    std::list<Variable*>::iterator iter;
-    txtFitResult->AddLineFast("  ------------------------------------------------");
-    for (iter = parameters.begin(); iter != parameters.end(); ++iter) {
-        Variable* v = (*iter);
-        TString str = (v->getError() == 0) ?
-            Form("%*s    %1.4e %s", 22, v->getDescription(), v->getValue(), v->getUnit()) :
-            Form("%*s    %1.4e (%1.2e) %s", 22, v->getDescription(), v->getValue(), v->getError(), v->getUnit());
-        txtFitResult->AddLineFast(str);
-    }
+void SWCalculatorView::displayIndirectParameters(RooArgList* parameters) {
+	txtFitResult->AddLineFast("  ------------------------------------------------");
+	TIterator* it = parameters->createIterator();
+	while(TObject* temp = it->Next()){
+		if(RooRealVar* v = dynamic_cast<RooRealVar*>(temp)){
+	        TString str = (v->getError() == 0) ?
+	            Form("%*s    %1.4e %s", 22, v->getTitle(), v->getVal(), v->getUnit()) :
+	            Form("%*s    %1.4e (%1.2e) %s", 22, v->getTitle(), v->getVal(), v->getError(), v->getUnit());
+	        txtFitResult->AddLineFast(str);
+		}
+	}
 }
 
-void SWCalculatorView::displayIntensities(std::list<std::pair<const char*, Double_t> > intensities) {
-    std::list<std::pair<const char*, Double_t>>::iterator iter;
-    txtFitResult->AddLineFast("  ------------------------------------------------");
-    for (iter = intensities.begin(); iter != intensities.end(); ++iter) {
-        std::pair<const char*, Double_t> p = (*iter);
-        TString str = Form("%*s    %f %c", 22, p.first, p.second*100, '%');
-        txtFitResult->AddLineFast(str);
-    }
+void SWCalculatorView::displayIntensities(RooArgList* intensities) {
+	txtFitResult->AddLineFast("  ------------------------------------------------");
+	TIterator* it = intensities->createIterator();
+	while(TObject* temp = it->Next()){
+		if(RooRealVar* intensity = dynamic_cast<RooRealVar*>(temp)){
+			TString str = Form("%*s    %f %c", 22, intensity->GetTitle(), intensity->getVal()*100, '%');
+			txtFitResult->AddLineFast(str);
+		}
+	}
 }
 
 void SWCalculatorView::displayChi2(Double_t sumChi2, Int_t freeParameters, Int_t degreesFreedom) {

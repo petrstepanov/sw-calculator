@@ -58,7 +58,7 @@ Double_t LorentzianPdf::indefiniteIntegral(Double_t _x) const {
 //    return _x;
 }
 
-std::list<Variable*> LorentzianPdf::getParameters(Bool_t isTwoDetector) {
+RooArgList* LorentzianPdf::getParameters(Bool_t isTwoDetector) {
 	// Energy value
 	Double_t Ry = Constants::Ry; // eV
 	Double_t a_B = Constants::a_B; // A
@@ -73,8 +73,8 @@ std::list<Variable*> LorentzianPdf::getParameters(Bool_t isTwoDetector) {
 	}
 	// Build list and return vars
 	TString str = TString::Format("Binding E %s", this->GetName());
-	Variable* v1 = new Variable(e, de, str.Data(), "eV");
-	std::list<Variable*> list;
-	list.push_back(v1);
+	RooRealVar* v1 = new RooRealVar(e, de, str.Data(), "eV");
+	RooArgList* list = new RooArgList();
+	list->add(*v1);
 	return list;
 }

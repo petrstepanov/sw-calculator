@@ -19,7 +19,6 @@
 #include <RooRealProxy.h>
 #include <TString.h>
 #include "../IndirectParamPdf.h"
-#include "../../util/Variable.h"
 
 class BackgroundPdf: public RooAbsPdf {
 public:

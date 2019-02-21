@@ -21,15 +21,13 @@
 
 class AbstractModelProvider {
 protected:
-	RooRealVar* E_0;
+	RooRealVar* mean;
 	RooAbsPdf* model;
 	RooAbsPdf* convolutedModel;
 	RooAbsPdf* resolutionFunction;
-	RooConstVar* fwhm2sigma;
-	RooConstVar* pi;
 	RooArgList* components;
 	RooArgList* bgComponents;
-	Int_t convolutionPoints;
+//	Int_t convolutionPoints;
 
 public:
 	AbstractModelProvider(RooRealVar*);
@@ -38,9 +36,9 @@ public:
 	RooAbsPdf* getModel();
 	RooAbsPdf* getConvolutedModel();
 	RooAbsPdf* getResolutionFuncton();
-	RooRealVar* getPeakCenter();
-	RooArgSet* getComponents();
-	RooArgSet* getBgComponents();
+	RooRealVar* getMean();
+	RooArgList* getComponents();
+	RooArgList* getBgComponents();
 };
 
 #endif /* ABSTRACTMODELPROVIDER_H */

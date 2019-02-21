@@ -12,6 +12,7 @@
  */
 
 #include "Constants.h"
+#include <TMath.h>
 
 const char* Constants::applicationName = "SW Calculator";
 
@@ -22,3 +23,6 @@ TColor* Constants::colorPrimary   = new TColor(0.232, 0.757, 0.832);
 TColor* Constants::colorWarning   = new TColor(0.832, 0.769, 0.232);
 TColor* Constants::colorGray      = new TColor(0.5, 0.5, 0.5);
 TColor* Constants::colorAppWindow = new TColor(0.906, 0.906, 0.906);
+
+RooConstVar* Constants::fwhm2sigma = new RooConstVar("fwhm2sigma", "Coefficient to convert FWHM to dispersion", 1/TMath::Sqrt(8*TMath::Log(2)));
+RooConstVar* Constants::pi = new RooConstVar("pi", "pi", TMath::Pi());

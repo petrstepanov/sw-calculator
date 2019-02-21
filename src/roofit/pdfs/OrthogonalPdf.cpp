@@ -67,15 +67,14 @@ Double_t OrthogonalPdf::indefiniteIntegral(Double_t _x) const {
 //    return pow(a2,4)*(s1+s2+s3+s4+s5)/30;
 }
 
-std::list<Variable*> OrthogonalPdf::getParameters(Bool_t isTwoDetector) {
+RooArgList* OrthogonalPdf::getParameters(Bool_t isTwoDetector) {
 	Double_t Ry = Constants::Ry; // eV
 	Double_t a_B = Constants::a_B; // A
 	Double_t e1 = isTwoDetector ? Ry * pow(a_B / a1, 2) : Ry * pow(a_B / a1, 2);
 	Double_t de1 = isTwoDetector ? 0 : 0;
-	Variable* v1 = new Variable(e1, de1, "Binding E (ort wf)", "eV");
-//    Variable* v2 = new Variable(a1, 0, "a1 (ort wf)", "A");
-	std::list<Variable*> list;
-	list.push_back(v1);
-//    list.push_back(v2);
+	RooRealVar()
+	RooRealVar* v1 = new RooRealVar("bindEnergyOrth", "Binding E (ort wf)", e1, de1, "Binding E (ort wf)", "eV");
+	RooArgList* list = new RooArgList();
+	list->add(*v1);
 	return list;
 }
