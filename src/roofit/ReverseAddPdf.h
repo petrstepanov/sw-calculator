@@ -23,8 +23,11 @@ public:
     virtual ~ReverseAddPdf();
     
     static RooAbsPdf* add(RooArgList* pdfList, const char* pdfName = "");
-    static RooArgList
+    static RooArgList* getSumCoefficients(RooArgList* pdfList);
+    static RooAbsPdf* add(RooArgList* pdfList, RooArgList* coeffList, const char* pdfName = "");
+
 private:
+    static RooArgList* getInverseList(RooArgList* list);
 
 };
 

@@ -27,7 +27,51 @@ ReverseAddPdf::ReverseAddPdf() {
 ReverseAddPdf::~ReverseAddPdf() {
 }
 
+static RooArgList* ReverseAddPdf::getInverseList(RooArgList* list){
+	RooArgList* pdfInverseList = new RooArgList();
+	TIterator* it = list->createIterator(kIterBackward);
+	TObject* temp;
+	while ((temp = it->Next())) {
+		RooAbsPdf* pdf = dynamic_cast<RooAbsPdf*>(temp);
+		if (pdf) {
+			pdfInverseList->add(*pdf);
+		}
+	}
+	return list;
+}
+
+static RooArgList* ReverseAddPdf::getSumCoefficients(RooArgList* pdfList){
+	unsigned numberOfComponents = pdfList->getSize();
+
+	// Construct inverse list;
+	RooArgList* pdfInverseList = getInverseList(pdfList);
+
+	RooArgList* I_i = new RooArgList();
+	for (unsigned i = 0; i < pdfList->getSize() - 1; i++) {
+		// Construct list of original model coefficients
+		// I_i = [I4, I3, I2]
+		// 1st "Source" component intensity
+		const char* pdfName = pdfInverseList->at(i)->GetName();
+		RooRealVar* I = new RooRealVar(Form("Int_%s", pdfName), Form("Intensity of %s", pdfName), 5.0, 0.0, 100.0, "%");
+		RooFormulaVar* INorm = new RooFormulaVar(Form("IntNorm_%s", pdfName), Form("Normalized intensity of %s", pdfName), "@0/100", *I);
+		I_i->add(*INorm);
+	}
+	return I_i;
+}
+
+static RooAbsPdf* ReverseAddPdf::add(RooArgList* pdfList, RooArgList* coeffList, const char* pdfName = ""){
+
+}
+
 RooAbsPdf* ReverseAddPdf::add(const char* name, RooArgList* pdfList) {
+	// If one component given just return it
+	unsigned numberOfComponents = pdfList->getSize();
+	if (numberOfComponents == 1) {
+		RooAbsArg* arg = pdfList->at(0);
+		RooAbsPdf* pdf = dynamic_cast<RooAbsPdf*>(arg);
+		return pdf;
+	}
+
 	// Construct inverse list;
 	RooArgList* pdfInverseList = new RooArgList();
 	TIterator* it = pdfList->createIterator(kIterBackward);
@@ -37,14 +81,6 @@ RooAbsPdf* ReverseAddPdf::add(const char* name, RooArgList* pdfList) {
 		if (pdf) {
 			pdfInverseList->add(*pdf);
 		}
-	}
-
-	// If one component given just return it
-	unsigned numberOfComponents = pdfList->getSize();
-	if (numberOfComponents == 1) {
-		RooAbsArg* arg = pdfList->at(0);
-		RooAbsPdf* pdf = dynamic_cast<RooAbsPdf*>(arg);
-		return pdf;
 	}
 
 	RooArgList* I_i = new RooArgList();

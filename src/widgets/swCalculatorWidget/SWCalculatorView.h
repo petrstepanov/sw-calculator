@@ -72,10 +72,6 @@ class SWCalculatorView : public AbstractView<SWCalculatorPresenter> {
     RooRealVarView* sourceContributionView;
     TGVerticalFrame* sourceContributionFrame;
 
-    // Source contribution view
-    RooRealVarView* sourceContributionView;
-    TGVerticalFrame* sourceContributionFrame;
-
     // Fitting function
     TGCheckButton* checkboxHasParabola;
     TGNumberEntry* numGauss;
