@@ -308,43 +308,43 @@ RooArgList* CompositeModelProvider::getIntensities() {
 //		}
 //	}
 
-//	// Add material pdfs intensities (for recursive sum)
-//	Double_t previousCoeff = 1;   // previouscoefficient
-//	Double_t previousCoeffError = 0;  // previous coefficient error
-//	for (unsigned i=0; i < pdfsInMaterial->getSize(); i++){
-//		if (RooAbsPdf* pdf = dynamic_cast<RooAbsPdf*>(pdfsInMaterial->at(i))){
-//			const char* name = Form("intensity%d", i);
-//			const char* title = Form("%s intensity", pdf->GetTitle());
-//			RootHelper::deleteObject(name);
-//			RooRealVar* v = new RooRealVar(name, title, 0, "%");
-//			if (i!=pdfsInMaterial->getSize()-1){
-//				// for all pdfs but not last
-//				if (RooRealVar* coeff = dynamic_cast<RooRealVar*>(coeffsInMaterial->at(i))){
-//					Double_t pdfIntensity = coeff->getValV();
-//					Double_t pdfIntensityError = coeff->getError();
-//					v->setVal(previousCoeff*pdfIntensity*100);
-//					Double_t error = sqrt(pow(pdfIntensity*previousCoeffError,2) + pow(previousCoeff*pdfIntensityError,2));
-//					v->setError(error*100);
-//					previousCoeff*= 1.-pdfIntensity;
-//					previousCoeffError = error;
-//				}
-//			} else {
-//				// for last pdf in the list
-//				v->setVal(previousCoeff*100);
-//			}
-//			intensities->add(*v);
-//		}
-//	}
-//
-//	// Add source contribution
-//	if (sourcePdf && intSourcePdf->getVal() != 0) {
-//		const char* name = "intensitySource";
-//		const char* title = Form("%s intensity", sourcePdf->GetTitle());
-//		RootHelper::deleteObject(name);
-//		RooRealVar* v = new RooRealVar(name, title, intSourcePdf->getValV(), "%");
-//		v->setError(intSourcePdf->getError());
-//		intensities->add(*v);
-//	}
+	// Add material pdfs intensities (for recursive sum)
+	Double_t previousCoeff = 1;   // previouscoefficient
+	Double_t previousCoeffError = 0;  // previous coefficient error
+	for (unsigned i=0; i < pdfsInMaterial->getSize(); i++){
+		if (RooAbsPdf* pdf = dynamic_cast<RooAbsPdf*>(pdfsInMaterial->at(i))){
+			const char* name = Form("intensity%d", i);
+			const char* title = Form("%s intensity", pdf->GetTitle());
+			RootHelper::deleteObject(name);
+			RooRealVar* v = new RooRealVar(name, title, 0, "%");
+			if (i!=pdfsInMaterial->getSize()-1){
+				// for all pdfs but not last
+				if (RooRealVar* coeff = dynamic_cast<RooRealVar*>(coeffsInMaterial->at(i))){
+					Double_t pdfIntensity = coeff->getValV();
+					Double_t pdfIntensityError = coeff->getError();
+					v->setVal(previousCoeff*pdfIntensity*100);
+					Double_t error = sqrt(pow(pdfIntensity*previousCoeffError,2) + pow(previousCoeff*pdfIntensityError,2));
+					v->setError(error*100);
+					previousCoeff*= 1.-pdfIntensity;
+					previousCoeffError = error;
+				}
+			} else {
+				// for last pdf in the list
+				v->setVal(previousCoeff*100);
+			}
+			intensities->add(*v);
+		}
+	}
+
+	// Add source contribution
+	if (sourcePdf && intSourcePdf->getVal() != 0) {
+		const char* name = "intensitySource";
+		const char* title = Form("%s intensity", sourcePdf->GetTitle());
+		RootHelper::deleteObject(name);
+		RooRealVar* v = new RooRealVar(name, title, intSourcePdf->getValV(), "%");
+		v->setError(intSourcePdf->getError());
+		intensities->add(*v);
+	}
 
 	Debug("CompositeModelProvider::getIntensities", "list of intensities:");
 	#ifdef USEDEBUG
