@@ -51,12 +51,12 @@ void SWCalculatorView::initUI(){
     tabsWidget = new TGTab(this, Constants::leftPanelWidth);
 
     // Import spectrum tab
-    TGCompositeFrame *tabImport = tabsWidget->AddTab("Material Spectrum");
+    TGCompositeFrame *tabImport = tabsWidget->AddTab("Experimental Spectrum");
     tabImport->SetLayoutManager(new TGVerticalLayout(tabImport));
     tabImport->AddFrame(new ImportSpectrumView(tabImport), new TGLayoutHints(kLHintsExpandX | kLHintsExpandY, dx, dx, dy*2, dy*2));
 
     // Import Kapton spectrum tab
-    TGCompositeFrame *tabImportKapton = tabsWidget->AddTab("Kapton Spectrum");
+    TGCompositeFrame *tabImportKapton = tabsWidget->AddTab("Source Spectrum");
     tabImportKapton->SetLayoutManager(new TGVerticalLayout(tabImportKapton));
     tabImportKapton->AddFrame(new ImportSourceSpectrumView(tabImportKapton), new TGLayoutHints(kLHintsExpandX | kLHintsExpandY, dx, dx, dy*2, dy*2));
 
@@ -172,21 +172,21 @@ void SWCalculatorView::initUI(){
     numGauss = new TGNumberEntry(modelParamsFrame, 3, 1, -1, TGNumberFormat::kNESInteger,
             TGNumberFormat::kNEANonNegative,
             TGNumberFormat::kNELLimitMinMax,
-            0, 5);
+            0, 4);
     modelParamsFrame->AddFrame(numGauss, new TGLayoutHints(kLHintsNormal, 0, dx, 2*dy/5, 0));
     modelParamsFrame->AddFrame(new TGLabel(modelParamsFrame, "Gauss"), new TGLayoutHints(kLHintsNormal, 0, 3*dx, dy, 0));
 
     numExponent = new TGNumberEntry(modelParamsFrame, 0, 1, -1, TGNumberFormat::kNESInteger,
             TGNumberFormat::kNEANonNegative,
             TGNumberFormat::kNELLimitMinMax,
-            0, 55);
+            0, 4);
     modelParamsFrame->AddFrame(numExponent, new TGLayoutHints(kLHintsNormal, 0, dx, 2*dy/5, 0));
     modelParamsFrame->AddFrame(new TGLabel(modelParamsFrame, "Exp"), new TGLayoutHints(kLHintsNormal, 0, 3*dx, dy, 0));
 
     numDampExponent = new TGNumberEntry(modelParamsFrame, 0, 1, -1, TGNumberFormat::kNESInteger,
             TGNumberFormat::kNEANonNegative,
             TGNumberFormat::kNELLimitMinMax,
-            0, 5);
+            0, 4);
     modelParamsFrame->AddFrame(numDampExponent, new TGLayoutHints(kLHintsNormal, 0, dx, 2*dy/5, 0));
     modelParamsFrame->AddFrame(new TGLabel(modelParamsFrame, "Damping Exp"), new TGLayoutHints(kLHintsNormal, 0, 3*dx, dy, 0));
 
@@ -513,8 +513,8 @@ void SWCalculatorView::displayIndirectParameters(RooArgList* parameters) {
 	while(TObject* temp = it->Next()){
 		if(RooRealVar* v = dynamic_cast<RooRealVar*>(temp)){
 	        TString str = (v->getError() == 0) ?
-	            Form("%*s    %1.4e %s", 22, v->getTitle(), v->getVal(), v->getUnit()) :
-	            Form("%*s    %1.4e (%1.2e) %s", 22, v->getTitle(), v->getVal(), v->getError(), v->getUnit());
+	            Form("%*s    %1.4e %s", 22, v->GetTitle(), v->getVal(), v->getUnit()) :
+	            Form("%*s    %1.4e (%1.2e) %s", 22, v->GetTitle(), v->getVal(), v->getError(), v->getUnit());
 	        txtFitResult->AddLineFast(str);
 		}
 	}
@@ -525,7 +525,9 @@ void SWCalculatorView::displayIntensities(RooArgList* intensities) {
 	TIterator* it = intensities->createIterator();
 	while(TObject* temp = it->Next()){
 		if(RooRealVar* intensity = dynamic_cast<RooRealVar*>(temp)){
-			TString str = Form("%*s    %f %c", 22, intensity->GetTitle(), intensity->getVal()*100, '%');
+	        TString str = (intensity->getError() == 0) ?
+	            Form("%*s    %1.4e %s", 22, intensity->GetTitle(), intensity->getVal(), intensity->getUnit()) :
+	            Form("%*s    %1.4e (%1.2e) %s", 22, intensity->GetTitle(), intensity->getVal(), intensity->getError(), intensity->getUnit());
 			txtFitResult->AddLineFast(str);
 		}
 	}

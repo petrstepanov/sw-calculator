@@ -72,9 +72,11 @@ RooArgList* GaussianPdf::getParameters(Bool_t isTwoDetector) {
 		de = isTwoDetector ? 2 * 3 * Ry * a_B * a_B / a / a / a * da : 3 / 2 * Ry * a_B * a_B / a / a / a * da;
 	}
 	// Build list and return vars
-	TString str = TString::Format("Binding E %s", this->GetName());
-	RooRealVar* v1 = new RooRealVar(e, de, str.Data(), "eV");
+	const char* name = Form("bindE%s", this->GetName());
+	const char* title = Form("Binding E %s", this->GetTitle());
+	RooRealVar* v = new RooRealVar(name, title, e, "eV");
+	v->setError(de);
 	RooArgList* list = new RooArgList();
-	list->add(*v1);
+	list->add(*v);
 	return list;
 }

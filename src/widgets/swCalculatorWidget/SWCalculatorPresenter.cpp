@@ -22,6 +22,7 @@
 #include "../../util/GraphicsHelper.h"
 #include "../../util/StringUtils.h"
 #include "../../util/UiHelper.h"
+#include "../../util/Debug.h"
 #include "../../roofit/CompositeModelProvider.h"
 #include "../../model/Constants.h"
 #include <RooFit.h>
@@ -128,9 +129,7 @@ void SWCalculatorPresenter::onFitSpectrumClicked(){
     RooRealVar* e0;
     {
         Double_t e0Val = fitHist->GetBinCenter(fitHist->GetMaximumBin());
-        Double_t e0Min = e0Val-2;
-        Double_t e0Max = e0Val+2;
-        e0 = new RooRealVar("e0", "Peak Center", e0Val, e0Min, e0Max, "keV");
+        e0 = new RooRealVar("e0", "Spectrum Mean", e0Val, e0Val-1, e0Val+1, "keV");
     }
 
     // Convert Histogram to RooDataHist for Fitting
@@ -144,18 +143,19 @@ void SWCalculatorPresenter::onFitSpectrumClicked(){
         Int_t numExp = view->getNumExp();
         Int_t numDampExp = view->getNumDampExp();
         Double_t fwhm = view->getResolutionFWHM();
-    	RootHelper::deleteObject("resFunctFWHM");
-        RooRealVar* fwhmRealVar = new RooRealVar("resFunctFWHM", "Resolution function FWHM", fwhm, fwhm / 4, fwhm * 4, "keV");
-        fwhmRealVar->setConstant(view->isResolutionFixed());
-        if (view->getConvolutionType() == 0) fwhmRealVar = NULL;
+        RooRealVar* fwhmRealVar = nullptr;
+        if (view->getConvolutionType() != 0) {
+        	RootHelper::deleteObject("resFunctFWHM");
+        	fwhmRealVar = new RooRealVar("resFunctFWHM", "Resolution function FWHM", fwhm, fwhm / 4, fwhm * 4, "keV");
+            fwhmRealVar->setConstant(view->isResolutionFixed());
+        }
 
         modelProvider = new CompositeModelProvider(e, e0);
                 
         TH1F* kaptonHist = model->getSourceHist();
         if (kaptonHist){
             RooRealVar* sourceContribution = model->getSourceContribution();
-            RooFormulaVar* sourceContributionNorm = new RooFormulaVar("sourceContributionNorm", "sCN", "@0/100", RooArgList(*sourceContribution));
-            modelProvider->initSourcePdf(kaptonHist, sourceContributionNorm);
+            modelProvider->initSourcePdf(kaptonHist, sourceContribution);
         }
         
         if (model->isTwoDetector()){
@@ -171,7 +171,8 @@ void SWCalculatorPresenter::onFitSpectrumClicked(){
     RooAbsPdf* fittingConvolutedModel = modelProvider->getConvolutedModel();
     RooAbsPdf* fittingModel = (fittingConvolutedModel) ? fittingConvolutedModel : fittingNonConvolutedModel;
     
-    std::cout << "Fitting model: " << fittingModel->GetTitle() << std::endl;
+    Debug("SWCalculatorPresenter::onFitSpectrumClicked", "Fitting model: " << fittingModel->GetTitle());
+
     // Testing purposes - let model generate data
     // data = static_cast<RooAddPdf*>(model)->generateBinned(*x,1000000) ;
 
@@ -269,16 +270,14 @@ void SWCalculatorPresenter::onFitSpectrumClicked(){
       
     // Plot Unconvoluted model components
     {
-        RooArgSet* components = modelProvider->getComponents();
+        RooArgList* components = modelProvider->getComponents();
         TIterator* it = components->createIterator();
-        TObject* tempObject = 0;
         Int_t i = 0;
-        while ((tempObject = it->Next())){
+        while (TObject* tempObject = it->Next()){
             RooAbsPdf* pdf = dynamic_cast<RooAbsPdf*>(tempObject);
             if (pdf){
                 RooArgSet* argSet = new RooArgSet();
                 argSet->add(*pdf);
-//                const char* componentName = TString::Format("%s", pdf->GetName());                
                 fittingNonConvolutedModel->plotOn(fitFrame, RooFit::Components(*argSet), RooFit::LineStyle(kDashed), 
                     RooFit::LineColor(Constants::colorSet[i++]), RooFit::LineWidth(1), RooFit::Name(pdf->GetName()));
                 legend->AddEntry(fitFrame->findObject(pdf->GetName()), pdf->GetTitle(), "l");

@@ -78,7 +78,8 @@ RooArgList* ParabolaPdf::getParameters(Bool_t isTwoDetector) {
 		de = isTwoDetector ? _r / (mc2) * dr : 4 * _r / mc2 * dr;
 	}
 	// Build list and return vars
-	RooRealVar* v1 = new RooRealVar(e, de, "Fermi energy", "eV");
+	RooRealVar* v1 = new RooRealVar("fermiEnergy", "Fermi Energy", e, "eV");
+	v1->setError(de);
 	RooArgList* list = new RooArgList();
 	list->add(*v1);
 	return list;

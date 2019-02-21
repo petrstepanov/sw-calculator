@@ -34,14 +34,15 @@ public:
     void initTwoDetector(Bool_t hasParabola = kTRUE, const Int_t numGauss = 1, const Int_t numLorentz = 1, const Int_t numLorentzSum = 1, /*Bool_t hasOrthogonal = kFALSE,*/ RooRealVar* fwhm = nullptr);
     void initSingleDetector(Bool_t hasParabola = kTRUE, const Int_t numGauss = 1, const Int_t numLorentz = 1, const Int_t numLorentzSum = 1, /*Bool_t hasOrthogonal = kFALSE,*/ RooRealVar* fwhm = nullptr, Double_t bgFraction = 0.1);
     
-    void initSourcePdf(TH1F* sourceHist, RooAbsReal* sourceContrib);
+    void initSourcePdf(TH1F* sourceHist, RooRealVar* sourceContrib);
     
 private:
     RooArgList* pdfsInMaterial;            // list of pdfs to be convoluted
     RooArgList* coeffsInMaterial;          // list of coefficients of pdfs in material
     RooRealVar* observable;
     RooHistPdf* sourcePdf = nullptr;
-    RooAbsReal* Int_sourcePdf = nullptr;
+    RooRealVar* intSourcePdf = nullptr;
+    RooFormulaVar* intSourcePdfNorm = nullptr;
     Bool_t isTwoDetector;
     
     static std::map<Int_t, TString> createConvolutionType(){

@@ -72,8 +72,8 @@ RooArgList* OrthogonalPdf::getParameters(Bool_t isTwoDetector) {
 	Double_t a_B = Constants::a_B; // A
 	Double_t e1 = isTwoDetector ? Ry * pow(a_B / a1, 2) : Ry * pow(a_B / a1, 2);
 	Double_t de1 = isTwoDetector ? 0 : 0;
-	RooRealVar()
-	RooRealVar* v1 = new RooRealVar("bindEnergyOrth", "Binding E (ort wf)", e1, de1, "Binding E (ort wf)", "eV");
+	RooRealVar* v1 = new RooRealVar("bindEnergyOrth", "Binding E (ortogonal w.f.)", e1, "eV");
+	v1->setError(de1);
 	RooArgList* list = new RooArgList();
 	list->add(*v1);
 	return list;

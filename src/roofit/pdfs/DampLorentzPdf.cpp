@@ -76,9 +76,11 @@ RooArgList* DampLorentzPdf::getParameters(Bool_t isTwoDetector) {
 		de = isTwoDetector ? Ry * pow(a_B / dA, 2) / 3 : Ry * pow(a_B / dA, 2) / 3;
 	}
 	// Build list and return vars
-	TString str = TString::Format("Binding E %s", this->GetName());
-	RooRealVar* v1 = new RooRealVar(e, de, str.Data(), "eV");
+	const char* name = Form("bindE%s", this->GetName());
+	const char* title = Form("Binding E %s", this->GetTitle());
+	RooRealVar* v = new RooRealVar(name, title, e, "eV");
+	v->setError(de);
 	RooArgList* list = new RooArgList();
-	list->add(*v1);
+	list->add(*v);
 	return list;
 }
