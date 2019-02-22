@@ -143,6 +143,9 @@ void SWCalculatorPresenter::onFitSpectrumClicked(){
         Int_t numExp = view->getNumExp();
         Int_t numDampExp = view->getNumDampExp();
         Double_t fwhm = view->getResolutionFWHM();
+
+        if (hasParabola+numGauss+numExp+numDampExp == 0) return;
+
         RooRealVar* fwhmRealVar = nullptr;
         if (view->getConvolutionType() != 0) {
         	RootHelper::deleteObject("resFunctFWHM");
@@ -184,19 +187,15 @@ void SWCalculatorPresenter::onFitSpectrumClicked(){
 
     // Chi2 fit
     // https://root.cern.ch/doc/master/RooChi2Var_8cxx_source.html
-    RooChi2Var* chi2 = new RooChi2Var("chi2", "chi2", *fittingModel, *data, kFALSE, 0, 0, RootHelper::getNumCpu(), RooFit::BulkPartition, kTRUE, kTRUE, RooDataHist::Expected);
-
+    Int_t numCpu = RootHelper::getNumCpu();
+    RooChi2Var* chi2 = new RooChi2Var("chi2", "chi2", *fittingModel, *data, RooFit::NumCPU(numCpu));
     RooMinimizer* m = new RooMinimizer(*chi2);
-    // m->setStrategy(RooMinimizer::Speed);
     m->setMinimizerType("Minuit");
     Int_t resultMigrad = m->migrad();
     Int_t resultHesse = m->hesse();
-    std::cout << "RooMinimizer: migrad=" << resultMigrad << ", hesse=" << resultHesse << std::endl;
+    Debug("SWCalculatorPresenter::onFitSpectrumClicked", "RooMinimizer: migrad=" << resultMigrad << ", hesse=" << resultHesse);
 
     RooFitResult* fitResult = m->save();
-
-    // Simple Fit
-    // RooFitResult* fitResult = convolutedModel->fitTo(*data, Save(kTRUE), Range("fitRange"), NumCPU(RootHelper::getNumCpu()));
 
     // Create RooPlot from energy axis frame
     RooPlot* fitFrame = e->frame();
@@ -343,6 +342,7 @@ void SWCalculatorPresenter::onFitSpectrumClicked(){
     padData->cd();
     fitFrame->Draw();
     legend->SetY1(legend->GetY2() - legend->GetNRows()*0.04);
+    legend->SetX2(0.94);
     legend->Draw();
     padData->SetLogy();    
     padData->Update();
@@ -365,10 +365,10 @@ void SWCalculatorPresenter::onFitSpectrumClicked(){
         // Output model parameters (RooRealVars')
         view->displayFitParameters(fitResult);
         // Output indirect model parameters
-        view->displayIndirectParameters(modelProvider->getIndirectParameters());
+        view->displayVariables(modelProvider->getIndirectParameters());
         // Output components intensities
-        view->displayIntensities(modelProvider->getIntensities());
-
+        view->displayVariables(modelProvider->getIntensities());
+        view->displayVariable(modelProvider->getSourceContribution());
         // Output Integral Chi^2
         std::pair<Double_t, Int_t> sumChi2AndDegreesFreedom = histProcessor->getChi2(fitHist, curveFit, fittingNonConvolutedModel);
         view->displayChi2(sumChi2AndDegreesFreedom.first, fittingNonConvolutedModel->getVariables()->getSize(), sumChi2AndDegreesFreedom.second);

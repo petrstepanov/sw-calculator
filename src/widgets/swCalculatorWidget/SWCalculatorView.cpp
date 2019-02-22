@@ -507,28 +507,19 @@ void SWCalculatorView::displayFitParameters(RooFitResult* fitResult) {
     }
 }
 
-void SWCalculatorView::displayIndirectParameters(RooArgList* parameters) {
-	txtFitResult->AddLineFast("  ------------------------------------------------");
-	TIterator* it = parameters->createIterator();
-	while(TObject* temp = it->Next()){
-		if(RooRealVar* v = dynamic_cast<RooRealVar*>(temp)){
-	        TString str = (v->getError() == 0) ?
-	            Form("%*s    %1.4e %s", 22, v->GetTitle(), v->getVal(), v->getUnit()) :
-	            Form("%*s    %1.4e (%1.2e) %s", 22, v->GetTitle(), v->getVal(), v->getError(), v->getUnit());
-	        txtFitResult->AddLineFast(str);
-		}
-	}
+void SWCalculatorView::displayVariable(RooRealVar* variable) {
+	displayVariables(new RooArgList(*variable));
 }
 
-void SWCalculatorView::displayIntensities(RooArgList* intensities) {
+void SWCalculatorView::displayVariables(RooArgList* variables) {
 	txtFitResult->AddLineFast("  ------------------------------------------------");
-	TIterator* it = intensities->createIterator();
+	TIterator* it = variables->createIterator();
 	while(TObject* temp = it->Next()){
-		if(RooRealVar* intensity = dynamic_cast<RooRealVar*>(temp)){
-	        TString str = (intensity->getError() == 0) ?
-	            Form("%*s    %1.4e %s", 22, intensity->GetTitle(), intensity->getVal(), intensity->getUnit()) :
-	            Form("%*s    %1.4e (%1.2e) %s", 22, intensity->GetTitle(), intensity->getVal(), intensity->getError(), intensity->getUnit());
-			txtFitResult->AddLineFast(str);
+		if(RooRealVar* var = dynamic_cast<RooRealVar*>(temp)){
+	        const char* s = var->getError() == 0 ?
+	            Form("%*s    %1.4e %s", 22, var->GetTitle(), var->getVal(), var->getUnit()) :
+	            Form("%*s    %1.4e (%1.2e) %s", 22, var->GetTitle(), var->getVal(), var->getError(), var->getUnit());
+			txtFitResult->AddLineFast(s);
 		}
 	}
 }
@@ -537,20 +528,19 @@ void SWCalculatorView::displayChi2(Double_t sumChi2, Int_t freeParameters, Int_t
     txtFitResult->AddLineFast("  ------------------------------------------------");
     Double_t chi2ByFreePars = sumChi2 / (Double_t)(degreesFreedom);
     Double_t chi2Err = sqrt((double)2 * freeParameters) / degreesFreedom;
-    TString strChiInt = Form("%*s   %2.1f/%d = %1.2f +/- %1.2f", 22, "chi^2/N", sumChi2, degreesFreedom, chi2ByFreePars, chi2Err);
-    txtFitResult->AddLineFast(strChiInt);
+    const char* s = Form("%*s    %2.1f/%d = %1.2f +/- %1.2f", 22, "chi^2/N", sumChi2, degreesFreedom, chi2ByFreePars, chi2Err);
+    txtFitResult->AddLineFast(s);
 }
 
 void SWCalculatorView::displaySW(std::pair<Double_t, Double_t> sValueError, std::pair<Double_t, Double_t> wValueError) {
     txtFitResult->AddLineFast("  ------------------------------------------------");
-    TString strS = Form("%*s    %1.4e +/-  %1.2e", 22, "S Parameter", sValueError.first, sValueError.second);
-    txtFitResult->AddLineFast(strS);
-    TString strW = Form("%*s    %1.4e +/-  %1.2e", 22, "W Parameter", wValueError.first, wValueError.second);
-    txtFitResult->AddLineFast(strW);
+    txtFitResult->AddLineFast(Form("%*s    %1.4e +/-  %1.2e", 22, "S Parameter", sValueError.first, sValueError.second));
+    txtFitResult->AddLineFast(Form("%*s    %1.4e +/-  %1.2e", 22, "W Parameter", wValueError.first, wValueError.second));
     txtFitResult->AddLineFast("  ------------------------------------------------");
+
     // Update output
-    txtFitResult->Update();
-    txtFitResult->ScrollUp(1000);
+//    txtFitResult->Update();
+//    txtFitResult->ScrollUp(1000);
 }
 
 void SWCalculatorView::updateCanvas() {

@@ -18,13 +18,13 @@
 #include <iostream>
 
 MyMainFrame::MyMainFrame(const TGWindow* w) : TGMainFrame(w, Constants::windowWidth, Constants::windowHeight) {
-    SetCleanup(kDeepCleanup);
-    SetWindowName(Constants::applicationName);
+	SetCleanup(kDeepCleanup);
 
-    Connect("CloseWindow()", "TApplication", gApplication, "Terminate()");
+	// Exit this application via the Exit button or Window Manager.
+	Connect("CloseWindow()", "MyMainFrame", this, "doExit()");
     DontCallClose();
 
-    // Pass TGMyMainFrame to UiHelper for centering the dialogs
+    // Save reverence to MyMainFrame in UiHelper (for centering of modal dialogs)
     UiHelper* uiHelper = UiHelper::getInstance();
     uiHelper->setMainFrame(this);
 }
@@ -34,13 +34,15 @@ MyMainFrame::~MyMainFrame(){
 }
 
 void MyMainFrame::mapAndResize(){
+    SetWindowName(Constants::applicationName);
     MapSubwindows();
+    Layout();
     Resize(GetDefaultSize());
-    Resize(Constants::windowWidth, Constants::windowHeight);
+//    Resize(Constants::windowWidth, Constants::windowHeight);
     MapWindow();
 }
 
-//void MyMainFrame::CloseWindow(){
-//    delete this;
-//    gApplication->Terminate(0);
-//}
+void MyMainFrame::doExit(){
+//	DeleteWindow();              // to stay in the ROOT session
+	gApplication->Terminate();   // to exit and close the ROOT session
+}

@@ -81,7 +81,7 @@ void CompositeModelProvider::initModel(Bool_t hasParabola, const Int_t numGauss,
 		ParabolaPdf* parabola = new ParabolaPdf("parabola", "Fermi gas", *observable, *mean, *parabolaRoot);
 		components->add(*parabola);
 		pdfsInMaterial->add(*parabola);
-		RooRealVar* Int_parabola = new RooRealVar("Int_parabola", "Parabola intensity", 0.7, 0.0, 1.0);
+		RooRealVar* Int_parabola = new RooRealVar("Int_parabola", "Parabola intensity", 0.9, 0.0, 1.0);
 		coeffsInMaterial->add(*Int_parabola);
 	}
 
@@ -103,7 +103,7 @@ void CompositeModelProvider::initModel(Bool_t hasParabola, const Int_t numGauss,
 
 		const char* coeffName = StringUtils::suffix("Int_gauss", i + 1)->Data();
 		RootHelper::deleteObject(coeffName);
-		Int_gauss[i] = new RooRealVar(coeffName, StringUtils::ordinal("gauss intensity", i + 1)->Data(), 0.7, 0.0, 1.0);
+		Int_gauss[i] = new RooRealVar(coeffName, StringUtils::ordinal("gauss intensity", i + 1)->Data(), 0.5, 0.0, 1.0);
 		coeffsInMaterial->add(*Int_gauss[i]);
 	}
 
@@ -123,7 +123,7 @@ void CompositeModelProvider::initModel(Bool_t hasParabola, const Int_t numGauss,
 
 		const char* coeffName = StringUtils::suffix("Int_lorentz", i + 1)->Data();
 		RootHelper::deleteObject(coeffName);
-		Int_lorentz[i] = new RooRealVar(coeffName, StringUtils::ordinal("lorentzian intensity", i + 1)->Data(), 0.7, 0.0, 1.0);
+		Int_lorentz[i] = new RooRealVar(coeffName, StringUtils::ordinal("lorentzian intensity", i + 1)->Data(), 0.75, 0.0, 1.0);
 		coeffsInMaterial->add(*Int_lorentz[i]);
 	}
 
@@ -143,7 +143,7 @@ void CompositeModelProvider::initModel(Bool_t hasParabola, const Int_t numGauss,
 
 		const char* coeffName = StringUtils::suffix("Int_dampLorentz", i + 1)->Data();
 		RootHelper::deleteObject(coeffName);
-		Int_lorentz2[i] = new RooRealVar(coeffName, StringUtils::ordinal("damping lorentzian intensity", i + 1)->Data(), 0.7, 0.0, 1.0);
+		Int_lorentz2[i] = new RooRealVar(coeffName, StringUtils::ordinal("damping lorentzian intensity", i + 1)->Data(), 0.75, 0.0, 1.0);
 		coeffsInMaterial->add(*Int_lorentz2[i]);
 	}
 
@@ -337,21 +337,21 @@ RooArgList* CompositeModelProvider::getIntensities() {
 		}
 	}
 
-	// Add source contribution
-	if (sourcePdf && intSourcePdf->getVal() != 0) {
-		const char* name = "intensitySource";
-		const char* title = Form("%s intensity", sourcePdf->GetTitle());
-		RootHelper::deleteObject(name);
-		RooRealVar* v = new RooRealVar(name, title, intSourcePdf->getValV(), "%");
-		v->setError(intSourcePdf->getError());
-		intensities->add(*v);
-	}
-
 	Debug("CompositeModelProvider::getIntensities", "list of intensities:");
 	#ifdef USEDEBUG
 		intensities->Print("V");
 	#endif
 	return intensities;
+}
+
+RooRealVar* CompositeModelProvider::getSourceContribution() {
+	if (sourcePdf==nullptr || intSourcePdf->getVal() == 0) return nullptr;
+	const char* name = "intensitySource";
+	const char* title = Form("%s intensity", sourcePdf->GetTitle());
+	RootHelper::deleteObject(name);
+	RooRealVar* v = new RooRealVar(name, title, intSourcePdf->getValV(), "%");
+	v->setError(intSourcePdf->getError());
+	return v;
 }
 
 std::map<Int_t, TString> CompositeModelProvider::convolutionType = CompositeModelProvider::createConvolutionType();

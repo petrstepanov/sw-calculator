@@ -28,6 +28,7 @@ public:
 
     RooArgList* getIndirectParameters();
     RooArgList* getIntensities();
+    RooRealVar* getSourceContribution();
     
     static std::map<Int_t, TString> getConvolutionTypes(void);
     
