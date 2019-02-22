@@ -143,7 +143,7 @@ void CompositeModelProvider::initModel(Bool_t hasParabola, const Int_t numGauss,
 		const char* coeffName = StringUtils::suffix("Int_dampLorentz", i + 1)->Data();
 		RootHelper::deleteObject(coeffName);
 		Int_lorentz2[i] = new RooRealVar(coeffName, StringUtils::ordinal("damping lorentzian intensity", i + 1)->Data(), 0.7, 0.0, 1.0);
-		coeffsInMaterial->add(*Int_lorentz[i]);
+		coeffsInMaterial->add(*Int_lorentz2[i]);
 	}
 
 	// Orthogonal PDF
