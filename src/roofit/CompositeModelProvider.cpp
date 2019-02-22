@@ -71,6 +71,7 @@ void CompositeModelProvider::initSourcePdf(TH1F* sourceHist, RooRealVar* sourceC
 void CompositeModelProvider::initModel(Bool_t hasParabola, const Int_t numGauss, const Int_t numLorentz, const Int_t numLorentzSum) {
 	pdfsInMaterial = new RooArgList();
 	coeffsInMaterial = new RooArgList();
+	model = nullptr;
 
 	// Parabola PDF
 	if (hasParabola) {

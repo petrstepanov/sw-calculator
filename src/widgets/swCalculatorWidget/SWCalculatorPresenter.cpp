@@ -168,11 +168,10 @@ void SWCalculatorPresenter::onFitSpectrumClicked(){
     
     // Obtain fitting model and convoluted model
     RooAbsPdf* fittingNonConvolutedModel = modelProvider->getModel();
+    if (fittingNonConvolutedModel == nullptr) return;
     RooAbsPdf* fittingConvolutedModel = modelProvider->getConvolutedModel();
     RooAbsPdf* fittingModel = (fittingConvolutedModel) ? fittingConvolutedModel : fittingNonConvolutedModel;
     
-    Debug("SWCalculatorPresenter::onFitSpectrumClicked", "Fitting model: " << fittingModel->GetTitle());
-
     // Testing purposes - let model generate data
     // data = static_cast<RooAddPdf*>(model)->generateBinned(*x,1000000) ;
 

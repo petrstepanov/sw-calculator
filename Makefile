@@ -50,7 +50,7 @@ release: CXXFLAGS+=-O3
 release: executable
 
 # Also might add flags for debug optimizations: -Og -ggdb -DDEBUG
-debug: CXXFLAGS+=-g
+debug: CXXFLAGS+=-g -Og
 debug: executable
 
 executable: directories $(DICT_FILENAME) $(SHARED_LIBRARY) $(OBJECTS) $(EXECUTABLE)
