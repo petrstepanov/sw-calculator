@@ -34,11 +34,11 @@ MyMainFrame::~MyMainFrame(){
 }
 
 void MyMainFrame::mapAndResize(){
-    SetWindowName(Constants::applicationName);
+	SetIconPixmap(Constants::applicationIcon);
+	SetWindowName(Constants::applicationName);
     MapSubwindows();
     Layout();
     Resize(GetDefaultSize());
-//    Resize(Constants::windowWidth, Constants::windowHeight);
     MapWindow();
 }
 
