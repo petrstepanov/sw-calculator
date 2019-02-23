@@ -25,3 +25,26 @@ TString* StringUtils::stripFileExtension(TString* path){
 	return new TString(p.substr(0, found).c_str());
 }
 
+TString* StringUtils::suffix(const char* name, int index, const char* nameSuffix) {
+    TString* s = new TString(name);
+    *s += nameSuffix;
+    if (index > 1) *s += index;
+    return s;
+}
+
+TString* StringUtils::ordinal(const char* name, int index) {
+	if (index == 1){
+		TString* s = new TString(name);
+		return s;
+    }
+    if (index == 2){
+    	TString* s = new TString(Form("2nd %s", name));
+    	return s;
+    }
+    if (index == 3){
+    	TString* s = new TString(Form("3rd %s", name));
+    	return s;
+    }
+    TString* s = new TString(Form("%dth %s", index, name));
+	return s;
+}

@@ -51,12 +51,12 @@ void SWCalculatorView::initUI(){
     tabsWidget = new TGTab(this, Constants::leftPanelWidth);
 
     // Import spectrum tab
-    TGCompositeFrame *tabImport = tabsWidget->AddTab("Material Spectrum");
+    TGCompositeFrame *tabImport = tabsWidget->AddTab("Experimental Spectrum");
     tabImport->SetLayoutManager(new TGVerticalLayout(tabImport));
     tabImport->AddFrame(new ImportSpectrumView(tabImport), new TGLayoutHints(kLHintsExpandX | kLHintsExpandY, dx, dx, dy*2, dy*2));
 
     // Import Kapton spectrum tab
-    TGCompositeFrame *tabImportKapton = tabsWidget->AddTab("Kapton Spectrum");
+    TGCompositeFrame *tabImportKapton = tabsWidget->AddTab("Source Spectrum");
     tabImportKapton->SetLayoutManager(new TGVerticalLayout(tabImportKapton));
     tabImportKapton->AddFrame(new ImportSourceSpectrumView(tabImportKapton), new TGLayoutHints(kLHintsExpandX | kLHintsExpandY, dx, dx, dy*2, dy*2));
 
@@ -153,7 +153,8 @@ void SWCalculatorView::initUI(){
     tabFit->AddFrame(convolutionParamsFrame, new TGLayoutHints(kLHintsExpandX, dx, dx, dy, dy));
 
     // Separator
-    tabFit->AddFrame(new TGHorizontal3DLine(tabFit), new TGLayoutHints(kLHintsExpandX, dx, dx, dy, dy));
+//    tabFit->AddFrame(new TGHorizontal3DLine(tabFit), new TGLayoutHints(kLHintsExpandX, dx, dx, dy, dy));
+
 
     // Add source contribution frame
     sourceContributionFrame = new TGVerticalFrame(tabFit);
@@ -171,21 +172,21 @@ void SWCalculatorView::initUI(){
     numGauss = new TGNumberEntry(modelParamsFrame, 3, 1, -1, TGNumberFormat::kNESInteger,
             TGNumberFormat::kNEANonNegative,
             TGNumberFormat::kNELLimitMinMax,
-            0, 5);
+            0, 4);
     modelParamsFrame->AddFrame(numGauss, new TGLayoutHints(kLHintsNormal, 0, dx, 2*dy/5, 0));
     modelParamsFrame->AddFrame(new TGLabel(modelParamsFrame, "Gauss"), new TGLayoutHints(kLHintsNormal, 0, 3*dx, dy, 0));
 
     numExponent = new TGNumberEntry(modelParamsFrame, 0, 1, -1, TGNumberFormat::kNESInteger,
             TGNumberFormat::kNEANonNegative,
             TGNumberFormat::kNELLimitMinMax,
-            0, 55);
+            0, 4);
     modelParamsFrame->AddFrame(numExponent, new TGLayoutHints(kLHintsNormal, 0, dx, 2*dy/5, 0));
     modelParamsFrame->AddFrame(new TGLabel(modelParamsFrame, "Exp"), new TGLayoutHints(kLHintsNormal, 0, 3*dx, dy, 0));
 
     numDampExponent = new TGNumberEntry(modelParamsFrame, 0, 1, -1, TGNumberFormat::kNESInteger,
             TGNumberFormat::kNEANonNegative,
             TGNumberFormat::kNELLimitMinMax,
-            0, 5);
+            0, 4);
     modelParamsFrame->AddFrame(numDampExponent, new TGLayoutHints(kLHintsNormal, 0, dx, 2*dy/5, 0));
     modelParamsFrame->AddFrame(new TGLabel(modelParamsFrame, "Damping Exp"), new TGLayoutHints(kLHintsNormal, 0, 3*dx, dy, 0));
 
@@ -506,46 +507,40 @@ void SWCalculatorView::displayFitParameters(RooFitResult* fitResult) {
     }
 }
 
-void SWCalculatorView::displayIndirectParameters(std::list<Variable*> parameters) {
-    std::list<Variable*>::iterator iter;
-    txtFitResult->AddLineFast("  ------------------------------------------------");
-    for (iter = parameters.begin(); iter != parameters.end(); ++iter) {
-        Variable* v = (*iter);
-        TString str = (v->getError() == 0) ?
-            Form("%*s    %1.4e %s", 22, v->getDescription(), v->getValue(), v->getUnit()) :
-            Form("%*s    %1.4e (%1.2e) %s", 22, v->getDescription(), v->getValue(), v->getError(), v->getUnit());
-        txtFitResult->AddLineFast(str);
-    }
+void SWCalculatorView::displayVariable(RooRealVar* variable) {
+	displayVariables(new RooArgList(*variable));
 }
 
-void SWCalculatorView::displayIntensities(std::list<std::pair<const char*, Double_t> > intensities) {
-    std::list<std::pair<const char*, Double_t>>::iterator iter;
-    txtFitResult->AddLineFast("  ------------------------------------------------");
-    for (iter = intensities.begin(); iter != intensities.end(); ++iter) {
-        std::pair<const char*, Double_t> p = (*iter);
-        TString str = Form("%*s    %f %c", 22, p.first, p.second*100, '%');
-        txtFitResult->AddLineFast(str);
-    }
+void SWCalculatorView::displayVariables(RooArgList* variables) {
+	txtFitResult->AddLineFast("  ------------------------------------------------");
+	TIterator* it = variables->createIterator();
+	while(TObject* temp = it->Next()){
+		if(RooRealVar* var = dynamic_cast<RooRealVar*>(temp)){
+	        const char* s = var->getError() == 0 ?
+	            Form("%*s    %1.4e %s", 22, var->GetTitle(), var->getVal(), var->getUnit()) :
+	            Form("%*s    %1.4e (%1.2e) %s", 22, var->GetTitle(), var->getVal(), var->getError(), var->getUnit());
+			txtFitResult->AddLineFast(s);
+		}
+	}
 }
 
 void SWCalculatorView::displayChi2(Double_t sumChi2, Int_t freeParameters, Int_t degreesFreedom) {
     txtFitResult->AddLineFast("  ------------------------------------------------");
     Double_t chi2ByFreePars = sumChi2 / (Double_t)(degreesFreedom);
     Double_t chi2Err = sqrt((double)2 * freeParameters) / degreesFreedom;
-    TString strChiInt = Form("%*s   %2.1f/%d = %1.2f +/- %1.2f", 22, "chi^2/N", sumChi2, degreesFreedom, chi2ByFreePars, chi2Err);
-    txtFitResult->AddLineFast(strChiInt);
+    const char* s = Form("%*s    %2.1f/%d = %1.2f +/- %1.2f", 22, "chi^2/N", sumChi2, degreesFreedom, chi2ByFreePars, chi2Err);
+    txtFitResult->AddLineFast(s);
 }
 
 void SWCalculatorView::displaySW(std::pair<Double_t, Double_t> sValueError, std::pair<Double_t, Double_t> wValueError) {
     txtFitResult->AddLineFast("  ------------------------------------------------");
-    TString strS = Form("%*s    %1.4e +/-  %1.2e", 22, "S Parameter", sValueError.first, sValueError.second);
-    txtFitResult->AddLineFast(strS);
-    TString strW = Form("%*s    %1.4e +/-  %1.2e", 22, "W Parameter", wValueError.first, wValueError.second);
-    txtFitResult->AddLineFast(strW);
+    txtFitResult->AddLineFast(Form("%*s    %1.4e +/-  %1.2e", 22, "S Parameter", sValueError.first, sValueError.second));
+    txtFitResult->AddLineFast(Form("%*s    %1.4e +/-  %1.2e", 22, "W Parameter", wValueError.first, wValueError.second));
     txtFitResult->AddLineFast("  ------------------------------------------------");
+
     // Update output
-    txtFitResult->Update();
-    txtFitResult->ScrollUp(1000);
+//    txtFitResult->Update();
+//    txtFitResult->ScrollUp(1000);
 }
 
 void SWCalculatorView::updateCanvas() {

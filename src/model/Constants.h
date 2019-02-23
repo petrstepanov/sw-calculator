@@ -16,6 +16,7 @@
 
 #include <TROOT.h>
 #include <TColor.h>
+#include <RooConstVar.h>
 
 class Constants {
   public:
@@ -24,14 +25,15 @@ class Constants {
     static constexpr Double_t Ry = 13.605; // Rydberg constant, eV
     static constexpr Double_t a_B = 0.529177; // Bohr radius, Å
     
-    static const Int_t windowWidth = 1200;
-    static const Int_t windowHeight = 600;
-    static const Int_t leftPanelWidth = 420;
+    static const UInt_t windowWidth = 1200;
+    static const UInt_t windowHeight = 600;
+    static const UInt_t leftPanelWidth = 420;
 //    static const Int_t btnOpenFileWidth = 220;
     
     static const Double_t padMargin[4]; // left, right, bottom, top
     
     static const char* applicationName;
+    static char* applicationIcon[];
     
     static TColor* colorPrimary;
     static TColor* colorWarning;
@@ -39,6 +41,9 @@ class Constants {
     static TColor* colorAppWindow;    
     
     static const Int_t colorSet[7];
+
+    static RooConstVar* fwhm2sigma;
+    static RooConstVar* pi;
 };
 
 #endif /* CONSTANTS_H */

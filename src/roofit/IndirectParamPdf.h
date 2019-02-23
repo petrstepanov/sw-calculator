@@ -4,7 +4,7 @@
  * and open the template in the editor.
  */
 
-/* 
+/*
  * File:   HasEnergyPdf.h
  * Author: petrstepanov
  *
@@ -17,23 +17,14 @@
 #include <TROOT.h>
 #include <RooRealVar.h>
 #include <utility>
-#include "../util/Variable.h"
 
 class IndirectParamPdf {
 public:
     IndirectParamPdf();
-//    IndirectParamPdf(RooRealVar* param);
-//    IndirectParamPdf(RooAbsReal& param);
     IndirectParamPdf(const IndirectParamPdf& orig);
     virtual ~IndirectParamPdf();
-    
-//    void setParameter(RooRealVar*);
-    virtual std::list<Variable*> getParameters(Bool_t isTwoDetector = kTRUE) = 0;
-//    RooAbsReal* getParameter();
-    
-//private:
-//    RooAbsReal* param;
+
+    virtual RooArgList* getParameters(Bool_t isTwoDetector = kTRUE) = 0;
 };
 
 #endif /* HASENERGYPDF_H */
-

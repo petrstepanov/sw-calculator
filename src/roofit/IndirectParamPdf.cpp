@@ -4,10 +4,10 @@
  * and open the template in the editor.
  */
 
-/* 
+/*
  * File:   HasEnergyPdf.cpp
  * Author: petrstepanov
- * 
+ *
  * Created on August 15, 2017, 10:03 PM
  */
 
@@ -17,17 +17,8 @@
 IndirectParamPdf::IndirectParamPdf() {
 }
 
-//IndirectParamPdf::IndirectParamPdf(RooRealVar* param) {
-//    this->param = param;
-//}
-//
-//IndirectParamPdf::IndirectParamPdf(RooAbsReal& param) {
-//    this->param = &param;  
-//}
-
 IndirectParamPdf::IndirectParamPdf(const IndirectParamPdf& orig) {
 }
 
 IndirectParamPdf::~IndirectParamPdf() {
 }
-

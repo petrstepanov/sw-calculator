@@ -22,7 +22,7 @@ public:
     virtual ~MyMainFrame();
 
     void mapAndResize();
-
+    void doExit();
     ClassDef(MyMainFrame, 0);
 };
 

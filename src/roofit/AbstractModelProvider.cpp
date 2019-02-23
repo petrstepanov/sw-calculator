@@ -14,15 +14,14 @@
 #include "AbstractModelProvider.h"
 #include <TMath.h>
 
-AbstractModelProvider::AbstractModelProvider(RooRealVar* E_0){
-	this->E_0 = E_0; //new RooRealVar("E_0", "Peak Center", 511, 507, 515, "KeV");
-	this->fwhm2sigma = new RooConstVar("fwhm2sigma", "Coefficient to convert FWHM to dispersion", 1/TMath::Sqrt(8*TMath::Log(2)));
-	this->pi = new RooConstVar("pi", "pi", TMath::Pi());
-	this->model = NULL;
-	this->convolutedModel = NULL;
-	this->components = new RooArgSet();
-	this->bgComponents = new RooArgSet();
-        this->convolutionPoints = 10000;
+AbstractModelProvider::AbstractModelProvider(RooRealVar* mean){
+	this->mean = mean;
+	this->model = nullptr;
+	this->convolutedModel = nullptr;
+	this->components = new RooArgList();
+	this->bgComponents = new RooArgList();
+//    this->convolutionPoints = 10000;
+    this->resolutionFunction = nullptr;
 }
 
 RooAbsPdf* AbstractModelProvider::getModel(){
@@ -37,14 +36,14 @@ RooAbsPdf* AbstractModelProvider::getResolutionFuncton(){
 	return resolutionFunction;
 }
 
-RooRealVar* AbstractModelProvider::getPeakCenter(){
-	return E_0;
+RooRealVar* AbstractModelProvider::getMean(){
+	return mean;
 }
 
-RooArgSet* AbstractModelProvider::getComponents(){
+RooArgList* AbstractModelProvider::getComponents(){
 	return components;
 }
 
-RooArgSet* AbstractModelProvider::getBgComponents(){
+RooArgList* AbstractModelProvider::getBgComponents(){
 	return bgComponents;
 }

@@ -20,6 +20,8 @@ class StringUtils {
 public:
 	static TString* stripFileName(TString*);
 	static TString* stripFileExtension(TString*);
+    static TString* suffix(const char* name, int index, const char* nameSuffix = "");
+    static TString* ordinal(const char*, int index);
 };
 
 #endif /* STRINGUTILS_H */

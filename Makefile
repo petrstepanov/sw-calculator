@@ -17,7 +17,6 @@ APP_NAME=sw-calculator
 DICT_NAME=$(APP_NAME)-dictionary
 DICT_FILENAME=$(DICT_NAME).cxx             # app-dictionary.cxx
 DICT_PCM_FILENAME=$(DICT_NAME)_rdict.pcm   # app-dictionary_rdict.pcm
-# DSYM_DIR=sw-calculator.so.dSYM
 
 # Compiler flags, library search paths and ROOT shared libraries names
 CXXFLAGS=`root-config --cflags` -fPIC
@@ -37,7 +36,8 @@ OBJECTS = $(patsubst $(SRC_DIR)/%,$(OBJ_DIR)/%,$(OBJECTS_TEMP))
 
 # Executable and shared library files path and name
 EXECUTABLE=$(BIN_DIR)/$(APP_NAME)       # src/app
-SHARED_LIBRARY=$(APP_NAME)-library.so   # app-library.so
+SHARED_LIBRARY=$(APP_NAME)-library.so           # app-library.so
+SHARED_LIBRARY_DS=$(APP_NAME)-library.so.dSYM   # .so debug symbols (generated on macOS)
 
 # convenience variable for making directories
 dir_guard=@mkdir -p $(@D)
@@ -50,7 +50,7 @@ release: CXXFLAGS+=-O3
 release: executable
 
 # Also might add flags for debug optimizations: -Og -ggdb -DDEBUG
-debug: CXXFLAGS+=-g
+debug: CXXFLAGS+=-g -Og
 debug: executable
 
 executable: directories $(DICT_FILENAME) $(SHARED_LIBRARY) $(OBJECTS) $(EXECUTABLE)
@@ -67,8 +67,12 @@ else
 	# https://stackoverflow.com/questions/38058041/correct-usage-of-rpath-relative-vs-absolute
 	$(CXX) -o $@ $(OBJECTS) $(SHARED_LIBRARY) $(GLIBS) -Wl,-rpath,'$$ORIGIN'
 endif
-	# move .so library to bin folder
+	# move .so library to /dist folder
 	mv $(SHARED_LIBRARY) $(BIN_DIR)/$(SHARED_LIBRARY)
+ifeq ($(OS),Darwin)
+	# move .so.dSYM debub symbols to /dist folder
+	mv $(SHARED_LIBRARY_DS) $(BIN_DIR)/$(SHARED_LIBRARY_DS)
+endif
 	# move dictionary .pcm next to the app executable, remove dictionary .cxx
 	mv $(DICT_PCM_FILENAME) $(BIN_DIR)/$(DICT_PCM_FILENAME)
 	rm $(DICT_FILENAME)
@@ -94,7 +98,9 @@ clean:
 	rm -f -r $(OBJ_DIR)
 	rm -f -r $(BIN_DIR)
 	rm -f $(DICT_FILENAME)
+	rm -f $(DICT_PCM_FILENAME)	
 	rm -f $(SHARED_LIBRARY)
+	rm -f -r $(SHARED_LIBRARY_DS)
 
 directories:
 	mkdir -p $(OBJ_DIR)

@@ -62,7 +62,7 @@ void GraphicsHelper::drawSWRegions(RooPlot* frame, Double_t sWidth, Double_t wWi
     wWidth = isTwoDetector ? wWidth * 2 : wWidth;
     wShift = isTwoDetector ? wShift * 2 : wShift;
 
-    yMax = 0.96*yMax;
+    yMax = 0.95*yMax;
     Double_t textSize = 0.05;
     Double_t logYMin = TMath::Log10(yMin);
     Double_t logYMax = TMath::Log10(yMax);  
@@ -87,7 +87,7 @@ void GraphicsHelper::drawSWRegions(RooPlot* frame, Double_t sWidth, Double_t wWi
     w1Box->SetLineWidth(0);
     w1Box->SetFillColorAlpha(19, 0.6);
     frame->addObject(w1Box);
-    TLatex* w1 = new TLatex(mean-wShift-wWidth/2, letterY, "#it{W_{1}}");
+    TLatex* w1 = new TLatex(mean-wShift-wWidth/2, letterY, "#it{W1}");
     w1->SetTextAlign(22);
     w1->SetTextColorAlpha(1, letterOpacity);
     w1->SetTextSize(textSize);    
@@ -98,7 +98,7 @@ void GraphicsHelper::drawSWRegions(RooPlot* frame, Double_t sWidth, Double_t wWi
     w2Box->SetLineWidth(0);
     w2Box->SetFillColorAlpha(19, 0.6);
     frame->addObject(w2Box);
-    TLatex* w2 = new TLatex(mean+wShift+wWidth/2, letterY, "#it{W_{2}}");
+    TLatex* w2 = new TLatex(mean+wShift+wWidth/2, letterY, "#it{W2}");
     w2->SetTextAlign(22);
     w2->SetTextSize(textSize);
     w2->SetTextColorAlpha(1, letterOpacity);

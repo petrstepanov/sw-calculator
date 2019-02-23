@@ -17,29 +17,28 @@
 #include <RooRealVar.h>
 #include <RooConstVar.h>
 #include <RooAbsPdf.h>
-#include <RooArgSet.h>
+#include <RooArgList.h>
 
 class AbstractModelProvider {
 protected:
-	RooRealVar* E_0;
+	RooRealVar* mean;
 	RooAbsPdf* model;
 	RooAbsPdf* convolutedModel;
 	RooAbsPdf* resolutionFunction;
-	RooConstVar* fwhm2sigma;
-	RooConstVar* pi;
-	RooArgSet* components;
-	RooArgSet* bgComponents;
-        Int_t convolutionPoints;
+	RooArgList* components;
+	RooArgList* bgComponents;
+//	Int_t convolutionPoints;
+
 public:
 	AbstractModelProvider(RooRealVar*);
-	virtual ~AbstractModelProvider(){};
+	virtual ~AbstractModelProvider() {};
 	//virtual RooArgSet getBackgroundSet() = 0;
 	RooAbsPdf* getModel();
 	RooAbsPdf* getConvolutedModel();
 	RooAbsPdf* getResolutionFuncton();
-	RooRealVar* getPeakCenter();
-	RooArgSet* getComponents();
-	RooArgSet* getBgComponents();
+	RooRealVar* getMean();
+	RooArgList* getComponents();
+	RooArgList* getBgComponents();
 };
 
 #endif /* ABSTRACTMODELPROVIDER_H */
