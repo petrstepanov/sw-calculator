@@ -383,6 +383,7 @@ void SWCalculatorPresenter::onFitSpectrumClicked(){
         std::pair<Double_t, Double_t> sValueError = histProcessor->getSParameter(fitHistNoBg, sWidth, modelMean, isTwoDetector);
         std::pair<Double_t, Double_t> wValueError = histProcessor->getWParameter(fitHistNoBg, wWidth, wShift, modelMean, isTwoDetector);
         view->displaySW(sValueError, wValueError);
+        view->scrollOutputDown();
     }
 
     view->initRooPlots(fitFrame, chiFrame);

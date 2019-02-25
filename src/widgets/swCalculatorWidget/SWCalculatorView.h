@@ -142,7 +142,7 @@ class SWCalculatorView : public AbstractView<SWCalculatorPresenter> {
     TCanvas* getCanvas();
     void saveFitResults(TString* fileName);
     void clearFitResults();
-
+    void scrollOutputDown();
     // Calls to Presenter
     void onNumFitMinChanged();
     void onNumFitMaxChanged();

@@ -33,7 +33,7 @@ class Constants {
     static const Double_t padMargin[4]; // left, right, bottom, top
     
     static const char* applicationName;
-    static char* applicationIcon[];
+//    static char* applicationIcon[];
     
     static TColor* colorPrimary;
     static TColor* colorWarning;

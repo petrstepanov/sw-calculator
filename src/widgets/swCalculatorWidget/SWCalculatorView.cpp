@@ -537,14 +537,17 @@ void SWCalculatorView::displaySW(std::pair<Double_t, Double_t> sValueError, std:
     txtFitResult->AddLineFast(Form("%*s    %1.4e +/-  %1.2e", 22, "S Parameter", sValueError.first, sValueError.second));
     txtFitResult->AddLineFast(Form("%*s    %1.4e +/-  %1.2e", 22, "W Parameter", wValueError.first, wValueError.second));
     txtFitResult->AddLineFast("  ------------------------------------------------");
-
-    // Update output
-//    txtFitResult->Update();
-//    txtFitResult->ScrollUp(1000);
 }
 
 void SWCalculatorView::updateCanvas() {
     canvasPlot->Update();
+}
+
+void SWCalculatorView::scrollOutputDown(){
+    // Update output
+    txtFitResult->Update();
+    Long_t lines = txtFitResult->ReturnLineCount();
+    txtFitResult->ScrollToPosition(TGLongPosition(0, lines));
 }
 
 // Calls to Presenter

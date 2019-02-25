@@ -34,7 +34,7 @@ MyMainFrame::~MyMainFrame(){
 }
 
 void MyMainFrame::mapAndResize(){
-	SetIconPixmap(Constants::applicationIcon);
+	SetIconPixmap("./sw-calculator.xpm");
 	SetWindowName(Constants::applicationName);
     MapSubwindows();
     Layout();

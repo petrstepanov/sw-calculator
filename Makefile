@@ -76,7 +76,9 @@ endif
 	# move dictionary .pcm next to the app executable, remove dictionary .cxx
 	mv $(DICT_PCM_FILENAME) $(BIN_DIR)/$(DICT_PCM_FILENAME)
 	rm $(DICT_FILENAME)
-
+	# copy icon
+	cp resources/sw-calculator.xpm $(BIN_DIR)/sw-calculator.xpm
+	
 $(DICT_FILENAME): $(HEADERS) $(SRC_DIR)/LinkDef.h
 	rootcling -f $@ -c $(CXXFLAGS) -p $^
 
