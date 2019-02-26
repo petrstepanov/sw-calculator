@@ -211,10 +211,10 @@ void SWCalculatorView::initUI(){
 
     TGHorizontalFrame* splitFrame = new TGHorizontalFrame(tabFit);
 
-    btnClearResult = new TGTextButton(splitFrame, "Clear file");
+    btnClearResult = new TGTextButton(splitFrame, "Clear output");
     btnClearResult->Connect("Clicked()", "SWCalculatorView", this, "onClearResultsClicked()");
     splitFrame->AddFrame(btnClearResult, new TGLayoutHints(kLHintsLeft | kLHintsTop | kLHintsExpandX, 0, dx/2));
-    btnSaveResult = new TGTextButton(splitFrame, "Save results");
+    btnSaveResult = new TGTextButton(splitFrame, "Save to file");
     btnSaveResult->Connect("Clicked()", "SWCalculatorView", this, "onSaveResultsClicked()");
     splitFrame->AddFrame(btnSaveResult, new TGLayoutHints(kLHintsLeft | kLHintsTop | kLHintsExpandX, dx/2));
     tabFit->AddFrame(splitFrame, new TGLayoutHints(kLHintsLeft | kLHintsTop | kLHintsExpandX, dx, dx, dy, 2*dy));
