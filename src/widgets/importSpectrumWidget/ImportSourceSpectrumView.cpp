@@ -12,7 +12,7 @@
  */
 
 #include "ImportSourceSpectrumView.h"
-#include "../../model/Constants.h"
+#include "../../util/GraphicsHelper.h"
 
 
 ImportSourceSpectrumView::ImportSourceSpectrumView(const TGWindow *w) : AbstractImportSpectrumView(w){
@@ -24,5 +24,5 @@ AbstractImportSpectrumPresenter* ImportSourceSpectrumView::instantinatePresenter
 };
 
 Int_t ImportSourceSpectrumView::getHistogramColor(){
-    return Constants::colorWarning->GetNumber();
+    return GraphicsHelper::colorWarning->GetNumber();
 }

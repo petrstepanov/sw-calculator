@@ -35,6 +35,7 @@
 #include "../AbstractView.h"
 #include "SWCalculatorPresenter.h"
 #include "../rooRealVarWidget/RooRealVarView.h"
+#include "../../util/HistProcessor.h"
 
 class SWCalculatorPresenter;
 
@@ -135,7 +136,7 @@ class SWCalculatorView : public AbstractView<SWCalculatorPresenter> {
     void displayFitParameters(RooFitResult* fitResult);
     void displayVariable(RooRealVar* variable);
     void displayVariables(RooArgList* variables);
-    void displayChi2(Double_t sumChi2, Int_t freeParameters, Int_t degreesFreedom);
+    void displayChi2(Chi2Struct chi2Struct);
     void displaySW(std::pair<Double_t, Double_t> sValueError, std::pair<Double_t, Double_t> wValueError);
     void updateCanvas();
     void setDisplayLimits(Float_t min, Float_t max);

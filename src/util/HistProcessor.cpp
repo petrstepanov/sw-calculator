@@ -17,6 +17,8 @@
 #include <TF1.h>
 #include <RooAbsPdf.h>
 #include <cmath>
+#include <TMath.h>
+#include "Debug.h"
 
 HistProcessor::HistProcessor(){};
 
@@ -208,30 +210,27 @@ Double_t HistProcessor::calcBackgroundFraction(TH1* hist){
 	return bgFraction;
 }
 
-std::pair<Double_t, Int_t> HistProcessor::getChi2(TH1* hist, RooCurve* curve, RooAbsPdf* model){
-    RooArgSet* params = model->getVariables();
-    params->Print("v");
-    Int_t numberOfFreeParameters = params->getSize();   
-    Double_t nBins = hist->GetXaxis()->GetNbins();
-    Int_t degreesOfFreedom = 0;
-    Double_t sum = 0;
-    for (int i = 1; i <= nBins; i++){
+Chi2Struct HistProcessor::getChi2(TH1* hist, RooCurve* curve, RooAbsPdf* model){
+	// https://en.wikipedia.org/wiki/Goodness_of_fit
+	Int_t degreesOfFreedom = 0;
+	Double_t chiSum = 0;
+    for (int i = 1; i <= hist->GetXaxis()->GetNbins(); i++){
         Double_t value = hist->GetBinContent(i);
         Double_t fit = curve->Eval(hist->GetXaxis()->GetBinCenter(i));
         Double_t error = hist->GetBinError(i);
         if (value != 0 && error != 0){
             // std::cout << "value: " << value << " fit: " << fit << "  error: " << error << std::endl;
-            sum += pow(value - fit, 2) / value;
-            degreesOfFreedom++;
+        	chiSum += pow(value - fit, 2) / value;
+        	degreesOfFreedom++;
         }
     }
-    degreesOfFreedom -= (numberOfFreeParameters + 1);
-    std::cout << "sum: " << sum << std::endl;
-    std::cout << "number of free prameters: " << numberOfFreeParameters << std::endl;
-    std::cout << "degrees of freedom: " << degreesOfFreedom << std::endl;
-    // Double_t chi2Int = sum / (Double_t)(degreesOfFreedom);
-    // Double_t chi2IntErr = sqrt((double)2*degreesOfFreedom);
-    return std::make_pair(sum, degreesOfFreedom);
+    // Subtract number of free parameters + 1
+    degreesOfFreedom -= (model->getVariables()->getSize() + 1);
+
+    Chi2Struct chi2Struct = {chiSum, degreesOfFreedom, chiSum / (Double_t)(degreesOfFreedom)};
+
+    //    Double_t chi2Err = TMath::Sqrt((Double_t)2 * freeParameters) / degreesFreedom;
+    return chi2Struct;
 }
 
 std::pair<Double_t, Double_t> HistProcessor::calcIntegral(TH1* hist, Double_t min, Double_t max){

@@ -12,7 +12,7 @@
  */
 
 #include "ImportSpectrumView.h"
-#include "../../model/Constants.h"
+#include "../../util/GraphicsHelper.h"
 
 ImportSpectrumView::ImportSpectrumView(const TGWindow *w) : AbstractImportSpectrumView(w){
 }
@@ -23,5 +23,5 @@ AbstractImportSpectrumPresenter* ImportSpectrumView::instantinatePresenter() {
 };
 
 Int_t ImportSpectrumView::getHistogramColor(){
-    return Constants::colorPrimary->GetNumber();
+    return GraphicsHelper::colorPrimary->GetNumber();
 }

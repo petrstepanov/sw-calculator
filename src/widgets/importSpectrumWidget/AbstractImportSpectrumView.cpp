@@ -53,7 +53,7 @@ void AbstractImportSpectrumView::initUI(){
 
     // File browser
     txtFileBrowser = new TGTextView(this);
-    txtFileBrowser->SetBackgroundColor(Constants::colorAppWindow->GetPixel());
+    txtFileBrowser->SetBackgroundColor(GraphicsHelper::colorAppWindow->GetPixel());
 //    txtFileBrowser->AddLine("no file loaded");
 //    txtFileBrowser->ChangeOptions(0);
     AddFrame(txtFileBrowser, new TGLayoutHints(kLHintsExpandX | kLHintsExpandY, 0, 0, dy, dy));
@@ -154,5 +154,5 @@ void AbstractImportSpectrumView::drawHistogram(TH1F* hist){
 }
 
 Int_t AbstractImportSpectrumView::getHistogramColor(){
-    return Constants::colorPrimary->GetNumber();
+    return GraphicsHelper::colorPrimary->GetNumber();
 }

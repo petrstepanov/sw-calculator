@@ -23,6 +23,8 @@
 #include <TGText.h>
 #include <TGDimension.h>
 #include "../../util/UiHelper.h"
+#include "../../util/GraphicsHelper.h"
+#include "../../util/Debug.h"
 #include <map>
 #include <sstream>
 #include <TRootEmbeddedCanvas.h>
@@ -204,7 +206,7 @@ void SWCalculatorView::initUI(){
 
     // Fit Result TextBox
     txtFitResult = new TGTextEdit(tabFit);
-    txtFitResult->SetBackgroundColor(Constants::colorAppWindow->GetPixel());
+    txtFitResult->SetBackgroundColor(GraphicsHelper::colorAppWindow->GetPixel());
     tabFit->AddFrame(txtFitResult, new TGLayoutHints(kLHintsExpandX | kLHintsExpandY, dx, dx, dy, dy));
 
     TGHorizontalFrame* splitFrame = new TGHorizontalFrame(tabFit);
@@ -295,7 +297,6 @@ void SWCalculatorView::initUI(){
     // Attach Right Canvas (Plot)
     TRootEmbeddedCanvas *embedPlot = new TRootEmbeddedCanvas("embedPlot", frameRightVertical);
     frameRightVertical->AddFrame(embedPlot, new TGLayoutHints(kLHintsLeft | kLHintsTop | kLHintsExpandX | kLHintsExpandY, 0, dx, dx, dx));
-    canvasPlot = embedPlot->GetCanvas();
 
     frameRightVertical->AddFrame(frameExportButtons, new TGLayoutHints(kLHintsExpandX, 0, 0, 0, 0));
 
@@ -306,14 +307,19 @@ void SWCalculatorView::initUI(){
     // of the composite frame have been mapped via method MapSubwindows()
 //    setSourceContributionFrameVisible(kFALSE);
 
-    // Plot Canvas Settings
-    padData = new TPad("padData", "Pad for data", 0.0, 0.3, 1.0, 1.0, kWhite); // x_low, y_low, x_hi, y_hi
-    padData->SetMargin(Constants::padMargin[0], Constants::padMargin[1], Constants::padMargin[2], Constants::padMargin[3]);
-    padData->Draw();
-//
-    padChi2 = new TPad("padChi2", "Pad for chi^2", 0.0, 0.0, 1.0, 0.3, kWhite);
-    padChi2->SetMargin(Constants::padMargin[0], Constants::padMargin[1], Constants::padMargin[2], Constants::padMargin[3]);
-    padChi2->Draw();
+    // Initialize pads on canvas
+    canvasPlot = embedPlot->GetCanvas();
+    canvasPlot->Divide(1, 2);
+
+    canvasPlot->cd(1)->SetPad("padData", "Pad for data", 0.0, GraphicsHelper::RESIDUALS_PAD_RELATIVE_HEIGHT, 1.0, 1.0, kWhite);
+    gPad->SetMargin((GraphicsHelper::padMargins).left,
+    		(GraphicsHelper::padMargins).right, (GraphicsHelper::padMargins).bottom, (GraphicsHelper::padMargins).top);
+	gPad->SetLogy();
+    padData = (TPad*)canvasPlot->GetPad(1);
+
+    canvasPlot->cd(2)->SetPad("padChi2", "Pad for chi^2", 0.0, 0.0, 1.0, GraphicsHelper::RESIDUALS_PAD_RELATIVE_HEIGHT, kWhite);
+    gPad->SetMargin((GraphicsHelper::padMargins).left, (GraphicsHelper::padMargins).right, (GraphicsHelper::padMargins).bottom, (GraphicsHelper::padMargins).top);
+    padChi2 = (TPad*)canvasPlot->GetPad(2);
 }
 
 // Calls from Presenter
@@ -508,11 +514,14 @@ void SWCalculatorView::displayFitParameters(RooFitResult* fitResult) {
 }
 
 void SWCalculatorView::displayVariable(RooRealVar* variable) {
+	if (variable == nullptr) return;
 	displayVariables(new RooArgList(*variable));
 }
 
+const char* dashedLine = "  ------------------------------------------------";
+
 void SWCalculatorView::displayVariables(RooArgList* variables) {
-	txtFitResult->AddLineFast("  ------------------------------------------------");
+	txtFitResult->AddLineFast(dashedLine);
 	TIterator* it = variables->createIterator();
 	while(TObject* temp = it->Next()){
 		if(RooRealVar* var = dynamic_cast<RooRealVar*>(temp)){
@@ -524,39 +533,40 @@ void SWCalculatorView::displayVariables(RooArgList* variables) {
 	}
 }
 
-void SWCalculatorView::displayChi2(Double_t sumChi2, Int_t freeParameters, Int_t degreesFreedom) {
-    txtFitResult->AddLineFast("  ------------------------------------------------");
-    Double_t chi2ByFreePars = sumChi2 / (Double_t)(degreesFreedom);
-    Double_t chi2Err = sqrt((double)2 * freeParameters) / degreesFreedom;
-    const char* s = Form("%*s    %2.1f/%d = %1.2f +/- %1.2f", 22, "chi^2/N", sumChi2, degreesFreedom, chi2ByFreePars, chi2Err);
+void SWCalculatorView::displayChi2(Chi2Struct chi2Struct) {
+    txtFitResult->AddLineFast(dashedLine);
+    const char* s = Form("%*s    %2.1f/%d = %1.2f", 22, "chi^2/N_free", chi2Struct.chiSum, chi2Struct.degreesOfFreedom, chi2Struct.chi2);
     txtFitResult->AddLineFast(s);
 }
 
 void SWCalculatorView::displaySW(std::pair<Double_t, Double_t> sValueError, std::pair<Double_t, Double_t> wValueError) {
-    txtFitResult->AddLineFast("  ------------------------------------------------");
+    txtFitResult->AddLineFast(dashedLine);
     txtFitResult->AddLineFast(Form("%*s    %1.4e +/-  %1.2e", 22, "S Parameter", sValueError.first, sValueError.second));
     txtFitResult->AddLineFast(Form("%*s    %1.4e +/-  %1.2e", 22, "W Parameter", wValueError.first, wValueError.second));
-    txtFitResult->AddLineFast("  ------------------------------------------------");
+    txtFitResult->AddLineFast(dashedLine);
 }
 
 void SWCalculatorView::updateCanvas() {
-    canvasPlot->Update();
+	canvasPlot->Modified();
+	canvasPlot->Update();
 }
 
+// Scroll output textarea to the very bottom
 void SWCalculatorView::scrollOutputDown(){
-    // Update output
+    Long_t lineCount = txtFitResult->ReturnLineCount();
+    Debug("SWCalculatorView::scrollOutputDown", "lineCount: " << lineCount);
+//    txtFitResult->ScrollToPosition(TGLongPosition(0, lineCount));
     txtFitResult->Update();
-    Long_t lines = txtFitResult->ReturnLineCount();
-    txtFitResult->ScrollToPosition(TGLongPosition(0, lines));
+    txtFitResult->ShowBottom();
 }
 
 // Calls to Presenter
 void SWCalculatorView::onNumFitMinChanged(){
-    std::cout << "SWCalculatorView::onNumFitMinChanged()" << std::endl;
+	Debug("SWCalculatorView::onNumFitMinChanged");
 }
 
 void SWCalculatorView::onNumFitMaxChanged(){
-    std::cout << "SWCalculatorView::onNumFitMaxChanged()" << std::endl;
+	Debug("SWCalculatorView::onNumFitMaxChanged");
 }
 
 void SWCalculatorView::onFitSpectrumClicked(){
@@ -565,11 +575,11 @@ void SWCalculatorView::onFitSpectrumClicked(){
 }
 
 void SWCalculatorView::onApplyZoomClicked(){
-    std::cout << "SWCalculatorView::onApplyZoomClicked()" << std::endl;
+	Debug("SWCalculatorView::onApplyZoomClicked");
 }
 
 void SWCalculatorView::onResetZoomClicked(){
-    std::cout << "SWCalculatorView::onResetZoomClicked()" << std::endl;
+	Debug("SWCalculatorView::onResetZoomClicked");
 }
 
 void SWCalculatorView::onSaveResultsClicked() {

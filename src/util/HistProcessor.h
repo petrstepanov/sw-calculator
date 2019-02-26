@@ -19,6 +19,12 @@
 #include <RooAbsPdf.h>
 #include <RooArgList.h>
 
+struct Chi2Struct {
+	const Double_t chiSum;
+	const Int_t degreesOfFreedom;
+	const Double_t chi2;
+};
+
 class HistProcessor {
 public:
     static HistProcessor* getInstance();
@@ -33,7 +39,7 @@ public:
     Bool_t hasBackground(TH1*);
     Bool_t hasAtan(TH1*);
     Double_t calcBackgroundFraction(TH1*);
-    std::pair<Double_t, Int_t> getChi2(TH1*, RooCurve*, RooAbsPdf*);
+    Chi2Struct getChi2(TH1*, RooCurve*, RooAbsPdf*);
     std::pair<Double_t, Double_t> calcIntegral(TH1*, Double_t, Double_t);
     Bool_t isTwoDetetor(TH1*);
     Double_t getPdfMaximumX (RooAbsPdf*, const RooArgList&);

@@ -19,6 +19,26 @@
 #include <TMath.h>
 #include <iostream>
 
+const Int_t GraphicsHelper::DEFAULT_FONT_SIZE = 14;  // px
+const Int_t GraphicsHelper::DEFAULT_FONT_NUMBER = 6; // Sans Serif
+const Double_t GraphicsHelper::DEFAULT_X_TITLE_OFFSET = 2.5;
+const Double_t GraphicsHelper::DEFAULT_X_LABEL_OFFSET = 0.01;
+const Double_t GraphicsHelper::DEFAULT_Y_TITLE_OFFSET = 2.1;
+const Double_t GraphicsHelper::DEFAULT_Y_LABEL_OFFSET = 0.02;
+const Double_t GraphicsHelper::RESIDUALS_PAD_RELATIVE_HEIGHT = 0.35;
+const Double_t GraphicsHelper::LEGEND_X1 = 0.72;
+const Double_t GraphicsHelper::LEGEND_LINE_HEIGHT = 0.045;
+
+const Margin GraphicsHelper::padMargins = { 0.10, 0.03, 0.15, 0.05 }; // left, right, bottom, top
+
+const Int_t GraphicsHelper::colorSet[7] = { kViolet + 6, kSpring - 5, kAzure + 8,
+		kPink + 1, kGray + 1, kViolet - 4, kRed - 7 };
+
+TColor* GraphicsHelper::colorPrimary = new TColor(0.232, 0.757, 0.832);
+TColor* GraphicsHelper::colorWarning = new TColor(0.832, 0.769, 0.232);
+TColor* GraphicsHelper::colorGray = new TColor(0.5, 0.5, 0.5);
+TColor* GraphicsHelper::colorAppWindow = new TColor(0.906, 0.906, 0.906);
+
 // Private Singleton Members
 GraphicsHelper::GraphicsHelper(){};
 

@@ -17,26 +17,47 @@
 #include <TStyle.h>
 #include <RooPlot.h>
 
+struct Margin {
+	Double_t left;
+	Double_t right;
+	Double_t bottom;
+	Double_t top;
+};
+
 class GraphicsHelper {
-	public:
-		static const int DEFAULT_FONT_SIZE = 14;  // px
-		static const int DEFAULT_FONT_NUMBER = 6; // Sans Serif
-		static constexpr double DEFAULT_X_TITLE_OFFSET = 2.5;
-		static constexpr double DEFAULT_X_LABEL_OFFSET = 0.01;
-		static constexpr double DEFAULT_Y_TITLE_OFFSET = 2.1;
-		static constexpr double DEFAULT_Y_LABEL_OFFSET = 0.02;
+public:
+	static const Int_t DEFAULT_FONT_SIZE;
+	static const Int_t DEFAULT_FONT_NUMBER;
+	static const Double_t DEFAULT_X_TITLE_OFFSET;
+	static const Double_t DEFAULT_X_LABEL_OFFSET;
+	static const Double_t DEFAULT_Y_TITLE_OFFSET;
+	static const Double_t DEFAULT_Y_LABEL_OFFSET;
+	static const Double_t LEGEND_X1;
+	static const Double_t LEGEND_LINE_HEIGHT;
 
-		static GraphicsHelper* getInstance();
+    static const Margin padMargins;
+    static const Int_t colorSet[7];
 
-		Style_t getFontCode(Int_t fontSize);
-		void setDefaultAxisFonts(TAxis* axis);
-		void setupAxis(TAxis* axis, const char* title = "",
-		               Double_t titleOffset = DEFAULT_X_TITLE_OFFSET,
-		               Double_t labelOffset = DEFAULT_X_LABEL_OFFSET);
-                void drawSWRegions(RooPlot* frame, Double_t sWidth, Double_t wWidth, Double_t wShift, Double_t mean, Double_t yMin, Double_t yMax, Bool_t isTwoDetector);
-	private:
-		GraphicsHelper();
-		static GraphicsHelper* instance;
+    static TColor* colorPrimary;
+    static TColor* colorWarning;
+    static TColor* colorGray;
+    static TColor* colorAppWindow;
+
+	static const Double_t RESIDUALS_PAD_RELATIVE_HEIGHT;
+
+	static GraphicsHelper* getInstance();
+
+	Style_t getFontCode(Int_t fontSize);
+	void setDefaultAxisFonts(TAxis* axis);
+	void setupAxis(TAxis* axis, const char* title = "", Double_t titleOffset =
+			DEFAULT_X_TITLE_OFFSET, Double_t labelOffset =
+			DEFAULT_X_LABEL_OFFSET);
+	void drawSWRegions(RooPlot* frame, Double_t sWidth, Double_t wWidth,
+			Double_t wShift, Double_t mean, Double_t yMin, Double_t yMax,
+			Bool_t isTwoDetector);
+private:
+	GraphicsHelper();
+	static GraphicsHelper* instance;
 };
 
 #endif /* GRAPHICSHELPER_H */

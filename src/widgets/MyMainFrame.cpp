@@ -11,6 +11,7 @@
  * Created on October 15, 2017, 1:47 AM
  */
 
+#include "TImage.h"
 #include "MyMainFrame.h"
 #include <TApplication.h>
 #include "../model/Constants.h"
@@ -34,9 +35,14 @@ MyMainFrame::~MyMainFrame(){
 }
 
 void MyMainFrame::mapAndResize(){
-	SetIconPixmap("./sw-calculator.xpm");
+//	TImage *img = TImage::Create();
+//	img->SetImageBuffer(Constants::applicationIcon, TImage::kXpm);
+//	gVirtualX->SetIconPixmap(GetId(), img->GetPixmap());
+
+	SetIconPixmap(Constants::applicationIcon);
 	SetWindowName(Constants::applicationName);
-    MapSubwindows();
+
+	MapSubwindows();
     Layout();
     Resize(GetDefaultSize());
     MapWindow();
