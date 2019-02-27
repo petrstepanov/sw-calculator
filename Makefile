@@ -47,11 +47,11 @@ all: release
 
 # Add -O3 optimization level for the release
 release: CXXFLAGS+=-O3
-release: executable
+release: executable move_files
 
 # Also might add flags for debug optimizations: -Og -ggdb -DDEBUG
 debug: CXXFLAGS+=-g -Og
-debug: executable
+debug: executable move_files move_debug_symbols
 
 executable: directories $(DICT_FILENAME) $(SHARED_LIBRARY) $(OBJECTS) $(EXECUTABLE)
 
@@ -67,17 +67,6 @@ else
 	# https://stackoverflow.com/questions/38058041/correct-usage-of-rpath-relative-vs-absolute
 	$(CXX) -o $@ $(OBJECTS) $(SHARED_LIBRARY) $(GLIBS) -Wl,-rpath,'$$ORIGIN'
 endif
-	# move .so library to /dist folder
-	mv $(SHARED_LIBRARY) $(BIN_DIR)/$(SHARED_LIBRARY)
-ifeq ($(OS),Darwin)
-	# move .so.dSYM debub symbols to /dist folder
-	mv $(SHARED_LIBRARY_DS) $(BIN_DIR)/$(SHARED_LIBRARY_DS)
-endif
-	# move dictionary .pcm next to the app executable, remove dictionary .cxx
-	mv $(DICT_PCM_FILENAME) $(BIN_DIR)/$(DICT_PCM_FILENAME)
-	rm $(DICT_FILENAME)
-	# copy icon
-	# cp resources/$(APP_NAME).xpm $(BIN_DIR)/$(APP_NAME).xpm
 
 $(DICT_FILENAME): $(HEADERS) $(SRC_DIR)/LinkDef.h
 	rootcling -f $@ -c $(CXXFLAGS) -p $^
@@ -112,5 +101,21 @@ echo:
 	$(info SOURCES: $(SOURCES))
 	$(info HEADERS: $(HEADERS))
 
+move_files:
+	# move .so library to /dist folder
+	mv $(SHARED_LIBRARY) $(BIN_DIR)/$(SHARED_LIBRARY)
+
+	# move dictionary .pcm next to the app executable, remove dictionary .cxx
+	mv $(DICT_PCM_FILENAME) $(BIN_DIR)/$(DICT_PCM_FILENAME)
+	rm $(DICT_FILENAME)
+	# copy icon
+	# cp resources/$(APP_NAME).xpm $(BIN_DIR)/$(APP_NAME).xpm
+	
+move_debug_symbols:
+ifeq ($(OS),Darwin)
+	# move .so.dSYM debub symbols to /dist folder
+	mv $(SHARED_LIBRARY_DS) $(BIN_DIR)/$(SHARED_LIBRARY_DS)
+endif
+
 # List of special targets that do not generate files
-.PHONY: directories echo
+.PHONY: clean directories move_files move_debug_symbols echo
