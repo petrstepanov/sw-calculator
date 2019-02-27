@@ -373,16 +373,6 @@ void SWCalculatorView::setDisplayLimits(Float_t min, Float_t max) {
     displayMax->SetNumber(max);
 }
 
-void SWCalculatorView::updateCanvasLimits(Double_t min, Double_t max) {
-//    std::cout << "(" << min << ", " << max << ")" << std::endl;
-    fitFrame->GetXaxis()->SetRangeUser(min, max);
-    chiFrame->GetXaxis()->SetRangeUser(min, max);
-    padData->Modified();
-    padData->Update();
-    padChi2->Modified();
-    padChi2->Update();
-}
-
 void SWCalculatorView::onDisplayMinChange(char* c) {
     Double_t min = displayMin->GetNumber();
     Double_t max = zoomSlider->GetMaxPosition();
@@ -604,6 +594,14 @@ void SWCalculatorView::clearFitResults() {
     txtFitResult->ScrollToPosition(*pos);
 }
 
+void SWCalculatorView::updateCanvasLimits(Double_t min, Double_t max) {
+    fitFrame->GetXaxis()->SetRangeUser(min, max);
+    chiFrame->GetXaxis()->SetRangeUser(min, max);
+    padData->Modified();
+    padData->Update();
+    padChi2->Modified();
+    padChi2->Update();
+}
 
 //void SWCalculatorView::onSaveDataClicked(){
 //    std::cout << "SWCalculatorView::onSaveDataClicked()" << std::endl;

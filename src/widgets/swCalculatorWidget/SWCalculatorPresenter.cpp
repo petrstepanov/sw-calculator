@@ -196,16 +196,9 @@ void SWCalculatorPresenter::onFitSpectrumClicked() {
 	// You should either use a binned likelihood fit or use the standard chi2 fit provided by ROOT. In this case bins with zero entries are excluded from the fit
 
 	// Chi2 fit
-	// https://root.cern.ch/doc/master/RooChi2Var_8cxx_source.html
 	Int_t numCpu = RootHelper::getNumCpu();
 	RooChi2Var* chi2 = new RooChi2Var("chi2", "chi2", *fittingModel, *data, RooFit::NumCPU(numCpu));
 	RooMinimizer* m = new RooMinimizer(*chi2);
-//	m->setMinimizerType("Minuit2");
-//	m->optimizeConst(kTRUE);
-//	m->setEps(100);
-//	m->setMaxIterations(10000);
-//	m->minimize("Minuit2", "Migrad") ;
-//	m->hesse() ;
 	Int_t resultMigrad = m->migrad();
 	Int_t resultHesse = m->hesse();
 	Debug("SWCalculatorPresenter::onFitSpectrumClicked", "RooMinimizer: migrad=" << resultMigrad << ", hesse=" << resultHesse);
@@ -255,20 +248,16 @@ void SWCalculatorPresenter::onFitSpectrumClicked() {
 		graphicsHelper->drawSWRegions(spectrumPlot, sWidth, wWidth, wShift, modelMean, yAxisMin, yAxisMax, isTwoDetector);
 	}
 
-	// Initialize legend
-	TLegend *legend = new TLegend(GraphicsHelper::LEGEND_X1, 0.5, 1 - 1.5 * GraphicsHelper::padMargins.right, 1 - 2 * GraphicsHelper::padMargins.top);
-	legend->SetFillColorAlpha(kWhite, 0);
-	legend->SetLineColorAlpha(kWhite, 0);
-
 	// Plot data points first (in transparent color). Essential for normalization of PDFs
 	// data->plotOn(spectrumPlot, RooFit::Invisible());
-	data->plotOn(spectrumPlot, RooFit::LineColor(kGray + 3), RooFit::XErrorSize(0), RooFit::MarkerSize(0.5), RooFit::MarkerColor(kGray + 3), RooFit::DataError(RooAbsData::SumW2),
-			RooFit::Name("data")); // LineStyle(kSolid), LineWidth(2)
+	data->plotOn(spectrumPlot, RooFit::LineColor(kGray + 3), RooFit::XErrorSize(0), RooFit::MarkerSize(0.5), RooFit::MarkerColor(kGray + 3), RooFit::Name("data"));
+
+	// Initialize legend
+	TLegend *legend = new TLegend(GraphicsHelper::LEGEND_X1, 0.5, 1 - 1.5 * GraphicsHelper::padMargins.right, 1 - 2 * GraphicsHelper::padMargins.top);
 	legend->AddEntry(spectrumPlot->findObject("data"), "Data points", "pe");
 
 	// Plot convoluted and unconvoluted models
-	// https://root-forum.cern.ch/t/roofit-normailzations/7040/2
-	// Normalization(totalFitCounts, RooAbsReal::NumEvent)
+
 	if (fittingConvolutedModel != NULL) {
 		fittingConvolutedModel->plotOn(spectrumPlot, RooFit::LineColor(kOrange + 6), RooFit::LineWidth(2), RooFit::Name("fit"));
 		legend->AddEntry(spectrumPlot->findObject("fit"), "Convoluted model", "l");
@@ -280,7 +269,7 @@ void SWCalculatorPresenter::onFitSpectrumClicked() {
 	}
 	RooCurve* curveFit = spectrumPlot->getCurve("fit");
 
-	// Plot Unconvoluted model components
+	// Plot unconvoluted model components
 	{
 		RooArgList* components = modelProvider->getComponents();
 		TIterator* it = components->createIterator();
@@ -327,7 +316,8 @@ void SWCalculatorPresenter::onFitSpectrumClicked() {
 
 	// Set legend's bottom coordinate depending on the number of entries
 	legend->SetY1(legend->GetY2() - legend->GetNRows() * GraphicsHelper::LEGEND_LINE_HEIGHT);
-	legend->SetFillStyle(0); // hollow
+	legend->SetFillStyle(0);  // transparent
+	legend->SetBorderSize(0); // no border
 	spectrumPlot->addObject(legend);
 
 	// Plot data points
@@ -351,19 +341,20 @@ void SWCalculatorPresenter::onFitSpectrumClicked() {
 	residualsPlot->GetXaxis()->SetRangeUser(fitMin, fitMax);      // Do we need this?
 	graphicsHelper->setupAxis(residualsPlot->GetXaxis(), "", 2.5, 0.05); // Title, Title offset, Label offset
 	graphicsHelper->setupAxis(residualsPlot->GetYaxis(), "Residuals", 1.6, 0.012); // "#chi^{2}"
-	Chi2Struct chi2Struct = histProcessor->getChi2(fitHist, curveFit, fittingNonConvolutedModel);
 
-	TPaveText* chiText = new TPaveText(GraphicsHelper::LEGEND_X1, 1 - 2 * GraphicsHelper::padMargins.right - 0.18, 1 - 1.2 * GraphicsHelper::padMargins.right, 1 - 2 * GraphicsHelper::padMargins.top,
-			"NDC");
+	// Plot residuals
+	chi2DataHist->plotOn(residualsPlot, RooFit::LineColor(kGray + 3), RooFit::XErrorSize(0), RooFit::DataError(RooAbsData::None), RooFit::MarkerSize(0.5), RooFit::MarkerColor(kGray + 3));
+
+	// Plot chi2
+	Chi2Struct chi2Struct = histProcessor->getChi2(fitHist, curveFit, fittingNonConvolutedModel);
+	TPaveText* chiText = new TPaveText(GraphicsHelper::LEGEND_X1, 1 - 2 * GraphicsHelper::padMargins.right - 0.18, 1 - 1.2 * GraphicsHelper::padMargins.right, 1 - 2 * GraphicsHelper::padMargins.top, "NDC");
 	chiText->AddText(Form("#chi^{2} = %.1f #divide %d = %.3f", chi2Struct.chiSum, chi2Struct.degreesOfFreedom, chi2Struct.chi2));
-	chiText->SetTextSize(gStyle->GetLegendTextSize());
+	chiText->SetTextSize(gStyle->GetLegendTextSize()); // make chi2 text same size like the legend
 	chiText->SetTextFont(gStyle->GetLegendFont());
-	chiText->SetFillStyle(0);
+	chiText->SetFillColor(kWhite);
 	chiText->SetBorderSize(0);
 	chiText->SetTextAlign(kHAlignRight + kVAlignCenter);
 	residualsPlot->addObject(chiText);
-
-	chi2DataHist->plotOn(residualsPlot, RooFit::LineColor(kGray + 3), RooFit::XErrorSize(0), RooFit::DataError(RooAbsData::None), RooFit::MarkerSize(0.5), RooFit::MarkerColor(kGray + 3));
 
 	// Draw data plot on canvas
 	TPad* padData = view->getPadData();

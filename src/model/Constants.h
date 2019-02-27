@@ -29,12 +29,15 @@ class Constants {
     static const UInt_t windowHeight = 600;
     static const UInt_t leftPanelWidth = 420;
     
+    static const Double_t sigmaToFwhm;
+    static const Double_t fwhmToSigma;
+
     static Double_t bufferFraction;
 
     static const char* applicationName;
     static char* applicationIcon[];
 
-    static RooConstVar* fwhm2sigma;
+    static RooConstVar* rooFwhmToSigma;
     static RooConstVar* pi;
 };
 

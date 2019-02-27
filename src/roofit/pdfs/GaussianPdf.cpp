@@ -18,7 +18,8 @@
 ClassImp(GaussianPdf);
 
 GaussianPdf::GaussianPdf(const char *name, const char *title, RooAbsReal& _x, RooAbsReal& _mean, RooAbsReal& _a) :
-		RooAbsPdf(name, title), x("x", "x", this, _x), mean("mean", "Gauss mean", this, _mean), a("a", "Gauss a", this, _a) {
+		RooAbsPdf(name, title), x("x", "x", this, _x), mean("mean", "Gauss mean", this, _mean), a("a", "Gauss a", this,
+				_a) {
 }
 
 GaussianPdf::GaussianPdf(const GaussianPdf& other, const char* name) :
@@ -26,7 +27,7 @@ GaussianPdf::GaussianPdf(const GaussianPdf& other, const char* name) :
 }
 
 Double_t GaussianPdf::evaluate() const {
-	Double_t k = a / (Constants::chbar / 1E3); // because x is in keVs
+	Double_t k = a / (Constants::chbar / 1E3); // convert chbar to [keV]
 	Double_t _x = (x - mean);
 	// Without normalization
 	return exp(-0.5 * _x * _x * k * k);
@@ -63,20 +64,33 @@ RooArgList* GaussianPdf::getParameters(Bool_t isTwoDetector) {
 	Double_t Ry = Constants::Ry; // eV
 	Double_t a_B = Constants::a_B; // A
 	Double_t e = isTwoDetector ? 3 * Ry * pow(a_B / a, 2) : 3 * Ry * pow(a_B / a / 2, 2);
+
+	// A error
+	RooRealVar* aReal = dynamic_cast<RooRealVar*>(a.absArg());
+	Double_t da = aReal ? aReal->getError() : 0;
+
 	// Energy error
 	Double_t de = 0;
-	RooAbsArg* aAbsArg = a.absArg();
-	RooRealVar* aReal = dynamic_cast<RooRealVar*>(aAbsArg);
-	if (aReal) {
-		Double_t da = aReal->getError();
-		de = isTwoDetector ? 2 * 3 * Ry * a_B * a_B / a / a / a * da : 3 / 2 * Ry * a_B * a_B / a / a / a * da;
-	}
+	de = isTwoDetector ? 2 * 3 * Ry * a_B * a_B / a / a / a * da : 3 / 2 * Ry * a_B * a_B / a / a / a * da;
+
 	// Build list and return vars
 	const char* name = Form("bindE%s", this->GetName());
 	const char* title = Form("Binding E %s", this->GetTitle());
 	RooRealVar* v = new RooRealVar(name, title, e, "eV");
 	v->setError(de);
+
+	// Add FWHM's
+	Double_t sigma = 1 / (a / (Constants::chbar / 1E3)); // this is 1/k - see evaluate() above
+	Double_t fwhm = sigma*Constants::sigmaToFwhm;
+	 // uncertanty propagation: https://en.wikipedia.org/wiki/Propagation_of_uncertainty
+	Double_t fwhmErr = da  / a / a * (Constants::chbar / 1E3) * Constants::sigmaToFwhm;
+	const char* nameFWHM = Form("fwhm%s", this->GetName());
+	const char* titleFWHM = Form("FWHM of %s", this->GetTitle());
+	RooRealVar* f = new RooRealVar(nameFWHM, titleFWHM, fwhm, "keV");
+	f->setError(fwhmErr);
+
 	RooArgList* list = new RooArgList();
 	list->add(*v);
+	list->add(*f);
 	return list;
 }

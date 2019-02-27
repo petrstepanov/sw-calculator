@@ -199,7 +199,7 @@ void CompositeModelProvider::initConvolutedModel(RooRealVar* fwhm) {
 
 	// Make resolution Function
 	RootHelper::deleteObject("resFunctSigma");
-	RooFormulaVar* resFunctSigma = new RooFormulaVar("resFunctSigma", "@0*@1", RooArgList(*fwhm, *Constants::fwhm2sigma));
+	RooFormulaVar* resFunctSigma = new RooFormulaVar("resFunctSigma", "@0*@1", RooArgList(*fwhm, *Constants::rooFwhmToSigma));
 	RootHelper::deleteObject("resFunct");
 	resolutionFunction = new RooGaussian("resFunct", "Resolution function", *observable, *mean, *resFunctSigma);
 
