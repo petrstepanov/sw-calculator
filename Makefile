@@ -77,7 +77,7 @@ endif
 	mv $(DICT_PCM_FILENAME) $(BIN_DIR)/$(DICT_PCM_FILENAME)
 	rm $(DICT_FILENAME)
 	# copy icon
-	cp resources/$(APP_NAME).xpm $(BIN_DIR)/$(APP_NAME).xpm
+	# cp resources/$(APP_NAME).xpm $(BIN_DIR)/$(APP_NAME).xpm
 
 $(DICT_FILENAME): $(HEADERS) $(SRC_DIR)/LinkDef.h
 	rootcling -f $@ -c $(CXXFLAGS) -p $^
