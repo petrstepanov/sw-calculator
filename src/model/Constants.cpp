@@ -21,6 +21,8 @@ RooConstVar* Constants::fwhm2sigma = new RooConstVar("fwhm2sigma",
 		1 / TMath::Sqrt(8 * TMath::Log(2)));
 RooConstVar* Constants::pi = new RooConstVar("pi", "pi", TMath::Pi());
 
+Double_t Constants::bufferFraction = 2;
+
 char* Constants::applicationIcon[] = {
 		"48 48 17 1",
 		" 	c None",

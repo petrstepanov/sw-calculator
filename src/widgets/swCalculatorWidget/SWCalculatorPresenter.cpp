@@ -200,7 +200,7 @@ void SWCalculatorPresenter::onFitSpectrumClicked() {
 	Int_t numCpu = RootHelper::getNumCpu();
 	RooChi2Var* chi2 = new RooChi2Var("chi2", "chi2", *fittingModel, *data, RooFit::NumCPU(numCpu));
 	RooMinimizer* m = new RooMinimizer(*chi2);
-	m->setMinimizerType("Minuit2");
+//	m->setMinimizerType("Minuit2");
 //	m->optimizeConst(kTRUE);
 //	m->setEps(100);
 //	m->setMaxIterations(10000);

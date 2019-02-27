@@ -29,6 +29,8 @@ class Constants {
     static const UInt_t windowHeight = 600;
     static const UInt_t leftPanelWidth = 420;
     
+    static Double_t bufferFraction;
+
     static const char* applicationName;
     static char* applicationIcon[];
 

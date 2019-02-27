@@ -212,6 +212,8 @@ void CompositeModelProvider::initConvolutedModel(RooRealVar* fwhm) {
 			const char* convPdfTitle = Form("%s Convoluted", pdf->GetTitle());
 			RootHelper::deleteObject(convPdfName);
 			RooFFTConvPdf* convPdf = new RooFFTConvPdf(convPdfName, convPdfTitle, *observable, *pdf, *resolutionFunction);
+			convPdf->setCacheObservables(RooArgSet(*observable));
+			convPdf->setBufferFraction(Constants::	bufferFraction);
 			convolutedPdfsInMaterial->add(*convPdf);
 		}
 	}
@@ -364,7 +366,7 @@ Double_t* CompositeModelProvider::getDefaultGaussAs(const Int_t numGauss) {
 	Double_t* As;
 	switch (numGauss) {
 	case 1:
-		static Double_t arr1[1] = { 0.1 };
+		static Double_t arr1[1] = { 0.5 };
 		As = &arr1[0];
 		break;
 	case 2:
@@ -372,11 +374,12 @@ Double_t* CompositeModelProvider::getDefaultGaussAs(const Int_t numGauss) {
 		As = &arr2[0];
 		break;
 	case 3:
-		static Double_t arr3[3] = { 0.6, 0.3, 0.1 };
+		static Double_t arr3[3] = { 0.6, 0.1, 0.5 };
 		As = &arr3[0];
 		break;
 	default:
-		static Double_t arr4[4] = { 1.5, 1, 0.5, 0.1 };
+		// The key is to give first two coefficients really different values
+		static Double_t arr4[4] = { 1.5, 0.1, 0.3, 0.7 };
 		As = &arr4[0];
 		break;
 	}
