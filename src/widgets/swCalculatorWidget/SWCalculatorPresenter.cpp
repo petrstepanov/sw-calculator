@@ -125,8 +125,7 @@ void SWCalculatorPresenter::onFitSpectrumClicked() {
 	TH1F* fitHist = (TH1F*) histProcessor->cutHist("fitHist", originalHist, fitMin, fitMax);
 
 	// Define energy axis
-	RooRealVar* e = new RooRealVar("e", "Energy axis", fitHist->GetXaxis()->GetXmin(), fitHist->GetXaxis()->GetXmax(),
-			"keV");
+	RooRealVar* e = new RooRealVar("e", "Energy axis", fitHist->GetXaxis()->GetXmin(), fitHist->GetXaxis()->GetXmax(), "keV");
 	// If fitting with ranges instead
 	// x->setRange("fitRange", fitMin, fitMax);
 
@@ -201,11 +200,15 @@ void SWCalculatorPresenter::onFitSpectrumClicked() {
 	Int_t numCpu = RootHelper::getNumCpu();
 	RooChi2Var* chi2 = new RooChi2Var("chi2", "chi2", *fittingModel, *data, RooFit::NumCPU(numCpu));
 	RooMinimizer* m = new RooMinimizer(*chi2);
-	m->setMinimizerType("Minuit");
+	m->setMinimizerType("Minuit2");
+//	m->optimizeConst(kTRUE);
+//	m->setEps(100);
+//	m->setMaxIterations(10000);
+//	m->minimize("Minuit2", "Migrad") ;
+//	m->hesse() ;
 	Int_t resultMigrad = m->migrad();
 	Int_t resultHesse = m->hesse();
-	Debug("SWCalculatorPresenter::onFitSpectrumClicked",
-			"RooMinimizer: migrad=" << resultMigrad << ", hesse=" << resultHesse);
+	Debug("SWCalculatorPresenter::onFitSpectrumClicked", "RooMinimizer: migrad=" << resultMigrad << ", hesse=" << resultHesse);
 
 	RooFitResult* fitResult = m->save();
 
@@ -253,29 +256,26 @@ void SWCalculatorPresenter::onFitSpectrumClicked() {
 	}
 
 	// Initialize legend
-	TLegend *legend = new TLegend(GraphicsHelper::LEGEND_X1, 0.5, 1 - 1.5*GraphicsHelper::padMargins.right, 1 - 2*GraphicsHelper::padMargins.top);
+	TLegend *legend = new TLegend(GraphicsHelper::LEGEND_X1, 0.5, 1 - 1.5 * GraphicsHelper::padMargins.right, 1 - 2 * GraphicsHelper::padMargins.top);
 	legend->SetFillColorAlpha(kWhite, 0);
 	legend->SetLineColorAlpha(kWhite, 0);
 
 	// Plot data points first (in transparent color). Essential for normalization of PDFs
 	// data->plotOn(spectrumPlot, RooFit::Invisible());
-	data->plotOn(spectrumPlot, RooFit::LineColor(kGray + 3), RooFit::XErrorSize(0), RooFit::MarkerSize(0.5),
-			RooFit::MarkerColor(kGray + 3), RooFit::DataError(RooAbsData::SumW2), RooFit::Name("data")); // LineStyle(kSolid), LineWidth(2)
+	data->plotOn(spectrumPlot, RooFit::LineColor(kGray + 3), RooFit::XErrorSize(0), RooFit::MarkerSize(0.5), RooFit::MarkerColor(kGray + 3), RooFit::DataError(RooAbsData::SumW2),
+			RooFit::Name("data")); // LineStyle(kSolid), LineWidth(2)
 	legend->AddEntry(spectrumPlot->findObject("data"), "Data points", "pe");
 
 	// Plot convoluted and unconvoluted models
 	// https://root-forum.cern.ch/t/roofit-normailzations/7040/2
 	// Normalization(totalFitCounts, RooAbsReal::NumEvent)
 	if (fittingConvolutedModel != NULL) {
-		fittingConvolutedModel->plotOn(spectrumPlot, RooFit::LineColor(kOrange + 6), RooFit::LineWidth(2),
-				RooFit::Name("fit"));
+		fittingConvolutedModel->plotOn(spectrumPlot, RooFit::LineColor(kOrange + 6), RooFit::LineWidth(2), RooFit::Name("fit"));
 		legend->AddEntry(spectrumPlot->findObject("fit"), "Convoluted model", "l");
-		fittingNonConvolutedModel->plotOn(spectrumPlot, RooFit::LineColor(kOrange + 6), RooFit::LineWidth(1),
-				RooFit::LineStyle(kDashed), RooFit::Name("model"));
+		fittingNonConvolutedModel->plotOn(spectrumPlot, RooFit::LineColor(kOrange + 6), RooFit::LineWidth(1), RooFit::LineStyle(kDashed), RooFit::Name("model"));
 		legend->AddEntry(spectrumPlot->findObject("model"), "Unconvoluted model", "l");
 	} else {
-		fittingNonConvolutedModel->plotOn(spectrumPlot, RooFit::LineColor(kOrange + 6), RooFit::LineWidth(2),
-				RooFit::Name("fit"));
+		fittingNonConvolutedModel->plotOn(spectrumPlot, RooFit::LineColor(kOrange + 6), RooFit::LineWidth(2), RooFit::Name("fit"));
 		legend->AddEntry(spectrumPlot->findObject("fit"), "Unconvoluted model", "l");
 	}
 	RooCurve* curveFit = spectrumPlot->getCurve("fit");
@@ -290,8 +290,7 @@ void SWCalculatorPresenter::onFitSpectrumClicked() {
 			if (pdf) {
 				RooArgSet* argSet = new RooArgSet();
 				argSet->add(*pdf);
-				fittingNonConvolutedModel->plotOn(spectrumPlot, RooFit::Components(*argSet), RooFit::LineStyle(kDashed),
-						RooFit::LineColor(GraphicsHelper::colorSet[i++]), RooFit::LineWidth(1),
+				fittingNonConvolutedModel->plotOn(spectrumPlot, RooFit::Components(*argSet), RooFit::LineStyle(kDashed), RooFit::LineColor(GraphicsHelper::colorSet[i++]), RooFit::LineWidth(1),
 						RooFit::Name(pdf->GetName()));
 				legend->AddEntry(spectrumPlot->findObject(pdf->GetName()), pdf->GetTitle(), "l");
 			}
@@ -301,8 +300,7 @@ void SWCalculatorPresenter::onFitSpectrumClicked() {
 	// Plot Resolution Function
 	RooAbsPdf* resolutionFunction = modelProvider->getResolutionFuncton();
 	if (resolutionFunction != NULL) {
-		resolutionFunction->plotOn(spectrumPlot, RooFit::LineStyle(kDashed), RooFit::LineColor(kGray), RooFit::LineWidth(1),
-				RooFit::Name("rf")); //, RooFit::Normalization(totalFitCounts, RooAbsReal::NumEvent));
+		resolutionFunction->plotOn(spectrumPlot, RooFit::LineStyle(kDashed), RooFit::LineColor(kGray), RooFit::LineWidth(1), RooFit::Name("rf")); //, RooFit::Normalization(totalFitCounts, RooAbsReal::NumEvent));
 		legend->AddEntry(spectrumPlot->findObject("rf"), "Resolution function", "l");
 	}
 
@@ -312,8 +310,8 @@ void SWCalculatorPresenter::onFitSpectrumClicked() {
 	// Single-dimentional experiment case - plot background
 	if (!model->isTwoDetector()) {
 		// Plot Convoluted Model background (its added after convolution graph because otherwise it changes backgroud)
-		fittingNonConvolutedModel->plotOn(spectrumPlot, RooFit::Components(*(modelProvider->getBgComponents())),
-				RooFit::LineStyle(kDashed), RooFit::LineColor(kPink - 4), RooFit::LineWidth(1), RooFit::Name("bg"));
+		fittingNonConvolutedModel->plotOn(spectrumPlot, RooFit::Components(*(modelProvider->getBgComponents())), RooFit::LineStyle(kDashed), RooFit::LineColor(kPink - 4), RooFit::LineWidth(1),
+				RooFit::Name("bg"));
 		legend->AddEntry(spectrumPlot->findObject("bg"), "Atan background", "l");
 		// Plot fit without background
 		RooCurve* curveBg = spectrumPlot->getCurve("bg");
@@ -321,10 +319,8 @@ void SWCalculatorPresenter::onFitSpectrumClicked() {
 		// curveFitNoBg->SetLineColor(kGray);
 		// curveFitNoBg->SetLineWidth(2);
 		fitHistNoBg = (TH1F*) histProcessor->subtractCurve("fitHistNoBg", fitHist, curveBg);
-		RooDataHist* dataNoBg = new RooDataHist("dataNoBg", "Dataset with e (no background)", RooArgSet(*e),
-				RooFit::Import(*fitHistNoBg));
-		dataNoBg->plotOn(spectrumPlot, RooFit::XErrorSize(0), RooFit::MarkerSize(0.5), RooFit::DataError(RooAbsData::None),
-				RooFit::MarkerColor(kGray), RooFit::Name("dataNoBg"));
+		RooDataHist* dataNoBg = new RooDataHist("dataNoBg", "Dataset with e (no background)", RooArgSet(*e), RooFit::Import(*fitHistNoBg));
+		dataNoBg->plotOn(spectrumPlot, RooFit::XErrorSize(0), RooFit::MarkerSize(0.5), RooFit::DataError(RooAbsData::None), RooFit::MarkerColor(kGray), RooFit::Name("dataNoBg"));
 		spectrumPlot->drawBefore("data", "dataNoBg");
 		legend->AddEntry(spectrumPlot->findObject("dataNoBg"), "Subtracted background", "p");
 	}
@@ -350,17 +346,15 @@ void SWCalculatorPresenter::onFitSpectrumClicked() {
 
 	// Create RooPlot for chi^2
 	RooPlot* residualsPlot = e->frame();
-	Double_t scaleFactor = (1-GraphicsHelper::RESIDUALS_PAD_RELATIVE_HEIGHT)/(GraphicsHelper::RESIDUALS_PAD_RELATIVE_HEIGHT);
+	Double_t scaleFactor = (1 - GraphicsHelper::RESIDUALS_PAD_RELATIVE_HEIGHT) / (GraphicsHelper::RESIDUALS_PAD_RELATIVE_HEIGHT);
 	residualsPlot->SetTitle("");                             // Set Empty Graph Title
 	residualsPlot->GetXaxis()->SetRangeUser(fitMin, fitMax);      // Do we need this?
 	graphicsHelper->setupAxis(residualsPlot->GetXaxis(), "", 2.5, 0.05); // Title, Title offset, Label offset
 	graphicsHelper->setupAxis(residualsPlot->GetYaxis(), "Residuals", 1.6, 0.012); // "#chi^{2}"
 	Chi2Struct chi2Struct = histProcessor->getChi2(fitHist, curveFit, fittingNonConvolutedModel);
 
-	TPaveText* chiText = new TPaveText(GraphicsHelper::LEGEND_X1,
-			1 - 2*GraphicsHelper::padMargins.right - 0.18,
-			1 - 1.2*GraphicsHelper::padMargins.right,
-			1 - 2*GraphicsHelper::padMargins.top, "NDC");
+	TPaveText* chiText = new TPaveText(GraphicsHelper::LEGEND_X1, 1 - 2 * GraphicsHelper::padMargins.right - 0.18, 1 - 1.2 * GraphicsHelper::padMargins.right, 1 - 2 * GraphicsHelper::padMargins.top,
+			"NDC");
 	chiText->AddText(Form("#chi^{2} = %.1f #divide %d = %.3f", chi2Struct.chiSum, chi2Struct.degreesOfFreedom, chi2Struct.chi2));
 	chiText->SetTextSize(gStyle->GetLegendTextSize());
 	chiText->SetTextFont(gStyle->GetLegendFont());
@@ -369,8 +363,7 @@ void SWCalculatorPresenter::onFitSpectrumClicked() {
 	chiText->SetTextAlign(kHAlignRight + kVAlignCenter);
 	residualsPlot->addObject(chiText);
 
-	chi2DataHist->plotOn(residualsPlot, RooFit::LineColor(kGray + 3), RooFit::XErrorSize(0),
-			RooFit::DataError(RooAbsData::None), RooFit::MarkerSize(0.5), RooFit::MarkerColor(kGray + 3));
+	chi2DataHist->plotOn(residualsPlot, RooFit::LineColor(kGray + 3), RooFit::XErrorSize(0), RooFit::DataError(RooAbsData::None), RooFit::MarkerSize(0.5), RooFit::MarkerColor(kGray + 3));
 
 	// Draw data plot on canvas
 	TPad* padData = view->getPadData();
@@ -407,10 +400,8 @@ void SWCalculatorPresenter::onFitSpectrumClicked() {
 		Double_t wWidth = view->getWWidth();
 		Double_t wShift = view->getWShift();
 		Bool_t isTwoDetector = model->isTwoDetector();
-		std::pair<Double_t, Double_t> sValueError = histProcessor->getSParameter(fitHistNoBg, sWidth, modelMean,
-				isTwoDetector);
-		std::pair<Double_t, Double_t> wValueError = histProcessor->getWParameter(fitHistNoBg, wWidth, wShift, modelMean,
-				isTwoDetector);
+		std::pair<Double_t, Double_t> sValueError = histProcessor->getSParameter(fitHistNoBg, sWidth, modelMean, isTwoDetector);
+		std::pair<Double_t, Double_t> wValueError = histProcessor->getWParameter(fitHistNoBg, wWidth, wShift, modelMean, isTwoDetector);
 		view->displaySW(sValueError, wValueError);
 		view->scrollOutputDown();
 	}

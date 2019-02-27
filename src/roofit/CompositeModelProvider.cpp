@@ -376,7 +376,7 @@ Double_t* CompositeModelProvider::getDefaultGaussAs(const Int_t numGauss) {
 		As = &arr3[0];
 		break;
 	default:
-		static Double_t arr4[4] = { 0.9, 0.5, 0.2, 0.1 };
+		static Double_t arr4[4] = { 1.5, 1, 0.5, 0.1 };
 		As = &arr4[0];
 		break;
 	}
