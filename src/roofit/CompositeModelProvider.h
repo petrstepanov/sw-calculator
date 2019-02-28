@@ -23,14 +23,17 @@ public:
     CompositeModelProvider();
     CompositeModelProvider(const CompositeModelProvider& orig);
     
+    enum ConvolutionTypes {
+    	kNoConvolution,
+		kFftConvolution
+    };
+
     CompositeModelProvider(RooRealVar* x, RooRealVar* x0);
 //    virtual ~CompositeModelProvider();
 
     RooArgList* getIndirectParameters();
     RooArgList* getIntensities();
     RooRealVar* getSourceContribution();
-    
-    static std::map<Int_t, TString> getConvolutionTypes(void);
     
     void initTwoDetector(Bool_t hasParabola = kTRUE, const Int_t numGauss = 1, const Int_t numLorentz = 1, const Int_t numLorentzSum = 1, /*Bool_t hasOrthogonal = kFALSE,*/ RooRealVar* fwhm = nullptr);
     void initSingleDetector(Bool_t hasParabola = kTRUE, const Int_t numGauss = 1, const Int_t numLorentz = 1, const Int_t numLorentzSum = 1, /*Bool_t hasOrthogonal = kFALSE,*/ RooRealVar* fwhm = nullptr, Double_t bgFraction = 0.1);
@@ -45,13 +48,6 @@ private:
     RooRealVar* intSourcePdf = nullptr;
     RooFormulaVar* intSourcePdfNorm = nullptr;
     Bool_t isTwoDetector;
-    
-    static std::map<Int_t, TString> createConvolutionType(){
-        std::map<Int_t, TString> m = {{1, TString("None")}, {2, TString("FFT3")}};
-        return m;
-    }; 
-
-    static std::map<Int_t, TString> convolutionType;
     
     void initModel(Bool_t hasParabola, const Int_t, const Int_t numLorentz, const Int_t numLorentzSum);
     void initConvolutedModel(RooRealVar* fwhm);

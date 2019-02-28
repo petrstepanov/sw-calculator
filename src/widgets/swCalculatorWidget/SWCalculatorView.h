@@ -67,6 +67,7 @@ class SWCalculatorView : public AbstractView<SWCalculatorPresenter> {
     TGComboBox* comboConvolutionType;
     TGNumberEntry* numResolutionFWHM;
     TGCheckButton* checkboxResFixed;
+    TGHorizontalFrame* resolutionFwhmFrame;
 
     // Resolution Function view
     RooRealVarView* sourceContributionView;
@@ -150,6 +151,8 @@ class SWCalculatorView : public AbstractView<SWCalculatorPresenter> {
     void onFitSpectrumClicked();
     void onApplyZoomClicked();
     void onResetZoomClicked();
+    void onConvolutionSelected(Int_t id);
+    void onUiReady();
 //    void onSaveDataClicked();
     void onSaveImageClicked();
     void onSaveResultsClicked();

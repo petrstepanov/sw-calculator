@@ -18,12 +18,15 @@
 
 class MyMainFrame : public TGMainFrame {
 public:
-    MyMainFrame(const TGWindow* w);
+    MyMainFrame();
     virtual ~MyMainFrame();
 
-    void mapAndResize();
+    void addChildFrame(TGFrame* child);
     void doExit();
     ClassDef(MyMainFrame, 0);
+
+private:
+    void mapAndResize();
 };
 
 #endif /* MyMainFrameW_H */

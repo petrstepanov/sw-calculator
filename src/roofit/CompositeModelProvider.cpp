@@ -356,12 +356,6 @@ RooRealVar* CompositeModelProvider::getSourceContribution() {
 	return v;
 }
 
-std::map<Int_t, TString> CompositeModelProvider::convolutionType = CompositeModelProvider::createConvolutionType();
-
-std::map<Int_t, TString> CompositeModelProvider::getConvolutionTypes(void) {
-	return convolutionType;
-}
-
 Double_t* CompositeModelProvider::getDefaultGaussAs(const Int_t numGauss) {
 	Double_t* As;
 	switch (numGauss) {

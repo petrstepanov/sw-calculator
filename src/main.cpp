@@ -8,12 +8,14 @@
 
 int main(int argc, char **argv) {
     TApplication* app = new TApplication(Constants::applicationName, &argc, argv);
-    MyMainFrame* myMainFrame = new MyMainFrame(gClient->GetRoot());
-    SWCalculatorView* swCalculatorView = new SWCalculatorView(myMainFrame);
 
-    myMainFrame->AddFrame(swCalculatorView, new TGLayoutHints(kLHintsExpandX | kLHintsExpandY));
-    myMainFrame->mapAndResize();
-    swCalculatorView->setSourceContributionFrameVisible(kFALSE);
+    // Main frame sets icon, title, resizes and maps the window
+    MyMainFrame* myMainFrame = new MyMainFrame();
+    SWCalculatorView* swCalculatorView = new SWCalculatorView(myMainFrame);
+    myMainFrame->addChildFrame(swCalculatorView);
+
+    // Hiding frames only possible after Window was mapped.
+    swCalculatorView->onUiReady();
 
     app->Run();
     return 0;

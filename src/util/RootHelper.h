@@ -16,6 +16,7 @@
 
 #include <TROOT.h>
 #include <TStopwatch.h>
+#include <TGFrame.h>
 
 class RootHelper {
 public:
@@ -24,6 +25,10 @@ public:
     static Int_t getNumCpu();
     static void startTimer(void);
     static void stopAndPrintTimer();
+    static TGCompositeFrame* getParentFrame(TGFrame* frame);
+    static void showFrame(TGFrame* frame);
+    static void hideFrame(TGFrame* frame);
+
 private:
     static TStopwatch* watch;
 };

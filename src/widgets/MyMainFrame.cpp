@@ -18,7 +18,9 @@
 #include "../util/UiHelper.h"
 #include <iostream>
 
-MyMainFrame::MyMainFrame(const TGWindow* w) : TGMainFrame(w, Constants::windowWidth, Constants::windowHeight) {
+MyMainFrame::MyMainFrame() : TGMainFrame(gClient->GetRoot(), Constants::windowWidth, Constants::windowHeight) {
+	SetIconPixmap(Constants::applicationIcon);
+	SetWindowName(Constants::applicationName);
 	SetCleanup(kDeepCleanup);
 
 	// Exit this application via the Exit button or Window Manager.
@@ -26,22 +28,19 @@ MyMainFrame::MyMainFrame(const TGWindow* w) : TGMainFrame(w, Constants::windowWi
     DontCallClose();
 
     // Save reverence to MyMainFrame in UiHelper (for centering of modal dialogs)
-    UiHelper* uiHelper = UiHelper::getInstance();
-    uiHelper->setMainFrame(this);
+    UiHelper::getInstance()->setMainFrame(this);
 }
 
 MyMainFrame::~MyMainFrame(){
     Cleanup();
 }
 
+void MyMainFrame::addChildFrame(TGFrame* child){
+    AddFrame(child, new TGLayoutHints(kLHintsExpandX | kLHintsExpandY));
+    mapAndResize();
+}
+
 void MyMainFrame::mapAndResize(){
-//	TImage *img = TImage::Create();
-//	img->SetImageBuffer(Constants::applicationIcon, TImage::kXpm);
-//	gVirtualX->SetIconPixmap(GetId(), img->GetPixmap());
-
-	SetIconPixmap(Constants::applicationIcon);
-	SetWindowName(Constants::applicationName);
-
 	MapSubwindows();
     Layout();
     Resize(GetDefaultSize());

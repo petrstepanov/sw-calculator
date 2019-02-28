@@ -156,7 +156,7 @@ void SWCalculatorPresenter::onFitSpectrumClicked() {
 			return;
 
 		RooRealVar* fwhmRealVar = nullptr;
-		if (view->getConvolutionType() != 0) {
+		if (view->getConvolutionType() != CompositeModelProvider::kNoConvolution) {
 			RootHelper::deleteObject("resFunctFWHM");
 			fwhmRealVar = new RooRealVar("resFunctFWHM", "Resolution function FWHM", fwhm, fwhm / 4, fwhm * 4, "keV");
 			fwhmRealVar->setConstant(view->isResolutionFixed());

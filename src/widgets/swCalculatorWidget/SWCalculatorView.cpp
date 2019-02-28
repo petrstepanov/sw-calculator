@@ -18,6 +18,7 @@
 #include "../importSpectrumWidget/ImportSpectrumView.h"
 #include "../importSpectrumWidget/ImportSourceSpectrumView.h"
 #include "../../util/StringUtils.h"
+#include "../../util/RootHelper.h"
 #include <TGFrame.h>
 #include <TGTextBuffer.h>
 #include <TGText.h>
@@ -130,33 +131,44 @@ void SWCalculatorView::initUI(){
     // Separator
     tabFit->AddFrame(new TGHorizontal3DLine(tabFit), new TGLayoutHints(kLHintsExpandX, dx, dx, dy, dy));
 
-    // Resolution Function Parameters
+    // Convolution type and resolution function
     TGHorizontalFrame* convolutionParamsFrame = new TGHorizontalFrame(tabFit);
+
     comboConvolutionType = new TGComboBox(convolutionParamsFrame, 0);
-    std::map<Int_t, TString> convTypes = CompositeModelProvider::getConvolutionTypes();
-    for (std::map<Int_t, TString>::iterator it=convTypes.begin(); it!=convTypes.end(); ++it){
+    // Initialize a map with std::initialzer_list
+    const std::map<Int_t, TString> convolutionTypesMap = {
+    		{CompositeModelProvider::kNoConvolution, "None"},
+    		{CompositeModelProvider::kFftConvolution, "FFT3"}
+    };
+    for(auto it=convolutionTypesMap.begin(); it!=convolutionTypesMap.end(); ++it){
         comboConvolutionType->AddEntry((it->second).Data(), it->first);
     }
-    comboConvolutionType->Select(1);
-    comboConvolutionType->Resize(75, 20);
-    checkboxResFixed = new TGCheckButton(convolutionParamsFrame, "fixed");
-    checkboxResFixed->SetOn();
-    numResolutionFWHM = new TGNumberEntry(convolutionParamsFrame, 2.0, 4, -1, TGNumberFormat::kNESRealTwo,
-            TGNumberFormat::kNEANonNegative,
-            TGNumberFormat::kNELLimitMinMax,
-            0.5, 4.0);
+    comboConvolutionType->Connect("Selected(Int_t)", "SWCalculatorView", this, "onConvolutionSelected(Int_t)");
+    comboConvolutionType->Select(CompositeModelProvider::kNoConvolution, kFALSE);
+    comboConvolutionType->Resize(60, 20);
+
     convolutionParamsFrame->AddFrame(new TGLabel(convolutionParamsFrame, "Convolution"),
                                      new TGLayoutHints(kLHintsLeft | kLHintsTop, 0, dx, 4*dy/5, 0));
     convolutionParamsFrame->AddFrame(comboConvolutionType, new TGLayoutHints(kLHintsLeft | kLHintsTop, 0, 0, dy/5, 0));
-    convolutionParamsFrame->AddFrame(checkboxResFixed, new TGLayoutHints(kLHintsRight | kLHintsTop, 0, 0, 3*dy/5, 0));
-    convolutionParamsFrame->AddFrame(numResolutionFWHM, new TGLayoutHints(kLHintsRight | kLHintsTop, 0, dx, dy/5, 0));
-    convolutionParamsFrame->AddFrame(new TGLabel(convolutionParamsFrame, "Resolution FWHM, keV"),
+
+    resolutionFwhmFrame = new TGHorizontalFrame(convolutionParamsFrame);
+    checkboxResFixed = new TGCheckButton(resolutionFwhmFrame, "fixed");
+    checkboxResFixed->SetOn();
+    numResolutionFWHM = new TGNumberEntry(resolutionFwhmFrame, 2.0, 4, -1, TGNumberFormat::kNESRealTwo,
+            TGNumberFormat::kNEANonNegative,
+            TGNumberFormat::kNELLimitMinMax,
+            0.5, 4.0);
+
+    resolutionFwhmFrame->AddFrame(checkboxResFixed, new TGLayoutHints(kLHintsRight | kLHintsTop, dx, 0, 3*dy/5, 0));
+    resolutionFwhmFrame->AddFrame(numResolutionFWHM, new TGLayoutHints(kLHintsRight | kLHintsTop, 0, 0, dy/5, 0));
+    resolutionFwhmFrame->AddFrame(new TGLabel(resolutionFwhmFrame, "Sum of detectors' FWHMs, keV"),
                                      new TGLayoutHints(kLHintsRight | kLHintsTop, 0, dx, 4*dy/5, 0));
+    convolutionParamsFrame->AddFrame(resolutionFwhmFrame, new TGLayoutHints(kLHintsExpandX, 0, 0, 0, 0));
+
     tabFit->AddFrame(convolutionParamsFrame, new TGLayoutHints(kLHintsExpandX, dx, dx, dy, dy));
 
     // Separator
-//    tabFit->AddFrame(new TGHorizontal3DLine(tabFit), new TGLayoutHints(kLHintsExpandX, dx, dx, dy, dy));
-
+    tabFit->AddFrame(new TGHorizontal3DLine(tabFit), new TGLayoutHints(kLHintsExpandX, dx, dx, dy, dy));
 
     // Add source contribution frame
     sourceContributionFrame = new TGVerticalFrame(tabFit);
@@ -302,11 +314,6 @@ void SWCalculatorView::initUI(){
 
     AddFrame(frameRightVertical, new TGLayoutHints(kLHintsLeft | kLHintsTop | kLHintsExpandX | kLHintsExpandY, 0, 0, 0, dx));
 
-//    MapSubwindows();
-    // You should call, for example HideFrame(TGFrame *f), only after the frames have been laid out and the sub windows
-    // of the composite frame have been mapped via method MapSubwindows()
-//    setSourceContributionFrameVisible(kFALSE);
-
     // Initialize pads on canvas
     canvasPlot = embedPlot->GetCanvas();
     canvasPlot->Divide(1, 2);
@@ -320,12 +327,21 @@ void SWCalculatorView::initUI(){
     canvasPlot->cd(2)->SetPad("padChi2", "Pad for chi^2", 0.0, 0.0, 1.0, GraphicsHelper::RESIDUALS_PAD_RELATIVE_HEIGHT, kWhite);
     gPad->SetMargin((GraphicsHelper::padMargins).left, (GraphicsHelper::padMargins).right, (GraphicsHelper::padMargins).bottom, (GraphicsHelper::padMargins).top);
     padChi2 = (TPad*)canvasPlot->GetPad(2);
+
+    // You should call, for example HideFrame(TGFrame *f), only after the frames have been laid out and the sub windows
+    // of the composite frame have been mapped via method MapSubwindows()
+    // RootHelper::hideFrame(resolutionFwhmFrame);
 }
 
 // Calls from Presenter
-
 RooRealVarView* SWCalculatorView::getSourceContributionView() {
     return sourceContributionView;
+}
+
+void SWCalculatorView::onUiReady(){
+	RootHelper::hideFrame(resolutionFwhmFrame);
+	RootHelper::hideFrame(checkboxResFixed);
+	RootHelper::hideFrame(sourceContributionFrame);
 }
 
 
@@ -422,7 +438,7 @@ Double_t SWCalculatorView::getWShift(){
 }
 
 Int_t SWCalculatorView::getConvolutionType(){
-    return comboConvolutionType->GetSelected() - 1;
+    return comboConvolutionType->GetSelected();
 }
 
 Bool_t SWCalculatorView::hasParabola(){
@@ -469,14 +485,22 @@ void SWCalculatorView::setToolbarEnabled(Bool_t isEnabled){
 }
 
 void SWCalculatorView::setSourceContributionFrameVisible(Bool_t isVisible) {
-    if (isVisible) tabFit->ShowFrame(sourceContributionFrame);
-    else tabFit->HideFrame(sourceContributionFrame);
+    if (isVisible) RootHelper::showFrame(sourceContributionFrame);
+    else RootHelper::hideFrame(sourceContributionFrame);
 }
 
 TCanvas* SWCalculatorView::getCanvas() {
     return canvasPlot;
 }
 
+void SWCalculatorView::onConvolutionSelected(Int_t id){
+	if (id == CompositeModelProvider::kNoConvolution){
+		RootHelper::hideFrame(resolutionFwhmFrame);
+	}
+	else {
+		RootHelper::showFrame(resolutionFwhmFrame);
+	}
+}
 
 void SWCalculatorView::updateRegionLabels(Bool_t isTwoDetector){
     lblRescale1->SetText(isTwoDetector ? "2 x " : " ");
@@ -543,9 +567,6 @@ void SWCalculatorView::updateCanvas() {
 
 // Scroll output textarea to the very bottom
 void SWCalculatorView::scrollOutputDown(){
-    Long_t lineCount = txtFitResult->ReturnLineCount();
-    Debug("SWCalculatorView::scrollOutputDown", "lineCount: " << lineCount);
-//    txtFitResult->ScrollToPosition(TGLongPosition(0, lineCount));
     txtFitResult->Update();
     txtFitResult->ShowBottom();
 }
