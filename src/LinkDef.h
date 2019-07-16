@@ -7,6 +7,10 @@
 // Main GUI class inherited from TGMainFrame
 #pragma link C++ class MyMainFrame;
 
+// For signals and slots
+#pragma link C++ class Model;
+#pragma link C++ class SWCalculatorPresenter;
+
 // PDFs inherited from RooAbsPdf
 #pragma link C++ class BackgroundPdf;
 #pragma link C++ class DampLorentzPdf;

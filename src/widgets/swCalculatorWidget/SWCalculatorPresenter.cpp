@@ -39,6 +39,7 @@ SWCalculatorPresenter::SWCalculatorPresenter(SWCalculatorView* view) :
 		AbstractPresenter<Model, SWCalculatorView>(view) {
 	// Need to instantinate RooRealVarView model for source Contribution
 	model = instantinateModel();
+	onInitModel();
 }
 
 Model* SWCalculatorPresenter::instantinateModel() {
@@ -46,10 +47,6 @@ Model* SWCalculatorPresenter::instantinateModel() {
 }
 
 void SWCalculatorPresenter::onInitModel() {
-	std::cout << "SWCalculatorPresenter::onInitModel" << std::endl;
-}
-
-void SWCalculatorPresenter::addEventListeners() {
 	model->Connect("safeFitRangeSet(Double_t, Double_t)", "SWCalculatorPresenter", this, "onSafeFitRangeSet(Double_t, Double_t)");
 //	model->Connect("sourceHistogramImported(TH1F*)", "SWCalculatorPresenter", this, "onSourceHistogramImported(TH1F*)");
 	model->Connect("twoDetectorSet(Bool_t)", "SWCalculatorPresenter", this, "onTwoDetectorSet(Bool_t)");

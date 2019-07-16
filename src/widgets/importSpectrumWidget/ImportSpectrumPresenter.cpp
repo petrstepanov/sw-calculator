@@ -9,6 +9,7 @@
 #include "../../model/Model.h"
 
 ImportSpectrumPresenter::ImportSpectrumPresenter(AbstractImportSpectrumView* view) : AbstractImportSpectrumPresenter(view){
+//	model = instantinateModel();
 }
         
 void ImportSpectrumPresenter::setModelFileName(TString* fileName){

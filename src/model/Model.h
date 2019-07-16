@@ -65,6 +65,8 @@ private:
     RooRealVar* sourceContribution;
     Bool_t twoDetector;
     std::pair<Double_t, Double_t> safeFitRange;
+
+	ClassDef(Model, 0)
 };
 
 #endif /* MODEL_H */

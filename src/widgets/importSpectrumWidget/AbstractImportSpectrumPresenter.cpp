@@ -13,6 +13,7 @@
 
 AbstractImportSpectrumPresenter::AbstractImportSpectrumPresenter(AbstractImportSpectrumView* view) : 
     AbstractPresenter<Model, AbstractImportSpectrumView>(view) {
+	model = instantinateModel();
 }
 
 void AbstractImportSpectrumPresenter::onOpenFileClicked(){

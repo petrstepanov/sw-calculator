@@ -26,15 +26,13 @@ public:
 
     // Override base class virtual methods
     Model* instantinateModel();
-    
-    void addEventListeners();
-    // View functions
+
+    void onInitModel();
     
     void onFitSpectrumClicked();
     void onSaveImageClicked();
     void onSaveResultsClicked();
     void onClearResultsClicked();
-    void onInitModel();
 
     // Slots for Model Signals
     void onSourceHistogramImported(TH1F* hist);

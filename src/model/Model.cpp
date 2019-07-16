@@ -59,6 +59,7 @@ TH1F* Model::getHist(){
 
 void Model::setSourceHist(TH1F* hist){
     sourceHist = hist;
+    sourceHistogramImported(hist);
     // EventBus::FireEvent(*(new SourceHistogramImportedEvent(*this))); // Fire the event
 }
 
@@ -68,7 +69,7 @@ TH1F* Model::getSourceHist(){
 
 void Model::setTwoDetector(Bool_t b){
     twoDetector = b;
-    // EventBus::FireEvent(*(new IsTwoDetectorEvent(*this, twoDetector))); // Fire the event
+    twoDetectorSet(b);
 }
 
 Bool_t Model::isTwoDetector(){
@@ -77,6 +78,7 @@ Bool_t Model::isTwoDetector(){
 
 void Model::setSafeFitRange(Double_t eMin, Double_t eMax){
     safeFitRange = std::make_pair(eMin, eMax);
+    safeFitRangeSet(eMin, eMax);
     // EventBus::FireEvent(*(new HistogramImportedEvent(*this, eMin, eMax))); // Fire the event
 }
 
@@ -91,7 +93,7 @@ void Model::sourceHistogramImported(TH1F* hist){
 }
 
 void Model::twoDetectorSet(Bool_t isTwoDetector){
-	Emit("isTwoDetector(Bool_t)", isTwoDetector);
+	Emit("twoDetectorSet(Bool_t)", isTwoDetector);
 }
 
 void Model::safeFitRangeSet(Double_t eMin, Double_t eMax){
