@@ -25,6 +25,7 @@
 
 class RooRealVarView : public AbstractView<RooRealVarPresenter> {
 private:
+    TGLabel* name;
     TGLabel* description;
     TGNumberEntry* value;
     TGNumberEntry* minValue;

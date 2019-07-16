@@ -16,41 +16,25 @@
 
 #include <TGFrame.h>
 #include <iostream>
+#include "../util/Debug.h"
 
 enum Padding {
-   dx = 10,
-   dy = 5,
-   d3x = 3*dx
+	dx = 10, dy = 5
 };
 
-template <class P> class AbstractView : public TGCompositeFrame {
-  public:
-    AbstractView(const TGWindow *w=0) : TGCompositeFrame(w){
-        presenter = NULL;
-    }
+template<class P> class AbstractView: public TGCompositeFrame {
+protected:
+	P* presenter;
+	virtual P* instantinatePresenter()=0;
 
-    ~AbstractView(){
-        delete presenter;
-    }
+public:
+	AbstractView(const TGWindow *w = 0) : TGCompositeFrame(w) {
+		presenter = nullptr;
+	}
 
-    P* getPresenter(){
-        if (presenter == NULL){
-            presenter = instantinatePresenter();
-        }
-        return presenter;
-    }
-
-//    TGCompositeFrame* GetParentComposite(){
-//        return parentCompositeFrame;
-//    }
-
-  private:
-    P* presenter;
-//    TGCompositeFrame* parentCompositeFrame;
-
-  protected:
-    virtual P* instantinatePresenter()=0;
-    virtual void initUI()=0;
+	~AbstractView() {
+		delete presenter;
+	}
 };
 
 #endif /* ABSTRACTVIEW_H */

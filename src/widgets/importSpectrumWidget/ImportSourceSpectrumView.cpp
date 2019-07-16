@@ -16,6 +16,7 @@
 
 
 ImportSourceSpectrumView::ImportSourceSpectrumView(const TGWindow *w) : AbstractImportSpectrumView(w){
+    presenter = instantinatePresenter();
 }
 
 // Override base class virtual functions

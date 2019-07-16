@@ -16,8 +16,6 @@ AbstractImportSpectrumPresenter::AbstractImportSpectrumPresenter(AbstractImportS
 }
 
 void AbstractImportSpectrumPresenter::onOpenFileClicked(){
-    AbstractImportSpectrumView* view = getView();
-    
     // Get FileInfo from open file dialog
     UiHelper* uiHelper = UiHelper::getInstance();
     TGFileInfo* fileInfo = uiHelper->getFileFromDialog();
@@ -33,7 +31,6 @@ void AbstractImportSpectrumPresenter::onOpenFileClicked(){
 
 void AbstractImportSpectrumPresenter::onImportSpectrumClicked(){
     // Import Histogram
-    AbstractImportSpectrumView* view = getView();
     Int_t energyColumn = view->getEnergyColumnNumber();
     Int_t countsColumn = view->getCountsColumnNumber();
     TString* fileName = view->getFileName();

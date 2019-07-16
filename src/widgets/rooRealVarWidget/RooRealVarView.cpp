@@ -33,16 +33,24 @@ void RooRealVarView::initUI() {
     // Set horizontal layout
     SetLayoutManager(new TGHorizontalLayout(this));
 
+    // Name label
+    description = new TGLabel(this, ""); // Variable name
+    description->SetTextJustify(kTextLeft);
+    AddFrame(description, new TGLayoutHints(kLHintsLeft | kLHintsTop | kLHintsExpandX, 0, dx, 3*dy/5));
+
     // Description label
     description = new TGLabel(this, ""); // Variable name
     description->SetTextJustify(kTextLeft);
     AddFrame(description, new TGLayoutHints(kLHintsLeft | kLHintsTop | kLHintsExpandX, 0, dx, 3*dy/5));
 
+    Double_t doubleMin = std::numeric_limits<Double_t>::min();
+    Double_t doubleMax = std::numeric_limits<Double_t>::min();
+
     // Value textbox
     value = new TGNumberEntry(this, 0, 5, -1, TGNumberFormat::kNESRealTwo,
                 TGNumberFormat::kNEANonNegative,
                 TGNumberFormat::kNELLimitMinMax,
-                -100, 100);
+                doubleMin, doubleMax);
     value->GetNumberEntry()->Connect("TextChanged(char*)", "RooRealVarView", this, "onValueChange(char*)");
     AddFrame(value, new TGLayoutHints(kLHintsLeft | kLHintsTop, dx, dx));
 
@@ -50,7 +58,7 @@ void RooRealVarView::initUI() {
     minValue = new TGNumberEntry(this, 0, 5, -1, TGNumberFormat::kNESRealTwo,
                 TGNumberFormat::kNEANonNegative,
                 TGNumberFormat::kNELLimitMax,
-                -100, 100);
+                doubleMin, doubleMax);
     minValue->GetNumberEntry()->Connect("TextChanged(char*)", "RooRealVarView", this, "onMinimumChange(char*)");
     AddFrame(minValue, new TGLayoutHints(kLHintsLeft | kLHintsTop, dx, dx));
 
@@ -61,7 +69,7 @@ void RooRealVarView::initUI() {
     maxValue = new TGNumberEntry(this, 0, 5, -1, TGNumberFormat::kNESRealTwo,
                 TGNumberFormat::kNEANonNegative,
                 TGNumberFormat::kNELLimitMin,
-                -100, 100);
+                doubleMin, doubleMax);
     maxValue->GetNumberEntry()->Connect("TextChanged(char*)", "RooRealVarView", this, "onMaximumChange(char*)");
     AddFrame(maxValue, new TGLayoutHints(kLHintsLeft | kLHintsTop, dx, dx));
 
@@ -105,18 +113,15 @@ void RooRealVarView::setConstant(Bool_t isConstant) {
 
 void RooRealVarView::onMinimumChange(char* c) {
     Double_t min = minValue->GetNumber();
-    RooRealVarPresenter* presenter = getPresenter();
     presenter->onMinimumChange(min);
 }
 
 void RooRealVarView::onMaximumChange(char* c) {
     Double_t max = maxValue->GetNumber();
-    RooRealVarPresenter* presenter = getPresenter();
     presenter->onMaximumChange(max);
 }
 
 void RooRealVarView::onSetConstant(Bool_t isConstant) {
-    RooRealVarPresenter* presenter = getPresenter();
     isConstant = fixed->IsOn();
     presenter->onSetConstant(isConstant);
     minValue->SetState(isConstant ? kFALSE : kTRUE);
@@ -125,6 +130,5 @@ void RooRealVarView::onSetConstant(Bool_t isConstant) {
 
 void RooRealVarView::onValueChange(char* c) {
     Double_t val = value->GetNumber();
-    RooRealVarPresenter* presenter = getPresenter();
     presenter->onValueChange(val);
 }

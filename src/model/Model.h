@@ -19,86 +19,50 @@
 #include <RtypesCore.h>
 #include <RooCurve.h>
 #include <iostream>
-#include "../event/events/HistogramImportedEvent.h"
-#include "../event/events/IsTwoDetectorEvent.h"
-#include "../event/events/SourceHistogramImportedEvent.h"
-#include "../event/Object.h"
-#include "../event/EventBus.h"
+#include <TQObject.h>
 #include <RooRealVar.h>
 
-class Model : public Object {
+class Model : public TQObject {
 public:
     static Model* getInstance();
     
-    void setFileName(TString* fileName){ 
-        std::cout << "Model::setFileName(), " << *fileName << std::endl;
-        strFileName = fileName; 
-    }
-    
-    TString* getFileName(){ 
-        return strFileName; 
-    }
+    void setFileName(TString* fileName);
+    TString* getFileName();
 
-    void setSourceFileName(TString* fileName){  
-        std::cout << "Model::setSourceFileName(), " << fileName << std::endl;
-        strSourceContribFileName = fileName; 
-    }
+    void setSourceFileName(TString* fileName);
+    TString* getSourceFileName();
     
-    TString* getSourceFileName(){ 
-        return strSourceContribFileName; 
-    }
+    void setHist(TH1F* hist);
+    TH1F* getHist();
     
-    void setHist(TH1F* hist){ 
-        fullHist = hist;
-        Double_t histMin = hist->GetXaxis()->GetXmin();
-        Double_t histMax = hist->GetXaxis()->GetXmax();
-    }
-    
-    TH1F* getHist(){ 
-        return fullHist; 
-    }
+    void setSourceHist(TH1F* hist);
+    TH1F* getSourceHist();
 
-    void setSourceHist(TH1F* hist){ 
-        sourceHist = hist; 
-        EventBus::FireEvent(*(new SourceHistogramImportedEvent(*this))); // Fire the event           
-    }
-    
-    TH1F* getSourceHist(){ 
-        return sourceHist; 
-    }
+    void setTwoDetector(Bool_t b);
+    Bool_t isTwoDetector();
 
-    void setTwoDetector(Bool_t b){ 
-        twoDetector = b;
-        EventBus::FireEvent(*(new IsTwoDetectorEvent(*this, twoDetector))); // Fire the event        
-    }
+    void setSafeFitRange(Double_t eMin, Double_t eMax);
     
-    Bool_t isTwoDetector(){ 
-        return twoDetector; 
-    }
+    RooRealVar* getSourceContribution();
+    
+    // SIGNALS
+    void sourceHistogramImported(TH1F* hist); // *SIGNAL*
+    void twoDetectorSet(Bool_t isTwoDetector); // *SIGNAL*
+    void safeFitRangeSet(Double_t eMin, Double_t eMax); // *SIGNAL*
 
-    void setSafeFitRange(Double_t eMin, Double_t eMax){
-        safeFitRange = std::make_pair(eMin, eMax);
-        EventBus::FireEvent(*(new HistogramImportedEvent(*this, eMin, eMax))); // Fire the event        
-    }
-    
-    RooRealVar* getSourceContribution(){
-        return sourceContribution;
-    }
-    
 private:
-    Model();                              // Private so that it can  not be called
+    Model();                              // Private so that it can not be called
     static Model* instance;
 
     TString* strFileName = nullptr;
     TString* strSourceContribFileName = nullptr;
     TH1F* fullHist = nullptr;
-//    TH1F* peakHist;
     TH1F* sourceHist = nullptr;
     RooCurve* curveBg = nullptr;
     RooCurve* curveFit = nullptr;
     TH1F* peakHistNoBg = nullptr;
     TH1F* chiHist = nullptr;
-    RooRealVar* sourceContribution = nullptr;
+    RooRealVar* sourceContribution;
     Bool_t twoDetector;
     std::pair<Double_t, Double_t> safeFitRange;
 };

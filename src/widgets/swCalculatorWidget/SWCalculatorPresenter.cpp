@@ -14,9 +14,6 @@
 #include "SWCalculatorPresenter.h"
 #include "SWCalculatorView.h"
 #include "../../model/Model.h"
-#include "../../event/events/HistogramImportedEvent.h"
-#include "../../event/EventBus.h"
-#include "../../event/HandlerRegistration.h"
 #include "../../util/RootHelper.h"
 #include "../../util/HistProcessor.h"
 #include "../../util/GraphicsHelper.h"
@@ -41,7 +38,7 @@
 SWCalculatorPresenter::SWCalculatorPresenter(SWCalculatorView* view) :
 		AbstractPresenter<Model, SWCalculatorView>(view) {
 	// Need to instantinate RooRealVarView model for source Contribution
-//    Model* model = getModel();
+	model = instantinateModel();
 }
 
 Model* SWCalculatorPresenter::instantinateModel() {
@@ -53,56 +50,9 @@ void SWCalculatorPresenter::onInitModel() {
 }
 
 void SWCalculatorPresenter::addEventListeners() {
-	SWCalculatorView* view = getView();
-	Model* model = getModel();
-
-	class HistogramImportedEventListener: public EventHandler<HistogramImportedEvent> {
-	public:
-		HistogramImportedEventListener(SWCalculatorView* v) :
-				view(v) {
-		}
-
-		virtual void onEvent(HistogramImportedEvent & e) override {
-			std::cout << "HistogramImportedEventListener::onEvent()" << std::endl;
-			view->setFitMinMaxRange(e.getHistMin() + 0.5, e.getHistMax());
-			view->setTabEnabled(1, true);
-			view->setTabEnabled(2, true);
-		}
-		SWCalculatorView* view = nullptr;
-	};
-	EventBus::AddHandler<HistogramImportedEvent>(*(new HistogramImportedEventListener(view)));
-
-	class SourceHistogramImportedEventListener: public EventHandler<SourceHistogramImportedEvent> {
-	public:
-		SourceHistogramImportedEventListener(SWCalculatorView* v, Model* m) :
-				view(v), model(m) {
-		}
-
-		virtual void onEvent(SourceHistogramImportedEvent & e) override {
-			std::cout << "SourceHistogramImportedEventListener::onEvent()" << std::endl;
-			RooRealVarView* sourceContributionView = view->getSourceContributionView();
-			sourceContributionView->getPresenter()->setModel(model->getSourceContribution());
-			view->setSourceContributionFrameVisible(kTRUE);
-		}
-		SWCalculatorView* view = nullptr;
-		Model* model = nullptr;
-	};
-	EventBus::AddHandler<SourceHistogramImportedEvent>(*(new SourceHistogramImportedEventListener(view, model)));
-
-	class IsTwoDetectorEventListener: public EventHandler<IsTwoDetectorEvent> {
-	public:
-		IsTwoDetectorEventListener(SWCalculatorView* v) :
-				view(v) {
-		}
-
-		virtual void onEvent(IsTwoDetectorEvent & e) override {
-			std::cout << "IsTwoDetectorEvent::onEvent()" << std::endl;
-			view->updateRegionLabels(e.isTwoDetector());
-			view->setFitMinMaxValues(e.isTwoDetector());
-		}
-		SWCalculatorView* view = nullptr;
-	};
-	EventBus::AddHandler<IsTwoDetectorEvent>(*(new IsTwoDetectorEventListener(view)));
+	model->Connect("safeFitRangeSet(Double_t, Double_t)", "SWCalculatorPresenter", this, "onSafeFitRangeSet(Double_t, Double_t)");
+//	model->Connect("sourceHistogramImported(TH1F*)", "SWCalculatorPresenter", this, "onSourceHistogramImported(TH1F*)");
+	model->Connect("twoDetectorSet(Bool_t)", "SWCalculatorPresenter", this, "onTwoDetectorSet(Bool_t)");
 }
 
 void SWCalculatorPresenter::onFitSpectrumClicked() {
@@ -110,7 +60,6 @@ void SWCalculatorPresenter::onFitSpectrumClicked() {
 	RootHelper::startTimer();
 
 	// Get UI values
-	SWCalculatorView* view = getView();
 	Int_t fitMin = view->getFitMinValue();
 	Int_t fitMax = view->getFitMaxValue();
 
@@ -119,7 +68,6 @@ void SWCalculatorPresenter::onFitSpectrumClicked() {
 
 	// Construct histogram with limits [fitMin, fitMax]
 	// Important for 1D Doppler spectra where spectrum range can be [0, 1] MeV
-	Model* model = getModel();
 	TH1F* originalHist = model->getHist();
 	HistProcessor* histProcessor = HistProcessor::getInstance();
 	TH1F* fitHist = (TH1F*) histProcessor->cutHist("fitHist", originalHist, fitMin, fitMax);
@@ -371,9 +319,6 @@ void SWCalculatorPresenter::onFitSpectrumClicked() {
 
 	// Output Parameters to the View
 	{
-		SWCalculatorView* view = getView();
-		Model* model = getModel();
-
 		// Output filename
 		view->displayFilename(model->getFileName());
 		// Output model parameters (RooRealVars')
@@ -404,9 +349,6 @@ void SWCalculatorPresenter::onFitSpectrumClicked() {
 }
 
 void SWCalculatorPresenter::onSaveImageClicked() {
-	Model* model = getModel();
-	SWCalculatorView* view = getView();
-
 	// Create image file names
 	TString* filePath = model->getFileName();
 	TString* filePathNoExtension = StringUtils::stripFileExtension(filePath);
@@ -429,9 +371,6 @@ void SWCalculatorPresenter::onSaveImageClicked() {
 }
 
 void SWCalculatorPresenter::onSaveResultsClicked() {
-	Model* model = getModel();
-	SWCalculatorView* view = getView();
-
 	// Create image file names
 	TString* filePath = model->getFileName();
 	TString* filePathNoExtension = StringUtils::stripFileExtension(filePath);
@@ -444,6 +383,26 @@ void SWCalculatorPresenter::onSaveResultsClicked() {
 }
 
 void SWCalculatorPresenter::onClearResultsClicked() {
-	SWCalculatorView* view = getView();
 	view->clearFitResults();
 }
+
+// Slots for Model Signals
+void SWCalculatorPresenter::onSafeFitRangeSet(Double_t eMin, Double_t eMax){
+	std::cout << "SWCalculator::onSafeFitRangeSet()" << std::endl;
+	view->setFitMinMaxRange(eMin + 0.5, eMax);
+	view->setTabEnabled(1, true);
+	view->setTabEnabled(2, true);
+}
+
+//void SWCalculatorPresenter::onSourceHistogramImported(TH1F* hist){
+//	std::cout << "SWCalculatorPresenter::onSourceHistogramImported(TH1F*)" << std::endl;
+//	view->getSourceContributionView()->presenter->setModel(model->getSourceContribution());
+//	view->setSourceContributionFrameVisible(kTRUE);
+//}
+
+void SWCalculatorPresenter::onTwoDetectorSet(Bool_t isTwoDetector){
+	std::cout << "SWCalculatorPresenter::onTwoDetectorSet(Bool_t)" << std::endl;
+	view->updateRegionLabels(isTwoDetector);
+	view->setFitMinMaxValues(isTwoDetector);
+}
+

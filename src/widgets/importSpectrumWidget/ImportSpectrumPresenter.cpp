@@ -12,12 +12,10 @@ ImportSpectrumPresenter::ImportSpectrumPresenter(AbstractImportSpectrumView* vie
 }
         
 void ImportSpectrumPresenter::setModelFileName(TString* fileName){
-    Model* model = getModel();
     model->setFileName(fileName);
 }
 
 void ImportSpectrumPresenter::setModelHist(TH1F* hist){
-    Model* model = getModel();
     model->setHist(hist);
 
     HistProcessor* histProcessor = HistProcessor::getInstance();

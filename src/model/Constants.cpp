@@ -11,6 +11,9 @@
  * Created on August 19, 2017, 11:30 PM
  */
 
+// Disable warnings for -Wwrite-strings
+// https://stackoverflow.com/questions/925179/selectively-remove-warning-message-gcc
+#pragma GCC diagnostic ignored "-Wwrite-strings"
 #include "Constants.h"
 #include <TMath.h>
 

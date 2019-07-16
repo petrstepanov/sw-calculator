@@ -15,6 +15,7 @@
 #include "../../util/GraphicsHelper.h"
 
 ImportSpectrumView::ImportSpectrumView(const TGWindow *w) : AbstractImportSpectrumView(w){
+    presenter = instantinatePresenter();
 }
 
 // Override base class virtual functions

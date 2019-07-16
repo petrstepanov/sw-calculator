@@ -35,6 +35,11 @@ public:
     void onSaveResultsClicked();
     void onClearResultsClicked();
     void onInitModel();
+
+    // Slots for Model Signals
+    void onSourceHistogramImported(TH1F* hist);
+	void onTwoDetectorSet(Bool_t isTwoDetector);
+	void onSafeFitRangeSet(Double_t eMin, Double_t eMax);
 };
 
 #endif /* SWCALCULATORPRESENTER_H */

@@ -31,6 +31,7 @@ class AbstractImportSpectrumPresenter;
 
 class AbstractImportSpectrumView : public AbstractView<AbstractImportSpectrumPresenter> {
   private:
+
     // Ui components
     TGTextButton* btnOpenFile;
     TGLabel* lblFileName;

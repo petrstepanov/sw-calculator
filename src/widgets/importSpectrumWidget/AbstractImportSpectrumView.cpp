@@ -105,12 +105,10 @@ AbstractImportSpectrumPresenter* AbstractImportSpectrumView::instantinatePresent
 // Calls to Presenter
 
 void AbstractImportSpectrumView::onOpenFileClicked(){
-    AbstractImportSpectrumPresenter* presenter = this->getPresenter();
     presenter->onOpenFileClicked();
 }
 
 void AbstractImportSpectrumView::onImportSpectrumClicked(){
-    AbstractImportSpectrumPresenter* presenter = this->getPresenter();
     presenter->onImportSpectrumClicked();
 }
 

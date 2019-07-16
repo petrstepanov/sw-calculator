@@ -39,8 +39,8 @@ using namespace RooFit;
 //SWCalculatorView::SWCalculatorView(const TGWindow* w) : TGMainFrame(w, Constants::windowWidth, Constants::windowHeight){
 SWCalculatorView::SWCalculatorView(const TGWindow* w) : AbstractView<SWCalculatorPresenter>(w){
     initUI();
-    SWCalculatorPresenter* presenter = getPresenter();
-    presenter->addEventListeners();
+	presenter = instantinatePresenter();
+//	connectSlots();
 }
 
 SWCalculatorPresenter* SWCalculatorView::instantinatePresenter(){
@@ -334,9 +334,9 @@ void SWCalculatorView::initUI(){
 }
 
 // Calls from Presenter
-RooRealVarView* SWCalculatorView::getSourceContributionView() {
-    return sourceContributionView;
-}
+//RooRealVarView* SWCalculatorView::getSourceContributionView() {
+//    return sourceContributionView;
+//}
 
 void SWCalculatorView::onUiReady(){
 	RootHelper::hideFrame(resolutionFwhmFrame);
@@ -581,7 +581,6 @@ void SWCalculatorView::onNumFitMaxChanged(){
 }
 
 void SWCalculatorView::onFitSpectrumClicked(){
-    SWCalculatorPresenter* presenter = getPresenter();
     presenter->onFitSpectrumClicked();
 }
 
@@ -594,12 +593,10 @@ void SWCalculatorView::onResetZoomClicked(){
 }
 
 void SWCalculatorView::onSaveResultsClicked() {
-    SWCalculatorPresenter* presenter = getPresenter();
     presenter->onSaveResultsClicked();
 }
 
 void SWCalculatorView::onClearResultsClicked() {
-    SWCalculatorPresenter* presenter = getPresenter();
     presenter->onClearResultsClicked();
 }
 
@@ -624,12 +621,16 @@ void SWCalculatorView::updateCanvasLimits(Double_t min, Double_t max) {
     padChi2->Update();
 }
 
+//void SWCalculatorView::setSourceContribution(RooRealVar* sourceContribution){
+//	sourceContributionView->setRooRealVar(sourceContribution);
+//}
+
+
 //void SWCalculatorView::onSaveDataClicked(){
 //    std::cout << "SWCalculatorView::onSaveDataClicked()" << std::endl;
 //}
 
 void SWCalculatorView::onSaveImageClicked(){
-    SWCalculatorPresenter* presenter = getPresenter();
     presenter->onSaveImageClicked();
 }
 

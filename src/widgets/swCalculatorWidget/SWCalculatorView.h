@@ -113,7 +113,6 @@ class SWCalculatorView : public AbstractView<SWCalculatorPresenter> {
     SWCalculatorPresenter* instantinatePresenter();
 
     // Calls from Presenter
-    RooRealVarView* getSourceContributionView();
     void setTabEnabled(Int_t, Bool_t);
     Int_t getFitMinValue();
     void setFitMinMaxRange(Int_t min, Int_t max);
@@ -157,6 +156,8 @@ class SWCalculatorView : public AbstractView<SWCalculatorPresenter> {
     void onSaveImageClicked();
     void onSaveResultsClicked();
     void onClearResultsClicked();
+
+//    void setSourceContribution(RooRealVar* sourceContribution);
 
     //    void CloseWindow();
     void initRooPlots(RooPlot* fitFrame, RooPlot* chiFrame);

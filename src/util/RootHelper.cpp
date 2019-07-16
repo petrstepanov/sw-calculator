@@ -15,6 +15,7 @@
 #include <TUnixSystem.h>
 #include <iostream>
 #include <TGFrame.h>
+#include "MathUtil.h"
 
 void RootHelper::deleteObject(const char* name){
     TObject* obj = gROOT->FindObject(name);
@@ -60,4 +61,22 @@ void RootHelper::showFrame(TGFrame* frame){
 void RootHelper::hideFrame(TGFrame* frame){
 	TGCompositeFrame* parentFrame = RootHelper::getParentFrame(frame);
 	parentFrame->HideFrame(frame);
+}
+
+TGNumberFormat::EStyle RootHelper::getNumberFormatStyle(Double_t value){
+	Int_t numberOfDecimals = MathUtil::numberOfDecimals(value);
+	switch (numberOfDecimals){
+		case 0:
+			return TGNumberFormat::EStyle::kNESInteger;
+		case 1:
+			return TGNumberFormat::EStyle::kNESRealOne;
+		case 2:
+			return TGNumberFormat::EStyle::kNESRealTwo;
+		case 3:
+			return TGNumberFormat::EStyle::kNESRealThree;
+		case 4:
+			return TGNumberFormat::EStyle::kNESRealFour;
+		default:
+			return TGNumberFormat::EStyle::kNESReal;
+	}
 }

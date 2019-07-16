@@ -17,6 +17,7 @@
 #include <TROOT.h>
 #include <TStopwatch.h>
 #include <TGFrame.h>
+#include <TGNumberEntry.h>
 
 class RootHelper {
 public:
@@ -28,6 +29,7 @@ public:
     static TGCompositeFrame* getParentFrame(TGFrame* frame);
     static void showFrame(TGFrame* frame);
     static void hideFrame(TGFrame* frame);
+    static TGNumberFormat::EStyle getNumberFormatStyle(Double_t value);
 
 private:
     static TStopwatch* watch;
