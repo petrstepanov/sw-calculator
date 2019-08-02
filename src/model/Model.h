@@ -21,7 +21,29 @@
 #include <iostream>
 #include <TQObject.h>
 #include <RooRealVar.h>
+#include "DoublePair.h"
+#include "ParametersPool.h"
 
+enum ConvolutionType {
+	kNoConvolution,
+	kFFTConvolution
+};
+
+// Struct of properties needed to build the fitting model
+struct FitProperties {
+	RooRealVar* fitMin;
+	RooRealVar* fitMax;
+	Bool_t isTwoDetector;
+	ConvolutionType convolutionType;
+    Bool_t hasParabola;
+    Int_t numberOfGaussians;
+    Int_t numberOfExponents;
+    Int_t numberOfDampingExponents;
+    TH1F* hist;
+    TH1F* sourceHist;
+};
+
+// To benefit from signals/slots mechanism classes must inherit from TQObject
 class Model : public TQObject {
 public:
     static Model* getInstance();
@@ -31,40 +53,67 @@ public:
 
     void setSourceFileName(TString* fileName);
     TString* getSourceFileName();
-    
-    void setHist(TH1F* hist);
-    TH1F* getHist();
-    
-    void setSourceHist(TH1F* hist);
-    TH1F* getSourceHist();
 
-    void setTwoDetector(Bool_t b);
+    void setTwoDetector(Bool_t isTwoDetector);
     Bool_t isTwoDetector();
 
-    void setSafeFitRange(Double_t eMin, Double_t eMax);
+    // Fit properties
+    void setFitRangeLimits(Double_t fitMinLo, Double_t fitMinHi, Double_t fitMaxLo, Double_t fitMaxHi);
+    void setFitRangeLimits(Double_t fitMinLo, Double_t fitMaxHi);
+    std::pair<Double_t, Double_t> getFitRangeLimits();
+
+    void setFitRange(Double_t min, Double_t max);
+    std::pair<Double_t, Double_t> getFitRange();
+
+    void setConvolutionType(ConvolutionType t);
+    ConvolutionType getConvolutionType();
+
+    void setHasParabola(Bool_t hasParabola);
+    Bool_t getHasParabola();
+
+    void setNumberOfGaussians(Int_t num);
+    Int_t getNumberOfGaussians();
     
-    RooRealVar* getSourceContribution();
-    
+    void setNumberOfExponents(Int_t num);
+    Int_t getNumberOfExponents();
+
+    void setNumberOfDampingExponents(Int_t num);
+    Int_t getNumberOfDampingExponents();
+
+    void setHist(TH1F* hist);
+//    TH1F* getHist();
+
+    void setSourceHist(TH1F* hist);
+//    TH1F* getSourceHist();
+
+    FitProperties getFitProperties();
+
+    ParametersPool* getParametersPool();
+
     // SIGNALS
+    void histogramImported(TH1F* hist); // *SIGNAL*
     void sourceHistogramImported(TH1F* hist); // *SIGNAL*
     void twoDetectorSet(Bool_t isTwoDetector); // *SIGNAL*
-    void safeFitRangeSet(Double_t eMin, Double_t eMax); // *SIGNAL*
+    void fitRangeLimitsSet(DoublePair* pair); // *SIGNAL*
+    void fitRangeSet(DoublePair* pair); // *SIGNAL*
+    void convolutionTypeSet(Int_t convolutionType); // *SIGNAL*
+    void hasParabolaSet(Bool_t b); // *SIGNAL*
+    void numberOfGaussiansSet(Int_t num); // *SIGNAL*
+    void numberOfExponentsSet(Int_t num); // *SIGNAL*
+    void numberOfDampingExponentsSet(Int_t num); // *SIGNAL*
 
 private:
     Model();                              // Private so that it can not be called
     static Model* instance;
 
-    TString* strFileName = nullptr;
-    TString* strSourceContribFileName = nullptr;
-    TH1F* fullHist = nullptr;
-    TH1F* sourceHist = nullptr;
-    RooCurve* curveBg = nullptr;
-    RooCurve* curveFit = nullptr;
-    TH1F* peakHistNoBg = nullptr;
-    TH1F* chiHist = nullptr;
-    RooRealVar* sourceContribution;
-    Bool_t twoDetector;
-    std::pair<Double_t, Double_t> safeFitRange;
+    TString* strFileName;
+    TString* strSourceContribFileName;
+
+//    TH1F* peakHistNoBg;
+//    TH1F* chiHist;
+
+    FitProperties fitProperties;
+    ParametersPool* parametersPool;
 
 	ClassDef(Model, 0)
 };

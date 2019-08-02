@@ -17,19 +17,19 @@ void ImportSpectrumPresenter::setModelFileName(TString* fileName){
 }
 
 void ImportSpectrumPresenter::setModelHist(TH1F* hist){
-    model->setHist(hist);
+	// Save original histogram to Model
+	model->setHist(hist);
 
+    // Determine if spectrum is two detector or not
     HistProcessor* histProcessor = HistProcessor::getInstance();
     Bool_t isTwoDetector = histProcessor->isTwoDetetor(hist);
+	model->setTwoDetector(isTwoDetector);
 
-    if (isTwoDetector){
-        std::pair<Double_t, Double_t> safeFitRange = histProcessor->getHistogramSafeFitRange(hist);
-        model->setSafeFitRange(safeFitRange.first, safeFitRange.second);
-    } else {
-        std::pair<Double_t, Double_t> safeFitRange = std::make_pair(491, 531);        
-        model->setSafeFitRange(safeFitRange.first, safeFitRange.second);
-    }
-    
-    model->setTwoDetector(isTwoDetector);
+	// Set fit range limits
+	Double_t fitMinLo = hist->GetXaxis()->GetXmin();
+	Double_t fitMinUp = hist->GetXaxis()->GetBinLowEdge(hist->GetMaximumBin());
+	Double_t fitMaxLo = hist->GetXaxis()->GetBinUpEdge(hist->GetMaximumBin());
+	Double_t fitMaxUp = hist->GetXaxis()->GetXmax();
+	model->setFitRangeLimits(fitMinLo, fitMinUp, fitMaxLo, fitMaxUp);
 };
     

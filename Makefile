@@ -50,7 +50,7 @@ release: CXXFLAGS+=-O3
 release: executable move_files
 
 # Also might add flags for debug optimizations: -Og -ggdb -DDEBUG
-debug: CXXFLAGS+=-g -Og
+debug: CXXFLAGS+=-g #-Og
 debug: executable move_files move_debug_symbols
 
 executable: directories $(DICT_FILENAME) $(SHARED_LIBRARY) $(OBJECTS) $(EXECUTABLE)

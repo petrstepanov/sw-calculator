@@ -15,7 +15,7 @@ int main(int argc, char **argv) {
     myMainFrame->addChildFrame(swCalculatorView);
 
     // Hiding frames only possible after Window was mapped.
-    swCalculatorView->onUiReady();
+    // swCalculatorView->onUiReady();
 
     app->Run();
     return 0;

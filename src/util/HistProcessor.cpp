@@ -33,7 +33,7 @@ HistProcessor* HistProcessor::getInstance(){
 	return instance;
 }
 
-TH1* HistProcessor::cutHistBasement(const char *newname, TH1* hist, Int_t xMin, Int_t xMax){
+TH1F* HistProcessor::cutHistBasement(const char *newname, TH1F* hist, Int_t xMin, Int_t xMax){
 	Int_t minBin = hist->FindBin(xMin);
 	Int_t maxBin = hist->FindBin(xMax);
         if (minBin <= 1) minBin = 1;
@@ -52,7 +52,7 @@ TH1* HistProcessor::cutHistBasement(const char *newname, TH1* hist, Int_t xMin, 
 
 	//std::cout << "reduceHist: lowEdge - " << lowEdge << ", upEdge - " << upEdge << std::endl;
 //        RootHelper::deleteObject(newname);
-	TH1* subHist = new TH1F(newname, "Histogram with cutted basement", nBins, lowEdge, upEdge);
+	TH1F* subHist = new TH1F(newname, "Histogram with cutted basement", nBins, lowEdge, upEdge);
 	for (int j = minBin; j <= maxBin; j++){
             Double_t val = hist->GetBinContent(j) - baseVal;
             subHist->SetBinContent(j - minBin + 1, val < 0 ? 0 : val);
@@ -61,29 +61,46 @@ TH1* HistProcessor::cutHistBasement(const char *newname, TH1* hist, Int_t xMin, 
 	return subHist;
 }
 
-TH1* HistProcessor::cutHist(const char *newname, TH1* hist, Int_t xMin, Int_t xMax){
-	Int_t minBin, maxBin;
-        for(minBin=1; hist->GetXaxis()->GetBinLowEdge(minBin) < xMin; minBin++){;}
-        for(maxBin=hist->GetXaxis()->GetNbins(); hist->GetXaxis()->GetBinUpEdge(maxBin)>xMax; maxBin--){;}
+void HistProcessor::liftHist(TH1F* hist, Double_t lift){
+	for (UInt_t i = 1; i <= hist->GetNbinsX(); i++){
+		Double_t value = hist->GetBinContent(i);
+		hist->SetBinContent(i, value + lift);
+	}
+}
+
+
+TH1F* HistProcessor::cutHist(const char *newname, TH1F* hist, Double_t xMin, Double_t xMax){
+	#ifdef USEDEBUG
+		std::cout << "HistProcessor::cutHist" << std::endl;
+		hist->Print();
+		std::cout << "low edge: " << hist->GetXaxis()->GetBinLowEdge(1) << ", up edge: " << hist->GetXaxis()->GetBinUpEdge(hist->GetNbinsX()) << std::endl;
+		std::cout << "cut range: (" << xMin << "; " << xMax << ")" << std::endl;
+	#endif
+
+	Int_t minBin = 1;
+	while (xMin > hist->GetXaxis()->GetBinCenter(minBin)){minBin++;}
+
+	Int_t maxBin = hist->GetXaxis()->GetNbins();
+	while (xMax < hist->GetXaxis()->GetBinCenter(maxBin)){maxBin--;}
 
 	Int_t nBins = maxBin - minBin + 1;
-        
-	//std::cout << "reduceHist: miBin - " << minBin << ", maxBin - " << maxBin << std::endl;
 
 	// Construct new histogram
 	Double_t lowEdge = hist->GetXaxis()->GetBinLowEdge(minBin);
 	Double_t upEdge = hist->GetXaxis()->GetBinUpEdge(maxBin);
 
-        std::cout << "lowEdge: " << lowEdge << "; " << "upEdge: " << upEdge << std::endl;
-        
-	//std::cout << "reduceHist: lowEdge - " << lowEdge << ", upEdge - " << upEdge << std::endl;
-//        RootHelper::deleteObject(newname);
-	TH1* subHist = new TH1F(newname, "Cutted histogram", nBins, lowEdge, upEdge);
-	for (int j = minBin; j <= maxBin; j++){
-		subHist->SetBinContent(j - minBin + 1, hist->GetBinContent(j));
-		subHist->SetBinError(j - minBin + 1, hist->GetBinError(j));
+	TH1F* trimmedHist = new TH1F(newname, "Trimmed histogram", nBins, lowEdge, upEdge);
+	for (Int_t i = 1; i <= nBins; i++){
+		trimmedHist->SetBinContent(i, hist->GetBinContent(i+minBin-1));
+		trimmedHist->SetBinError(i, hist->GetBinError(i+minBin-1));
 	}
-	return subHist;
+
+	#ifdef USEDEBUG
+		trimmedHist->Print();
+		std::cout << "low edge: " << trimmedHist->GetXaxis()->GetBinLowEdge(1) << ", up edge: " << trimmedHist->GetXaxis()->GetBinUpEdge(trimmedHist->GetNbinsX()) << std::endl;
+	#endif
+
+	return trimmedHist;
 }
 
 RooCurve* HistProcessor::subtractCurves(const char *newname, RooCurve* curveFit, RooCurve* curveBg){
@@ -108,13 +125,13 @@ RooCurve* HistProcessor::subtractCurves(const char *newname, RooCurve* curveFit,
 	return c;
 }
 
-TH1* HistProcessor::subtractCurve(const char *newname, TH1* hist, RooCurve* curve){
+TH1F* HistProcessor::subtractCurve(const char *newname, TH1F* hist, RooCurve* curve){
 	Double_t xMin = hist->GetXaxis()->GetXmin();
 	Double_t xMax = hist->GetXaxis()->GetXmax();
 	Double_t nBins = hist->GetXaxis()->GetNbins();
 
 //        RootHelper::deleteObject("histMinusCurve");
-	TH1* histMinusCurve = new TH1F(newname, "Histogram minus curve", nBins, xMin, xMax);
+	TH1F* histMinusCurve = new TH1F(newname, "Histogram minus curve", nBins, xMin, xMax);
 	for (int i = 1; i <= nBins; i++){
 		Double_t bg = (curve == NULL) ? 0.0 : curve->Eval(hist->GetXaxis()->GetBinCenter(i));
 		if (hist->GetBinContent(i) - bg >= 0) {
@@ -129,13 +146,13 @@ TH1* HistProcessor::subtractCurve(const char *newname, TH1* hist, RooCurve* curv
 	return histMinusCurve;
 }
 
-TH1* HistProcessor::getResidualHist(const char *newname, TH1* hist, RooCurve* curve) {
+TH1F* HistProcessor::getResidualHist(const char *newname, TH1F* hist, RooCurve* curve) {
 	Double_t xMin = hist->GetXaxis()->GetXmin();
 	Double_t xMax = hist->GetXaxis()->GetXmax();
 	Double_t nBins = hist->GetXaxis()->GetNbins();
 
-        RootHelper::deleteObject(newname);
-	TH1* resHist = new TH1F(newname, "Residual histogram", nBins, xMin, xMax);
+//        RootHelper::deleteObject(newname);
+	TH1F* resHist = new TH1F(newname, "Residual histogram", nBins, xMin, xMax);
 	for (int i = 1; i <= nBins; i++){
 		Double_t count = hist->GetBinContent(i);
 		Double_t error = sqrt(count);//hist -> GetBinError(i);
@@ -153,13 +170,13 @@ TH1* HistProcessor::getResidualHist(const char *newname, TH1* hist, RooCurve* cu
 	return resHist;
 }
 
-TH1* HistProcessor::getChi2Hist(const char *newname, TH1* hist, RooCurve* curve){
+TH1F* HistProcessor::getChi2Hist(const char *newname, TH1F* hist, RooCurve* curve){
 	Double_t xMin = hist->GetXaxis()->GetXmin();
 	Double_t xMax = hist->GetXaxis()->GetXmax();
 	Double_t nBins = hist->GetXaxis()->GetNbins();
 
 //        RootHelper::deleteObject(newname);
-	TH1* chiHist = new TH1F(newname, "Chi2 histogram", nBins, xMin, xMax);
+	TH1F* chiHist = new TH1F(newname, "Chi2 histogram", nBins, xMin, xMax);
 	for (int i = 1; i <= nBins; i++){
 		Double_t count = hist->GetBinContent(i);
 		Double_t error = sqrt(count);//hist -> GetBinError(i);
@@ -177,7 +194,7 @@ TH1* HistProcessor::getChi2Hist(const char *newname, TH1* hist, RooCurve* curve)
 	return chiHist;
 }
 
-Double_t HistProcessor::getTotalCounts(TH1* hist){
+Double_t HistProcessor::getTotalCounts(TH1F* hist){
     Double_t counts = 0;
     Double_t nBins = hist->GetXaxis()->GetNbins();
     for (int i = 1; i <= nBins; i++){
@@ -186,7 +203,7 @@ Double_t HistProcessor::getTotalCounts(TH1* hist){
     return counts;
 }
 
-Bool_t HistProcessor::hasAtan(TH1* hist){
+Bool_t HistProcessor::hasAtan(TH1F* hist){
 	const Int_t wingBins = 10;
 	Double_t leftWingMeanValue, rightWingMeanValue;
 	Int_t nBins = hist->GetXaxis()->GetNbins();
@@ -198,7 +215,7 @@ Bool_t HistProcessor::hasAtan(TH1* hist){
 	return false;
 }
 
-Double_t HistProcessor::calcBackgroundFraction(TH1* hist){
+Double_t HistProcessor::calcBackgroundFraction(TH1F* hist){
 	Int_t nBins = hist->GetXaxis()->GetNbins();
         Int_t maxBin = hist->GetMinimumBin();
 	const Int_t wingBins = 10;
@@ -210,7 +227,7 @@ Double_t HistProcessor::calcBackgroundFraction(TH1* hist){
 	return bgFraction;
 }
 
-Chi2Struct HistProcessor::getChi2(TH1* hist, RooCurve* curve, RooAbsPdf* model){
+Chi2Struct HistProcessor::getChi2(TH1F* hist, RooCurve* curve, RooAbsPdf* model){
 	// https://en.wikipedia.org/wiki/Goodness_of_fit
 	Int_t degreesOfFreedom = 0;
 	Double_t chiSum = 0;
@@ -233,7 +250,7 @@ Chi2Struct HistProcessor::getChi2(TH1* hist, RooCurve* curve, RooAbsPdf* model){
     return chi2Struct;
 }
 
-std::pair<Double_t, Double_t> HistProcessor::calcIntegral(TH1* hist, Double_t min, Double_t max){
+std::pair<Double_t, Double_t> HistProcessor::calcIntegral(TH1F* hist, Double_t min, Double_t max){
 	int minBin = hist->FindBin(min);
 	int maxBin = hist->FindBin(max);
 	Double_t sum = 0;
@@ -247,7 +264,7 @@ std::pair<Double_t, Double_t> HistProcessor::calcIntegral(TH1* hist, Double_t mi
 	return std::make_pair(sum, error);
 }
 
-std::pair<Double_t, Double_t> HistProcessor::getSParameter(TH1* hist, Double_t sWidth, Double_t mean, Bool_t isTwoDetector) {
+std::pair<Double_t, Double_t> HistProcessor::getSParameter(TH1F* hist, Double_t sWidth, Double_t mean, Bool_t isTwoDetector) {
     // Calculate full histogram integral
     if (isTwoDetector) sWidth*=2;
     std::cout << "Calculating S parameter. Mean " << mean << ", sWidth " <<  sWidth << std::endl;
@@ -261,7 +278,7 @@ std::pair<Double_t, Double_t> HistProcessor::getSParameter(TH1* hist, Double_t s
     return std::make_pair(S, dS);
 }
 
-std::pair<Double_t, Double_t> HistProcessor::getWParameter(TH1* hist, Double_t wWidth, Double_t wShift, Double_t mean, Bool_t isTwoDetector) {
+std::pair<Double_t, Double_t> HistProcessor::getWParameter(TH1F* hist, Double_t wWidth, Double_t wShift, Double_t mean, Bool_t isTwoDetector) {
     // Calculate full histogram integral
     if (isTwoDetector){ wWidth*=2; wShift*=2; }
     std::cout << "Calculating W parameter. Mean " << mean << ", wWidth " <<  wWidth << ", wShift " << wShift << std::endl;    
@@ -277,7 +294,7 @@ std::pair<Double_t, Double_t> HistProcessor::getWParameter(TH1* hist, Double_t w
     return std::make_pair(W, dW);
 }
 
-Bool_t HistProcessor::isTwoDetetor(TH1* hist){
+Bool_t HistProcessor::isTwoDetetor(TH1F* hist){
 	TAxis* x = hist->GetXaxis();
 	return !((x->GetXmin() < 511) && (x->GetXmax() > 511));
 }
@@ -287,22 +304,20 @@ Double_t HistProcessor::getPdfMaximumX(RooAbsPdf* pdf, const RooArgList& args){
     return tf1->GetMaximumX();
 }
 
-std::pair<Double_t, Double_t> HistProcessor::getHistogramSafeFitRange(TH1* hist){
+std::pair<Double_t, Double_t> HistProcessor::getHistogramSafeFitRange(TH1F* hist){
     Int_t maxBin = hist->GetMaximumBin();
-    Int_t firstBin;
+    Int_t firstSafeBin = 1; // First bin with zero value (if )
     for (Int_t i = 1; i < maxBin; i++){
         if (hist->GetBinContent(i) < 1){
-            firstBin = i;
+            firstSafeBin = i+1;
         }
     }
-    firstBin++;
-    Int_t lastBin;
     Int_t nbins = hist->GetXaxis()->GetNbins();
+    Int_t lastSafeBin = nbins;
     for (Int_t i = nbins; i > maxBin; i--){
         if (hist->GetBinContent(i) < 1){
-            lastBin = i;
+            lastSafeBin = i-1;
         }
     }
-    lastBin--;
-    return std::make_pair(hist->GetXaxis()->GetBinLowEdge(firstBin), hist->GetXaxis()->GetBinUpEdge(lastBin));
+    return std::make_pair(hist->GetXaxis()->GetBinLowEdge(firstSafeBin), hist->GetXaxis()->GetBinUpEdge(lastSafeBin));
 }

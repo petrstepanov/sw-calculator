@@ -22,6 +22,7 @@
 #include <TGNumberEntry.h>
 #include <TGComboBox.h>
 #include <TGButton.h>
+#include <TGButtonGroup.h>
 #include <TCanvas.h>
 #include <TImage.h>
 #include <TH1I.h>
@@ -29,8 +30,10 @@
 #include <RooCurve.h>
 #include <RooFitResult.h>
 #include <RooPlot.h>
+#include "../../model/Model.h"
 #include <TGDoubleSlider.h>
 #include <TGTextEntry.h>
+#include <TGDoubleSlider.h>
 #include <TGTextBuffer.h>
 #include "../AbstractView.h"
 #include "SWCalculatorPresenter.h"
@@ -43,19 +46,24 @@ class SWCalculatorView : public AbstractView<SWCalculatorPresenter> {
   protected:
     void initUI();
 
-//      #if defined(__ROOTCLING__)
-//	  ClassDef(SWCalculatorFrame, 1);
-//      #endif
+  public:
+    SWCalculatorView(const TGWindow *w = 0);
+    virtual ~SWCalculatorView();
 
-  private:
-    TGTextButton* btn;
+    // Override base class virtual functions
+    SWCalculatorPresenter* instantinatePresenter();
+    void connectSignals();
+
+    // View elements
     TGTab* tabsWidget;
-    TGNumberEntry* numPeakPosition;
     TGCompositeFrame *tabFit;
 
-    // Fit and W,S ranges
+    // Fit range
     TGNumberEntry* numFitMin;
     TGNumberEntry* numFitMax;
+    TGDoubleHSlider* numFitSlider;
+
+    // S and W widths
     TGLabel* lblRescale1;
     TGLabel* lblRescale2;
     TGLabel* lblRescale3;
@@ -63,30 +71,25 @@ class SWCalculatorView : public AbstractView<SWCalculatorPresenter> {
     TGNumberEntry* numWWidth;
     TGNumberEntry* numWShift;
 
-    // Convolution parameters
-    TGComboBox* comboConvolutionType;
-    TGNumberEntry* numResolutionFWHM;
-    TGCheckButton* checkboxResFixed;
-    TGHorizontalFrame* resolutionFwhmFrame;
-
-    // Resolution Function view
-    RooRealVarView* sourceContributionView;
-    TGVerticalFrame* sourceContributionFrame;
-
-    // Fitting function
-    TGCheckButton* checkboxHasParabola;
+    // Model components
+    TGCheckButton* hasParabola;
     TGNumberEntry* numGauss;
     TGNumberEntry* numExponent;
     TGNumberEntry* numDampExponent;
 
+    // Convolution radios
+    TGButtonGroup* convTypeButtonGroup;
+
     // Fit
+    TGTextButton* btnEditParameters;
     TGTextButton* btnFitSpectrum;
+
     TGTextEdit* txtFitResult;
     TGTextButton* btnClearResult;
     TGTextButton* btnSaveResult;
 
     // Plot and display params
-//    TGTextButton* btnSaveData;
+    // TGTextButton* btnSaveData;
     TGTextButton* btnSaveImage;
     TCanvas* canvasPlot;
     TGDoubleHSlider* zoomSlider;
@@ -105,34 +108,16 @@ class SWCalculatorView : public AbstractView<SWCalculatorPresenter> {
     TPad* padData;
     TPad* padChi2;
 
-  public:
-    SWCalculatorView(const TGWindow *w = 0);
-    virtual ~SWCalculatorView();
-
-    // Override base class virtual functions
-    SWCalculatorPresenter* instantinatePresenter();
-
     // Calls from Presenter
     void setTabEnabled(Int_t, Bool_t);
-    Int_t getFitMinValue();
-    void setFitMinMaxRange(Int_t min, Int_t max);
-    void setFitMinMaxValues(Bool_t isTwoDetector);
-    Int_t getFitMaxValue();
-    Double_t getSWidth();
-    Double_t getWWidth();
-    Double_t getWShift();
-    Int_t getConvolutionType();
-    Bool_t hasParabola();
-    Int_t getNumGauss();
-    Int_t getNumExp();
-    Int_t getNumDampExp();
-    Double_t getResolutionFWHM();
-    Bool_t isResolutionFixed();
-    TPad* getPadData();
-    TPad* getPadChi2();
     void setToolbarEnabled(Bool_t isEnabled);
-    void updateRegionLabels(Bool_t isTwoDetector);
-    void displayFilename(TString* fileName);
+
+    void setFitRange(Double_t min, Double_t max);
+    void setFitRangeLimits(Double_t min, Double_t max);
+    void reflectTwoDetector(Bool_t isTwoDetector);
+
+    void setConvolutionType(ConvolutionType t);
+
     void displayFitParameters(RooFitResult* fitResult);
     void displayVariable(RooRealVar* variable);
     void displayVariables(RooArgList* variables);
@@ -144,32 +129,18 @@ class SWCalculatorView : public AbstractView<SWCalculatorPresenter> {
     void saveFitResults(TString* fileName);
     void clearFitResults();
     void scrollOutputDown();
+
     // Calls to Presenter
-    void onNumFitMinChanged();
-    void onNumFitMaxChanged();
-    void onFitSpectrumClicked();
-    void onApplyZoomClicked();
-    void onResetZoomClicked();
-    void onConvolutionSelected(Int_t id);
-    void onUiReady();
-//    void onSaveDataClicked();
-    void onSaveImageClicked();
-    void onSaveResultsClicked();
-    void onClearResultsClicked();
-
-//    void setSourceContribution(RooRealVar* sourceContribution);
-
-    //    void CloseWindow();
     void initRooPlots(RooPlot* fitFrame, RooPlot* chiFrame);
 
-    // Update display range functions
-    void onDisplayMinChange(char* c);
-    void onDisplayMaxChange(char* c);
+    // Local view functions for widgt interactions
+    void displayFilename(TString* fileName);
+    void onDisplayMinChange(char*);
+    void onDisplayMaxChange(char*);
     void onSliderChange();
     void updateCanvasLimits(Double_t min, Double_t max);
-    void setSourceContributionFrameVisible(Bool_t isVisible);
 
-    // ClassDef(SWCalculatorView,0);
+    ClassDef(SWCalculatorView,0);
 };
 
 #endif /* SWCALCULATORVIEW_H */

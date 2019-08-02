@@ -12,35 +12,41 @@
 #include <RooRealVar.h>
 #include <TGLabel.h>
 #include <TGNumberEntry.h>
+#include "../overrides/MyTGNumberEntry.h"
 #include <TGButton.h>
 
-class RooRealVarFrame: public TGHorizontalFrame {
+class RooRealVarFrame : public TGHorizontalFrame {
 public:
-	RooRealVarFrame();
-	RooRealVarFrame(RooRealVar* var);
+	RooRealVarFrame(const TGWindow *p = 0, RooRealVar* var = 0);
 	virtual ~RooRealVarFrame();
 
 	void setRooRealVar(RooRealVar* var);
 
+    // Slots for UI signals
+	void onValueSet();
+	void onMinValueSet();
+	void onMaxValueSet();
+//	void onValueSet(char *);
+//	void onMinValueSet(char *);
+//	void onMaxValueSet(char *);
+	void onFixedSet(Bool_t isFixed);
+
+	void updateView();
+
 private:
 	void initUI();
 	void connectSlots();
-	void updateView();
 
 	RooRealVar* rooRealVar;
 
     TGLabel* nameLabel;
-    TGLabel* descriptionLabel;
+    TGLabel* titleLabel;
     TGNumberEntry* valueNumberEntry;
     TGNumberEntry* minValueNumberEntry;
     TGNumberEntry* maxValueNumberEntry;
     TGCheckButton* fixedCheckButton;
 
-    // Slots for UI signals
-    void onValueSet(Long_t value);
-    void onMinValueSet(Long_t value);
-    void onMaxValueSet(Long_t value);
-    void onFixedSet(Bool_t isFixed);
+	ClassDef(RooRealVarFrame,0)
 };
 
 #endif /* SRC_FRAMES_ROOREALVARFRAME_H_ */

@@ -17,6 +17,7 @@
 #include "../AbstractPresenter.h"
 #include "SWCalculatorView.h"
 #include "../../model/Model.h"
+#include "../../roofit/CompositeModelProvider.h"
 
 class SWCalculatorView;
 
@@ -29,15 +30,35 @@ public:
 
     void onInitModel();
     
+    void onEditParametersClicked();
     void onFitSpectrumClicked();
     void onSaveImageClicked();
     void onSaveResultsClicked();
     void onClearResultsClicked();
 
+    // Slots for View Signals
+    void onViewFitSliderRangeSet();
+    void onViewFitRangeSet();
+    void onViewConvolutionSelected(Int_t convolutionType);
+    void onViewHasParabolaSet(Bool_t b);
+    void onViewNumGaussSet();
+    void onViewNumExponentSet();
+    void onViewNumDampExponentSet();
+
     // Slots for Model Signals
-    void onSourceHistogramImported(TH1F* hist);
-	void onTwoDetectorSet(Bool_t isTwoDetector);
-	void onSafeFitRangeSet(Double_t eMin, Double_t eMax);
+    void onModelHistogramImported(TH1F* hist);
+	void onModelTwoDetectorSet(Bool_t isTwoDetector);
+	void onModelFitRangeLimitsSet(DoublePair* fitRangeLimits);
+	void onModelFitRangeSet(DoublePair* fitFange);
+
+	void onModelHasParabolaSet(Bool_t b);
+	void onModelNumberOfGaussiansSet(Int_t);
+	void onModelNumberOfExponentsSet(Int_t);
+	void onModelNumberOfDampingExponentsSet(Int_t);
+
+private:
+	CompositeModelProvider* pdfProvider;
+	void buildFittingModel();
 };
 
 #endif /* SWCALCULATORPRESENTER_H */

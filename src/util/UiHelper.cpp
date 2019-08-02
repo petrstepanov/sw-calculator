@@ -33,7 +33,7 @@ TGFileInfo* UiHelper::getFileFromDialog(){
     fileInfo->fFileTypes = filetypes;
     fileInfo->fIniDir = StrDup(dir);
     // Show the dialog
-    new TGFileDialog(gClient->GetRoot(), mainFrame ? mainFrame : gClient->GetRoot(), kFDOpen, fileInfo);
+    new TGFileDialog(gClient->GetDefaultRoot(), mainFrame ? mainFrame : gClient->GetRoot(), kFDOpen, fileInfo);
     // printf("Open file: %s (dir: %s)\n", fileInfo->fFilename, fileInfo->fIniDir);
     return fileInfo;
 }
@@ -54,9 +54,31 @@ void UiHelper::setMainFrame(TGWindow* w) {
     mainFrame = w;
 }
 
+TGWindow* UiHelper::getMainFrame() {
+    return mainFrame;
+}
+
+
+TGCompositeFrame* UiHelper::getParentFrame(TGFrame* frame){
+	const TGWindow* parentWindow = frame->GetParent();
+	TGCompositeFrame* parentFrame = dynamic_cast<TGCompositeFrame*>(const_cast<TGWindow*>(parentWindow));
+	return parentFrame;
+}
+
 UiHelper* UiHelper::getInstance() {
     if (!instance){
         instance = new UiHelper();
     }
     return instance;
+}
+
+ModalDialogFrame* UiHelper::getDialog(const char* windowName){
+	ModalDialogFrame* dialog = new ModalDialogFrame(gClient->GetDefaultRoot(), mainFrame, windowName);
+	return dialog;
+}
+
+Int_t UiHelper::uid = 0;
+
+Int_t UiHelper::getUId() {
+    return uid++;
 }

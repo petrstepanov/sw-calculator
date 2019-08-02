@@ -32,7 +32,7 @@ TString* StringUtils::suffix(const char* name, int index, const char* nameSuffix
     return s;
 }
 
-TString* StringUtils::ordinal(const char* name, int index) {
+char* StringUtils::ordinal(int index, const char* name) {
 	if (index == 1){
 		TString* s = new TString(name);
 		return s;
@@ -47,4 +47,10 @@ TString* StringUtils::ordinal(const char* name, int index) {
     }
     TString* s = new TString(Form("%dth %s", index, name));
 	return s;
+}
+
+Bool_t StringUtils::isSubstring(const char* parent, const char* child) {
+	TString parentString(parent);
+	TString childString(child);
+	return parentString.Contains(childString);
 }

@@ -17,13 +17,21 @@
 
 ClassImp(GaussianPdf);
 
-GaussianPdf::GaussianPdf(const char *name, const char *title, RooAbsReal& _x, RooAbsReal& _mean, RooAbsReal& _a) :
-		RooAbsPdf(name, title), x("x", "x", this, _x), mean("mean", "Gauss mean", this, _mean), a("a", "Gauss a", this,
-				_a) {
+GaussianPdf::GaussianPdf(const char *name,
+		const char *title,
+		RooAbsReal& _x,
+		RooAbsReal& _mean, RooAbsReal& _a) :
+		RooAbsPdf(name, title),
+		x("x", "x", this, _x),
+		mean("mean", "mean", this, _mean),
+		a("a", "a", this,_a) {
 }
 
 GaussianPdf::GaussianPdf(const GaussianPdf& other, const char* name) :
-		RooAbsPdf(other, name), x("x", this, other.x), mean("mean", this, other.mean), a("a", this, other.a) {
+		RooAbsPdf(other, name),
+		x("x", this, other.x),
+		mean("mean", this, other.mean),
+		a("a", this, other.a) {
 }
 
 Double_t GaussianPdf::evaluate() const {
