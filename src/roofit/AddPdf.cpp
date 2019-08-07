@@ -21,6 +21,7 @@
 #include "RooFormulaVar.h"
 #include "RooAddPdf.h"
 #include "../util/StringUtils.h"
+#include "../model/Constants.h"
 
 AddPdf::AddPdf() {
 }
@@ -53,17 +54,22 @@ RooAbsPdf* AddPdf::add(RooArgList* pdfList, RooRealVar* observable, const char* 
 		return pdf;
 	}
 
-	RooArgList* I_i = new RooArgList();
+	RooArgList* intensities = new RooArgList();
 	for (unsigned i = 0; i < numberOfComponents - 1; i++) {
 		// Construct list of original model coefficients
 		// I_i = [I4, I3, I2]
 		const char* componentName = pdfList->at(i)->GetName();
 		const char* componentTitle = pdfList->at(i)->GetTitle();
-		RooRealVar* I = new RooRealVar(TString::Format("int%s", componentName), TString::Format("Intensity of %s", componentTitle), 20, 0, 100, "%");
-		RooFormulaVar* INorm = new RooFormulaVar(TString::Format("int%sNorm", componentName), TString::Format("Intensity of %s, normalized", componentTitle), "@0/100", *I);
-		I_i->add(*INorm);
+		Double_t defaultIntensity = 100. / (Double_t) pdfList->getSize();
+		RooRealVar* intensity = new RooRealVar(TString::Format("int%s", componentName), TString::Format("Intensity of %s", componentTitle), defaultIntensity, 0, 100, "%");
+
+		// Intensities are always diferent depending on number of components.
+		// To avoid total intensity more than 1 we don't save them in Pool
+		intensity->setAttribute(Constants::ATTR_NO_SAVE_TO_POOL, kTRUE);
+		RooFormulaVar* intensityNorm = new RooFormulaVar(TString::Format("int%sNorm", componentName), TString::Format("Intensity of %s, normalized", componentTitle), "@0/100", *intensity);
+		intensities->add(*intensityNorm);
 	}
-	RooAddPdf* pdf = new RooAddPdf(TString::Format("addPdf%s", pdfName), TString::Format("Additive model %s", pdfName), *pdfList, *I_i);
+	RooAddPdf* pdf = new RooAddPdf(TString::Format("addPdf%s", pdfName), TString::Format("Additive model %s", pdfName), *pdfList, *intensities);
 
 	// https://sft.its.cern.ch/jira/browse/ROOT-9653
 	pdf->fixAddCoefNormalization(RooArgSet(*observable));

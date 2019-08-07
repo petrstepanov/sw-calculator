@@ -48,10 +48,12 @@ Model* SWCalculatorPresenter::instantinateModel() {
 
 void SWCalculatorPresenter::onInitModel() {
 	model->Connect("histogramImported(TH1F*)", "SWCalculatorPresenter", this, "onModelHistogramImported(TH1F*)");
+	model->Connect("sourceHistogramImported(TH1F*)", "SWCalculatorPresenter", this, "onModelSourceHistogramImported(TH1F*)");
 	model->Connect("fitRangeLimitsSet(DoublePair*)", "SWCalculatorPresenter", this, "onModelFitRangeLimitsSet(DoublePair*)");
 	model->Connect("fitRangeSet(DoublePair*)", "SWCalculatorPresenter", this, "onModelFitRangeSet(DoublePair*)");
 
 	model->Connect("twoDetectorSet(Bool_t)", "SWCalculatorPresenter", this, "onModelTwoDetectorSet(Bool_t)");
+	model->Connect("convolutionTypeSet(Int_t)", "SWCalculatorPresenter", this, "onModelConvolutionTypeSet(Int_t)");
 	model->Connect("hasParabolaSet(Bool_t)", "SWCalculatorPresenter", this, "onModelHasParabolaSet(Bool_t)");
 	model->Connect("numberOfGaussiansSet(Int_t)", "SWCalculatorPresenter", this, "onModelNumberOfGaussiansSet(Int_t)");
 	model->Connect("numberOfExponentsSet(Int_t)", "SWCalculatorPresenter", this, "onModelNumberOfExponentsSet(Int_t)");
@@ -76,8 +78,8 @@ void SWCalculatorPresenter::buildFittingModel(){
 	// Construct model
 	pdfProvider = new CompositeModelProvider(model->getFitProperties());
 	RooAbsPdf* pdf = pdfProvider->getPdf();
+	if (!pdf) return;
 
-	// TODO: Update parameter values from Pool
 	RooRealVar* observable = pdfProvider->getObservable();
 	RooArgSet* pdfParameters = pdfProvider->getPdfNonConvoluted()->getParameters(RooArgSet(*observable));
 	model->getParametersPool()->synchronizePdfParameters(pdfParameters);
@@ -111,16 +113,20 @@ void SWCalculatorPresenter::onFitSpectrumClicked() {
 	// Obtain fitting model and convoluted model
 
 	RooRealVar* observable = pdfProvider->getObservable();
-	TH1F* fitHist = pdfProvider->getTrimmedHistogram();
+	TH1F* fitHist = pdfProvider->getFitHistogram();
 	RooAbsPdf* pdfConvoluted = pdfProvider->getPdfConvoluted();
 	RooAbsPdf* pdfNonConvoluted = pdfProvider->getPdfNonConvoluted();
 
-	RooDataHist* data = new RooDataHist("data", "Dataset with e", RooArgSet(), RooFit::Import(*fitHist));
+	if (!pdfNonConvoluted) return;
+
+	RooDataHist* data = new RooDataHist("data", "Dataset", RooArgList(*observable), fitHist);
 
 	// Chi2 fit
 	RootHelper::startTimer();  // Start tracking Time
 	RooChi2Var* chi2 = new RooChi2Var("chi2", "chi2", *(pdfProvider->getPdf()), *data, RooFit::NumCPU(RootHelper::getNumCpu()));
 	RooMinimizer* m = new RooMinimizer(*chi2);
+
+	// Print Chi2 fit results
 	Int_t resultMigrad = m->migrad();
 	Int_t resultHesse = m->hesse();
 	Debug("SWCalculatorPresenter::onFitSpectrumClicked", "RooMinimizer: migrad=" << resultMigrad << ", hesse=" << resultHesse);
@@ -180,16 +186,16 @@ void SWCalculatorPresenter::onFitSpectrumClicked() {
 
 	// Plot convoluted and unconvoluted models
 
-	if (pdfNonConvoluted){
-		pdfNonConvoluted->plotOn(spectrumPlot, RooFit::LineColor(kOrange + 6), RooFit::LineWidth(1), RooFit::LineStyle(kDashed), RooFit::Name("model"));
-		legend->AddEntry(spectrumPlot->findObject("model"), "Unconvoluted model", "l");
-	}
 	if (pdfConvoluted){
-		pdfConvoluted->plotOn(spectrumPlot, RooFit::LineColor(kOrange + 6), RooFit::LineWidth(2), RooFit::Name("fit"));
-		legend->AddEntry(spectrumPlot->findObject("fit"), "Convoluted model", "l");
+		pdfConvoluted->plotOn(spectrumPlot, RooFit::LineColor(kOrange + 6), RooFit::LineWidth(1), RooFit::Name("pdfConv"));
+		legend->AddEntry(spectrumPlot->findObject("pdfConv"), "Convoluted model", "l");
+	}
+	if (pdfNonConvoluted){
+		pdfNonConvoluted->plotOn(spectrumPlot, RooFit::LineColor(kOrange + 6), RooFit::LineWidth(1), RooFit::LineStyle(kDashed), RooFit::Name("pdfNonConv"));
+		legend->AddEntry(spectrumPlot->findObject("pdfNonConv"), "Unconvoluted model", "l");
 	}
 
-	RooCurve* curveFit = spectrumPlot->getCurve("fit");
+	RooCurve* curveFit = spectrumPlot->getCurve(pdfConvoluted ? "pdfConv" : "pdfNonConv");
 
 	// Plot unconvoluted model components
 	{
@@ -198,11 +204,8 @@ void SWCalculatorPresenter::onFitSpectrumClicked() {
 		Int_t i = 0;
 		while (TObject* tempObject = it->Next()) {
 			RooAbsPdf* pdf = dynamic_cast<RooAbsPdf*>(tempObject);
-			if (pdf) {
-				RooArgSet* argSet = new RooArgSet();
-				argSet->add(*pdf);
-				pdfNonConvoluted->plotOn(spectrumPlot, RooFit::Components(*argSet), RooFit::LineStyle(kDashed), RooFit::LineColor(GraphicsHelper::colorSet[i++]), RooFit::LineWidth(1),
-						RooFit::Name(pdf->GetName()));
+			if (pdf && pdf->getAttribute(Constants::ATTR_NO_DRAW_ON_PLOT)==kFALSE) {
+				pdfNonConvoluted->plotOn(spectrumPlot, RooFit::Components(*pdf), RooFit::LineStyle(kDashed), RooFit::LineColor(GraphicsHelper::colorSet[i++]), RooFit::LineWidth(1), RooFit::Name(pdf->GetName()));
 				legend->AddEntry(spectrumPlot->findObject(pdf->GetName()), pdf->GetTitle(), "l");
 			}
 		}
@@ -210,7 +213,7 @@ void SWCalculatorPresenter::onFitSpectrumClicked() {
 
 	// Plot Resolution Function
 	RooAbsPdf* resolutionFunction = pdfProvider->getResolutionFunction();
-	if (resolutionFunction != NULL) {
+	if (resolutionFunction) {
 		resolutionFunction->plotOn(spectrumPlot, RooFit::LineStyle(kDashed), RooFit::LineColor(kGray), RooFit::LineWidth(1), RooFit::Name("rf")); //, RooFit::Normalization(totalFitCounts, RooAbsReal::NumEvent));
 		legend->AddEntry(spectrumPlot->findObject("rf"), "Resolution function", "l");
 	}
@@ -219,22 +222,22 @@ void SWCalculatorPresenter::onFitSpectrumClicked() {
 	HistProcessor* histProcessor = HistProcessor::getInstance();
 	TH1F* fitHistNoBg = fitHist;
 
-	// Single-dimentional experiment case - plot background
-	if (!model->isTwoDetector()) {
-		// Plot Convoluted Model background (its added after convolution graph because otherwise it changes backgroud)
-		pdfNonConvoluted->plotOn(spectrumPlot, RooFit::Components(*(pdfProvider->getBackgroundComponents())), RooFit::LineStyle(kDashed), RooFit::LineColor(kPink - 4), RooFit::LineWidth(1), RooFit::Name("bg"));
-		legend->AddEntry(spectrumPlot->findObject("bg"), "Atan background", "l");
-		// Plot fit without background
-		RooCurve* curveBg = spectrumPlot->getCurve("bg");
-		// RooCurve* curveFitNoBg = histProcessor->subtractCurves(curveFit, curveBg);
-		// curveFitNoBg->SetLineColor(kGray);
-		// curveFitNoBg->SetLineWidth(2);
-		fitHistNoBg = (TH1F*) histProcessor->subtractCurve("fitHistNoBg", fitHist, curveBg);
-		RooDataHist* dataNoBg = new RooDataHist("dataNoBg", "Dataset with e (no background)", RooArgSet(*observable), RooFit::Import(*fitHistNoBg));
-		dataNoBg->plotOn(spectrumPlot, RooFit::XErrorSize(0), RooFit::MarkerSize(0.5), RooFit::DataError(RooAbsData::None), RooFit::MarkerColor(kGray), RooFit::Name("dataNoBg"));
-		spectrumPlot->drawBefore("data", "dataNoBg");
-		legend->AddEntry(spectrumPlot->findObject("dataNoBg"), "Subtracted background", "p");
-	}
+//	// Single-dimentional experiment case - plot background
+//	if (!model->isTwoDetector()) {
+//		// Plot Convoluted Model background (its added after convolution graph because otherwise it changes backgroud)
+//		pdfNonConvoluted->plotOn(spectrumPlot, RooFit::Components(*(pdfProvider->getBackgroundComponents())), RooFit::LineStyle(kDashed), RooFit::LineColor(kPink - 4), RooFit::LineWidth(1), RooFit::Name("bg"));
+//		legend->AddEntry(spectrumPlot->findObject("bg"), "Atan background", "l");
+//		// Plot fit without background
+//		RooCurve* curveBg = spectrumPlot->getCurve("bg");
+//		// RooCurve* curveFitNoBg = histProcessor->subtractCurves(curveFit, curveBg);
+//		// curveFitNoBg->SetLineColor(kGray);
+//		// curveFitNoBg->SetLineWidth(2);
+//		fitHistNoBg = (TH1F*) histProcessor->subtractCurve("fitHistNoBg", fitHist, curveBg);
+//		RooDataHist* dataNoBg = new RooDataHist("dataNoBg", "Dataset with e (no background)", RooArgSet(*observable), RooFit::Import(*fitHistNoBg));
+//		dataNoBg->plotOn(spectrumPlot, RooFit::XErrorSize(0), RooFit::MarkerSize(0.5), RooFit::DataError(RooAbsData::None), RooFit::MarkerColor(kGray), RooFit::Name("dataNoBg"));
+//		spectrumPlot->drawBefore("data", "dataNoBg");
+//		legend->AddEntry(spectrumPlot->findObject("dataNoBg"), "Subtracted background", "p");
+//	}
 
 	// Set legend's bottom coordinate depending on the number of entries
 	legend->SetY1(legend->GetY2() - legend->GetNRows() * GraphicsHelper::LEGEND_LINE_HEIGHT);
@@ -254,7 +257,7 @@ void SWCalculatorPresenter::onFitSpectrumClicked() {
 
 	// Plot Bottom Frame with Fit Goodness
 	TH1F* resHist = (TH1F*) histProcessor->getResidualHist("resHist", fitHist, curveFit);
-	RooDataHist* chi2DataHist = new RooDataHist("chi2DataHist", "Chi2", RooArgSet(*(observable)), resHist);
+	RooDataHist* chi2DataHist = new RooDataHist("chi2DataHist", "Chi2", RooArgList(*observable), resHist);
 
 	// Create RooPlot for chi^2
 	RooPlot* residualsPlot = observable->frame();
@@ -298,8 +301,10 @@ void SWCalculatorPresenter::onFitSpectrumClicked() {
 		// Output indirect model parameters
 		view->displayVariables(pdfProvider->getIndirectParameters());
 		// Output components intensities
-		view->displayVariables(pdfProvider->getIntensities());
-		view->displayVariable(pdfProvider->getSourceContribution());
+		// view->displayVariables(pdfProvider->getIntensities());
+		if (RooRealVar* sourceContribution = pdfProvider->getSourceContribution()){
+			view->displayVariable(sourceContribution);
+		}
 		// Output Integral Chi^2
 		view->displayChi2(chi2Struct);
 
@@ -379,7 +384,10 @@ void SWCalculatorPresenter::onViewFitRangeSet(){
 
 void SWCalculatorPresenter::onViewConvolutionSelected(Int_t i){
 	ConvolutionType convolutionType = static_cast<ConvolutionType>(i);
-	model->setConvolutionType(convolutionType);
+	// Fix: TGButtonGroup signal fires twice?
+	if (model->getConvolutionType() != convolutionType){
+		model->setConvolutionType(convolutionType);
+	}
 }
 
 void SWCalculatorPresenter::onViewHasParabolaSet(Bool_t b){
@@ -410,8 +418,17 @@ void SWCalculatorPresenter::onModelHistogramImported(TH1F* hist){
 	view->setTabEnabled(2, true);
 }
 
+void SWCalculatorPresenter::onModelSourceHistogramImported(TH1F* hist){
+	buildFittingModel();
+}
+
 void SWCalculatorPresenter::onModelFitRangeLimitsSet(DoublePair* fitRangeLimits){
 	view->setFitRangeLimits(fitRangeLimits->first, fitRangeLimits->second);
+}
+
+void SWCalculatorPresenter::onModelConvolutionTypeSet(Int_t convolutionType){
+	view->setConvolutionType((ConvolutionType)convolutionType);
+	buildFittingModel();
 }
 
 void SWCalculatorPresenter::onModelFitRangeSet(DoublePair* fitRange){

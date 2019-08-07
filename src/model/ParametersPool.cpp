@@ -43,7 +43,9 @@ void ParametersPool::synchronizePdfParameters(RooArgSet* modelParameters) {
 			}
 			// If pool parameter not found - add model parameter to pool
 			else {
-				parametersPool->add(*modelParameter);
+				if (modelParameter->getAttribute(Constants::ATTR_NO_SAVE_TO_POOL) != kTRUE){
+					parametersPool->add(*modelParameter);
+				}
 			}
 		}
 	}

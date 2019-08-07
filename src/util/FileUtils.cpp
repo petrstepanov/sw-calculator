@@ -12,6 +12,8 @@
  */
 
 #include "FileUtils.h"
+#include <TDatime.h>
+#include <TString.h>
 #include <iomanip>
 #include <iostream>
 #include <fstream>
@@ -112,7 +114,10 @@ TH1F* FileUtils::importTH1(const char* fileName, int eColumn, int cColumn){
 	Double_t binWidth = (energyMax - energyMin) / (bins - 1);
 
 	// Make Histogram
-	TH1F* hist = new TH1F("hist", "", bins, energyMin - binWidth / 2, energyMax + binWidth / 2);
+	UInt_t time = (new TDatime())->Get();
+	const char *histName = TString::Format("hist%u", time).Data();
+	const char *histTitle = TString::Format("Histogram %u", time).Data();
+	TH1F* hist = new TH1F(histName, histTitle, bins, energyMin - binWidth / 2, energyMax + binWidth / 2);
 	// TH1I (const char *name, const char *title, Int_t nbinsx, Double_t xlow, Double_t xup)
 	// bin = 0;       underflow bin
 	// bin = 1;       first bin with low-edge xlow INCLUDED
@@ -135,6 +140,7 @@ TH1F* FileUtils::importTH1(const char* fileName, int eColumn, int cColumn){
 //		hist->SetBinError(i, error);
 		//std::cout << "Bin " << i << " error " << error << std::endl;
 	}
+
 	return hist;
 }
 

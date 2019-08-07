@@ -27,7 +27,7 @@ public:
     RooArgList* getIndirectParameters();
 //    RooArgList* getIntensities();
     RooRealVar* getSourceContribution();
-    TH1F* getTrimmedHistogram(); // return trimmed histogram to be fitted
+    TH1F* getFitHistogram(); // return trimmed histogram to be fitted
 
     // Return RooRealVar variables
     RooRealVar* getObservable();
@@ -39,7 +39,7 @@ public:
     RooAbsPdf* getPdfNonConvoluted();
     RooAbsPdf* getPdf();
 
-    RooArgList* getBackgroundComponents();
+//    RooArgList* getBackgroundComponents();
     RooArgList* getIntensities();
     //    RooArgSet* getParameters();
     
@@ -55,11 +55,6 @@ private:
 
     TH1F* fitHistogram;
 
-    // Histogram might have negative values when we subtract background.
-    // In order to perform chi^2 fit we add a constant value to the histogram.
-    // This way histogram does not have zero or negative values and can be fitted with chi^2 fit on full range.
-    Double_t lift;
-
     // Components in material
 //	RooArgList* components;
 //	RooArgList* intensities;
@@ -68,7 +63,7 @@ private:
 	RooRealVar* intSource;
 
 	// Background
-	RooArgList* backgroundComponents;
+//	RooArgList* backgroundComponents;
 //	RooArgList* coeffsInMaterial;
 
 	// Convolution
@@ -89,7 +84,7 @@ private:
     void initSingleDetectorBackground();
     void initTwoDetectorBackground();
 
-    Double_t getDefaultAValue(Int_t aMin, Int_t aMax, Int_t currentIndex, Int_t maxIndex);
+    Double_t getDefaultAValue(Double_t aMin, Double_t aMax, Int_t currentIndex, Int_t maxIndex);
 
 //    Double_t* getDefaultGaussAs(Int_t numGauss);
 //    Double_t* getDefaultLorentzAs(Int_t numGauss);

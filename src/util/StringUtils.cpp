@@ -32,7 +32,7 @@ TString* StringUtils::suffix(const char* name, int index, const char* nameSuffix
     return s;
 }
 
-char* StringUtils::ordinal(int index, const char* name) {
+TString* StringUtils::ordinal(int index, const char* name) {
 	if (index == 1){
 		TString* s = new TString(name);
 		return s;

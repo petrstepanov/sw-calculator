@@ -47,10 +47,12 @@ public:
 
     // Slots for Model Signals
     void onModelHistogramImported(TH1F* hist);
+    void onModelSourceHistogramImported(TH1F* hist);
 	void onModelTwoDetectorSet(Bool_t isTwoDetector);
 	void onModelFitRangeLimitsSet(DoublePair* fitRangeLimits);
 	void onModelFitRangeSet(DoublePair* fitFange);
 
+	void onModelConvolutionTypeSet(Int_t);
 	void onModelHasParabolaSet(Bool_t b);
 	void onModelNumberOfGaussiansSet(Int_t);
 	void onModelNumberOfExponentsSet(Int_t);

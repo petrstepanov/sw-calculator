@@ -50,7 +50,7 @@ Model::Model(){
 	fitProperties.hist = nullptr;
 	fitProperties.sourceHist = nullptr;
 
-	parametersPool = new ParametersPool();
+	parametersPool = nullptr;
 };
 
 void Model::setFileName(TString* fileName){
@@ -72,6 +72,7 @@ TString* Model::getSourceFileName(){
 void Model::setHist(TH1F* hist){
 	// Save original histogram to Model
     fitProperties.hist = hist;
+    parametersPool = new ParametersPool();
     histogramImported(hist);
 }
 

@@ -29,8 +29,8 @@ class HistProcessor {
 public:
     static HistProcessor* getInstance();
 
-    void liftHist(TH1F* hist, Double_t lift);
-    TH1F* cutHist(const char *newname, TH1F* hist, Double_t, Double_t);
+    Double_t liftHistAboveZero(TH1F* hist);
+    TH1F* cutHist(TH1F* hist, Double_t, Double_t);
     TH1F* cutHistBasement(const char *newname, TH1F* hist, Int_t, Int_t);
     RooCurve* subtractCurves(const char *newname, RooCurve*, RooCurve*);
     TH1F* subtractCurve(const char *newname, TH1F*, RooCurve*);

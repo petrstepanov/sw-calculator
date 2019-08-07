@@ -61,15 +61,20 @@ TH1F* HistProcessor::cutHistBasement(const char *newname, TH1F* hist, Int_t xMin
 	return subHist;
 }
 
-void HistProcessor::liftHist(TH1F* hist, Double_t lift){
+Double_t HistProcessor::liftHistAboveZero(TH1F* hist){
+	Double_t histMinimum = hist->GetMinimum();
+	if (histMinimum >= 0) return 0.;
+
+	Double_t lift = TMath::Abs(histMinimum);
 	for (UInt_t i = 1; i <= hist->GetNbinsX(); i++){
 		Double_t value = hist->GetBinContent(i);
 		hist->SetBinContent(i, value + lift);
 	}
+	return lift;
 }
 
 
-TH1F* HistProcessor::cutHist(const char *newname, TH1F* hist, Double_t xMin, Double_t xMax){
+TH1F* HistProcessor::cutHist(TH1F* hist, Double_t xMin, Double_t xMax){
 	#ifdef USEDEBUG
 		std::cout << "HistProcessor::cutHist" << std::endl;
 		hist->Print();
@@ -89,7 +94,10 @@ TH1F* HistProcessor::cutHist(const char *newname, TH1F* hist, Double_t xMin, Dou
 	Double_t lowEdge = hist->GetXaxis()->GetBinLowEdge(minBin);
 	Double_t upEdge = hist->GetXaxis()->GetBinUpEdge(maxBin);
 
-	TH1F* trimmedHist = new TH1F(newname, "Trimmed histogram", nBins, lowEdge, upEdge);
+	UInt_t time = (new TDatime())->Get();
+	const char *histName = TString::Format("hist%u", time).Data();
+	const char *histTitle = TString::Format("Trimmed %s", hist->GetName()).Data();
+	TH1F* trimmedHist = new TH1F(histName, histTitle, nBins, lowEdge, upEdge);
 	for (Int_t i = 1; i <= nBins; i++){
 		trimmedHist->SetBinContent(i, hist->GetBinContent(i+minBin-1));
 		trimmedHist->SetBinError(i, hist->GetBinError(i+minBin-1));

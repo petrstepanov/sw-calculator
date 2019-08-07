@@ -19,6 +19,7 @@
 #include <RooConstVar.h>
 
 class Constants {
+
   public:
     static constexpr Double_t chbar = 0.19732697 * 1E4; // c*hbar, eV*Å
     static constexpr Double_t mc2 = 0.511E6;            // electron mc^2, eV
@@ -39,7 +40,11 @@ class Constants {
 
     static RooConstVar* rooFwhmToSigma;
     static RooConstVar* pi;
+
+    static const char* ATTR_NO_SAVE_TO_POOL;
+    static const char* ATTR_NO_DRAW_ON_PLOT;
 };
+
 
 #endif /* CONSTANTS_H */
 
