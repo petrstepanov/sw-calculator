@@ -35,8 +35,8 @@ public:
 
     // Return PDFs
     RooAbsPdf* getResolutionFunction();
-    RooAbsPdf* getPdfConvoluted();
-    RooAbsPdf* getPdfNonConvoluted();
+    RooAbsPdf* getSourcePdf(); // components in material
+    RooAbsPdf* getPdfInMaterial(); // components in material
     RooAbsPdf* getPdf();
 
 //    RooArgList* getBackgroundComponents();
@@ -69,8 +69,9 @@ private:
 
 	// Convolution
 	RooAbsPdf* resolutionFunction;
-	RooAbsPdf* modelNonConvoluted;
-	RooAbsPdf* modelConvoluted;
+	RooAbsPdf* sourcePdf;
+	RooAbsPdf* pdfInMaterial; // fiting components and background, always non-convoluted
+	RooAbsPdf* pdfFinal;      // convoluted (or not) modelInMaterial with source contribution
 
     FitProperties fitProperties;
 
@@ -79,7 +80,7 @@ private:
     
 
     void initObservableAndMean();
-    void initModel(Bool_t hasParabola, const Int_t, const Int_t numLorentz, const Int_t numLorentzSum);
+    void initMaterialPdf(Bool_t hasParabola, const Int_t, const Int_t numLorentz, const Int_t numLorentzSum);
     void initSourceContribution(TH1F* sourceHist);
     void initConvolutedModel(ConvolutionType convolutionType);
     void initSingleDetectorBackground();

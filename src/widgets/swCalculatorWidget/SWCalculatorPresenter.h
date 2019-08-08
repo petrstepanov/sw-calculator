@@ -30,12 +30,6 @@ public:
 
     void onInitModel();
     
-    void onEditParametersClicked();
-    void onFitSpectrumClicked();
-    void onSaveImageClicked();
-    void onSaveResultsClicked();
-    void onClearResultsClicked();
-
     // Slots for View Signals
     void onViewFitSliderRangeSet();
     void onViewFitRangeSet();
@@ -44,6 +38,13 @@ public:
     void onViewNumGaussSet();
     void onViewNumExponentSet();
     void onViewNumDampExponentSet();
+    void onViewSaveData();
+    void onViewSaveImageClicked();
+    void onViewEditParametersClicked();
+    void onViewSaveDataClicked();
+    void onViewFitSpectrumClicked();
+    void onViewSaveResultsClicked();
+    void onViewClearResultsClicked();
 
     // Slots for Model Signals
     void onModelHistogramImported(TH1F* hist);

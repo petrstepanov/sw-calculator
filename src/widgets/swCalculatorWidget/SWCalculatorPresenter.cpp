@@ -20,6 +20,7 @@
 #include "../../util/StringUtils.h"
 #include "../../util/UiHelper.h"
 #include "../../util/Debug.h"
+#include "../../util/FileUtils.h".h"
 #include "../../model/Constants.h"
 #include "../../model/ParametersPool.h"
 #include "../frames/ModalDialogFrame.h"
@@ -81,11 +82,14 @@ void SWCalculatorPresenter::buildFittingModel(){
 	if (!pdf) return;
 
 	RooRealVar* observable = pdfProvider->getObservable();
-	RooArgSet* pdfParameters = pdfProvider->getPdfNonConvoluted()->getParameters(RooArgSet(*observable));
+//	RooArgSet* pdfParameters = pdfProvider->getPdfNonConvoluted()->getParameters(RooArgSet(*observable));
+	RooArgSet* pdfParameters = pdfProvider->getPdf()->getParameters(RooArgSet(*observable));
+
 	model->getParametersPool()->synchronizePdfParameters(pdfParameters);
 }
 
-void SWCalculatorPresenter::onEditParametersClicked() {
+// Slots for View Signals
+void SWCalculatorPresenter::onViewEditParametersClicked() {
 	ModalDialogFrame* dialog = UiHelper::getInstance()->getDialog("Model Parameters");
 	RooRealVar* observable = pdfProvider->getObservable();
 	RooAbsPdf* pdf = pdfProvider->getPdf();
@@ -96,7 +100,7 @@ void SWCalculatorPresenter::onEditParametersClicked() {
 	dialog->show();
 }
 
-void SWCalculatorPresenter::onFitSpectrumClicked() {
+void SWCalculatorPresenter::onViewFitSpectrumClicked() {
 	// Testing purposes - let model generate data
 	// data = static_cast<RooAddPdf*>(model)->generateBinned(*x,1000000) ;
 
@@ -114,10 +118,11 @@ void SWCalculatorPresenter::onFitSpectrumClicked() {
 
 	RooRealVar* observable = pdfProvider->getObservable();
 	TH1F* fitHist = pdfProvider->getFitHistogram();
-	RooAbsPdf* pdfConvoluted = pdfProvider->getPdfConvoluted();
-	RooAbsPdf* pdfNonConvoluted = pdfProvider->getPdfNonConvoluted();
 
-	if (!pdfNonConvoluted) return;
+	RooAbsPdf* pdfInMaterial = pdfProvider->getPdfInMaterial();
+	RooAbsPdf* pdf = pdfProvider->getPdf();
+
+	if (!pdf) return;
 
 	RooDataHist* data = new RooDataHist("data", "Dataset", RooArgList(*observable), fitHist);
 
@@ -184,29 +189,30 @@ void SWCalculatorPresenter::onFitSpectrumClicked() {
 	TLegend *legend = new TLegend(GraphicsHelper::LEGEND_X1, 0.5, 1 - 1.5 * GraphicsHelper::padMargins.right, 1 - 2 * GraphicsHelper::padMargins.top);
 	legend->AddEntry(spectrumPlot->findObject("data"), "Data points", "pe");
 
-	// Plot convoluted and unconvoluted models
-
-	if (pdfConvoluted){
-		pdfConvoluted->plotOn(spectrumPlot, RooFit::LineColor(kOrange + 6), RooFit::LineWidth(1), RooFit::Name("pdfConv"));
-		legend->AddEntry(spectrumPlot->findObject("pdfConv"), "Convoluted model", "l");
+	// Plot fitting pdf
+	if (pdf){
+		pdf->plotOn(spectrumPlot, RooFit::LineColor(kOrange + 6), RooFit::LineWidth(1), RooFit::Name("pdf"));
+		legend->AddEntry(spectrumPlot->findObject("pdf"), "Fitting model", "l");
 	}
-	if (pdfNonConvoluted){
-		pdfNonConvoluted->plotOn(spectrumPlot, RooFit::LineColor(kOrange + 6), RooFit::LineWidth(1), RooFit::LineStyle(kDashed), RooFit::Name("pdfNonConv"));
-		legend->AddEntry(spectrumPlot->findObject("pdfNonConv"), "Unconvoluted model", "l");
-	}
-
-	RooCurve* curveFit = spectrumPlot->getCurve(pdfConvoluted ? "pdfConv" : "pdfNonConv");
+	RooCurve* curveFit = spectrumPlot->getCurve("pdf");
 
 	// Plot unconvoluted model components
+	// Problem: convoluted PDF loses normalization of components
+	// TODO: normalize components on (1-source contribution) relative!
 	{
-		RooArgSet* components = pdfNonConvoluted->getComponents();
+		RooArgSet* components = pdfInMaterial->getComponents();
 		TIterator* it = components->createIterator();
 		Int_t i = 0;
+//		Double_t integral = pdfProvider->getFitHistogram()->Integral();
+//		Double_t range = pdfProvider->getObservable()->getMax() - pdfProvider->getObservable()->getMin();
+//		Double_t totalFitCounts = integral*range;
+		// Here we have to normalize non-convoluted material components with respect to the source contribution!
+		Double_t relativeNormalization = pdfProvider->getSourceContribution() ? 1-pdfProvider->getSourceContribution()->getVal()/100. : 1;
 		while (TObject* tempObject = it->Next()) {
-			RooAbsPdf* pdf = dynamic_cast<RooAbsPdf*>(tempObject);
-			if (pdf && pdf->getAttribute(Constants::ATTR_NO_DRAW_ON_PLOT)==kFALSE) {
-				pdfNonConvoluted->plotOn(spectrumPlot, RooFit::Components(*pdf), RooFit::LineStyle(kDashed), RooFit::LineColor(GraphicsHelper::colorSet[i++]), RooFit::LineWidth(1), RooFit::Name(pdf->GetName()));
-				legend->AddEntry(spectrumPlot->findObject(pdf->GetName()), pdf->GetTitle(), "l");
+			RooAbsPdf* component = dynamic_cast<RooAbsPdf*>(tempObject);
+			if (component && component->getAttribute(Constants::ATTR_NO_DRAW_ON_PLOT)==kFALSE) {
+				pdfInMaterial->plotOn(spectrumPlot, RooFit::Components(*component), RooFit::LineStyle(kDashed), RooFit::LineColor(GraphicsHelper::colorSet[i++]), RooFit::LineWidth(1), RooFit::Name(component->GetName()), RooFit::Normalization(relativeNormalization, RooAbsReal::Relative));
+				legend->AddEntry(spectrumPlot->findObject(component->GetName()), component->GetTitle(), "l");
 			}
 		}
 	}
@@ -214,8 +220,15 @@ void SWCalculatorPresenter::onFitSpectrumClicked() {
 	// Plot Resolution Function
 	RooAbsPdf* resolutionFunction = pdfProvider->getResolutionFunction();
 	if (resolutionFunction) {
-		resolutionFunction->plotOn(spectrumPlot, RooFit::LineStyle(kDashed), RooFit::LineColor(kGray), RooFit::LineWidth(1), RooFit::Name("rf")); //, RooFit::Normalization(totalFitCounts, RooAbsReal::NumEvent));
-		legend->AddEntry(spectrumPlot->findObject("rf"), "Resolution function", "l");
+		resolutionFunction->plotOn(spectrumPlot, RooFit::LineStyle(kDashed), RooFit::LineColor(kGray), RooFit::LineWidth(1), RooFit::Name(resolutionFunction->GetName())); //, RooFit::Normalization(totalFitCounts, RooAbsReal::NumEvent)); Normalization(1.0,RooAbsReal::RelativeExpected)
+		legend->AddEntry(spectrumPlot->findObject(resolutionFunction->GetName()), resolutionFunction->GetTitle(), "l");
+	}
+
+	// Plot Source contribution
+	RooAbsPdf* sourcePdf = pdfProvider->getSourcePdf();
+	if (sourcePdf) {
+		pdf->plotOn(spectrumPlot, RooFit::Components(*sourcePdf), RooFit::LineStyle(kDashed), RooFit::LineColor(kBlack+3), RooFit::LineWidth(1), RooFit::Name(sourcePdf->GetName()));
+		legend->AddEntry(spectrumPlot->findObject(sourcePdf->GetName()), sourcePdf->GetTitle(), "l");
 	}
 
 	// This histogram is used for calculating S and W parameters
@@ -270,8 +283,15 @@ void SWCalculatorPresenter::onFitSpectrumClicked() {
 	// Plot residuals
 	chi2DataHist->plotOn(residualsPlot, RooFit::LineColor(kGray + 3), RooFit::XErrorSize(0), RooFit::DataError(RooAbsData::None), RooFit::MarkerSize(0.5), RooFit::MarkerColor(kGray + 3));
 
-	// Plot chi2
-	Chi2Struct chi2Struct = histProcessor->getChi2(fitHist, curveFit, pdfNonConvoluted);
+	// Draw horizontal line
+	TLine* hr = new TLine(1, 0, observable->getMax(), 0);
+	hr->SetLineStyle(1); // https://root.cern.ch/doc/master/classTAttLine.html#L3
+	hr->SetLineWidth(2);
+	hr->SetLineColor(kGray+2);
+	residualsPlot->addObject(hr);
+
+	// Plot chi2 legend
+	Chi2Struct chi2Struct = histProcessor->getChi2(fitHist, curveFit, pdf);
 	TPaveText* chiText = new TPaveText(GraphicsHelper::LEGEND_X1, 1 - 2 * GraphicsHelper::padMargins.right - 0.18, 1 - 1.2 * GraphicsHelper::padMargins.right, 1 - 2 * GraphicsHelper::padMargins.top, "NDC");
 	chiText->AddText(Form("#chi^{2} = %.1f #divide %d = %.3f", chi2Struct.chiSum, chi2Struct.degreesOfFreedom, chi2Struct.chi2));
 	chiText->SetTextSize(gStyle->GetLegendTextSize()); // make chi2 text same size like the legend
@@ -325,7 +345,14 @@ void SWCalculatorPresenter::onFitSpectrumClicked() {
 	RootHelper::stopAndPrintTimer();
 }
 
-void SWCalculatorPresenter::onSaveImageClicked() {
+void SWCalculatorPresenter::onViewSaveDataClicked() {
+	// Create image file names
+	TString fileName = TString::Format("%s-data-columns.txt", model->getFileName()->Data());
+	FileUtils::savePlotsToFile(view->fitFrame, view->chiFrame, fileName.Data(), pdfProvider->getObservable());
+}
+
+
+void SWCalculatorPresenter::onViewSaveImageClicked() {
 	// Create image file names
 	TString* filePath = model->getFileName();
 	TString* filePathNoExtension = StringUtils::stripFileExtension(filePath);
@@ -348,7 +375,7 @@ void SWCalculatorPresenter::onSaveImageClicked() {
 	uiHelper->showOkDialog("PNG and PDF images saved.");
 }
 
-void SWCalculatorPresenter::onSaveResultsClicked() {
+void SWCalculatorPresenter::onViewSaveResultsClicked() {
 	// Create image file names
 	TString* filePath = model->getFileName();
 	TString* filePathNoExtension = StringUtils::stripFileExtension(filePath);
@@ -360,12 +387,9 @@ void SWCalculatorPresenter::onSaveResultsClicked() {
 	view->saveFitResults(&resultsFilename);
 }
 
-void SWCalculatorPresenter::onClearResultsClicked() {
+void SWCalculatorPresenter::onViewClearResultsClicked() {
 	view->clearFitResults();
 }
-
-
-// Slots for View Signals
 
 void SWCalculatorPresenter::onViewFitSliderRangeSet(){
 	Float_t min, max;

@@ -35,6 +35,7 @@ public:
     static void setRooRealVarValueLimits(RooRealVar* var, Double_t value, Double_t min, Double_t max);
     static RooRealVar* getParameterNameContains(RooAbsPdf* pdf, const char* nameSubstring);
     static RooAbsArg* findArgNameSubstring(RooAbsCollection* list, const char* nameSubstring);
+    static std::pair<TMatrixD,TList*> rooPlotToMatrix(RooRealVar* axis, RooPlot* plot);
 
 private:
     static TStopwatch* watch;

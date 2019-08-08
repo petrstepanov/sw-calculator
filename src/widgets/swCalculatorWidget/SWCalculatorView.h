@@ -89,7 +89,7 @@ class SWCalculatorView : public AbstractView<SWCalculatorPresenter> {
     TGTextButton* btnSaveResult;
 
     // Plot and display params
-    // TGTextButton* btnSaveData;
+     TGTextButton* btnSaveData;
     TGTextButton* btnSaveImage;
     TCanvas* canvasPlot;
     TGDoubleHSlider* zoomSlider;

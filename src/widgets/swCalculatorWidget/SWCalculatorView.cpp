@@ -225,14 +225,14 @@ void SWCalculatorView::initUI(){
 
     // Fit Result TextBox
     txtFitResult = new TGTextEdit(tabFit);
-    txtFitResult->SetBackgroundColor(GraphicsHelper::colorAppWindow->GetPixel());
+//    txtFitResult->SetBackgroundColor(GraphicsHelper::colorAppWindow->GetPixel());
     tabFit->AddFrame(txtFitResult, new TGLayoutHints(kLHintsExpandX | kLHintsExpandY, dx, dx, dy, dy));
 
     TGHorizontalFrame* splitFrame = new TGHorizontalFrame(tabFit);
 
     btnClearResult = new TGTextButton(splitFrame, "Clear output");
     splitFrame->AddFrame(btnClearResult, new TGLayoutHints(kLHintsNormal | kLHintsExpandX, 0, dx/2));
-    btnSaveResult = new TGTextButton(splitFrame, "Save to file");
+    btnSaveResult = new TGTextButton(splitFrame, "Save output to file");
     splitFrame->AddFrame(btnSaveResult, new TGLayoutHints(kLHintsNormal | kLHintsExpandX, dx/2));
     tabFit->AddFrame(splitFrame, new TGLayoutHints(kLHintsLeft | kLHintsTop | kLHintsExpandX, dx, dx, dy, 2*dy));
 
@@ -294,12 +294,12 @@ void SWCalculatorView::initUI(){
 //    tbMax->AddText(0, buf);
 
     // Save data file button
-//    btnSaveData = new TGTextButton(frameExportButtons, "Export Fit Data");
-//    btnSaveData->Connect("Clicked()", "SWCalculatorView", this, "onSaveDataClicked()");
-//    btnSaveData->SetEnabled(false);
-//    frameExportButtons->AddFrame(btnSaveData, new TGLayoutHints(kLHintsRight | kLHintsTop, 0, 0, 0, 0));  // left, right, top, bottom
+    btnSaveData = new TGTextButton(frameExportButtons, "Export Fit Data");
+    btnSaveData->SetEnabled(false);
+    frameExportButtons->AddFrame(btnSaveData, new TGLayoutHints(kLHintsRight | kLHintsTop, 0, 0, 0, 0));  // left, right, top, bottom
 
     // Save image button
+
     btnSaveImage = new TGTextButton(frameExportButtons, "Save Image");
     btnSaveImage->SetEnabled(false);
     frameExportButtons->AddFrame(btnSaveImage, new TGLayoutHints(kLHintsRight | kLHintsTop, 0, dx, 0, 0));
@@ -345,11 +345,12 @@ void SWCalculatorView::connectSignals(){
 	numExponent->Connect("ValueSet(Long_t)", "SWCalculatorPresenter", presenter, "onViewNumExponentSet()");
 	numDampExponent->Connect("ValueSet(Long_t)", "SWCalculatorPresenter", presenter, "onViewNumDampExponentSet()");
 
-	btnEditParameters->Connect("Clicked()", "SWCalculatorPresenter", presenter, "onEditParametersClicked()");
-    btnFitSpectrum->Connect("Clicked()", "SWCalculatorPresenter", presenter, "onFitSpectrumClicked()");
-    btnClearResult->Connect("Clicked()", "SWCalculatorPresenter", presenter, "onClearResultsClicked()");
-    btnSaveResult->Connect("Clicked()", "SWCalculatorPresenter", presenter, "onSaveResultsClicked()");
-    btnSaveImage->Connect("Clicked()", "SWCalculatorPresenter", presenter, "onSaveImageClicked()");
+	btnEditParameters->Connect("Clicked()", "SWCalculatorPresenter", presenter, "onViewEditParametersClicked()");
+    btnFitSpectrum->Connect("Clicked()", "SWCalculatorPresenter", presenter, "onViewFitSpectrumClicked()");
+    btnClearResult->Connect("Clicked()", "SWCalculatorPresenter", presenter, "onViewClearResultsClicked()");
+    btnSaveResult->Connect("Clicked()", "SWCalculatorPresenter", presenter, "onViewSaveResultsClicked()");
+    btnSaveData->Connect("Clicked()", "SWCalculatorPresenter", this, "onViewSaveDataClicked()");
+    btnSaveImage->Connect("Clicked()", "SWCalculatorPresenter", presenter, "onViewSaveImageClicked()");
 
 
 	// Local signals within view
@@ -438,8 +439,8 @@ void SWCalculatorView::initRooPlots(RooPlot* fitFrame, RooPlot* chiFrame) {
 void SWCalculatorView::setToolbarEnabled(Bool_t isEnabled){
 //    btnApplyZoom->SetEnabled(isEnabled);
 //    btnResetZoom->SetEnabled(isEnabled);
+    btnSaveData->SetEnabled(isEnabled);
     btnSaveImage->SetEnabled(isEnabled);
-//    btnSaveData->SetEnabled(isEnabled);
 //    numDisplayMin->SetState(isEnabled);
 //    numDisplayMax->SetState(isEnabled);
     displayMin->SetState(isEnabled);

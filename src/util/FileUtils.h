@@ -22,6 +22,7 @@ public:
 	static FileUtils* getInstance();
 	TH1F* importTH1(const char*, int, int);
 	void saveData(TString*, TH1F*, RooCurve*, RooCurve*, TH1F*, TH1F*);
+    static void savePlotsToFile(RooPlot* spectrumPlot, RooPlot* residualsPlot, const char* fileName,  RooRealVar* observable);
 	static constexpr int prec = 6; // Output values precision
 
 private:

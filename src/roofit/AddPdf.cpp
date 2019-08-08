@@ -48,6 +48,9 @@ RooAbsPdf* AddPdf::addReversed(RooArgList* pdfList, RooRealVar* observable, cons
 RooAbsPdf* AddPdf::add(RooArgList* pdfList, RooRealVar* observable, const char* pdfName) {
 	// If one component given just return it
 	unsigned numberOfComponents = pdfList->getSize();
+	if (numberOfComponents == 0) {
+		return nullptr;
+	}
 	if (numberOfComponents == 1) {
 		RooAbsArg* arg = pdfList->at(0);
 		RooAbsPdf* pdf = dynamic_cast<RooAbsPdf*>(arg);

@@ -39,10 +39,7 @@
 #include <TMath.h>
 #include <TH1F.h>
 
-PdfProvider::PdfProvider(FitProperties fitProperties) : observable(0), mean(0), resolutionFunction(0), fitHistogram(0), modelNonConvoluted(0), modelConvoluted(0), intSource(0){
-	if ((Int_t)(fitProperties.sourceHist!=nullptr) + (Int_t)(fitProperties.hasParabola) + fitProperties.numberOfGaussians + fitProperties.numberOfExponents + fitProperties.numberOfDampingExponents == 0){
-		return;
-	}
+PdfProvider::PdfProvider(FitProperties fitProperties) : observable(0), mean(0), resolutionFunction(0), sourcePdf(0), fitHistogram(0), pdfInMaterial(0), pdfFinal(0), intSource(0){
 	// Define variables
 	this->fitProperties = fitProperties;
 
@@ -54,20 +51,22 @@ PdfProvider::PdfProvider(FitProperties fitProperties) : observable(0), mean(0), 
 	// So we pass histograms by reference. But here cutHist() always creates new histogram! So we avoid changes in model.
 	fitHistogram = histProcessor->cutHist("fitHistogram", fitProperties.hist, fitProperties.fitMin->getVal(), fitProperties.fitMax->getVal());
 
-	// Initialize fitting pdf
+	// Initialize pdfs in material
 	initObservableAndMean();
-	initModel(fitProperties.hasParabola, fitProperties.numberOfGaussians, fitProperties.numberOfExponents, fitProperties.numberOfDampingExponents);
-	initSourceContribution(fitProperties.sourceHist);
+	initMaterialPdf(fitProperties.hasParabola, fitProperties.numberOfGaussians, fitProperties.numberOfExponents, fitProperties.numberOfDampingExponents);
 
-	// In case of single detector experiment - add background
-//	backgroundComponents = new RooArgList();
+	// Add correspondent background
 	if (fitProperties.isTwoDetector == kFALSE) {
 		initSingleDetectorBackground();
 	} else {
 		initTwoDetectorBackground();
 	}
 
+	// Convolute (or not) before adding source contribution histogram
 	initConvolutedModel(fitProperties.convolutionType);
+
+	// Add source contribution latest because it should not be convoluted
+	initSourceContribution(fitProperties.sourceHist);
 }
 
 PdfProvider::~PdfProvider(){
@@ -86,12 +85,7 @@ void PdfProvider::initObservableAndMean(){
 	mean = new RooRealVar("mean", "Spectrum peak position", m, m-1, m+1);
 }
 
-void PdfProvider::initModel(Bool_t hasParabola, const Int_t numGauss, const Int_t numLorentz, const Int_t numLorentzSum) {
-	// Only if has
-	if ((Int_t)(fitProperties.hasParabola) + fitProperties.numberOfGaussians + fitProperties.numberOfExponents + fitProperties.numberOfDampingExponents == 0){
-		return;
-	}
-
+void PdfProvider::initMaterialPdf(Bool_t hasParabola, const Int_t numGauss, const Int_t numLorentz, const Int_t numLorentzSum) {
 	RooArgList* pdfsInMaterial = new RooArgList();
 
 	// Parabola PDF
@@ -148,11 +142,11 @@ void PdfProvider::initModel(Bool_t hasParabola, const Int_t numGauss, const Int_
 	//     coeffsInMaterial->add(*Int_ortho);
 	// }
 
-	modelNonConvoluted = AddPdf::add(pdfsInMaterial, observable, "materialPdf");
+	pdfInMaterial = AddPdf::add(pdfsInMaterial, observable, "materialPdf");
 
-	Int_t numberOfComponents = hasParabola + numGauss + numLorentz + numLorentzSum;
-	if (numberOfComponents > 1){
-		modelNonConvoluted->setAttribute(Constants::ATTR_NO_DRAW_ON_PLOT, kTRUE);
+	// Mark to ignore on plot if more than one component (ignore sum but plot individual components)
+	if (pdfInMaterial && pdfsInMaterial->getSize() > 1){
+		pdfInMaterial->setAttribute(Constants::ATTR_NO_DRAW_ON_PLOT, kTRUE);
 	}
 }
 
@@ -166,7 +160,7 @@ void PdfProvider::initSourceContribution(TH1F* sourceHist){
 	sourceHistogram = histProcessor->removeHistNegatives("sourceHistogramNoNegatives", sourceHistogram);
 
 	RooDataHist* sourceDataHist = new RooDataHist("sourceDataHist", "Source Data Hist", RooArgList(*observable), sourceHistogram);
-	RooHistPdf* sourcePdf = new RooHistPdf("sourcePdf", "Source Contribution PDF", RooArgSet(*observable), *sourceDataHist, 1);
+	sourcePdf = new RooHistPdf("sourcePdf", "Source Contribution PDF", RooArgSet(*observable), *sourceDataHist, 1);
 
 	// Add PDF from annihilation in source if needed
 	intSource = new RooRealVar("intSource", "Source contribution", 12, 5, 20, "%");
@@ -174,15 +168,8 @@ void PdfProvider::initSourceContribution(TH1F* sourceHist){
 
 	RooFormulaVar* intSourceNorm = new RooFormulaVar("intSourceNorm", "Source contribution normalized", "@0/100", RooArgList(*intSource));
 
-	// If there were any components besides source contribution...
-	if (modelNonConvoluted){
-		modelNonConvoluted = new RooAddPdf("materialSourcePdf", "Pdf with source contribution", RooArgList(*sourcePdf, *modelNonConvoluted), RooArgList(*intSourceNorm));
-		modelNonConvoluted->setAttribute(Constants::ATTR_NO_DRAW_ON_PLOT, kTRUE);
-		modelNonConvoluted->fixAddCoefNormalization(RooArgSet(*observable));
-	}
-	else {
-		modelNonConvoluted = sourcePdf;
-	}
+	pdfFinal = new RooAddPdf("materialSourcePdf", "Pdf with source contribution", RooArgList(*sourcePdf, *pdfFinal), RooArgList(*intSourceNorm));
+	pdfFinal->fixAddCoefNormalization(RooArgSet(*observable));
 }
 
 void PdfProvider::initSingleDetectorBackground() {
@@ -207,9 +194,14 @@ void PdfProvider::initSingleDetectorBackground() {
 	RooRealVar* intAtanBackground = new RooRealVar("intAtanBackground", "Intensity of arctangent background", 1, 0, 10, "%");
     RooFormulaVar* intAtanBackgroundNorm = new RooFormulaVar("intAtanBackgroundNorm", "Intensity of arctangent background normalized", "@0/100", RooArgList(*intAtanBackground));
 
-	modelNonConvoluted = new RooAddPdf("withBackgroundPdf", "Sum of model and background", RooArgList(*atanBackgroundPdf, *flatBackgroundPdf, *modelNonConvoluted), RooArgList(*intAtanBackgroundNorm, *intFlatBackgroundNorm));
-	modelNonConvoluted->setAttribute(Constants::ATTR_NO_DRAW_ON_PLOT, kTRUE);
-	modelNonConvoluted->fixAddCoefNormalization(RooArgSet(*observable));
+    if (pdfInMaterial){
+		pdfInMaterial = new RooAddPdf("withBackgroundPdf", "Material components and background", RooArgList(*atanBackgroundPdf, *flatBackgroundPdf, *pdfInMaterial), RooArgList(*intAtanBackgroundNorm, *intFlatBackgroundNorm));
+		pdfInMaterial->setAttribute(Constants::ATTR_NO_DRAW_ON_PLOT, kTRUE);
+		pdfInMaterial->fixAddCoefNormalization(RooArgSet(*observable));
+    }
+    else {
+    	pdfInMaterial = new RooAddPdf("backgroundPdf", "Background", RooArgList(*atanBackgroundPdf, *flatBackgroundPdf), RooArgList(*intAtanBackgroundNorm));
+    }
 }
 
 void PdfProvider::initTwoDetectorBackground() {
@@ -244,22 +236,30 @@ void PdfProvider::initTwoDetectorBackground() {
 	// Initialize flat ground PDF
 	RooPolynomial* flatPdf = new RooPolynomial("flatPdf", "Histogram ground level", *observable, RooArgSet());
 
-	modelNonConvoluted = new RooAddPdf("withFlatBackgroundPdf", "Sum of model and ground level", RooArgList(*flatPdf, *modelNonConvoluted), RooArgList(*intFlatBackgroundNorm));
-	modelNonConvoluted->setAttribute(Constants::ATTR_NO_DRAW_ON_PLOT, kTRUE);
-	modelNonConvoluted->fixAddCoefNormalization(RooArgSet(*observable));
+	if (pdfInMaterial){
+		pdfInMaterial = new RooAddPdf("withFlatBackgroundPdf", "Sum of model and ground level", RooArgList(*flatPdf, *pdfInMaterial), RooArgList(*intFlatBackgroundNorm));
+		pdfInMaterial->setAttribute(Constants::ATTR_NO_DRAW_ON_PLOT, kTRUE);
+		pdfInMaterial->fixAddCoefNormalization(RooArgSet(*observable));
+	}
+	else {
+		pdfInMaterial = flatPdf;
+	}
 }
 
 
 void PdfProvider::initConvolutedModel(ConvolutionType convolutionType) {
-	if (convolutionType == kNoConvolution) return;
+	if (convolutionType == kNoConvolution){
+		pdfFinal = pdfInMaterial;
+		return;
+	}
 
-	// Make resolution Function
+	// Convolute components in material
 	RooRealVar* resolutionFWHM = new RooRealVar("resolutionFWHM", "Resolution function FWHM", 2, 0.5, 4, "keV");
 	resolutionFWHM->setConstant(kTRUE);
 	RooFormulaVar* resFunctSigma = new RooFormulaVar("resFunctSigma", "@0*@1", RooArgList(*resolutionFWHM, *Constants::rooFwhmToSigma));
 
 	resolutionFunction = new RooGaussian("resolutionPdf", "Resolution function", *observable, *mean, *resFunctSigma);
-	modelConvoluted = new RooFFTConvPdf("modelConvoluted", "Convoluted with resolution function", *observable, *modelNonConvoluted, *resolutionFunction);
+	pdfFinal = new RooFFTConvPdf("modelConvoluted", "Convoluted with resolution function", *observable, *pdfInMaterial, *resolutionFunction);
 }
 
 // Getters
@@ -273,7 +273,7 @@ RooRealVar* PdfProvider::getMean(){
 
 RooArgList* PdfProvider::getIndirectParameters() {
 	RooArgList* parameters = new RooArgList();
-	TIterator* it = modelNonConvoluted->getComponents()->createIterator();
+	TIterator* it = pdfInMaterial->getComponents()->createIterator();
 	while (TObject* tempObj = it->Next()) {
 		if (IndirectParamPdf* paramPdf = dynamic_cast<IndirectParamPdf*>(tempObj)) {
 			RooArgList* list = paramPdf->getParameters(fitProperties.isTwoDetector);
@@ -292,22 +292,19 @@ TH1F* PdfProvider::getFitHistogram(){
 }
 
 RooAbsPdf* PdfProvider::getPdf() {
-	if (modelConvoluted != nullptr){
-		return modelConvoluted;
-	}
-	return modelNonConvoluted;
+	return pdfFinal;
+}
+
+RooAbsPdf* PdfProvider::getSourcePdf() {
+	return sourcePdf;
 }
 
 RooAbsPdf* PdfProvider::getResolutionFunction() {
 	return resolutionFunction;
 }
 
-RooAbsPdf* PdfProvider::getPdfConvoluted() {
-	return modelConvoluted;
-}
-
-RooAbsPdf* PdfProvider::getPdfNonConvoluted() {
-	return modelNonConvoluted;
+RooAbsPdf* PdfProvider::getPdfInMaterial() {
+	return pdfInMaterial;
 }
 
 Double_t PdfProvider::getDefaultAValue(Double_t aMin, Double_t aMax, Int_t currentIndex, Int_t maxIndex) {
