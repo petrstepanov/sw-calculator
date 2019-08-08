@@ -18,16 +18,16 @@
 #include "MathUtil.h"
 #include "StringUtils.h"
 
-//void RootHelper::deleteObject(const char* name){
-//    TObject* obj = gROOT->FindObject(name);
-//    deleteObject(obj);
-//}
+void RootHelper::deleteObject(const char* name){
+    TObject* obj = gROOT->FindObject(name);
+    deleteObject(obj);
+}
 
-//void RootHelper::deleteObject(TObject* obj){
-//    if (obj){
-//        obj->Delete();
-//    }
-//}
+void RootHelper::deleteObject(TObject* obj){
+    if (obj){
+        obj->Delete();
+    }
+}
 
 Int_t RootHelper::getNumCpu(){
     SysInfo_t sysInfo;

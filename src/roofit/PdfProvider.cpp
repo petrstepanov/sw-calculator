@@ -5,13 +5,14 @@
  */
 
 /*
- * File:   CompositeModelProvider.cpp
+ * File:   PdfProvider.cpp
  * Author: petrstepanov
  *
  * Created on August 15, 2017, 9:59 PM
  */
 
-#include "CompositeModelProvider.h"
+#include "PdfProvider.h"
+
 #include "pdfs/ParabolaPdf.h"
 #include "pdfs/GaussianPdf.h"
 #include "pdfs/LorentzianPdf.h"
@@ -38,8 +39,8 @@
 #include <TMath.h>
 #include <TH1F.h>
 
-CompositeModelProvider::CompositeModelProvider(FitProperties fitProperties) : observable(0), mean(0), resolutionFunction(0), fitHistogram(0), modelNonConvoluted(0), modelConvoluted(0), intSource(0){
-	if (!fitProperties.hasParabola && fitProperties.numberOfGaussians + fitProperties.numberOfExponents + fitProperties.numberOfDampingExponents == 0){
+PdfProvider::PdfProvider(FitProperties fitProperties) : observable(0), mean(0), resolutionFunction(0), fitHistogram(0), modelNonConvoluted(0), modelConvoluted(0), intSource(0){
+	if ((Int_t)(fitProperties.sourceHist!=nullptr) + (Int_t)(fitProperties.hasParabola) + fitProperties.numberOfGaussians + fitProperties.numberOfExponents + fitProperties.numberOfDampingExponents == 0){
 		return;
 	}
 	// Define variables
@@ -47,10 +48,14 @@ CompositeModelProvider::CompositeModelProvider(FitProperties fitProperties) : ob
 
 	// Cut original histogram with respect to the fitting limits
 	HistProcessor* histProcessor = HistProcessor::getInstance();
-	fitHistogram = histProcessor->cutHist(fitProperties.hist, fitProperties.fitMin->getVal(), fitProperties.fitMax->getVal());
+
+	// Histograms can be acessed via gROOT->FindObject. So proper way to treat them is pass by reference?
+	// Problem: if you pass histogram by value then you copy it but it still has the same ROOT name? Mess.
+	// So we pass histograms by reference. But here cutHist() always creates new histogram! So we avoid changes in model.
+	fitHistogram = histProcessor->cutHist("fitHistogram", fitProperties.hist, fitProperties.fitMin->getVal(), fitProperties.fitMax->getVal());
 
 	// Initialize fitting pdf
-	initObservableAndMean(fitProperties.fitMin, fitProperties.fitMax);
+	initObservableAndMean();
 	initModel(fitProperties.hasParabola, fitProperties.numberOfGaussians, fitProperties.numberOfExponents, fitProperties.numberOfDampingExponents);
 	initSourceContribution(fitProperties.sourceHist);
 
@@ -65,10 +70,10 @@ CompositeModelProvider::CompositeModelProvider(FitProperties fitProperties) : ob
 	initConvolutedModel(fitProperties.convolutionType);
 }
 
-CompositeModelProvider::~CompositeModelProvider(){
+PdfProvider::~PdfProvider(){
 }
 
-void CompositeModelProvider::initObservableAndMean(RooRealVar* fitMin, RooRealVar* fitMax){
+void PdfProvider::initObservableAndMean(){
 	// Define energy axis (observable)
 	observable = new RooRealVar("observable", "Energy axis", fitHistogram->GetXaxis()->GetXmin(), fitHistogram->GetXaxis()->GetXmax(), "keV");
 
@@ -81,7 +86,12 @@ void CompositeModelProvider::initObservableAndMean(RooRealVar* fitMin, RooRealVa
 	mean = new RooRealVar("mean", "Spectrum peak position", m, m-1, m+1);
 }
 
-void CompositeModelProvider::initModel(Bool_t hasParabola, const Int_t numGauss, const Int_t numLorentz, const Int_t numLorentzSum) {
+void PdfProvider::initModel(Bool_t hasParabola, const Int_t numGauss, const Int_t numLorentz, const Int_t numLorentzSum) {
+	// Only if has
+	if ((Int_t)(fitProperties.hasParabola) + fitProperties.numberOfGaussians + fitProperties.numberOfExponents + fitProperties.numberOfDampingExponents == 0){
+		return;
+	}
+
 	RooArgList* pdfsInMaterial = new RooArgList();
 
 	// Parabola PDF
@@ -129,7 +139,7 @@ void CompositeModelProvider::initModel(Bool_t hasParabola, const Int_t numGauss,
 	//     RootHelper::deleteObject("a1");
 	//     RooRealVar* a1 = new RooRealVar("a1", "a1 coeff", 1, 1E-2, 1E2, "A");
 	//     RootHelper::deleteObject("a2");
-	//     RooReCompositeModelProvideralVar* a2 = new RooRealVar("a2", "a2 coeff", 1, 1E-2, 1E2, "A");
+	//     RooRePdfProvideralVar* a2 = new RooRealVar("a2", "a2 coeff", 1, 1E-2, 1E2, "A");
 	//     RootHelper::deleteObject("orthogonal");
 	//     OrthogonalPdf* orthogonalPdf = new OrthogonalPdf("orthogonal", "Orthogonal Pdf", *x, *x0, *a1, *a2);
 	//     components->add(*orthogonalPdf);
@@ -146,42 +156,35 @@ void CompositeModelProvider::initModel(Bool_t hasParabola, const Int_t numGauss,
 	}
 }
 
-void CompositeModelProvider::initSourceContribution(TH1F* sourceHist){
+void PdfProvider::initSourceContribution(TH1F* sourceHist){
 	if (!sourceHist) return;
 
+	// cutHist() always returns copy of the histogram so we ensure we don't change the model
 	HistProcessor* histProcessor = HistProcessor::getInstance();
-	histProcessor->liftHistAboveZero(sourceHist);
+	TH1F* sourceHistogram = histProcessor->cutHist("sourceHistogram", sourceHist,  observable->getMin(),  observable->getMax());
+	histProcessor->liftHistAboveZero(sourceHistogram);
 
-	Double_t histMin = sourceHist->GetXaxis()->GetXmin();
-	Double_t histMax = sourceHist->GetXaxis()->GetXmax();
-
-	Double_t observableMin = observable->getMin();
-	Double_t observableMax = observable->getMax();
-
-	RooDataHist* sourceDataHist;
-	// Cut source histogram if it exceeds the observable limits
-	if (histMin < observableMin || histMax > observableMax) {
-		HistProcessor* histProcessor = HistProcessor::getInstance();
-		TH1F* cutSourceHist = histProcessor->cutHist(sourceHist, observableMin, observableMax);
-		Double_t min = cutSourceHist->GetXaxis()->GetXmin();
-		Double_t max = cutSourceHist->GetXaxis()->GetXmax();
-		std::cout << "cutSourceHistMin: " << min << ". cutSourceHistMax:" << max << std::endl;
-		sourceDataHist = new RooDataHist("sourceDataHist", "Source Data Hist", RooArgList(*observable), cutSourceHist);
-	} else {
-		sourceDataHist = new RooDataHist("sourceDataHist", "Source Data Hist", RooArgList(*observable), sourceHist);
-	}
+	RooDataHist* sourceDataHist = new RooDataHist("sourceDataHist", "Source Data Hist", RooArgList(*observable), sourceHist);
 	RooHistPdf* sourcePdf = new RooHistPdf("sourcePdf", "Source Contribution PDF", RooArgSet(*observable), *sourceDataHist, 1);
 
 	// Add PDF from annihilation in source if needed
 	intSource = new RooRealVar("intSource", "Contribution from annihilation in source", 12, 5, 20, "%");
 	intSource->setConstant(kTRUE);
+
 	RooFormulaVar* intSourceNorm = new RooFormulaVar("intSourceNorm", "Source contribution normalized", "@0/100", RooArgList(*intSource));
-	modelNonConvoluted = new RooAddPdf("materialSourcePdf", "Sum of components in material with source contribution", RooArgList(*sourcePdf, *modelNonConvoluted), RooArgList(*intSourceNorm));
-	modelNonConvoluted->setAttribute(Constants::ATTR_NO_DRAW_ON_PLOT, kTRUE);
-	modelNonConvoluted->fixAddCoefNormalization(RooArgSet(*observable));
+
+	// If there were any components besides source contribution...
+	if (modelNonConvoluted){
+		modelNonConvoluted = new RooAddPdf("materialSourcePdf", "Sum of components in material with source contribution", RooArgList(*sourcePdf, *modelNonConvoluted), RooArgList(*intSourceNorm));
+		modelNonConvoluted->setAttribute(Constants::ATTR_NO_DRAW_ON_PLOT, kTRUE);
+		modelNonConvoluted->fixAddCoefNormalization(RooArgSet(*observable));
+	}
+	else {
+		modelNonConvoluted = sourcePdf;
+	}
 }
 
-void CompositeModelProvider::initSingleDetectorBackground() {
+void PdfProvider::initSingleDetectorBackground() {
 	// Ore-Powell background
 //    RooRealVar* threeGammaInt = new RooRealVar("threeGammaInt", "Three Gamma fraction", 10, 1, 100);
 //    BackgroundPdf* bgPdf = new BackgroundPdf("bgPdf", "Ore-Powell background", *observable, *threeGammaInt);
@@ -208,13 +211,14 @@ void CompositeModelProvider::initSingleDetectorBackground() {
 	modelNonConvoluted->fixAddCoefNormalization(RooArgSet(*observable));
 }
 
-void CompositeModelProvider::initTwoDetectorBackground() {
+void PdfProvider::initTwoDetectorBackground() {
     // Histogram might have negative values when we subtract background in 2-detector experiment.
     // In order to perform chi^2 fit we add a constant value to the histogram to avoid negative or zero values.
 
 	// Calculate histogram ground level and lift it and find ground contribution
 	HistProcessor* histProcessor = HistProcessor::getInstance();
-	Double_t lift = histProcessor->liftHistAboveZero(fitHistogram);
+	Double_t lift = histProcessor->liftHistAboveZero(fitHistogram); // lift is how high we lifted the histogram up
+	histProcessor->liftHist(fitHistogram, 1); lift++; // need to lift more because histogram still
 
 	RooRealVar* groundLevel = new RooRealVar("groundLevel", "Histogram ground level (for chi2 fit)", lift, 0, (Int_t) lift*10, "counts");
 //	groundLevel->setConstant(kTRUE);
@@ -225,14 +229,13 @@ void CompositeModelProvider::initTwoDetectorBackground() {
 //	range->setConstant(kTRUE);
 //	range->setAttribute(Constants::ATTR_NO_SAVE_TO_POOL);
 
+//	Double_t i = fitHistogram->Integral();
+//	RooRealVar* integral = new RooRealVar("integral", "Histogram integral", i); // counts
+//	integral->setConstant(kTRUE);
+//	integral->setAttribute(Constants::ATTR_NO_SAVE_TO_POOL);
+
 	RooConstVar* bins = new RooConstVar("bins", "Histogram bins", fitHistogram->GetXaxis()->GetNbins()); // keV
-
-	Double_t i = fitHistogram->Integral();
-//	RooConstVar* integral = new RooConstVar("integral", "Histogram integral", i); // counts
-	RooRealVar* integral = new RooRealVar("integral", "Histogram integral", i); // counts
-	integral->setConstant(kTRUE);
-	integral->setAttribute(Constants::ATTR_NO_SAVE_TO_POOL);
-
+	RooConstVar* integral = new RooConstVar("integral", "Histogram integral", fitHistogram->Integral()); // counts
 	RooFormulaVar* intFlatBackgroundNorm = new RooFormulaVar("intFlatBackgroundNorm", "Flat background intensity normalized", "@0*@1/@2", RooArgList(*groundLevel, *bins, *integral));
 
 	// Initialize flat ground PDF
@@ -244,7 +247,7 @@ void CompositeModelProvider::initTwoDetectorBackground() {
 }
 
 
-void CompositeModelProvider::initConvolutedModel(ConvolutionType convolutionType) {
+void PdfProvider::initConvolutedModel(ConvolutionType convolutionType) {
 	if (convolutionType == kNoConvolution) return;
 
 	// Make resolution Function
@@ -257,15 +260,15 @@ void CompositeModelProvider::initConvolutedModel(ConvolutionType convolutionType
 }
 
 // Getters
-RooRealVar* CompositeModelProvider::getObservable(){
+RooRealVar* PdfProvider::getObservable(){
 	return observable;
 }
 
-RooRealVar* CompositeModelProvider::getMean(){
+RooRealVar* PdfProvider::getMean(){
 	return mean;
 }
 
-RooArgList* CompositeModelProvider::getIndirectParameters() {
+RooArgList* PdfProvider::getIndirectParameters() {
 	RooArgList* parameters = new RooArgList();
 	TIterator* it = modelNonConvoluted->getComponents()->createIterator();
 	while (TObject* tempObj = it->Next()) {
@@ -277,38 +280,34 @@ RooArgList* CompositeModelProvider::getIndirectParameters() {
 	return parameters;
 }
 
-RooRealVar* CompositeModelProvider::getSourceContribution() {
+RooRealVar* PdfProvider::getSourceContribution() {
 	return intSource;
 }
-//
-//RooArgList* CompositeModelProvider::getBackgroundComponents() {
-//	return backgroundComponents;
-//}
 
-TH1F* CompositeModelProvider::getFitHistogram(){
+TH1F* PdfProvider::getFitHistogram(){
 	return fitHistogram;
 }
 
-RooAbsPdf* CompositeModelProvider::getPdf() {
+RooAbsPdf* PdfProvider::getPdf() {
 	if (modelConvoluted != nullptr){
 		return modelConvoluted;
 	}
 	return modelNonConvoluted;
 }
 
-RooAbsPdf* CompositeModelProvider::getResolutionFunction() {
+RooAbsPdf* PdfProvider::getResolutionFunction() {
 	return resolutionFunction;
 }
 
-RooAbsPdf* CompositeModelProvider::getPdfConvoluted() {
+RooAbsPdf* PdfProvider::getPdfConvoluted() {
 	return modelConvoluted;
 }
 
-RooAbsPdf* CompositeModelProvider::getPdfNonConvoluted() {
+RooAbsPdf* PdfProvider::getPdfNonConvoluted() {
 	return modelNonConvoluted;
 }
 
-Double_t CompositeModelProvider::getDefaultAValue(Double_t aMin, Double_t aMax, Int_t currentIndex, Int_t maxIndex) {
+Double_t PdfProvider::getDefaultAValue(Double_t aMin, Double_t aMax, Int_t currentIndex, Int_t maxIndex) {
 	// Polynomial default coefficients
 	// https://www.dropbox.com/s/xykmomlt9x3k181/Photo%20Aug%2002%2C%204%2048%2058%20PM.jpg?dl=0
 	Double_t x = (Double_t) currentIndex/(maxIndex+1);

@@ -132,13 +132,13 @@ TString* AbstractImportSpectrumView::getFileName(){
 }
 
 void AbstractImportSpectrumView::drawHistogram(TH1F* hist){
-    GraphicsHelper* graphicsHelper = GraphicsHelper::getInstance();
     canvasHist->cd();
     hist->SetLineColor(getHistogramColor());
     hist->SetFillColorAlpha(getHistogramColor(), 0.2);
     hist->GetXaxis()->SetLabelOffset(0.03);
     hist->GetYaxis()->SetLabelOffset(0.015);
     hist->Draw();
+    GraphicsHelper* graphicsHelper = GraphicsHelper::getInstance();
     graphicsHelper->setDefaultAxisFonts(hist->GetXaxis());
     graphicsHelper->setDefaultAxisFonts(hist->GetYaxis());
     hist->SetStats(0);

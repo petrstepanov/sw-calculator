@@ -76,7 +76,7 @@ void SWCalculatorPresenter::onInitModel() {
 
 void SWCalculatorPresenter::buildFittingModel(){
 	// Construct model
-	pdfProvider = new CompositeModelProvider(model->getFitProperties());
+	pdfProvider = new PdfProvider(model->getFitProperties());
 	RooAbsPdf* pdf = pdfProvider->getPdf();
 	if (!pdf) return;
 
@@ -178,7 +178,7 @@ void SWCalculatorPresenter::onFitSpectrumClicked() {
 
 	// Plot data points first (in transparent color). Essential for normalization of PDFs
 	// data->plotOn(setNumberOfGaussiansspectrumPlot, RooFit::Invisible());
-	data->plotOn(spectrumPlot, RooFit::LineColor(kGray + 3), RooFit::XErrorSize(0), RooFit::MarkerSize(0.5), RooFit::MarkerColor(kGray + 3), RooFit::Name("data"));
+	data->plotOn(spectrumPlot, RooFit::LineColor(kGray + 3), /*RooFit::ShiftToZero(),*/ RooFit::XErrorSize(0), RooFit::MarkerSize(0.5), RooFit::MarkerColor(kGray + 3), RooFit::Name("data"));
 
 	// Initialize legend
 	TLegend *legend = new TLegend(GraphicsHelper::LEGEND_X1, 0.5, 1 - 1.5 * GraphicsHelper::padMargins.right, 1 - 2 * GraphicsHelper::padMargins.top);
@@ -331,10 +331,7 @@ void SWCalculatorPresenter::onSaveImageClicked() {
 	TString* filePathNoExtension = StringUtils::stripFileExtension(filePath);
 	if (pdfProvider->getSourceContribution()) {
 		*filePathNoExtension += "-kapton";
-	}//
-	//RooArgList* CompositeModelProvider::getIntensities() {
-	//	return coeffsInMaterial;
-	//}
+	}
 
 	TString pngFilePath = *filePathNoExtension + ".png";
 	TString pdfFilePath = *filePathNoExtension + ".pdf";

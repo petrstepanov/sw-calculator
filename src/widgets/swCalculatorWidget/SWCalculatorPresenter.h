@@ -17,7 +17,7 @@
 #include "../AbstractPresenter.h"
 #include "SWCalculatorView.h"
 #include "../../model/Model.h"
-#include "../../roofit/CompositeModelProvider.h"
+#include "../../roofit/PdfProvider.h"
 
 class SWCalculatorView;
 
@@ -59,7 +59,7 @@ public:
 	void onModelNumberOfDampingExponentsSet(Int_t);
 
 private:
-	CompositeModelProvider* pdfProvider;
+	PdfProvider* pdfProvider;
 	void buildFittingModel();
 };
 

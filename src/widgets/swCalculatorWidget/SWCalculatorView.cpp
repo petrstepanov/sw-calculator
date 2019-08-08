@@ -31,7 +31,7 @@
 #include <sstream>
 #include <TRootEmbeddedCanvas.h>
 #include <TG3DLine.h>
-#include "../../roofit/CompositeModelProvider.h"
+#include "../../roofit/PdfProvider.h"
 
 using namespace RooFit;
 

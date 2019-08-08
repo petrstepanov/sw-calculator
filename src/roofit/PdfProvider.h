@@ -5,24 +5,24 @@
  */
 
 /* 
- * File:   CompositeModelProvider.h
+ * File:   PdfProvider.h
  * Author: petrstepanov
  *
  * Created on August 15, 2017, 9:59 PM
  */
 
-#ifndef COMPOSITEMODELPROVIDER_H
-#define COMPOSITEMODELPROVIDER_H
+#ifndef PdfProvider_H
+#define PdfProvider_H
 
 #include <RooRealVar.h>
 #include <RooHistPdf.h>
 #include "../model/Model.h"
 
-class CompositeModelProvider {
+class PdfProvider {
 public:
 
-    CompositeModelProvider(FitProperties fitProperties);
-    virtual ~CompositeModelProvider();
+    PdfProvider(FitProperties fitProperties);
+    virtual ~PdfProvider();
 
     RooArgList* getIndirectParameters();
 //    RooArgList* getIntensities();
@@ -46,14 +46,15 @@ public:
     void initSourcePdf(TH1F* sourceHist, RooRealVar* sourceContrib);
     
 private:
-    CompositeModelProvider();
-    CompositeModelProvider(const CompositeModelProvider& orig);
+    PdfProvider();
+    PdfProvider(const PdfProvider& orig);
 
     // General variables
     RooRealVar* observable;
     RooRealVar* mean;
 
     TH1F* fitHistogram;
+    TH1F* sourceHistogram;
 
     // Components in material
 //	RooArgList* components;
@@ -77,7 +78,7 @@ private:
 //    RooArgList* coeffsInMaterial;          // list of coefficients of pdfs in material
     
 
-    void initObservableAndMean(RooRealVar* fitMin, RooRealVar* fitMax);
+    void initObservableAndMean();
     void initModel(Bool_t hasParabola, const Int_t, const Int_t numLorentz, const Int_t numLorentzSum);
     void initSourceContribution(TH1F* sourceHist);
     void initConvolutedModel(ConvolutionType convolutionType);
@@ -93,5 +94,5 @@ private:
     void deleteObject();
 };
 
-#endif /* COMPOSITEMODELPROVIDER_H */
+#endif /* PdfProvider_H */
 
