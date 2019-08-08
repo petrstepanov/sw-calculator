@@ -51,7 +51,7 @@ TH1F* HistProcessor::cutHistBasement(const char *newname, TH1F* hist, Int_t xMin
 	Double_t upEdge = hist->GetXaxis()->GetBinUpEdge(maxBin);
 
 	//std::cout << "reduceHist: lowEdge - " << lowEdge << ", upEdge - " << upEdge << std::endl;
-//        RootHelper::deleteObject(newname);
+	RootHelper::deleteObject(newname);
 	TH1F* subHist = new TH1F(newname, "Histogram with cutted basement", nBins, lowEdge, upEdge);
 	for (int j = minBin; j <= maxBin; j++){
             Double_t val = hist->GetBinContent(j) - baseVal;
@@ -75,6 +75,22 @@ Double_t HistProcessor::liftHist(TH1F* hist, Double_t lift){
 		hist->SetBinContent(i, value + lift);
 	}
 	return lift;
+}
+
+TH1F* HistProcessor::removeHistNegatives(const char *newname, TH1F* hist){
+	Double_t xMin = hist->GetXaxis()->GetXmin();
+	Double_t xMax = hist->GetXaxis()->GetXmax();
+	Double_t nBins = hist->GetXaxis()->GetNbins();
+
+    RootHelper::deleteObject(newname);
+	TH1F* newHist = new TH1F(newname, "Histogram with subtracted negatives", nBins, xMin, xMax);
+	for (int i = 1; i <= nBins; i++){
+		Double_t value = hist->GetBinContent(i);
+		newHist->SetBinContent(i, value < 0 ? 0 : value);
+		Double_t error = hist->GetBinError(i);
+		newHist->SetBinError(i, error);
+	}
+	return newHist;
 }
 
 TH1F* HistProcessor::cutHist(const char *newname, TH1F* hist, Double_t xMin, Double_t xMax){
@@ -162,7 +178,7 @@ TH1F* HistProcessor::getResidualHist(const char *newname, TH1F* hist, RooCurve* 
 	Double_t xMax = hist->GetXaxis()->GetXmax();
 	Double_t nBins = hist->GetXaxis()->GetNbins();
 
-//        RootHelper::deleteObject(newname);
+    RootHelper::deleteObject(newname);
 	TH1F* resHist = new TH1F(newname, "Residual histogram", nBins, xMin, xMax);
 	for (int i = 1; i <= nBins; i++){
 		Double_t count = hist->GetBinContent(i);

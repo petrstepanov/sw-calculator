@@ -37,6 +37,7 @@ public:
     TH1F* subtractCurve(const char *newname, TH1F*, RooCurve*);
     TH1F* getResidualHist(const char *newname, TH1F*, RooCurve*);
     TH1F* getChi2Hist(const char *newname, TH1F*, RooCurve*);
+    TH1F* removeHistNegatives(const char *newname, TH1F* hist);
     Double_t getTotalCounts(TH1F*);
     Bool_t hasBackground(TH1F*);
     Bool_t hasAtan(TH1F*);

@@ -477,7 +477,9 @@ void SWCalculatorView::displayFilename(TString* fileName) {
 }
 
 void SWCalculatorView::displayFitParameters(RooFitResult* fitResult) {
-    std::ostringstream os;
+	if (!fitResult) return;
+
+	std::ostringstream os;
     fitResult->printStream(os, fitResult->defaultPrintContents(""), fitResult->defaultPrintStyle(""));
     std::istringstream iss(os.str());
     std::string str;

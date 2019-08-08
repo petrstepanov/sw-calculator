@@ -162,20 +162,21 @@ void PdfProvider::initSourceContribution(TH1F* sourceHist){
 	// cutHist() always returns copy of the histogram so we ensure we don't change the model
 	HistProcessor* histProcessor = HistProcessor::getInstance();
 	TH1F* sourceHistogram = histProcessor->cutHist("sourceHistogram", sourceHist,  observable->getMin(),  observable->getMax());
-	histProcessor->liftHistAboveZero(sourceHistogram);
+//	histProcessor->liftHistAboveZero(sourceHistogram);
+	sourceHistogram = histProcessor->removeHistNegatives("sourceHistogramNoNegatives", sourceHistogram);
 
-	RooDataHist* sourceDataHist = new RooDataHist("sourceDataHist", "Source Data Hist", RooArgList(*observable), sourceHist);
+	RooDataHist* sourceDataHist = new RooDataHist("sourceDataHist", "Source Data Hist", RooArgList(*observable), sourceHistogram);
 	RooHistPdf* sourcePdf = new RooHistPdf("sourcePdf", "Source Contribution PDF", RooArgSet(*observable), *sourceDataHist, 1);
 
 	// Add PDF from annihilation in source if needed
-	intSource = new RooRealVar("intSource", "Contribution from annihilation in source", 12, 5, 20, "%");
+	intSource = new RooRealVar("intSource", "Source contribution", 12, 5, 20, "%");
 	intSource->setConstant(kTRUE);
 
 	RooFormulaVar* intSourceNorm = new RooFormulaVar("intSourceNorm", "Source contribution normalized", "@0/100", RooArgList(*intSource));
 
 	// If there were any components besides source contribution...
 	if (modelNonConvoluted){
-		modelNonConvoluted = new RooAddPdf("materialSourcePdf", "Sum of components in material with source contribution", RooArgList(*sourcePdf, *modelNonConvoluted), RooArgList(*intSourceNorm));
+		modelNonConvoluted = new RooAddPdf("materialSourcePdf", "Pdf with source contribution", RooArgList(*sourcePdf, *modelNonConvoluted), RooArgList(*intSourceNorm));
 		modelNonConvoluted->setAttribute(Constants::ATTR_NO_DRAW_ON_PLOT, kTRUE);
 		modelNonConvoluted->fixAddCoefNormalization(RooArgSet(*observable));
 	}
@@ -217,10 +218,12 @@ void PdfProvider::initTwoDetectorBackground() {
 
 	// Calculate histogram ground level and lift it and find ground contribution
 	HistProcessor* histProcessor = HistProcessor::getInstance();
-	Double_t lift = histProcessor->liftHistAboveZero(fitHistogram); // lift is how high we lifted the histogram up
-	histProcessor->liftHist(fitHistogram, 1); lift++; // need to lift more because histogram still
 
-	RooRealVar* groundLevel = new RooRealVar("groundLevel", "Histogram ground level (for chi2 fit)", lift, 0, (Int_t) lift*10, "counts");
+	// lift is how high we lifted the histogram up
+	Double_t lift = histProcessor->liftHistAboveZero(fitHistogram); // lift above zero for chi2 fit
+	histProcessor->liftHist(fitHistogram, 1); lift++; // need to lift more because can't plot zeros in log scale
+
+	RooRealVar* background = new RooRealVar("background", TString::Format("Background (histogram is lifted %.1f)", lift).Data(), lift+0.5, 0, (Int_t) (lift+0.5)*10, "counts");
 //	groundLevel->setConstant(kTRUE);
 //	groundLevel->setAttribute(Constants::ATTR_NO_SAVE_TO_POOL);
 
@@ -236,7 +239,7 @@ void PdfProvider::initTwoDetectorBackground() {
 
 	RooConstVar* bins = new RooConstVar("bins", "Histogram bins", fitHistogram->GetXaxis()->GetNbins()); // keV
 	RooConstVar* integral = new RooConstVar("integral", "Histogram integral", fitHistogram->Integral()); // counts
-	RooFormulaVar* intFlatBackgroundNorm = new RooFormulaVar("intFlatBackgroundNorm", "Flat background intensity normalized", "@0*@1/@2", RooArgList(*groundLevel, *bins, *integral));
+	RooFormulaVar* intFlatBackgroundNorm = new RooFormulaVar("intFlatBackgroundNorm", "Flat background intensity normalized", "@0*@1/@2", RooArgList(*background, *bins, *integral));
 
 	// Initialize flat ground PDF
 	RooPolynomial* flatPdf = new RooPolynomial("flatPdf", "Histogram ground level", *observable, RooArgSet());
