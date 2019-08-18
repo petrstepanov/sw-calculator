@@ -20,7 +20,7 @@
 #include "../../util/StringUtils.h"
 #include "../../util/UiHelper.h"
 #include "../../util/Debug.h"
-#include "../../util/FileUtils.h".h"
+#include "../../util/FileUtils.h"
 #include "../../model/Constants.h"
 #include "../../model/ParametersPool.h"
 #include "../frames/ModalDialogFrame.h"
@@ -284,9 +284,8 @@ void SWCalculatorPresenter::onViewFitSpectrumClicked() {
 	chi2DataHist->plotOn(residualsPlot, RooFit::LineColor(kGray + 3), RooFit::XErrorSize(0), RooFit::DataError(RooAbsData::None), RooFit::MarkerSize(0.5), RooFit::MarkerColor(kGray + 3));
 
 	// Draw horizontal line
-	TLine* hr = new TLine(1, 0, observable->getMax(), 0);
-	hr->SetLineStyle(1); // https://root.cern.ch/doc/master/classTAttLine.html#L3
-	hr->SetLineWidth(2);
+	TLine* hr = new TLine(observable->getMin(), 0, observable->getMax(), 0);
+	hr->SetLineStyle(kDashed); // https://root.cern.ch/doc/master/classTAttLine.html#L3
 	hr->SetLineColor(kGray+2);
 	residualsPlot->addObject(hr);
 

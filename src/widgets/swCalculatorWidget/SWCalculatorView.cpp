@@ -225,7 +225,7 @@ void SWCalculatorView::initUI(){
 
     // Fit Result TextBox
     txtFitResult = new TGTextEdit(tabFit);
-//    txtFitResult->SetBackgroundColor(GraphicsHelper::colorAppWindow->GetPixel());
+    txtFitResult->SetBackgroundColor(GraphicsHelper::colorAppWindow->GetPixel());
     tabFit->AddFrame(txtFitResult, new TGLayoutHints(kLHintsExpandX | kLHintsExpandY, dx, dx, dy, dy));
 
     TGHorizontalFrame* splitFrame = new TGHorizontalFrame(tabFit);
@@ -293,16 +293,15 @@ void SWCalculatorView::initUI(){
 //    tbMax->Clear();
 //    tbMax->AddText(0, buf);
 
-    // Save data file button
-    btnSaveData = new TGTextButton(frameExportButtons, "Export Fit Data");
-    btnSaveData->SetEnabled(false);
-    frameExportButtons->AddFrame(btnSaveData, new TGLayoutHints(kLHintsRight | kLHintsTop, 0, 0, 0, 0));  // left, right, top, bottom
-
     // Save image button
-
-    btnSaveImage = new TGTextButton(frameExportButtons, "Save Image");
+    btnSaveImage = new TGTextButton(frameExportButtons, "Save image");
     btnSaveImage->SetEnabled(false);
     frameExportButtons->AddFrame(btnSaveImage, new TGLayoutHints(kLHintsRight | kLHintsTop, 0, dx, 0, 0));
+
+    // Save data file button
+    btnSaveData = new TGTextButton(frameExportButtons, "Save data columns");
+    btnSaveData->SetEnabled(false);
+    frameExportButtons->AddFrame(btnSaveData, new TGLayoutHints(kLHintsRight | kLHintsTop, 0, dx, 0, 0));  // left, right, top, bottom
 
     setToolbarEnabled(kFALSE);
 
@@ -437,12 +436,8 @@ void SWCalculatorView::initRooPlots(RooPlot* fitFrame, RooPlot* chiFrame) {
 }
 
 void SWCalculatorView::setToolbarEnabled(Bool_t isEnabled){
-//    btnApplyZoom->SetEnabled(isEnabled);
-//    btnResetZoom->SetEnabled(isEnabled);
     btnSaveData->SetEnabled(isEnabled);
     btnSaveImage->SetEnabled(isEnabled);
-//    numDisplayMin->SetState(isEnabled);
-//    numDisplayMax->SetState(isEnabled);
     displayMin->SetState(isEnabled);
     displayMax->SetState(isEnabled);
 }
@@ -450,15 +445,6 @@ void SWCalculatorView::setToolbarEnabled(Bool_t isEnabled){
 TCanvas* SWCalculatorView::getCanvas() {
     return canvasPlot;
 }
-
-//void SWCalculatorView::onConvolutionSelected(Int_t id){
-//	if (id == CompositeModelProvider::kNoConvolution){
-//		RootHelper::hideFrame(resolutionFwhmFrame);
-//	}
-//	else {
-//		RootHelper::showFrame(resolutionFwhmFrame);
-//	}
-//}
 
 void SWCalculatorView::reflectTwoDetector(Bool_t isTwoDetector){
 	const char* text = isTwoDetector ? "2 x" : "";

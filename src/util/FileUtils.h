@@ -16,6 +16,8 @@
 
 #include <TH1.h>
 #include <RooCurve.h>
+#include <RooPlot.h>
+#include <RooRealVar.h>
 
 class FileUtils {
 public:

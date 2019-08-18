@@ -22,6 +22,7 @@
 #include <map>
 #include <RooPlot.h>
 #include "../model/Constants.h"
+#include "RootHelper.h"
 #include "TMath.h"
 #include "TMatrixD.h"
 

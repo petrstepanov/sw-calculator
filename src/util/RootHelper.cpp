@@ -12,11 +12,23 @@
  */
 
 #include "RootHelper.h"
-#include <TUnixSystem.h>
-#include <iostream>
-#include <TGFrame.h>
+#include "Debug.h"
 #include "MathUtil.h"
 #include "StringUtils.h"
+
+#include <TUnixSystem.h>
+#include <TGFrame.h>
+#include <TObject.h>
+#include <TMatrixD.h>
+#include <TMatrixDUtils.h>
+#include <TString.h>
+#include <TList.h>
+
+#include <RooHist.h>
+#include <RooPlot.h>
+
+#include <iostream>
+#include <utility>
 
 void RootHelper::deleteObject(const char* name){
     TObject* obj = gROOT->FindObject(name);
