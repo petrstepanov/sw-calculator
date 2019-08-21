@@ -18,6 +18,8 @@
 #include <TStopwatch.h>
 #include <TGFrame.h>
 #include <TGNumberEntry.h>
+#include <RooRealVar.h>
+#include <RooAbsPdf.h>
 
 class RootHelper {
 public:
@@ -30,6 +32,10 @@ public:
     static void showFrame(TGFrame* frame);
     static void hideFrame(TGFrame* frame);
     static TGNumberFormat::EStyle getNumberFormatStyle(Double_t value);
+    static void setRooRealVarValueLimits(RooRealVar* var, Double_t value, Double_t min, Double_t max);
+    static RooRealVar* getParameterNameContains(RooAbsPdf* pdf, const char* nameSubstring);
+    static RooAbsArg* findArgNameSubstring(RooAbsCollection* list, const char* nameSubstring);
+    static std::pair<TMatrixD,TList*> rooPlotToMatrix(RooRealVar* axis, RooPlot* plot);
 
 private:
     static TStopwatch* watch;

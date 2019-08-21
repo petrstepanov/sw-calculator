@@ -28,9 +28,9 @@ ParabolaPdf::ParabolaPdf(const ParabolaPdf& other, const char* name) :
 
 Double_t ParabolaPdf::evaluate() const {
 	Double_t arg = x - mean;
-	if (arg < -r)
+	if (arg <= -r)
 		return 0.;
-	if (arg > r)
+	if (arg >= r)
 		return 0.;
 	return (-arg * arg + r * r);
 }
@@ -51,7 +51,7 @@ Double_t ParabolaPdf::analyticalIntegral(Int_t code, const char* rangeName) cons
 //          int(r*r-x*x, 'x', -r, r)  
 		Double_t xMin = x.min(rangeName) - mean;
 		Double_t xMax = x.max(rangeName) - mean;
-		if (xMax < -r || xMin > r)
+		if (xMax <= -r || xMin >= r)
 			return 0.;
 		Double_t x1 = TMath::Max(-r, xMin);
 		Double_t x2 = TMath::Min(r, xMax);

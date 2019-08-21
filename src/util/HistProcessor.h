@@ -29,23 +29,26 @@ class HistProcessor {
 public:
     static HistProcessor* getInstance();
 
-    TH1* cutHist(const char *newname, TH1* hist, Int_t, Int_t);
-    TH1* cutHistBasement(const char *newname, TH1* hist, Int_t, Int_t);
+    Double_t liftHistAboveZero(TH1F* hist);
+    Double_t liftHist(TH1F* hist, Double_t lift);
+    TH1F* cutHist(const char *newname, TH1F* hist, Double_t, Double_t);
+    TH1F* cutHistBasement(const char *newname, TH1F* hist, Int_t, Int_t);
     RooCurve* subtractCurves(const char *newname, RooCurve*, RooCurve*);
-    TH1* subtractCurve(const char *newname, TH1*, RooCurve*);
-    TH1* getResidualHist(const char *newname, TH1*, RooCurve*);
-    TH1* getChi2Hist(const char *newname, TH1*, RooCurve*);
-    Double_t getTotalCounts(TH1*);
-    Bool_t hasBackground(TH1*);
-    Bool_t hasAtan(TH1*);
-    Double_t calcBackgroundFraction(TH1*);
-    Chi2Struct getChi2(TH1*, RooCurve*, RooAbsPdf*);
-    std::pair<Double_t, Double_t> calcIntegral(TH1*, Double_t, Double_t);
-    Bool_t isTwoDetetor(TH1*);
+    TH1F* subtractCurve(const char *newname, TH1F*, RooCurve*);
+    TH1F* getResidualHist(const char *newname, TH1F*, RooCurve*);
+    TH1F* getChi2Hist(const char *newname, TH1F*, RooCurve*);
+    TH1F* removeHistNegatives(const char *newname, TH1F* hist);
+    Double_t getTotalCounts(TH1F*);
+    Bool_t hasBackground(TH1F*);
+    Bool_t hasAtan(TH1F*);
+    Double_t calcBackgroundFraction(TH1F*);
+    Chi2Struct getChi2(TH1F*, RooCurve*, RooAbsPdf*);
+    std::pair<Double_t, Double_t> calcIntegral(TH1F*, Double_t, Double_t);
+    Bool_t isTwoDetetor(TH1F*);
     Double_t getPdfMaximumX (RooAbsPdf*, const RooArgList&);
-    std::pair<Double_t, Double_t> getHistogramSafeFitRange(TH1*);
-    std::pair<Double_t, Double_t> getSParameter(TH1* hist, Double_t sWidth, Double_t mean, Bool_t isTwoDetector);
-    std::pair<Double_t, Double_t> getWParameter(TH1* hist, Double_t wWidth, Double_t wShift, Double_t mean, Bool_t isTwoDetector);
+    std::pair<Double_t, Double_t> getHistogramSafeFitRange(TH1F*);
+    std::pair<Double_t, Double_t> getSParameter(TH1F* hist, Double_t sWidth, Double_t mean, Bool_t isTwoDetector);
+    std::pair<Double_t, Double_t> getWParameter(TH1F* hist, Double_t wWidth, Double_t wShift, Double_t mean, Bool_t isTwoDetector);
     
 private:
     HistProcessor();                                      // Private so that it can  not be called

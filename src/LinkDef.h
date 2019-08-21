@@ -4,8 +4,13 @@
 #pragma link off all functions;
 #pragma link C++ nestedclasses;
 
-// Main GUI class inherited from TGMainFrame
+// GUI classes
 #pragma link C++ class MyMainFrame;
+#pragma link C++ class ModalDialogFrame;
+#pragma link C++ class RooRealVarFrame;
+#pragma link C++ class RooRealVarListFrame;
+#pragma link C++ class SWCalculatorView;
+#pragma link C++ class MyTGNumberEntry;
 
 // For signals and slots
 #pragma link C++ class Model;
@@ -18,4 +23,9 @@
 #pragma link C++ class LorentzianPdf;
 #pragma link C++ class OrthogonalPdf;
 #pragma link C++ class ParabolaPdf;
+
+// Why this?
+#pragma link C++ class DoublePair;
+
+
 #endif

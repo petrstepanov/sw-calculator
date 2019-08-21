@@ -24,7 +24,7 @@ MyMainFrame::MyMainFrame() : TGMainFrame(gClient->GetRoot(), Constants::windowWi
 	SetCleanup(kDeepCleanup);
 
 	// Exit this application via the Exit button or Window Manager.
-	Connect("CloseWindow()", "MyMainFrame", this, "doExit()");
+	Connect("CloseWindow()", "MyMainFrame", this, "exit()");
     DontCallClose();
 
     // Save reverence to MyMainFrame in UiHelper (for centering of modal dialogs)
@@ -47,7 +47,7 @@ void MyMainFrame::mapAndResize(){
     MapWindow();
 }
 
-void MyMainFrame::doExit(){
+void MyMainFrame::exit(){
 //	DeleteWindow();              // to stay in the ROOT session
 	gApplication->Terminate();   // to exit and close the ROOT session
 }

@@ -12,12 +12,19 @@
  */
 
 #include "FileUtils.h"
+#include <TDatime.h>
+#include <TString.h>
 #include <iomanip>
 #include <iostream>
 #include <fstream>
 #include <sstream>
 #include <string>
 #include <map>
+#include <RooPlot.h>
+#include "../model/Constants.h"
+#include "RootHelper.h"
+#include "TMath.h"
+#include "TMatrixD.h"
 
 FileUtils::FileUtils(){};
 
@@ -112,7 +119,8 @@ TH1F* FileUtils::importTH1(const char* fileName, int eColumn, int cColumn){
 	Double_t binWidth = (energyMax - energyMin) / (bins - 1);
 
 	// Make Histogram
-	TH1F* hist = new TH1F("hist", "", bins, energyMin - binWidth / 2, energyMax + binWidth / 2);
+	Int_t id = (new TDatime())->Get();
+	TH1F* hist = new TH1F(TString::Format("hist%d", id).Data(), "", bins, energyMin - binWidth / 2, energyMax + binWidth / 2);
 	// TH1I (const char *name, const char *title, Int_t nbinsx, Double_t xlow, Double_t xup)
 	// bin = 0;       underflow bin
 	// bin = 1;       first bin with low-edge xlow INCLUDED
@@ -135,45 +143,63 @@ TH1F* FileUtils::importTH1(const char* fileName, int eColumn, int cColumn){
 //		hist->SetBinError(i, error);
 		//std::cout << "Bin " << i << " error " << error << std::endl;
 	}
+
 	return hist;
 }
 
-void FileUtils::saveData(TString* outFileName, TH1F* hist, RooCurve* bg, RooCurve* fit, TH1F* chi2, TH1F* peakHistNoBg){
-	std::ofstream outputFile;
-	outputFile.open(outFileName->Data());
-	outputFile.precision(prec);
+void FileUtils::savePlotsToFile(RooPlot* spectrumPlot, RooPlot* residualsPlot, const char* fileName, RooRealVar* observable){
+	std::pair<TMatrixD,TList*> spectrumMatrixAndHeader = RootHelper::rooPlotToMatrix(observable, spectrumPlot);
+	std::pair<TMatrixD,TList*> residualsMatrixAndHeader = RootHelper::rooPlotToMatrix(observable, residualsPlot);
+	TMatrixD spectrumMatrix = (spectrumMatrixAndHeader.first);
+	TMatrixD residualsMatrix = (residualsMatrixAndHeader.first);
 
-	Double_t nBins = hist->GetXaxis()->GetNbins();
+	Int_t numberOfRows = TMath::Min(spectrumMatrix.GetNrows(), residualsMatrix.GetNrows());
+	Int_t numberOfColumns = spectrumMatrix.GetNcols() + residualsMatrix.GetNcols();
 
-	// Write file header
-	outputFile << "Energy [KeV]" << ","
-		<< "Count" << ","
-		<< "Count Err" << ","
-		<< "Fit" << ","
-		<< "Chi^2" << ","
-		<< "Atan Background" << ","
-		<< "Count-Bg" << ","
-		<< "Count-Bg Err" << std::endl;
-
-	for (int i = 1; i <= nBins; i++){
-		Double_t energy = hist->GetXaxis()->GetBinCenter(i);
-		Int_t count = hist->GetBinContent(i);
-		Double_t count_err = hist->GetBinError(i);
-		Double_t fit_count = fit->Eval(energy);
-		Double_t chi_2 = chi2->GetBinContent(i);
-
-		Double_t fit_bg = bg->Eval(energy);
-		Double_t count_min_bg = peakHistNoBg->GetBinContent(i);
-		Double_t count_min_bg_err = peakHistNoBg->GetBinContent(i);
-
-		outputFile << energy << ","
-			<< count << ","
-			<< count_err << ","
-			<< fit_count << ","
-			<< chi_2 << ","
-			<< fit_bg << ","
-			<< count_min_bg << ","
-			<< count_min_bg_err << std::endl;
+	TMatrixD matrix(numberOfRows, numberOfColumns);
+	for (Int_t j=0; j<numberOfRows; j++){
+		for (Int_t i=0; i<numberOfColumns; i++){
+			if (i<spectrumMatrix.GetNcols()){
+				matrix(j,i) = spectrumMatrix(j,i);
+			}
+			else {
+				matrix(j,i) = residualsMatrix(j,i-spectrumMatrix.GetNcols());
+			}
+		}
 	}
-	outputFile.close();
+
+	std::ofstream outputFile;
+	outputFile.open(fileName);
+
+	// Print header names to file
+	std::string delimeter = "\t";
+
+	TList* columnNames = new TList();
+	columnNames->AddAll(spectrumMatrixAndHeader.second);
+	columnNames->AddAll(residualsMatrixAndHeader.second);
+
+	for (Int_t i=0; i<columnNames->GetSize(); i++){
+		TObject* object = columnNames->At(i);
+		if (TObjString* str = dynamic_cast<TObjString*>(object)){
+			outputFile << (str->String()).Data();
+		}
+		if (i != columnNames->GetSize()-1){
+			outputFile << delimeter.c_str();
+		}
+	}
+
+	outputFile << std::endl;
+
+	// Print matrix to file
+	for (Int_t j=0; j<numberOfRows; j++){
+		for (Int_t i=0; i<numberOfColumns; i++){
+			if (i != numberOfColumns-1){
+				outputFile << matrix(j,i) << delimeter.c_str();
+			} else {
+				outputFile << matrix(j,i);
+			}
+		}
+		outputFile << std::endl;
+	}
 }
+

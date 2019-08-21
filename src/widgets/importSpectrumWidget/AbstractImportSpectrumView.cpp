@@ -34,20 +34,14 @@ void AbstractImportSpectrumView::initUI(){
     {
         btnOpenFile = new TGTextButton(frameOpenFile, " Open File ");
         btnOpenFile->Connect("Clicked()", "AbstractImportSpectrumView", this, "onOpenFileClicked()");
-        frameOpenFile->AddFrame(btnOpenFile, new TGLayoutHints(kLHintsLeft | kLHintsTop));
 
         lblFileName = new TGLabel(frameOpenFile, "no file loaded");
         lblFileName->SetTextJustify(kTextLeft);
         lblFileName->Disable(kTRUE);
         lblFileName->ChangeOptions(lblFileName->GetOptions() | kFixedSize);
-//        ULong_t bcolor;
-//        gClient->GetColorByName("blue", bcolor);
-//        lblFileName->SetBackgroundColor(bcolor);
-//        lblFileName->Resize(Constants::leftPanelWidth-btnOpenFile->GetWidth()-10, lblFileName->GetHeight());
 
-//        lblFileName->SetTextColor(Constants::colorGray);
-//        UiHelper::setLabelColor(lblFileName, "gray");
-        frameOpenFile->AddFrame(lblFileName, new TGLayoutHints(kLHintsLeft | kLHintsTop | kLHintsExpandX, dx, 0, dy*3/5)); // left right top bottom
+        frameOpenFile->AddFrame(btnOpenFile, new TGLayoutHints(kLHintsLeft | kLHintsCenterY));
+        frameOpenFile->AddFrame(lblFileName, new TGLayoutHints(kLHintsLeft | kLHintsCenterY | kLHintsExpandX, dx)); // left right top bottom
     }
     AddFrame(frameOpenFile, new TGLayoutHints(kLHintsExpandX, 0, 0, 0, dy));
 
@@ -62,12 +56,12 @@ void AbstractImportSpectrumView::initUI(){
     TGHorizontalFrame* frameEnergyColumn = new TGHorizontalFrame(this);
     {
         TGLabel* lblEnergyColumn = new TGLabel(frameEnergyColumn, "Energy column #");
-        numEnergyColumn = new TGNumberEntry(frameEnergyColumn, 1, 2, -1, TGNumberFormat::kNESInteger,
+        numEnergyColumn = new TGNumberEntry(frameEnergyColumn, 1, 2, UiHelper::getUId(), TGNumberFormat::kNESInteger,
                 TGNumberFormat::kNEANonNegative,
                 TGNumberFormat::kNELLimitMinMax,
                 1, 99);
-        frameEnergyColumn->AddFrame(lblEnergyColumn, new TGLayoutHints(kLHintsLeft | kLHintsTop, 0, 0, dy*6/5));
-        frameEnergyColumn->AddFrame(numEnergyColumn, new TGLayoutHints(kLHintsRight | kLHintsTop));
+        frameEnergyColumn->AddFrame(lblEnergyColumn, new TGLayoutHints(kLHintsLeft | kLHintsCenterY));
+        frameEnergyColumn->AddFrame(numEnergyColumn, new TGLayoutHints(kLHintsRight | kLHintsCenterY));
     }
     AddFrame(frameEnergyColumn, new TGLayoutHints(kLHintsExpandX, 0, 0, dy, dy));
 
@@ -75,12 +69,12 @@ void AbstractImportSpectrumView::initUI(){
     TGHorizontalFrame* frameCountsColumn = new TGHorizontalFrame(this);
     {
         TGLabel* lblCountsColumn = new TGLabel(frameCountsColumn, "Counts column #");
-        numCountsColumn = new TGNumberEntry(frameCountsColumn, 2, 2, -1, TGNumberFormat::kNESInteger,
+        numCountsColumn = new TGNumberEntry(frameCountsColumn, 2, 2, UiHelper::getUId(), TGNumberFormat::kNESInteger,
                 TGNumberFormat::kNEANonNegative,
                 TGNumberFormat::kNELLimitMinMax,
                 1, 99);
-        frameCountsColumn->AddFrame(lblCountsColumn, new TGLayoutHints(kLHintsNormal, 0, 0, dy*6/5, 0));
-        frameCountsColumn->AddFrame(numCountsColumn, new TGLayoutHints(kLHintsRight));
+        frameCountsColumn->AddFrame(lblCountsColumn, new TGLayoutHints(kLHintsLeft | kLHintsCenterY));
+        frameCountsColumn->AddFrame(numCountsColumn, new TGLayoutHints(kLHintsRight | kLHintsCenterY));
     }
     AddFrame(frameCountsColumn, new TGLayoutHints(kLHintsExpandX, 0, 0, dy, dy));
 
@@ -138,13 +132,13 @@ TString* AbstractImportSpectrumView::getFileName(){
 }
 
 void AbstractImportSpectrumView::drawHistogram(TH1F* hist){
-    GraphicsHelper* graphicsHelper = GraphicsHelper::getInstance();
     canvasHist->cd();
     hist->SetLineColor(getHistogramColor());
     hist->SetFillColorAlpha(getHistogramColor(), 0.2);
     hist->GetXaxis()->SetLabelOffset(0.03);
     hist->GetYaxis()->SetLabelOffset(0.015);
     hist->Draw();
+    GraphicsHelper* graphicsHelper = GraphicsHelper::getInstance();
     graphicsHelper->setDefaultAxisFonts(hist->GetXaxis());
     graphicsHelper->setDefaultAxisFonts(hist->GetYaxis());
     hist->SetStats(0);

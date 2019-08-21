@@ -21,7 +21,8 @@ public:
 	static TString* stripFileName(TString*);
 	static TString* stripFileExtension(TString*);
     static TString* suffix(const char* name, int index, const char* nameSuffix = "");
-    static TString* ordinal(const char*, int index);
+    static TString* ordinal(int index, const char*);
+    static Bool_t isSubstring(const char* parent, const char* child);
 };
 
 #endif /* STRINGUTILS_H */

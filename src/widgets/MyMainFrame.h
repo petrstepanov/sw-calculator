@@ -22,11 +22,12 @@ public:
     virtual ~MyMainFrame();
 
     void addChildFrame(TGFrame* child);
-    void doExit();
-    ClassDef(MyMainFrame, 0);
+    void exit();
 
 private:
     void mapAndResize();
+
+    ClassDef(MyMainFrame, 0);
 };
 
 #endif /* MyMainFrameW_H */

@@ -18,10 +18,15 @@
 
 ClassImp(DampLorentzPdf);
 
-DampLorentzPdf::DampLorentzPdf(const char *name, const char *title, RooAbsReal& _x, RooAbsReal& _mean, RooAbsReal& _a) :
-		RooAbsPdf(name, title), x("x", "x", this, _x),
-		mean("mean", "DampExp mean", this, _mean),
-		a("a", "DampExp a", this, _a) {
+DampLorentzPdf::DampLorentzPdf(const char *name,
+		const char *title,
+		RooAbsReal& _x,
+		RooAbsReal& _mean,
+		RooAbsReal& _a) :
+		RooAbsPdf(name, title),
+		x("x", "x", this, _x),
+		mean("mean", "mean", this, _mean),
+		a("a", "a", this, _a) {
 }
 
 DampLorentzPdf::DampLorentzPdf(const DampLorentzPdf& other, const char* name) :
@@ -45,11 +50,11 @@ Int_t DampLorentzPdf::getAnalyticalIntegral(RooArgSet& allVars, RooArgSet& analV
 
 Double_t DampLorentzPdf::analyticalIntegral(Int_t code, const char* rangeName) const {
 	switch (code) {
-	case 1: {
-		Double_t x1 = (x.min(rangeName) - mean);
-		Double_t x2 = (x.max(rangeName) - mean);
-		return indefiniteIntegral(x2) - indefiniteIntegral(x1);
-	}
+		case 1: {
+			Double_t x1 = (x.min(rangeName) - mean);
+			Double_t x2 = (x.max(rangeName) - mean);
+			return indefiniteIntegral(x2) - indefiniteIntegral(x1);
+		}
 	}
 	assert(0);
 	return 0;

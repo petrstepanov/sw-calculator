@@ -17,11 +17,11 @@
 #include <TMath.h>
 
 LorentzianPdf::LorentzianPdf(const char *name, const char *title, RooAbsReal& _x, RooAbsReal& _mean, RooAbsReal& _a) :
-		RooAbsPdf(name, title), x("x", "x", this, _x), mean("mean", "Lorentz mean", this, _mean), a("a", "Lorentz a", this, _a) {
+	RooAbsPdf(name, title), x("x", "x", this, _x), mean("mean", "mean", this, _mean), a("a", "a", this, _a) {
 }
 
 LorentzianPdf::LorentzianPdf(const LorentzianPdf& other, const char* name) :
-		RooAbsPdf(other, name), x("x", this, other.x), mean("mean", this, other.mean), a("epsilon", this, other.a) {
+	RooAbsPdf(other, name), x("x", this, other.x), mean("mean", this, other.mean), a("a", this, other.a) {
 }
 
 Double_t LorentzianPdf::evaluate() const {
