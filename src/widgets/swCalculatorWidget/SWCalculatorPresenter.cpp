@@ -345,9 +345,11 @@ void SWCalculatorPresenter::onViewFitSpectrumClicked() {
 }
 
 void SWCalculatorPresenter::onViewSaveDataClicked() {
-	// Create image file names
 	TString fileName = TString::Format("%s-data-columns.txt", model->getFileName()->Data());
 	FileUtils::savePlotsToFile(view->fitFrame, view->chiFrame, fileName.Data(), pdfProvider->getObservable());
+
+	UiHelper* uiHelper = UiHelper::getInstance();
+    uiHelper->showOkDialog("Canvas exported to ASCII data columns successfully");
 }
 
 
@@ -361,17 +363,22 @@ void SWCalculatorPresenter::onViewSaveImageClicked() {
 
 	TString pngFilePath = *filePathNoExtension + ".png";
 	TString pdfFilePath = *filePathNoExtension + ".pdf";
+	TString rooFilePath = *filePathNoExtension + ".root";
 
-	// Save raster and vector images
+		// Save raster and vector images
 	TCanvas* canvas = view->getCanvas();
-	TImage *image = TImage::Create();
-	image->FromPad(canvas);
-	image->WriteImage(pngFilePath.Data()); // raster
-	canvas->Print(pdfFilePath.Data());     // vector
+//	TImage *image = TImage::Create();
+//	image->FromPad(canvas);
+//	image->WriteImage(pngFilePath.Data()); // raster
+//	canvas->Print(pdfFilePath.Data());     // vector
+
+	canvas->SaveAs(pngFilePath);
+	canvas->SaveAs(pdfFilePath);
+	canvas->SaveAs(rooFilePath);
 
 	// Show ok dialog
 	UiHelper* uiHelper = UiHelper::getInstance();
-	uiHelper->showOkDialog("PNG and PDF images saved.");
+	uiHelper->showOkDialog("PNG and PDF images saved. Canvas exported as ROOT file.");
 }
 
 void SWCalculatorPresenter::onViewSaveResultsClicked() {
@@ -383,7 +390,9 @@ void SWCalculatorPresenter::onViewSaveResultsClicked() {
 	}
 	TString resultsFilename = *filePathNoExtension + "-results.txt";
 
-	view->saveFitResults(&resultsFilename);
+    Bool_t ok = view->txtFitResult->SaveFile(resultsFilename.Data());
+    UiHelper* uiHelper = UiHelper::getInstance();
+    uiHelper->showOkDialog(ok ? "Results saved successfully" : "Error saving results file");
 }
 
 void SWCalculatorPresenter::onViewClearResultsClicked() {

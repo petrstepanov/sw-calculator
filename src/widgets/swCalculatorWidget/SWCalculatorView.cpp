@@ -524,12 +524,6 @@ void SWCalculatorView::scrollOutputDown(){
 
 // Calls to Presenter
 
-void SWCalculatorView::saveFitResults(TString* fileName) {
-    Bool_t ok = txtFitResult->SaveFile(fileName->Data());
-    UiHelper* uiHelper = UiHelper::getInstance();
-    uiHelper->showOkDialog(ok ? "Results saved successfully" : "Error saving results file");
-}
-
 void SWCalculatorView::clearFitResults() {
     txtFitResult->SetText(new TGText(""));
     TGLongPosition* pos = new TGLongPosition(0, 0);

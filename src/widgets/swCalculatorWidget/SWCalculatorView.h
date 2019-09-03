@@ -126,7 +126,6 @@ class SWCalculatorView : public AbstractView<SWCalculatorPresenter> {
     void updateCanvas();
     void setDisplayLimits(Float_t min, Float_t max);
     TCanvas* getCanvas();
-    void saveFitResults(TString* fileName);
     void clearFitResults();
     void scrollOutputDown();
 

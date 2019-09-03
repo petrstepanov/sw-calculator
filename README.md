@@ -126,6 +126,7 @@ Install Git if you don't have it. In terminal run `sudo apt-get install git`. Na
 ```bash
 git clone https://github.com/petrstepanov/sw-calculator.git
 cd sw-calculator
+make clean
 make
 sudo make install
 ```
