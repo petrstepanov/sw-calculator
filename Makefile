@@ -42,6 +42,11 @@ SHARED_LIBRARY_DS=$(APP_NAME)-library.so.dSYM   # .so debug symbols (generated o
 # convenience variable for making directories
 dir_guard=@mkdir -p $(@D)
 
+# for 'install' target PREFIX is environment variable, but if it is not set, then set default value
+ifeq ($(PREFIX),)
+    PREFIX := /usr/local
+endif
+
 # Empty target ensures that list of all 'end products' are called
 all: release
 
@@ -50,7 +55,7 @@ release: CXXFLAGS+=-O3
 release: executable move_files
 
 # Also might add flags for debug optimizations: -Og -ggdb -DDEBUG
-debug: CXXFLAGS+=-g #-Og
+debug: CXXFLAGS+=-g
 debug: executable move_files move_debug_symbols
 
 executable: directories $(DICT_FILENAME) $(SHARED_LIBRARY) $(OBJECTS) $(EXECUTABLE)
@@ -116,6 +121,12 @@ ifeq ($(OS),Darwin)
 	# move .so.dSYM debub symbols to /dist folder
 	mv $(SHARED_LIBRARY_DS) $(BIN_DIR)/$(SHARED_LIBRARY_DS)
 endif
+
+install:
+	install -d $(DESTDIR)$(PREFIX)/bin/
+	install -m 755 $(EXECUTABLE) $(DESTDIR)$(PREFIX)/bin/
+	install -m 755 $(BIN_DIR)/$(SHARED_LIBRARY) $(DESTDIR)$(PREFIX)/bin/
+	install -m 755 $(BIN_DIR)/$(DICT_PCM_FILENAME) $(DESTDIR)$(PREFIX)/bin/
 
 # List of special targets that do not generate files
 .PHONY: clean directories move_files move_debug_symbols echo

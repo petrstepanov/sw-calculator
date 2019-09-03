@@ -127,13 +127,10 @@ Install Git if you don't have it. In terminal run `sudo apt-get install git`. Na
 git clone https://github.com/petrstepanov/sw-calculator.git
 cd sw-calculator
 make
+sudo make install
 ```
 
-In order to run the application you need to navigate to the `/dist` folder first and run from there.
-
-```bash
-cd dist/ && ./sw-calculator
-```
+In order to run the application type `sw-calculator` in terminal. Below find instructions on how to create a desktop launcher.
 
 ### Creating a launcher
 
