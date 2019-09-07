@@ -130,6 +130,7 @@ void SWCalculatorPresenter::onViewFitSpectrumClicked() {
 	RootHelper::startTimer();  // Start tracking Time
 	RooChi2Var* chi2 = new RooChi2Var("chi2", "chi2", *(pdfProvider->getPdf()), *data, RooFit::NumCPU(RootHelper::getNumCpu()));
 	RooMinimizer* m = new RooMinimizer(*chi2);
+	m->setMinimizerType("Minuit2");
 
 	// Print Chi2 fit results
 	Int_t resultMigrad = m->migrad();

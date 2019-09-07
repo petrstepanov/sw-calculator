@@ -45,8 +45,7 @@ Double_t GaussianPdf::evaluate() const {
 }
 
 Int_t GaussianPdf::getAnalyticalIntegral(RooArgSet& allVars, RooArgSet& analVars, const char* /*rangeName*/) const {
-	if (matchArgs(allVars, analVars, x))
-		return 1;
+	if (matchArgs(allVars, analVars, x)) return 1;
 	return 0;
 }
 

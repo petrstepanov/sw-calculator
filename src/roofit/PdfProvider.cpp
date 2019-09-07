@@ -78,7 +78,7 @@ void PdfProvider::initObservableAndMean(){
 
 	// Set binning for different types of convolution
 	observable->setBins(fitHistogram->GetNbinsX());
-	observable->setBins(1024, "cache");
+	observable->setBins(2048, "cache");
 
 	// Set mean
 	Double_t m = fitHistogram->GetBinCenter(fitHistogram->GetMaximumBin());
@@ -90,7 +90,7 @@ void PdfProvider::initMaterialPdf(Bool_t hasParabola, const Int_t numGauss, cons
 
 	// Parabola PDF
 	if (hasParabola) {
-		RooRealVar* parabolaRoot = new RooRealVar("parabolaRoot", "Coefficient at -x^2 + r*2", 3.5, 2.5, 8); // 3.4579 = Al (11.7)
+		RooRealVar* parabolaRoot = new RooRealVar("parabolaRoot", "Coefficient at -x^2 + r*2", 3.5, 1, 10); // 3.4579 = Al (11.7)
 		ParabolaPdf* parabolaPdf = new ParabolaPdf("Parabola", "Parabola p.d.f.", *observable, *mean, *parabolaRoot);
 		pdfsInMaterial->add(*parabolaPdf);
 	}
@@ -212,8 +212,8 @@ void PdfProvider::initTwoDetectorBackground() {
 	HistProcessor* histProcessor = HistProcessor::getInstance();
 
 	// lift is how high we lifted the histogram up
-	Double_t lift = histProcessor->liftHistAboveZero(fitHistogram); // lift above zero for chi2 fit
-	histProcessor->liftHist(fitHistogram, 1); lift++; // need to lift more because can't plot zeros in log scale
+	Double_t lift = fitHistogram->GetMinimum() + 1; // lift is abs(minimum hist value) + 1 (1 is for plotting - cant plot zeros in log scale)
+	histProcessor->liftHist(fitHistogram, lift);
 
 	RooRealVar* background = new RooRealVar("background", TString::Format("Background (histogram is lifted %.1f)", lift).Data(), lift+0.5, 0, (Int_t) (lift+0.5)*10, "counts");
 //	groundLevel->setConstant(kTRUE);

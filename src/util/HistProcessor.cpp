@@ -61,14 +61,6 @@ TH1F* HistProcessor::cutHistBasement(const char *newname, TH1F* hist, Int_t xMin
 	return subHist;
 }
 
-Double_t HistProcessor::liftHistAboveZero(TH1F* hist){
-	Double_t histMinimum = hist->GetMinimum();
-	if (histMinimum >= 0) return 0.;
-
-	Double_t lift = TMath::Abs(histMinimum);
-	return liftHist(hist, lift);
-}
-
 Double_t HistProcessor::liftHist(TH1F* hist, Double_t lift){
 	for (UInt_t i = 1; i <= hist->GetNbinsX(); i++){
 		Double_t value = hist->GetBinContent(i);

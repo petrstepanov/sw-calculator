@@ -29,7 +29,6 @@ class HistProcessor {
 public:
     static HistProcessor* getInstance();
 
-    Double_t liftHistAboveZero(TH1F* hist);
     Double_t liftHist(TH1F* hist, Double_t lift);
     TH1F* cutHist(const char *newname, TH1F* hist, Double_t, Double_t);
     TH1F* cutHistBasement(const char *newname, TH1F* hist, Int_t, Int_t);
