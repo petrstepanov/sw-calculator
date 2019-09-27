@@ -297,7 +297,7 @@ void SWCalculatorPresenter::onViewFitSpectrumClicked() {
 	graphicsHelper->styleAxis(residualsPlot->GetXaxis(), "", 0, 0.05, kFALSE); // Title, Title offset, Label offset
 	graphicsHelper->styleAxis(residualsPlot->GetYaxis(), "Residuals", 0.44, 0.015, kFALSE); // "#chi^{2}"
 	Int_t nDivisions = residualsPlot->GetYaxis()->GetNdivisions();
-	nDivisions = (nDivisions%100)++;
+	nDivisions = (nDivisions%100)/2;
 	residualsPlot->GetYaxis()->SetNdivisions(nDivisions);
 
 	// Plot residuals
@@ -413,7 +413,7 @@ void SWCalculatorPresenter::onViewFitSpectrumClicked() {
 	residualsPlot->Draw();
 
 	// Update canvas
-	// view->updateCanvas();
+	view->updateCanvas();
 
 	view->initRooPlots(spectrumPlot, residualsPlot);
 	view->setToolbarEnabled(kTRUE);
