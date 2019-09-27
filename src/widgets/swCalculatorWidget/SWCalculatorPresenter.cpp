@@ -295,7 +295,10 @@ void SWCalculatorPresenter::onViewFitSpectrumClicked() {
 	residualsPlot->SetTitle(""); // Set Empty Graph Title
 	// residualsPlot->GetXaxis()->SetRangeUser(fitRangeMin, fitRangeMax);      // Do we need this?
 	graphicsHelper->styleAxis(residualsPlot->GetXaxis(), "", 0, 0.05, kFALSE); // Title, Title offset, Label offset
-	graphicsHelper->styleAxis(residualsPlot->GetYaxis(), "Residuals", 0.55, 0.012, kFALSE); // "#chi^{2}"
+	graphicsHelper->styleAxis(residualsPlot->GetYaxis(), "Residuals", 0.44, 0.015, kFALSE); // "#chi^{2}"
+	Int_t nDivisions = residualsPlot->GetYaxis()->GetNdivisions();
+	nDivisions = (nDivisions%100)++;
+	residualsPlot->GetYaxis()->SetNdivisions(nDivisions);
 
 	// Plot residuals
 	chi2DataHist->plotOn(residualsPlot, RooFit::LineColor(kGray + 3), RooFit::XErrorSize(0), RooFit::DataError(RooAbsData::None), RooFit::MarkerSize(0.5), RooFit::MarkerColor(kGray + 3));
@@ -410,7 +413,7 @@ void SWCalculatorPresenter::onViewFitSpectrumClicked() {
 	residualsPlot->Draw();
 
 	// Update canvas
-	view->updateCanvas();
+	// view->updateCanvas();
 
 	view->initRooPlots(spectrumPlot, residualsPlot);
 	view->setToolbarEnabled(kTRUE);

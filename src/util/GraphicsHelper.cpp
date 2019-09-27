@@ -208,6 +208,7 @@ TPaveText* GraphicsHelper::makeParametersPaveText(const RooArgList& params, Doub
 		if (showConstants || !var->isConstant()) ymin -= LINE_HEIGHT_SMALL;
 	}
 	ymin -= 2*LINE_HEIGHT_SMALL;
+	ymin = TMath::Max(ymin, padMargins.bottom);
 
 	// Create the box and set its options
 	TPaveText *box = new TPaveText(xmin, ymax, xmax, ymin, "BRNDC"); //
