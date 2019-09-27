@@ -28,16 +28,21 @@ struct Margin {
 
 class GraphicsHelper {
 public:
-	static const Int_t TEXT_SIZE_SMALL;
-	static const Int_t TEXT_SIZE_NORMAL;
-	static const Int_t DEFAULT_FONT_NUMBER;
+	static const Double_t TEXT_SIZE_NORMAL;
+	static const Double_t TEXT_SIZE_SMALL;
+	static const Double_t TEXT_SIZE_SMALLER;
+
+	static const Double_t LINE_HEIGHT_NORMAL;
+	static const Double_t LINE_HEIGHT_SMALL;
+
 	static const Double_t DEFAULT_X_TITLE_OFFSET;
 	static const Double_t DEFAULT_X_LABEL_OFFSET;
 	static const Double_t DEFAULT_Y_TITLE_OFFSET;
 	static const Double_t DEFAULT_Y_LABEL_OFFSET;
 	static const Double_t LEGEND_X1;
-	static const Double_t LEGEND_LINE_HEIGHT;
-	static const Double_t LEGEND_LINE_HEIGHT_DENSE;
+
+	static const Int_t FONT_REGULAR;
+	static const Int_t FONT_BOLD;
 
     static const Margin padMargins;
     static const Int_t colorSet[7];
@@ -47,15 +52,13 @@ public:
     static TColor* colorGray;
     static TColor* colorAppWindow;
 
-	static const Double_t RESIDUALS_PAD_RELATIVE_HEIGHT;
+	static const Double_t TOP_TO_BOTTOM_PAD_HEIGHT_RATIO;
 
 	static GraphicsHelper* getInstance();
 
-	Style_t getFontCode(Int_t fontSize);
-	void setDefaultAxisFonts(TAxis* axis);
-	void setupAxis(TAxis* axis, const char* title = "", Double_t titleOffset =
-			DEFAULT_X_TITLE_OFFSET, Double_t labelOffset =
-			DEFAULT_X_LABEL_OFFSET);
+	static Style_t getFontCode(Int_t fontSize);
+	static Double_t getFontSizeScale(Bool_t isTopPad);
+	void styleAxis(TAxis* axis, const char* title, Double_t titleOffset, Double_t labelOffset, Bool_t isTopPad);
 	void drawSWRegions(RooPlot* frame, Double_t sWidth, Double_t wWidth,
 			Double_t wShift, Double_t mean, Double_t yMin, Double_t yMax,
 			Bool_t isTwoDetector);

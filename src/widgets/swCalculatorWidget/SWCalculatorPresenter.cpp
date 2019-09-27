@@ -159,8 +159,8 @@ void SWCalculatorPresenter::onViewFitSpectrumClicked() {
 
 	// Configure axis labels and look
 	GraphicsHelper* graphicsHelper = GraphicsHelper::getInstance();
-	graphicsHelper->setupAxis(spectrumPlot->GetXaxis(), "E_{1} #minus E_{2}, keV", 2.2, 0.02); // Title, Title offset, Label offset
-	graphicsHelper->setupAxis(spectrumPlot->GetYaxis(), "Counts", 1.6, 0.012);
+	graphicsHelper->styleAxis(spectrumPlot->GetXaxis(), "E_{1} #minus E_{2}, keV", 1.5, 0.02, kTRUE); // Title, Title offset, Label offset
+	graphicsHelper->styleAxis(spectrumPlot->GetYaxis(), "Counts", 1.1, 0.012, kTRUE);
 
 	// Evaluate Counts axis limits
 	Double_t yAxisMin, yAxisMax;
@@ -200,7 +200,7 @@ void SWCalculatorPresenter::onViewFitSpectrumClicked() {
 	data->plotOn(spectrumPlot, RooFit::LineColor(kGray + 3), /*RooFit::ShiftToZero(),*/ RooFit::XErrorSize(0), RooFit::MarkerSize(0.5), RooFit::MarkerColor(kGray + 3), RooFit::Name("data"));
 
 	// Initialize legend
-	TLegend *legend = new TLegend(GraphicsHelper::LEGEND_X1, 0.5, 1 - 1.5 * GraphicsHelper::padMargins.right, 1 - 2 * GraphicsHelper::padMargins.top);
+	TLegend *legend = new TLegend(GraphicsHelper::padMargins.left + 0.04, 0.5, GraphicsHelper::padMargins.left + 0.4, 1 - GraphicsHelper::padMargins.top - 0.05);
 	legend->AddEntry(spectrumPlot->findObject("data"), "Data points", "pe");
 
 	// Plot fitting pdf
@@ -269,9 +269,11 @@ void SWCalculatorPresenter::onViewFitSpectrumClicked() {
 //	}
 
 	// Set legend's bottom coordinate depending on the number of entries
-	legend->SetY1(legend->GetY2() - legend->GetNRows() * GraphicsHelper::LEGEND_LINE_HEIGHT);
+	legend->SetY1(legend->GetY2() - legend->GetNRows() * GraphicsHelper::LINE_HEIGHT_NORMAL);
 	legend->SetFillStyle(0);  // transparent
 	legend->SetBorderSize(0); // no border
+	legend->SetMargin(0.15);
+	legend->SetTextSize(GraphicsHelper::TEXT_SIZE_SMALL*GraphicsHelper::getFontSizeScale(kTRUE));
 	spectrumPlot->addObject(legend);
 
 	// Plot data points
@@ -290,11 +292,10 @@ void SWCalculatorPresenter::onViewFitSpectrumClicked() {
 
 	// Create RooPlot for chi^2
 	RooPlot* residualsPlot = observable->frame();
-	Double_t scaleFactor = (1 - GraphicsHelper::RESIDUALS_PAD_RELATIVE_HEIGHT) / (GraphicsHelper::RESIDUALS_PAD_RELATIVE_HEIGHT);
-	residualsPlot->SetTitle("");                             // Set Empty Graph Title
+	residualsPlot->SetTitle(""); // Set Empty Graph Title
 	// residualsPlot->GetXaxis()->SetRangeUser(fitRangeMin, fitRangeMax);      // Do we need this?
-	graphicsHelper->setupAxis(residualsPlot->GetXaxis(), "", 2.5, 0.05); // Title, Title offset, Label offset
-	graphicsHelper->setupAxis(residualsPlot->GetYaxis(), "Residuals", 1.6, 0.012); // "#chi^{2}"
+	graphicsHelper->styleAxis(residualsPlot->GetXaxis(), "", 0, 0.05, kFALSE); // Title, Title offset, Label offset
+	graphicsHelper->styleAxis(residualsPlot->GetYaxis(), "Residuals", 0.55, 0.012, kFALSE); // "#chi^{2}"
 
 	// Plot residuals
 	chi2DataHist->plotOn(residualsPlot, RooFit::LineColor(kGray + 3), RooFit::XErrorSize(0), RooFit::DataError(RooAbsData::None), RooFit::MarkerSize(0.5), RooFit::MarkerColor(kGray + 3));
@@ -307,14 +308,15 @@ void SWCalculatorPresenter::onViewFitSpectrumClicked() {
 
 	// Plot chi2 legend
 	Chi2Struct chi2Struct = histProcessor->getChi2(fitHist, curveFit, pdf);
-	TPaveText* chiText = new TPaveText(GraphicsHelper::LEGEND_X1, 1 - 2 * GraphicsHelper::padMargins.right - 0.18, 1 - 1.2 * GraphicsHelper::padMargins.right, 1 - 2 * GraphicsHelper::padMargins.top, "NDC");
-	chiText->AddText(Form("#chi^{2} = %.1f #divide %d = %.3f", chi2Struct.chiSum, chi2Struct.degreesOfFreedom, chi2Struct.chi2));
-	chiText->SetTextSize(gStyle->GetLegendTextSize()); // make chi2 text same size like the legend
-	chiText->SetTextFont(gStyle->GetLegendFont());
-	chiText->SetFillColor(kWhite);
-	chiText->SetBorderSize(0);
-	chiText->SetTextAlign(kHAlignRight + kVAlignCenter);
-	residualsPlot->addObject(chiText);
+	TPaveText* chiPaveText = new TPaveText(GraphicsHelper::LEGEND_X1, 1 - 2 * GraphicsHelper::padMargins.right - 0.18, 1 - 1.2 * GraphicsHelper::padMargins.right, 1 - 2 * GraphicsHelper::padMargins.top, "NDC");
+	TText* text = chiPaveText->AddText(Form("#chi^{2} = %.1f #divide %d = %.3f", chi2Struct.chiSum, chi2Struct.degreesOfFreedom, chi2Struct.chi2));
+	// text->SetTextSize(GraphicsHelper::TEXT_SIZE_SMALL);
+	chiPaveText->SetTextSize(GraphicsHelper::TEXT_SIZE_SMALLER*GraphicsHelper::getFontSizeScale(kFALSE));
+	chiPaveText->SetTextFont(GraphicsHelper::getFontCode(GraphicsHelper::FONT_REGULAR));
+	chiPaveText->SetFillColor(kWhite);
+	chiPaveText->SetBorderSize(0);
+	chiPaveText->SetTextAlign(kHAlignRight + kVAlignCenter);
+	residualsPlot->addObject(chiPaveText);
 
 	// Calculate S and W parameters
 	Double_t sWidth = view->numSWidth->GetNumber();
@@ -393,8 +395,10 @@ void SWCalculatorPresenter::onViewFitSpectrumClicked() {
 		// Output S and W values
 		plotParametersList->add(RooArgList(*s, *w));
 
-		TPaveText* pave = GraphicsHelper::makeParametersPaveText(*plotParametersList, GraphicsHelper::padMargins.left, 0.5, 1 - GraphicsHelper::padMargins.top);
-		spectrumPlot->addObject(pave);
+		TPaveText* paramsPaveText = GraphicsHelper::makeParametersPaveText(*plotParametersList, GraphicsHelper::LEGEND_X1, 1-GraphicsHelper::padMargins.right, 1 - GraphicsHelper::padMargins.top);
+		paramsPaveText->SetTextSize(GraphicsHelper::TEXT_SIZE_SMALLER*GraphicsHelper::getFontSizeScale(kTRUE));
+		paramsPaveText->SetTextFont(GraphicsHelper::getFontCode(GraphicsHelper::FONT_REGULAR));
+		spectrumPlot->addObject(paramsPaveText);
 	}
 
 	// Draw data plot on canvas

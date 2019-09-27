@@ -134,8 +134,10 @@ void AbstractImportSpectrumView::drawHistogram(TH1F* hist){
     hist->GetYaxis()->SetLabelOffset(0.015);
     hist->Draw();
     GraphicsHelper* graphicsHelper = GraphicsHelper::getInstance();
-    graphicsHelper->setDefaultAxisFonts(hist->GetXaxis());
-    graphicsHelper->setDefaultAxisFonts(hist->GetYaxis());
+
+    hist->GetXaxis()->SetLabelSize(1.6*GraphicsHelper::TEXT_SIZE_NORMAL);
+    hist->GetYaxis()->SetLabelSize(1.6*GraphicsHelper::TEXT_SIZE_NORMAL);
+
     hist->SetStats(0);
     canvasHist->Update();
 }

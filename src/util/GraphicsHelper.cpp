@@ -27,19 +27,28 @@
 #include <RooFormula.h>
 #include <iostream>
 
-const Int_t GraphicsHelper::TEXT_SIZE_SMALL = gStyle->GetLegendTextSize()*0.75;
-const Int_t GraphicsHelper::TEXT_SIZE_NORMAL = gStyle->GetLegendTextSize();
-const Int_t GraphicsHelper::DEFAULT_FONT_NUMBER = 6; // Sans Serif
+// for fonts just read this https://root.cern.ch/doc/master/classTAttText.html
+// tip: don't use font sizes in pixels; they are not relative to the canvas size
+
+const Double_t GraphicsHelper::TEXT_SIZE_NORMAL = 0.03;
+const Double_t GraphicsHelper::TEXT_SIZE_SMALL = TEXT_SIZE_NORMAL*0.75;
+const Double_t GraphicsHelper::TEXT_SIZE_SMALLER = TEXT_SIZE_SMALL*0.75;
+
+const Double_t GraphicsHelper::LINE_HEIGHT_NORMAL = 0.045;
+const Double_t GraphicsHelper::LINE_HEIGHT_SMALL = LINE_HEIGHT_NORMAL*0.75;
+
+const Int_t GraphicsHelper::FONT_REGULAR = 4;
+const Int_t GraphicsHelper::FONT_BOLD = 6;
+
 const Double_t GraphicsHelper::DEFAULT_X_TITLE_OFFSET = 2.5;
 const Double_t GraphicsHelper::DEFAULT_X_LABEL_OFFSET = 0.01;
 const Double_t GraphicsHelper::DEFAULT_Y_TITLE_OFFSET = 2.1;
 const Double_t GraphicsHelper::DEFAULT_Y_LABEL_OFFSET = 0.02;
-const Double_t GraphicsHelper::RESIDUALS_PAD_RELATIVE_HEIGHT = 0.35;
-const Double_t GraphicsHelper::LEGEND_X1 = 0.72;
-const Double_t GraphicsHelper::LEGEND_LINE_HEIGHT = 0.045;
-const Double_t GraphicsHelper::LEGEND_LINE_HEIGHT_DENSE = 0.03;
+const Double_t GraphicsHelper::LEGEND_X1 = 0.65;
 
-const Margin GraphicsHelper::padMargins = { 0.10, 0.03, 0.15, 0.05 }; // left, right, bottom, top
+const Double_t GraphicsHelper::TOP_TO_BOTTOM_PAD_HEIGHT_RATIO = 2.5;
+
+const Margin GraphicsHelper::padMargins = { 0.10, 0.02, 0.15, 0.05 }; // left, right, bottom, top
 
 const Int_t GraphicsHelper::colorSet[7] = { kViolet + 6, kSpring - 5, kAzure + 8,
 		kPink + 1, kGray + 1, kViolet - 4, kRed - 7 };
@@ -63,28 +72,32 @@ GraphicsHelper* GraphicsHelper::getInstance(){
 
 Style_t GraphicsHelper::getFontCode(Int_t fontNumber){
     // https://root.cern.ch/doc/master/classTAttText.html#T5
-    return fontNumber * 10 + 3;
+	Int_t precision = 2;  // if "1" then problems rendering
+	return fontNumber * 10 + precision;
 }
 
-void GraphicsHelper::setDefaultAxisFonts(TAxis *axis){
-    // Font face
-    Style_t fontCode = getFontCode(DEFAULT_FONT_NUMBER);
+Double_t GraphicsHelper::getFontSizeScale(Bool_t isTopPad){
+	if (isTopPad){
+		Double_t scale = 1/(TOP_TO_BOTTOM_PAD_HEIGHT_RATIO/(TOP_TO_BOTTOM_PAD_HEIGHT_RATIO+1));
+		return scale;
+	}
+	Double_t scale = 1/(1/(TOP_TO_BOTTOM_PAD_HEIGHT_RATIO+1));
+	return scale;
+}
 
-    // Label font
+void GraphicsHelper::styleAxis(TAxis* axis, const char* title, Double_t titleOffset, Double_t labelOffset, Bool_t isTopPad){
+    Style_t fontCode = getFontCode(FONT_REGULAR);
+
     axis->SetLabelFont(fontCode);
-    axis->SetLabelSize(12); // px
+    axis->SetLabelOffset(labelOffset);
+    axis->SetLabelSize(GraphicsHelper::TEXT_SIZE_SMALL*getFontSizeScale(isTopPad));
 
-    // Title font
     axis->SetTitleFont(fontCode);
-    axis->SetTitleSize(16); // px
-}
+    axis->SetTitleOffset(titleOffset);
+    axis->SetTitleSize(GraphicsHelper::TEXT_SIZE_NORMAL*getFontSizeScale(isTopPad));
 
-void GraphicsHelper::setupAxis(TAxis* axis, const char* title, Double_t titleOffset, Double_t labelOffset){
-    setDefaultAxisFonts(axis);
     axis->CenterTitle(kTRUE);
     axis->SetTitle(title);
-    axis->SetTitleOffset(titleOffset);
-    axis->SetLabelOffset(labelOffset);
 }
 
 void GraphicsHelper::drawSWRegions(RooPlot* frame, Double_t sWidth, Double_t wWidth, Double_t wShift, Double_t mean, Double_t yMin, Double_t yMax, Bool_t isTwoDetector) {
@@ -93,7 +106,6 @@ void GraphicsHelper::drawSWRegions(RooPlot* frame, Double_t sWidth, Double_t wWi
     wShift = isTwoDetector ? wShift * 2 : wShift;
 
     yMax = 0.95*yMax;
-    Double_t textSize = 0.03;
     Double_t logYMin = TMath::Log10(yMin);
     Double_t logYMax = TMath::Log10(yMax);  
     Double_t heightCoeff = isTwoDetector ? 0.25 : 0.75;
@@ -107,9 +119,9 @@ void GraphicsHelper::drawSWRegions(RooPlot* frame, Double_t sWidth, Double_t wWi
     sBox->SetFillColorAlpha(19, 0.6);
     frame->addObject(sBox);
     TLatex* s = new TLatex(mean, letterY, "#it{S}");
-    s->SetTextAlign(22);    
+    s->SetTextAlign(22);
     s->SetTextColorAlpha(1, letterOpacity);
-    s->SetTextSize(textSize);    
+    s->SetTextSize(TEXT_SIZE_SMALL);
     frame->addObject(s);
 
     std::cout << "W1 integration region (" << mean - wShift - wWidth << ", " << mean - wShift << ")" << std::endl;
@@ -120,7 +132,7 @@ void GraphicsHelper::drawSWRegions(RooPlot* frame, Double_t sWidth, Double_t wWi
     TLatex* w1 = new TLatex(mean-wShift-wWidth/2, letterY, "#it{W1}");
     w1->SetTextAlign(22);
     w1->SetTextColorAlpha(1, letterOpacity);
-    w1->SetTextSize(textSize);    
+    w1->SetTextSize(TEXT_SIZE_SMALL);
     frame->addObject(w1);
     
     std::cout << "W2 integration region (" << mean + wShift << ", " << mean + wShift + wWidth << ")" << std::endl;
@@ -130,7 +142,7 @@ void GraphicsHelper::drawSWRegions(RooPlot* frame, Double_t sWidth, Double_t wWi
     frame->addObject(w2Box);
     TLatex* w2 = new TLatex(mean+wShift+wWidth/2, letterY, "#it{W2}");
     w2->SetTextAlign(22);
-    w2->SetTextSize(textSize);
+    w2->SetTextSize(TEXT_SIZE_SMALL);
     w2->SetTextColorAlpha(1, letterOpacity);
 //    w2->SetBBoxCenterX(mean+wShift+wWidth/2);
 //    w2->SetBBoxCenterY(letterY);
@@ -159,8 +171,10 @@ void GraphicsHelper::printVariable(const char* options, Int_t& currentLine, RooA
 		if (!isConstant && (atMaximum || atMinimum)){
 			TText* t = box->AddText(TString::Format("%s (at limit)", formattedString).Data());
 			t->SetTextColor(kOrange+8);
+//			t->SetTextSize(GraphicsHelper::TEXT_SIZE_SMALL);
 		} else {
-			box->AddText(formattedString);
+			TText* t = box->AddText(formattedString);
+//			t->SetTextSize(GraphicsHelper::TEXT_SIZE_SMALL);
 		}
 		// Mark variable as printed
 		currentLine++;
@@ -191,16 +205,16 @@ TPaveText* GraphicsHelper::makeParametersPaveText(const RooArgList& params, Doub
 	// Calculate bottom Legend coordinate (ymin)
 	Double_t ymin = ymax;
 	while (RooAbsArg* var = (RooAbsArg*) pIter->Next()) {
-		if (showConstants || !var->isConstant()) ymin -= LEGEND_LINE_HEIGHT_DENSE;
+		if (showConstants || !var->isConstant()) ymin -= LINE_HEIGHT_SMALL;
 	}
-	ymin -= LEGEND_LINE_HEIGHT_DENSE*2; // 2 empty lines
+	ymin -= 2*LINE_HEIGHT_SMALL;
 
 	// Create the box and set its options
 	TPaveText *box = new TPaveText(xmin, ymax, xmax, ymin, "BRNDC"); //
 	box->SetName("myParamBox");
 	box->SetFillColor(EColor::kBlack);
 	box->SetBorderSize(1);
-	box->SetTextSize(TEXT_SIZE_SMALL);
+//	box->SetTextFont(getFontCode(FONT_REGULAR));
 	box->SetTextAlign(ETextAlign::kHAlignLeft + ETextAlign::kVAlignCenter);
 	box->SetFillStyle(1001);
 	box->SetFillColorAlpha(EColor::kWhite, 0.9);
@@ -210,8 +224,8 @@ TPaveText* GraphicsHelper::makeParametersPaveText(const RooArgList& params, Doub
 	std::vector<int> hrLineNumbers;
 
 	// Empty first line (for better padding)
-	box->AddText("");
-	linesNumber++;
+	 box->AddText("");
+	 linesNumber++;
 
 	// Add horizontal rule
 	// hrLineNumbers.push_back(linesNumber);
@@ -233,8 +247,8 @@ TPaveText* GraphicsHelper::makeParametersPaveText(const RooArgList& params, Doub
 	}
 
 	// Empty last line (for better padding)
-	box->AddText("");
-	linesNumber++;
+	 box->AddText("");
+	 linesNumber++;
 
 	// Draw horizontal rules
 	for (std::vector<int>::iterator it = hrLineNumbers.begin(); it != hrLineNumbers.end(); ++it){

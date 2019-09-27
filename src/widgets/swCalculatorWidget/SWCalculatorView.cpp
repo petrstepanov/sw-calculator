@@ -331,13 +331,13 @@ void SWCalculatorView::initUI(){
     canvasPlot = embedPlot->GetCanvas();
     canvasPlot->Divide(1, 2);
 
-    canvasPlot->cd(1)->SetPad("padData", "Pad for data", 0.0, GraphicsHelper::RESIDUALS_PAD_RELATIVE_HEIGHT, 1.0, 1.0, kWhite);
+    canvasPlot->cd(1)->SetPad("padData", "Pad for data", 0.0, 1/(1+GraphicsHelper::TOP_TO_BOTTOM_PAD_HEIGHT_RATIO), 1.0, 1.0, kWhite);
     gPad->SetMargin((GraphicsHelper::padMargins).left,
     		(GraphicsHelper::padMargins).right, (GraphicsHelper::padMargins).bottom, (GraphicsHelper::padMargins).top);
 	gPad->SetLogy();
     padData = (TPad*)canvasPlot->GetPad(1);
 
-    canvasPlot->cd(2)->SetPad("padChi2", "Pad for chi^2", 0.0, 0.0, 1.0, GraphicsHelper::RESIDUALS_PAD_RELATIVE_HEIGHT, kWhite);
+    canvasPlot->cd(2)->SetPad("padChi2", "Pad for chi^2", 0.0, 0.0, 1.0, 1/(1+GraphicsHelper::TOP_TO_BOTTOM_PAD_HEIGHT_RATIO), kWhite);
     gPad->SetMargin((GraphicsHelper::padMargins).left, (GraphicsHelper::padMargins).right, (GraphicsHelper::padMargins).bottom, (GraphicsHelper::padMargins).top);
     padChi2 = (TPad*)canvasPlot->GetPad(2);
 
