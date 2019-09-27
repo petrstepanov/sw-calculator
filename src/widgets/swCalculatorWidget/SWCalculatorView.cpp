@@ -211,9 +211,23 @@ void SWCalculatorView::initUI(){
     modelParamsFrame->AddFrame(numDampExponent, new TGLayoutHints(kLHintsLeft | kLHintsCenterY, 0, dx));
     modelParamsFrame->AddFrame(new TGLabel(modelParamsFrame, "Damping Exp"), new TGLayoutHints(kLHintsLeft | kLHintsCenterY, 0, dx));
 
+    // Add custom histogram
+    TGHorizontalFrame* modelHistogramFrame = new TGHorizontalFrame(modelComponentsGroupFrame);
+    addHistogramButton = new TGTextButton(modelHistogramFrame, "Add from file...");
+    modelHistogramFrame->AddFrame(addHistogramButton, new TGLayoutHints(kLHintsLeft | kLHintsCenterY, 0, dx));
+    histComponentLabel = new TGLabel(modelHistogramFrame, Constants::LABEL_NO_FILE_LOADED);
+    histComponentLabel->SetTextJustify(kTextLeft);
+    histComponentLabel->Disable(kTRUE);
+    histComponentLabel->ChangeOptions(histComponentLabel->GetOptions() | kFixedSize);
+    modelHistogramFrame->AddFrame(histComponentLabel, new TGLayoutHints(kLHintsLeft | kLHintsExpandX | kLHintsCenterY, 0, dx));
+
+    removeHistogramButton = new TGTextButton(modelHistogramFrame, "Remove");
+    modelHistogramFrame->AddFrame(removeHistogramButton, new TGLayoutHints(kLHintsLeft | kLHintsCenterY, 0, dx));
+    removeHistogramButton->SetEnabled(false);
     //	hasOrtho = new TGCheckButton(modelParamsFrame, "Ortho Exps", UiHelper::getUId());
     //	modelParamsFrme->AddFrame(hasOrtho, new TGLayoutHints(kLHintsNormal, 0, 20, 4, 0));
-    modelComponentsGroupFrame->AddFrame(modelParamsFrame, new TGLayoutHints(kLHintsNormal, 0, 0, dy, dy));
+    modelComponentsGroupFrame->AddFrame(modelParamsFrame, new TGLayoutHints(kLHintsNormal | kLHintsExpandX, 0, 0, dy, dy));
+    modelComponentsGroupFrame->AddFrame(modelHistogramFrame, new TGLayoutHints(kLHintsNormal | kLHintsExpandX, 0, 0, dy, dy));
     tabFit->AddFrame(modelComponentsGroupFrame, new TGLayoutHints(kLHintsNormal | kLHintsExpandX, dx, dx, dy, 0));
 
     TGHorizontalFrame* frameFitSpectrum = new TGHorizontalFrame(tabFit);
@@ -344,6 +358,9 @@ void SWCalculatorView::connectSignals(){
 	numExponent->Connect("ValueSet(Long_t)", "SWCalculatorPresenter", presenter, "onViewNumExponentSet()");
 	numDampExponent->Connect("ValueSet(Long_t)", "SWCalculatorPresenter", presenter, "onViewNumDampExponentSet()");
 
+	addHistogramButton->Connect("Clicked()", "SWCalculatorPresenter", presenter, "onViewAddHistComponentClicked()");
+	removeHistogramButton->Connect("Clicked()", "SWCalculatorPresenter", presenter, "onViewRemoveHistComponentClicked()");
+
 	btnEditParameters->Connect("Clicked()", "SWCalculatorPresenter", presenter, "onViewEditParametersClicked()");
     btnFitSpectrum->Connect("Clicked()", "SWCalculatorPresenter", presenter, "onViewFitSpectrumClicked()");
     btnClearResult->Connect("Clicked()", "SWCalculatorPresenter", presenter, "onViewClearResultsClicked()");
@@ -453,6 +470,19 @@ void SWCalculatorView::reflectTwoDetector(Bool_t isTwoDetector){
     lblRescale3->SetText(text);
 }
 
+void SWCalculatorView::setComponentHistogram(TH1F* hist){
+	if (hist){
+		addHistogramButton->SetEnabled(kFALSE);
+		histComponentLabel->SetText(hist->GetTitle());
+		removeHistogramButton->SetEnabled(kTRUE);
+	}
+	else {
+		addHistogramButton->SetEnabled(kTRUE);
+		histComponentLabel->SetText(Constants::LABEL_NO_FILE_LOADED);
+		removeHistogramButton->SetEnabled(kFALSE);
+	}
+}
+
 void SWCalculatorView::setConvolutionType(ConvolutionType convolutionType){
 	convTypeButtonGroup->SetButton(convolutionType);
 }
@@ -504,10 +534,10 @@ void SWCalculatorView::displayChi2(Chi2Struct chi2Struct) {
     txtFitResult->AddLineFast(s);
 }
 
-void SWCalculatorView::displaySW(std::pair<Double_t, Double_t> sValueError, std::pair<Double_t, Double_t> wValueError) {
+void SWCalculatorView::displaySW(RooRealVar* s, RooRealVar* w) {
     txtFitResult->AddLineFast(dashedLine);
-    txtFitResult->AddLineFast(Form("%*s    %1.4e +/-  %1.2e", 22, "S Parameter", sValueError.first, sValueError.second));
-    txtFitResult->AddLineFast(Form("%*s    %1.4e +/-  %1.2e", 22, "W Parameter", wValueError.first, wValueError.second));
+    txtFitResult->AddLineFast(Form("%*s    %1.4e +/-  %1.2e", 22, s->GetTitle(), s->getVal(), s->getError()));
+    txtFitResult->AddLineFast(Form("%*s    %1.4e +/-  %1.2e", 22, w->GetTitle(), w->getVal(), w->getError()));
     txtFitResult->AddLineFast(dashedLine);
 }
 

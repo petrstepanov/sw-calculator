@@ -53,7 +53,7 @@ PdfProvider::PdfProvider(FitProperties fitProperties) : observable(0), mean(0), 
 
 	// Initialize pdfs in material
 	initObservableAndMean();
-	initMaterialPdf(fitProperties.hasParabola, fitProperties.numberOfGaussians, fitProperties.numberOfExponents, fitProperties.numberOfDampingExponents);
+	initMaterialPdf(fitProperties.hasParabola, fitProperties.componentHist, fitProperties.numberOfGaussians, fitProperties.numberOfExponents, fitProperties.numberOfDampingExponents);
 
 	// Add correspondent background
 	if (fitProperties.isTwoDetector == kFALSE) {
@@ -85,14 +85,25 @@ void PdfProvider::initObservableAndMean(){
 	mean = new RooRealVar("mean", "Spectrum peak position", m, m-1, m+1);
 }
 
-void PdfProvider::initMaterialPdf(Bool_t hasParabola, const Int_t numGauss, const Int_t numLorentz, const Int_t numLorentzSum) {
+void PdfProvider::initMaterialPdf(Bool_t hasParabola, TH1F* componentHist, const Int_t numGauss, const Int_t numLorentz, const Int_t numLorentzSum) {
 	RooArgList* pdfsInMaterial = new RooArgList();
 
 	// Parabola PDF
 	if (hasParabola) {
 		RooRealVar* parabolaRoot = new RooRealVar("parabolaRoot", "Coefficient at -x^2 + r*2", 3.5, 1, 10); // 3.4579 = Al (11.7)
-		ParabolaPdf* parabolaPdf = new ParabolaPdf("Parabola", "Parabola p.d.f.", *observable, *mean, *parabolaRoot);
+		ParabolaPdf* parabolaPdf = new ParabolaPdf("Parabola", "Parabola", *observable, *mean, *parabolaRoot);
 		pdfsInMaterial->add(*parabolaPdf);
+	}
+
+	// Component Histogram PDF
+	if (componentHist){
+		HistProcessor* histProcessor = HistProcessor::getInstance();
+		TH1F* componentHistogram = histProcessor->cutHist("componentHistogram", componentHist, observable->getMin(), observable->getMax());
+		componentHistogram = histProcessor->removeHistNegatives("componentHistogramNoNegatives", componentHistogram);
+
+		RooDataHist* componentDataHist = new RooDataHist("componentDataHist", "Component Data Hist", RooArgList(*observable), componentHistogram);
+		RooHistPdf* componentHistPdf = new RooHistPdf("componentHistPdf", "Component Hist PDF", RooArgSet(*observable), *componentDataHist, 1);
+		pdfsInMaterial->add(*componentHistPdf);
 	}
 
 	Double_t aMin = 0.01;
@@ -142,7 +153,9 @@ void PdfProvider::initMaterialPdf(Bool_t hasParabola, const Int_t numGauss, cons
 	//     coeffsInMaterial->add(*Int_ortho);
 	// }
 
-	pdfInMaterial = AddPdf::add(pdfsInMaterial, observable, "materialPdf");
+	materialIntensities = new RooArgList();
+	// AddPdf::add initializes intensity variables itself, we only pass a RooArgList pointer there.
+	pdfInMaterial = AddPdf::add(pdfsInMaterial, materialIntensities, observable, "materialPdf", kTRUE); // build recursive! sum only
 
 	// Mark to ignore on plot if more than one component (ignore sum but plot individual components)
 	if (pdfInMaterial && pdfsInMaterial->getSize() > 1){
@@ -212,7 +225,8 @@ void PdfProvider::initTwoDetectorBackground() {
 	HistProcessor* histProcessor = HistProcessor::getInstance();
 
 	// lift is how high we lifted the histogram up
-	Double_t lift = fitHistogram->GetMinimum() + 1; // lift is abs(minimum hist value) + 1 (1 is for plotting - cant plot zeros in log scale)
+	Double_t lift = fitHistogram->GetMinimum() < 0 ? TMath::Abs(fitHistogram->GetMinimum()) : 0; // lift is abs(minimum hist value)
+	lift++; // cant plot zeros in log scale
 	histProcessor->liftHist(fitHistogram, lift);
 
 	RooRealVar* background = new RooRealVar("background", TString::Format("Background (histogram is lifted %.1f)", lift).Data(), lift+0.5, 0, (Int_t) (lift+0.5)*10, "counts");
@@ -271,6 +285,10 @@ RooRealVar* PdfProvider::getMean(){
 	return mean;
 }
 
+RooArgSet* PdfProvider::getParameters() {
+	return getPdf()->getParameters(RooArgSet(*getObservable()));
+}
+
 RooArgList* PdfProvider::getIndirectParameters() {
 	RooArgList* parameters = new RooArgList();
 	TIterator* it = pdfInMaterial->getComponents()->createIterator();
@@ -285,6 +303,10 @@ RooArgList* PdfProvider::getIndirectParameters() {
 
 RooRealVar* PdfProvider::getSourceContribution() {
 	return intSource;
+}
+
+RooArgList* PdfProvider::getIntensitiesInMaterial(){
+	return materialIntensities;
 }
 
 TH1F* PdfProvider::getFitHistogram(){

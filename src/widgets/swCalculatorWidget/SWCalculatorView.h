@@ -77,6 +77,10 @@ class SWCalculatorView : public AbstractView<SWCalculatorPresenter> {
     TGNumberEntry* numExponent;
     TGNumberEntry* numDampExponent;
 
+    TGTextButton* addHistogramButton;
+    TGLabel* histComponentLabel;
+    TGTextButton* removeHistogramButton;
+
     // Convolution radios
     TGButtonGroup* convTypeButtonGroup;
 
@@ -115,6 +119,7 @@ class SWCalculatorView : public AbstractView<SWCalculatorPresenter> {
     void setFitRange(Double_t min, Double_t max);
     void setFitRangeLimits(Double_t min, Double_t max);
     void reflectTwoDetector(Bool_t isTwoDetector);
+    void setComponentHistogram(TH1F* hist);
 
     void setConvolutionType(ConvolutionType t);
 
@@ -122,7 +127,7 @@ class SWCalculatorView : public AbstractView<SWCalculatorPresenter> {
     void displayVariable(RooRealVar* variable);
     void displayVariables(RooArgList* variables);
     void displayChi2(Chi2Struct chi2Struct);
-    void displaySW(std::pair<Double_t, Double_t> sValueError, std::pair<Double_t, Double_t> wValueError);
+    void displaySW(RooRealVar* s, RooRealVar* w);
     void updateCanvas();
     void setDisplayLimits(Float_t min, Float_t max);
     TCanvas* getCanvas();

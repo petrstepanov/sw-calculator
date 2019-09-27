@@ -44,11 +44,12 @@ Model::Model(){
 	fitProperties.isTwoDetector = kFALSE;
 	fitProperties.convolutionType = kNoConvolution;
 	fitProperties.hasParabola = kFALSE;
-	fitProperties.numberOfGaussians = 3;
+	fitProperties.numberOfGaussians = 1;
 	fitProperties.numberOfExponents = 0;
 	fitProperties.numberOfDampingExponents = 0;
 	fitProperties.hist = nullptr;
 	fitProperties.sourceHist = nullptr;
+	fitProperties.componentHist = nullptr;
 
 	parametersPool = nullptr;
 };
@@ -80,6 +81,12 @@ void Model::setSourceHist(TH1F* sourceHist){
     fitProperties.sourceHist = sourceHist;
     sourceHistogramImported(sourceHist);
 }
+
+void Model::setComponentHist(TH1F* componentHist){
+    fitProperties.componentHist = componentHist;
+    componentHistogramImported(componentHist);
+}
+
 void Model::setTwoDetector(Bool_t isTwoDetector){
     fitProperties.isTwoDetector = isTwoDetector;
 }
@@ -200,6 +207,10 @@ void Model::histogramImported(TH1F* hist){
 
 void Model::sourceHistogramImported(TH1F* hist){
 	Emit("sourceHistogramImported(TH1F*)", hist);
+}
+
+void Model::componentHistogramImported(TH1F* hist){
+	Emit("componentHistogramImported(TH1F*)", hist);
 }
 
 void Model::twoDetectorSet(Bool_t isTwoDetector){

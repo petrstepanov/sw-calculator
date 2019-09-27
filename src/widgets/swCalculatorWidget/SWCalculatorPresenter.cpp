@@ -25,15 +25,20 @@
 #include "../../model/ParametersPool.h"
 #include "../frames/ModalDialogFrame.h"
 #include "../frames/RooRealVarListFrame.h"
+#include "../importSpectrumWidget/ImportComponentView.h"
 #include <RooFit.h>
+#include <RooAbsArg.h>
+#include <RooStringVar.h>
+#include <RooDataHist.h>
 #include <RooDataHist.h>
 #include <TPaveText.h>
-#include <RooDataHist.h>
 #include <RooChi2Var.h>
 #include <RooMinimizer.h>
 #include <RooFitResult.h>
 #include <RooRealVar.h>
 #include <RooArgSet.h>
+#include <RooNumIntConfig.h>
+#include <RooCategory.h>
 #include <TMath.h>
 #include <TLegend.h>
 #include <iostream>
@@ -50,6 +55,8 @@ Model* SWCalculatorPresenter::instantinateModel() {
 void SWCalculatorPresenter::onInitModel() {
 	model->Connect("histogramImported(TH1F*)", "SWCalculatorPresenter", this, "onModelHistogramImported(TH1F*)");
 	model->Connect("sourceHistogramImported(TH1F*)", "SWCalculatorPresenter", this, "onModelSourceHistogramImported(TH1F*)");
+	model->Connect("componentHistogramImported(TH1F*)", "SWCalculatorPresenter", this, "onModelComponentHistogramImported(TH1F*)");
+
 	model->Connect("fitRangeLimitsSet(DoublePair*)", "SWCalculatorPresenter", this, "onModelFitRangeLimitsSet(DoublePair*)");
 	model->Connect("fitRangeSet(DoublePair*)", "SWCalculatorPresenter", this, "onModelFitRangeSet(DoublePair*)");
 
@@ -126,6 +133,12 @@ void SWCalculatorPresenter::onViewFitSpectrumClicked() {
 
 	RooDataHist* data = new RooDataHist("data", "Dataset", RooArgList(*observable), fitHist);
 
+	RooAbsReal::defaultIntegratorConfig()->Print("v"); // RooAdaptiveIntegratorND
+	// RooAbsReal::defaultIntegratorConfig()->getConfigSection("RooIntegrator1D").setRealValue("maxSteps", 30); // default 20
+
+	 RooAbsReal::defaultIntegratorConfig()->method1D().setLabel("RooSegmentedIntegrator1D");
+	 RooAbsReal::defaultIntegratorConfig()->method2D().setLabel("RooSegmentedIntegrator2D");
+
 	// Chi2 fit
 	RootHelper::startTimer();  // Start tracking Time
 	RooChi2Var* chi2 = new RooChi2Var("chi2", "chi2", *(pdfProvider->getPdf()), *data, RooFit::NumCPU(RootHelper::getNumCpu()));
@@ -141,7 +154,7 @@ void SWCalculatorPresenter::onViewFitSpectrumClicked() {
 
 	// Create RooPlot from energy axis frame
 	RooPlot* spectrumPlot = observable->frame();
-	spectrumPlot->SetTitle("");                             // Set Empty Graph Title
+	spectrumPlot->SetTitle("");  // Set Empty Graph Title
 	// spectrumPlot->GetXaxis()->SetRangeUser(fitRangeMin, fitRangeMax);      // Do we need this?
 
 	// Configure axis labels and look
@@ -212,7 +225,9 @@ void SWCalculatorPresenter::onViewFitSpectrumClicked() {
 		while (TObject* tempObject = it->Next()) {
 			RooAbsPdf* component = dynamic_cast<RooAbsPdf*>(tempObject);
 			if (component && component->getAttribute(Constants::ATTR_NO_DRAW_ON_PLOT)==kFALSE) {
-				pdfInMaterial->plotOn(spectrumPlot, RooFit::Components(*component), RooFit::LineStyle(kDashed), RooFit::LineColor(GraphicsHelper::colorSet[i++]), RooFit::LineWidth(1), RooFit::Name(component->GetName()), RooFit::Normalization(relativeNormalization, RooAbsReal::Relative));
+				Double_t precision = strcmp(component->GetName(), "Parabola") == 0 ? 1E-8 : 1E-3;
+				RooCmdArg precisionCmdArg =  RooFit::Precision(precision);
+				pdfInMaterial->plotOn(spectrumPlot, RooFit::Components(*component), RooFit::LineStyle(kDashed), RooFit::LineColor(GraphicsHelper::colorSet[i++]), RooFit::LineWidth(1), RooFit::Name(component->GetName()), RooFit::Normalization(relativeNormalization, RooAbsReal::Relative), precisionCmdArg);
 				legend->AddEntry(spectrumPlot->findObject(component->GetName()), component->GetTitle(), "l");
 			}
 		}
@@ -301,6 +316,87 @@ void SWCalculatorPresenter::onViewFitSpectrumClicked() {
 	chiText->SetTextAlign(kHAlignRight + kVAlignCenter);
 	residualsPlot->addObject(chiText);
 
+	// Calculate S and W parameters
+	Double_t sWidth = view->numSWidth->GetNumber();
+	Double_t wWidth = view->numWWidth->GetNumber();
+	Double_t wShift = view->numWShift->GetNumber();
+	Bool_t isTwoDetector = model->isTwoDetector();
+	RooRealVar* s = histProcessor->getSParameter(fitHistNoBg, sWidth, modelMean, isTwoDetector);
+	RooRealVar* w = histProcessor->getWParameter(fitHistNoBg, wWidth, wShift, modelMean, isTwoDetector);
+
+	// Calculate linear intensitiesv
+	RooArgList* recursiveIntensities = pdfProvider->getIntensitiesInMaterial();
+	RooArgList* linearIntensities = RootHelper::getLinearIntensities(recursiveIntensities);
+
+	// Output Parameters to the View
+	{
+		// Output filename
+		view->displayFilename(model->getFileName());
+		view->displayFitParameters(fitResult);
+
+		// Output indirect model parameters
+		view->displayVariables(pdfProvider->getIndirectParameters());
+
+		// Output components intensities
+		if (linearIntensities->getSize()){
+			view->displayVariables(linearIntensities);
+		}
+
+		// Output source contribution
+		if (RooRealVar* sourceContribution = pdfProvider->getSourceContribution()){
+			view->displayVariable(sourceContribution);
+		}
+
+		// Output Integral Chi^2
+		view->displayChi2(chi2Struct);
+
+		// Output S and W values
+		view->displaySW(s, w);
+
+		view->scrollOutputDown();
+	}
+
+	// Output parameters onto the plot
+	{
+		RooArgList* plotParametersList = new RooArgList();
+
+		RooArgSet* modelParameters = pdfProvider->getParameters();
+		plotParametersList->add(*modelParameters);
+
+		// Separator
+		RooStringVar* separator = new RooStringVar(RootHelper::getUUID()->Data(), "", " ");
+		plotParametersList->add(*separator);
+
+		RooArgList* indirectParameters = pdfProvider->getIndirectParameters();
+		plotParametersList->add(*indirectParameters);
+
+		if (linearIntensities->getSize()){
+			// Separator
+			separator = new RooStringVar(RootHelper::getUUID()->Data(), "", " ");
+			plotParametersList->add(*separator);
+
+			// Output components intensities
+			plotParametersList->add(*linearIntensities);
+		}
+
+		// Output source contribution
+		if (RooRealVar* sourceContribution = pdfProvider->getSourceContribution()){
+			separator = new RooStringVar(RootHelper::getUUID()->Data(), "", " ");
+			plotParametersList->add(*separator);
+			plotParametersList->add(*sourceContribution);
+		}
+
+		// Separator
+		separator = new RooStringVar(RootHelper::getUUID()->Data(), "", " ");
+		plotParametersList->add(*separator);
+
+		// Output S and W values
+		plotParametersList->add(RooArgList(*s, *w));
+
+		TPaveText* pave = GraphicsHelper::makeParametersPaveText(*plotParametersList, GraphicsHelper::padMargins.left, 0.5, 1 - GraphicsHelper::padMargins.top);
+		spectrumPlot->addObject(pave);
+	}
+
 	// Draw data plot on canvas
 	view->padData->cd();
 	spectrumPlot->Draw();
@@ -311,33 +407,6 @@ void SWCalculatorPresenter::onViewFitSpectrumClicked() {
 
 	// Update canvas
 	view->updateCanvas();
-
-	// Output Parameters to the View
-	{
-		// Output filename
-		view->displayFilename(model->getFileName());
-		// Output model parameters (RooRealVars')
-		view->displayFitParameters(fitResult);
-		// Output indirect model parameters
-		view->displayVariables(pdfProvider->getIndirectParameters());
-		// Output components intensities
-		// view->displayVariables(pdfProvider->getIntensities());
-		if (RooRealVar* sourceContribution = pdfProvider->getSourceContribution()){
-			view->displayVariable(sourceContribution);
-		}
-		// Output Integral Chi^2
-		view->displayChi2(chi2Struct);
-
-		// Output S and W values
-		Double_t sWidth = view->numSWidth->GetNumber();
-		Double_t wWidth = view->numWWidth->GetNumber();
-		Double_t wShift = view->numWShift->GetNumber();
-		Bool_t isTwoDetector = model->isTwoDetector();
-		std::pair<Double_t, Double_t> sValueError = histProcessor->getSParameter(fitHistNoBg, sWidth, modelMean, isTwoDetector);
-		std::pair<Double_t, Double_t> wValueError = histProcessor->getWParameter(fitHistNoBg, wWidth, wShift, modelMean, isTwoDetector);
-		view->displaySW(sValueError, wValueError);
-		view->scrollOutputDown();
-	}
 
 	view->initRooPlots(spectrumPlot, residualsPlot);
 	view->setToolbarEnabled(kTRUE);
@@ -439,6 +508,18 @@ void SWCalculatorPresenter::onViewNumDampExponentSet(){
 	model->setNumberOfDampingExponents(value);
 }
 
+void SWCalculatorPresenter::onViewAddHistComponentClicked(){
+	ModalDialogFrame* dialog = UiHelper::getInstance()->getDialog("Add model component");
+	ImportComponentView* importComponentView = new ImportComponentView(dialog);
+
+	dialog->AddFrame(importComponentView, new TGLayoutHints(kLHintsExpandX | kLHintsExpandY, dx, dx, dy*2, dy*2));
+
+	dialog->show(480, 480);
+}
+
+void SWCalculatorPresenter::onViewRemoveHistComponentClicked(){
+	model->setComponentHist(nullptr);
+}
 
 // Slots for Model Signals
 
@@ -449,6 +530,11 @@ void SWCalculatorPresenter::onModelHistogramImported(TH1F* hist){
 }
 
 void SWCalculatorPresenter::onModelSourceHistogramImported(TH1F* hist){
+	buildFittingModel();
+}
+
+void SWCalculatorPresenter::onModelComponentHistogramImported(TH1F* hist){
+	view->setComponentHistogram(hist);
 	buildFittingModel();
 }
 

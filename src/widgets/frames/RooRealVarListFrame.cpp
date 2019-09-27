@@ -9,6 +9,7 @@
 #include "RooRealVarFrame.h"
 #include "../AbstractView.h"
 #include "../../util/RootHelper.h"
+#include "../../model/Constants.h"
 #include <TGLabel.h>
 #include <TObject.h>
 #include <TG3DLine.h>
@@ -26,7 +27,7 @@ RooRealVarListFrame::RooRealVarListFrame(const TGWindow *p, RooArgSet* vars) : T
 RooRealVarListFrame::~RooRealVarListFrame() {}
 
 void RooRealVarListFrame::initUI(){
-	// Inuit bold font
+	// Init bold font
 	TGFont* menuHiliteFont = (TGFont*) gClient->GetResourcePool()->GetMenuHiliteFont();
 
 	// Table header
@@ -70,7 +71,11 @@ void RooRealVarListFrame::initUI(){
 	TObject* temp;
 	while((temp = it->Next())){
 		RooRealVar* var = dynamic_cast<RooRealVar*>(temp);
-		if (var){
+
+		// Show all parameters excluding those who have ATTR_HIDE_PARAMETER_FROM_UI
+		// Useful for recursive coefficients that are not too user friendly
+		// TODISS: put in dissertation (mess top peak with higher statistics)
+		if (var && !var->getAttribute(Constants::ATTR_HIDE_PARAMETER_FROM_UI)){
 			RooRealVarFrame* frame = new RooRealVarFrame(this, var);
 			this->AddFrame(frame, new TGLayoutHints(kLHintsLeft | kLHintsExpandX, 0, 0, dy, dy));
 		}

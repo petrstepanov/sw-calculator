@@ -22,6 +22,7 @@
 #include <map>
 #include <RooPlot.h>
 #include "../model/Constants.h"
+#include "../util/StringUtils.h"
 #include "RootHelper.h"
 #include "TMath.h"
 #include "TMatrixD.h"
@@ -39,14 +40,14 @@ FileUtils* FileUtils::getInstance(){
 	return instance;
 }
 
-TH1F* FileUtils::importTH1(const char* fileName, int eColumn, int cColumn){
+TH1F* FileUtils::importTH1(const char* path, int eColumn, int cColumn){
 	std::ifstream ifs;
 	std::string str;
 
-	ifs.open(fileName, std::ifstream::in);
+	ifs.open(path, std::ifstream::in);
 
 	if (!ifs.is_open()){
-		std::cout << "importTH1: file \"" << fileName << "\" not found." << std::endl;
+		std::cout << "importTH1: file \"" << path << "\" not found." << std::endl;
 		return NULL;
 	}
 
@@ -120,7 +121,10 @@ TH1F* FileUtils::importTH1(const char* fileName, int eColumn, int cColumn){
 
 	// Make Histogram
 	Int_t id = (new TDatime())->Get();
-	TH1F* hist = new TH1F(TString::Format("hist%d", id).Data(), "", bins, energyMin - binWidth / 2, energyMax + binWidth / 2);
+	const char* name = TString::Format("hist%d", id).Data();
+	TString* pathString = new TString(path);
+	const char* title = StringUtils::stripFileName(pathString)->Data();
+	TH1F* hist = new TH1F(name, title, bins, energyMin - binWidth / 2, energyMax + binWidth / 2);
 	// TH1I (const char *name, const char *title, Int_t nbinsx, Double_t xlow, Double_t xup)
 	// bin = 0;       underflow bin
 	// bin = 1;       first bin with low-edge xlow INCLUDED

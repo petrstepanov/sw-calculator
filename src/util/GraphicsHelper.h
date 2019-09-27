@@ -16,6 +16,8 @@
 
 #include <TStyle.h>
 #include <RooPlot.h>
+#include <TPaveText.h>
+#include <RooArgList.h>
 
 struct Margin {
 	Double_t left;
@@ -26,7 +28,8 @@ struct Margin {
 
 class GraphicsHelper {
 public:
-	static const Int_t DEFAULT_FONT_SIZE;
+	static const Int_t TEXT_SIZE_SMALL;
+	static const Int_t TEXT_SIZE_NORMAL;
 	static const Int_t DEFAULT_FONT_NUMBER;
 	static const Double_t DEFAULT_X_TITLE_OFFSET;
 	static const Double_t DEFAULT_X_LABEL_OFFSET;
@@ -34,6 +37,7 @@ public:
 	static const Double_t DEFAULT_Y_LABEL_OFFSET;
 	static const Double_t LEGEND_X1;
 	static const Double_t LEGEND_LINE_HEIGHT;
+	static const Double_t LEGEND_LINE_HEIGHT_DENSE;
 
     static const Margin padMargins;
     static const Int_t colorSet[7];
@@ -55,9 +59,13 @@ public:
 	void drawSWRegions(RooPlot* frame, Double_t sWidth, Double_t wWidth,
 			Double_t wShift, Double_t mean, Double_t yMin, Double_t yMax,
 			Bool_t isTwoDetector);
+	static TPaveText* makeParametersPaveText(const RooArgList& params, Double_t xmin, Double_t xmax, Double_t ymax);
+
 private:
 	GraphicsHelper();
 	static GraphicsHelper* instance;
+
+	static void printVariable(const char* options, Int_t& currentLine, RooAbsArg* rooAbsArg, TPaveText* box);
 };
 
 #endif /* GRAPHICSHELPER_H */

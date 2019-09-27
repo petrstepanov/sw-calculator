@@ -43,6 +43,19 @@ class Constants {
 
     static const char* ATTR_NO_SAVE_TO_POOL;
     static const char* ATTR_NO_DRAW_ON_PLOT;
+    static const char* ATTR_HIDE_PARAMETER_FROM_UI;
+//    static const char* ATTR_TPAVE_SEPARATOR;
+
+    static const char* ATTR_FORMAT_SIG_DIGITS_0;
+    static const char* ATTR_FORMAT_SIG_DIGITS_1;
+    static const char* ATTR_FORMAT_SIG_DIGITS_2;
+    static const char* ATTR_FORMAT_SIG_DIGITS_3;
+    static const char* ATTR_FORMAT_SIG_DIGITS_4;
+    static const char* ATTR_FORMAT_SIG_DIGITS_5;
+
+
+    static const char* LABEL_NO_FILE_LOADED;
+
 };
 
 

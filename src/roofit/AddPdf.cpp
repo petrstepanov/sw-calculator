@@ -29,7 +29,7 @@ AddPdf::AddPdf() {
 AddPdf::~AddPdf() {
 }
 
-RooAbsPdf* AddPdf::addReversed(RooArgList* pdfList, RooRealVar* observable, const char* pdfName) {
+RooAbsPdf* AddPdf::addReversed(RooArgList* pdfList, RooArgList* intensities, RooRealVar* observable, const char* pdfName) {
 	// Construct inverse list;
 	RooArgList* pdfInverseList = new RooArgList();
 	TIterator* it = pdfList->createIterator(kIterBackward);
@@ -42,10 +42,10 @@ RooAbsPdf* AddPdf::addReversed(RooArgList* pdfList, RooRealVar* observable, cons
 	}
 
 	// Add PDFs
-	return add(pdfInverseList, observable, pdfName);
+	return add(pdfInverseList, intensities, observable, pdfName);
 }
 
-RooAbsPdf* AddPdf::add(RooArgList* pdfList, RooRealVar* observable, const char* pdfName) {
+RooAbsPdf* AddPdf::add(RooArgList* pdfList, RooArgList* intensities, RooRealVar* observable, const char* pdfName, Bool_t recursive) {
 	// If one component given just return it
 	unsigned numberOfComponents = pdfList->getSize();
 	if (numberOfComponents == 0) {
@@ -57,22 +57,34 @@ RooAbsPdf* AddPdf::add(RooArgList* pdfList, RooRealVar* observable, const char* 
 		return pdf;
 	}
 
-	RooArgList* intensities = new RooArgList();
+	// Initialize intensities list if it was not done before
+	if (!intensities) intensities = new RooArgList();
+
 	for (unsigned i = 0; i < numberOfComponents - 1; i++) {
 		// Construct list of original model coefficients
 		// I_i = [I4, I3, I2]
 		const char* componentName = pdfList->at(i)->GetName();
 		const char* componentTitle = pdfList->at(i)->GetTitle();
-		Double_t defaultIntensity = 100. / (Double_t) pdfList->getSize();
-		RooRealVar* intensity = new RooRealVar(TString::Format("int%s", componentName), TString::Format("Intensity of %s", componentTitle), defaultIntensity, 0, 100, "%");
 
-		// Intensities are always diferent depending on number of components.
-		// To avoid total intensity more than 1 we don't save them in Pool
-		intensity->setAttribute(Constants::ATTR_NO_SAVE_TO_POOL, kTRUE);
-		RooFormulaVar* intensityNorm = new RooFormulaVar(TString::Format("int%sNorm", componentName), TString::Format("Intensity of %s, normalized", componentTitle), "@0/100", *intensity);
-		intensities->add(*intensityNorm);
+		if (recursive){
+			RooRealVar* intensity = new RooRealVar(TString::Format("int%s", componentName).Data(), TString::Format("Intensity of %s", componentTitle).Data(), 0.75, 0, 1);
+
+			// Intensities are always different depending on number of components.
+			// To avoid total intensity more than 1 we don't save them in Pool
+			intensity->setAttribute(Constants::ATTR_NO_SAVE_TO_POOL, kTRUE);
+			intensity->setAttribute(Constants::ATTR_HIDE_PARAMETER_FROM_UI, kTRUE);
+			intensities->add(*intensity);
+		}
+		else {
+			Double_t defaultIntensity = 100. / (Double_t) pdfList->getSize();
+			RooRealVar* intensity = new RooRealVar(TString::Format("int%s", componentName).Data(), TString::Format("Intensity of %s", componentTitle).Data(), defaultIntensity, 0, 100, "%");
+			intensity->setAttribute(Constants::ATTR_NO_SAVE_TO_POOL, kTRUE);
+			RooFormulaVar* intensityNorm = new RooFormulaVar(TString::Format("int%sNorm", componentName).Data(), TString::Format("Intensity of %s, normalized", componentTitle).Data(), "@0/100", *intensity);
+			intensities->add(*intensityNorm);
+		}
 	}
-	RooAddPdf* pdf = new RooAddPdf(TString::Format("addPdf%s", pdfName), TString::Format("Additive model %s", pdfName), *pdfList, *intensities);
+
+	RooAddPdf* pdf = new RooAddPdf(TString::Format("addPdf%s", pdfName), TString::Format("Additive model %s", pdfName), *pdfList, *intensities, recursive);
 
 	// https://sft.its.cern.ch/jira/browse/ROOT-9653
 	pdf->fixAddCoefNormalization(RooArgSet(*observable));

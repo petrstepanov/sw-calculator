@@ -41,6 +41,7 @@ struct FitProperties {
     Int_t numberOfDampingExponents;
     TH1F* hist;
     TH1F* sourceHist;
+    TH1F* componentHist;
 };
 
 // To benefit from signals/slots mechanism classes must inherit from TQObject
@@ -84,7 +85,8 @@ public:
 //    TH1F* getHist();
 
     void setSourceHist(TH1F* hist);
-//    TH1F* getSourceHist();
+    void setComponentHist(TH1F* hist);
+    //    TH1F* getSourceHist();
 
     FitProperties getFitProperties();
 
@@ -93,6 +95,7 @@ public:
     // SIGNALS
     void histogramImported(TH1F* hist); // *SIGNAL*
     void sourceHistogramImported(TH1F* hist); // *SIGNAL*
+    void componentHistogramImported(TH1F* hist); // *SIGNAL*
     void twoDetectorSet(Bool_t isTwoDetector); // *SIGNAL*
     void fitRangeLimitsSet(DoublePair* pair); // *SIGNAL*
     void fitRangeSet(DoublePair* pair); // *SIGNAL*

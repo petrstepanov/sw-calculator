@@ -38,6 +38,9 @@ public:
     void onViewNumGaussSet();
     void onViewNumExponentSet();
     void onViewNumDampExponentSet();
+	void onViewAddHistComponentClicked();
+	void onViewRemoveHistComponentClicked();
+
     void onViewSaveData();
     void onViewSaveImageClicked();
     void onViewEditParametersClicked();
@@ -49,6 +52,7 @@ public:
     // Slots for Model Signals
     void onModelHistogramImported(TH1F* hist);
     void onModelSourceHistogramImported(TH1F* hist);
+    void onModelComponentHistogramImported(TH1F* hist);
 	void onModelTwoDetectorSet(Bool_t isTwoDetector);
 	void onModelFitRangeLimitsSet(DoublePair* fitRangeLimits);
 	void onModelFitRangeSet(DoublePair* fitFange);

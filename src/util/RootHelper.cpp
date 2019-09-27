@@ -15,6 +15,7 @@
 #include "Debug.h"
 #include "MathUtil.h"
 #include "StringUtils.h"
+#include "../model/Constants.h"
 
 #include <TUnixSystem.h>
 #include <TGFrame.h>
@@ -49,6 +50,7 @@ Int_t RootHelper::getNumCpu(){
 }
 
 TStopwatch* RootHelper::watch = new TStopwatch();
+TRandom* RootHelper::random = new TRandom(0);
 
 void RootHelper::startTimer(){
     watch->Start();
@@ -201,4 +203,78 @@ std::pair<TMatrixD,TList*> RootHelper::rooPlotToMatrix(RooRealVar* axis, RooPlot
 	#endif
 
 	return std::make_pair(matrix,columnNames);
+}
+
+RooArgList* RootHelper::getLinearIntensities(RooArgList* recursiveIntensities) {
+	RooArgList* intensities = new RooArgList();
+
+	// Add material pdfs intensities (for recursive sum)
+	Double_t previousCoeff = 1;   // previous coefficient
+	Double_t previousCoeffError = 0;  // previous coefficient error
+	for (unsigned i=0; i < recursiveIntensities->getSize(); i++){
+		TString nameString = TString::Format("%s_", recursiveIntensities->at(i)->GetName());
+		const char* name = nameString.Data();
+		const char* title = recursiveIntensities->at(i)->GetTitle();
+		RooRealVar* linearIntensity = new RooRealVar(name, title, 0, "%");
+
+		if (RooRealVar* coeff = dynamic_cast<RooRealVar*>(recursiveIntensities->at(i))){
+			Double_t recursiveIntensity = coeff->getValV();
+			Double_t recursiveIntensityError = coeff->getError();
+			linearIntensity->setVal(previousCoeff*recursiveIntensity*100);
+
+			Double_t error = sqrt(pow(recursiveIntensity*previousCoeffError,2) + pow(previousCoeff*recursiveIntensityError,2));
+			linearIntensity->setError(error*100);
+
+			previousCoeff *= 1.-recursiveIntensity;
+			previousCoeffError = error;
+		}
+		intensities->add(*linearIntensity);
+	}
+	return intensities;
+}
+
+void RootHelper::setSigDigits(RooAbsReal* rooAbsReal, Int_t sigDigits){
+	rooAbsReal->setAttribute(Constants::ATTR_FORMAT_SIG_DIGITS_0, kFALSE);
+	rooAbsReal->setAttribute(Constants::ATTR_FORMAT_SIG_DIGITS_1, kFALSE);
+	rooAbsReal->setAttribute(Constants::ATTR_FORMAT_SIG_DIGITS_2, kFALSE);
+	rooAbsReal->setAttribute(Constants::ATTR_FORMAT_SIG_DIGITS_3, kFALSE);
+	rooAbsReal->setAttribute(Constants::ATTR_FORMAT_SIG_DIGITS_4, kFALSE);
+	rooAbsReal->setAttribute(Constants::ATTR_FORMAT_SIG_DIGITS_5, kFALSE);
+
+	switch (sigDigits){
+		case 0:
+			rooAbsReal->setAttribute(Constants::ATTR_FORMAT_SIG_DIGITS_0, kTRUE);
+			break;
+		case 1:
+			rooAbsReal->setAttribute(Constants::ATTR_FORMAT_SIG_DIGITS_1, kTRUE);
+			break;
+		case 2:
+			rooAbsReal->setAttribute(Constants::ATTR_FORMAT_SIG_DIGITS_2, kTRUE);
+			break;
+		case 3:
+			rooAbsReal->setAttribute(Constants::ATTR_FORMAT_SIG_DIGITS_3, kTRUE);
+			break;
+		case 4:
+			rooAbsReal->setAttribute(Constants::ATTR_FORMAT_SIG_DIGITS_4, kTRUE);
+			break;
+		case 5:
+			rooAbsReal->setAttribute(Constants::ATTR_FORMAT_SIG_DIGITS_5, kTRUE);
+			break;
+	}
+}
+
+Int_t RootHelper::getSigDigits(RooAbsReal* rooAbsReal){
+	if (rooAbsReal->getAttribute(Constants::ATTR_FORMAT_SIG_DIGITS_0)) return 0;
+	if (rooAbsReal->getAttribute(Constants::ATTR_FORMAT_SIG_DIGITS_1)) return 1;
+	if (rooAbsReal->getAttribute(Constants::ATTR_FORMAT_SIG_DIGITS_2)) return 2;
+	if (rooAbsReal->getAttribute(Constants::ATTR_FORMAT_SIG_DIGITS_3)) return 3;
+	if (rooAbsReal->getAttribute(Constants::ATTR_FORMAT_SIG_DIGITS_4)) return 4;
+	if (rooAbsReal->getAttribute(Constants::ATTR_FORMAT_SIG_DIGITS_5)) return 5;
+	return 3;
+}
+
+TString* RootHelper::getUUID(){
+	UInt_t randomInt = random->Rndm()*1E8;
+	TString uuidString = TString::Format("%u", randomInt);
+	return new TString(uuidString);
 }

@@ -24,6 +24,7 @@ public:
     PdfProvider(FitProperties fitProperties);
     virtual ~PdfProvider();
 
+    RooArgSet* getParameters();
     RooArgList* getIndirectParameters();
 //    RooArgList* getIntensities();
     RooRealVar* getSourceContribution();
@@ -37,11 +38,11 @@ public:
     RooAbsPdf* getResolutionFunction();
     RooAbsPdf* getSourcePdf(); // components in material
     RooAbsPdf* getPdfInMaterial(); // components in material
+    RooArgList* getIntensitiesInMaterial(); // intensities in material
     RooAbsPdf* getPdf();
 
 //    RooArgList* getBackgroundComponents();
-    RooArgList* getIntensities();
-    //    RooArgSet* getParameters();
+//    RooArgList* getIntensities();
     
     void initSourcePdf(TH1F* sourceHist, RooRealVar* sourceContrib);
     
@@ -58,7 +59,7 @@ private:
 
     // Components in material
 //	RooArgList* components;
-//	RooArgList* intensities;
+    RooArgList* materialIntensities;
 
 	// Source contribution
 	RooRealVar* intSource;
@@ -80,7 +81,7 @@ private:
     
 
     void initObservableAndMean();
-    void initMaterialPdf(Bool_t hasParabola, const Int_t, const Int_t numLorentz, const Int_t numLorentzSum);
+    void initMaterialPdf(Bool_t hasParabola, TH1F* componentHist, const Int_t, const Int_t numLorentz, const Int_t numLorentzSum);
     void initSourceContribution(TH1F* sourceHist);
     void initConvolutedModel(ConvolutionType convolutionType);
     void initSingleDetectorBackground();

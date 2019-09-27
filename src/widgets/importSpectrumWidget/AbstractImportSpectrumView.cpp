@@ -19,13 +19,6 @@ AbstractImportSpectrumView::AbstractImportSpectrumView(const TGWindow* w) : Abst
 }
 
 AbstractImportSpectrumView::~AbstractImportSpectrumView() {
-    // default destructor doesn't follow pointers
-    delete btnOpenFile;
-    delete lblFileName;
-    delete txtFileBrowser;
-    delete numEnergyColumn;
-    delete numCountsColumn;
-    delete btnImportSpectrum;
 }
 
 void AbstractImportSpectrumView::initUI(){
@@ -35,7 +28,7 @@ void AbstractImportSpectrumView::initUI(){
         btnOpenFile = new TGTextButton(frameOpenFile, " Open File ");
         btnOpenFile->Connect("Clicked()", "AbstractImportSpectrumView", this, "onOpenFileClicked()");
 
-        lblFileName = new TGLabel(frameOpenFile, "no file loaded");
+        lblFileName = new TGLabel(frameOpenFile, Constants::LABEL_NO_FILE_LOADED);
         lblFileName->SetTextJustify(kTextLeft);
         lblFileName->Disable(kTRUE);
         lblFileName->ChangeOptions(lblFileName->GetOptions() | kFixedSize);
@@ -48,6 +41,7 @@ void AbstractImportSpectrumView::initUI(){
     // File browser
     txtFileBrowser = new TGTextView(this);
     txtFileBrowser->SetBackgroundColor(GraphicsHelper::colorAppWindow->GetPixel());
+
 //    txtFileBrowser->AddLine("no file loaded");
 //    txtFileBrowser->ChangeOptions(0);
     AddFrame(txtFileBrowser, new TGLayoutHints(kLHintsExpandX | kLHintsExpandY, 0, 0, dy, dy));
@@ -86,6 +80,7 @@ void AbstractImportSpectrumView::initUI(){
 
     // Histogram canvas
     TRootEmbeddedCanvas* embedHist = new TRootEmbeddedCanvas("embedHist", this);
+
     canvasHist = embedHist->GetCanvas();
     canvasHist->SetMargin(0.09, 0.04, 0.14, 0.1);
     canvasHist->SetLogy();

@@ -12,14 +12,23 @@
  */
 
 #include "GraphicsHelper.h"
+#include "RootHelper.h"
+#include "../model/Constants.h"
+
 #include <RooPlot.h>
 #include <TAxis.h>
 #include <TBox.h>
 #include <TLatex.h>
 #include <TMath.h>
+#include <TString.h>
+#include <RooRealVar.h>
+#include <RooStringVar.h>
+#include <RooFormulaVar.h>
+#include <RooFormula.h>
 #include <iostream>
 
-const Int_t GraphicsHelper::DEFAULT_FONT_SIZE = 14;  // px
+const Int_t GraphicsHelper::TEXT_SIZE_SMALL = gStyle->GetLegendTextSize()*0.75;
+const Int_t GraphicsHelper::TEXT_SIZE_NORMAL = gStyle->GetLegendTextSize();
 const Int_t GraphicsHelper::DEFAULT_FONT_NUMBER = 6; // Sans Serif
 const Double_t GraphicsHelper::DEFAULT_X_TITLE_OFFSET = 2.5;
 const Double_t GraphicsHelper::DEFAULT_X_LABEL_OFFSET = 0.01;
@@ -28,6 +37,7 @@ const Double_t GraphicsHelper::DEFAULT_Y_LABEL_OFFSET = 0.02;
 const Double_t GraphicsHelper::RESIDUALS_PAD_RELATIVE_HEIGHT = 0.35;
 const Double_t GraphicsHelper::LEGEND_X1 = 0.72;
 const Double_t GraphicsHelper::LEGEND_LINE_HEIGHT = 0.045;
+const Double_t GraphicsHelper::LEGEND_LINE_HEIGHT_DENSE = 0.03;
 
 const Margin GraphicsHelper::padMargins = { 0.10, 0.03, 0.15, 0.05 }; // left, right, bottom, top
 
@@ -127,3 +137,112 @@ void GraphicsHelper::drawSWRegions(RooPlot* frame, Double_t sWidth, Double_t wWi
     frame->addObject(w2);
 
 }
+
+void GraphicsHelper::printVariable(const char* options, Int_t& currentLine, RooAbsArg* rooAbsArg, TPaveText* box) {
+	// Don't print hidden variables
+	if (rooAbsArg->getAttribute(Constants::ATTR_HIDE_PARAMETER_FROM_UI)) return;
+
+	if (RooRealVar* var = dynamic_cast<RooRealVar*>(rooAbsArg)){
+		Int_t sigDigits = RootHelper::getSigDigits(var);
+		TString* formatted = var->format(sigDigits, options);
+		const char* formattedString = formatted->Data();
+
+		Bool_t isConstant = var->isConstant();
+		Bool_t atMaximum = var->getVal() + var->getError() > var->getMax();
+		Bool_t atMinimum = var->getVal() - var->getError() < var->getMin();
+
+		#ifdef USEDEBUG
+			std::cout << "GraphicsHelper::printVariable" << std::endl;
+			std::cout << var->GetName() << "; constant " << isConstant << "; atMinimum " << atMinimum << "; atMaximum " << atMaximum << std::endl;
+		#endif
+
+		if (!isConstant && (atMaximum || atMinimum)){
+			TText* t = box->AddText(TString::Format("%s (at limit)", formattedString).Data());
+			t->SetTextColor(kOrange+8);
+		} else {
+			box->AddText(formattedString);
+		}
+		// Mark variable as printed
+		currentLine++;
+	}
+	else if (RooFormulaVar* var = dynamic_cast<RooFormulaVar*>(rooAbsArg)){
+		#ifdef USEDEBUG
+			std::cout << "GraphicsHelper::printVariable" << std::endl;
+			std::cout << var->GetName() << std::endl;
+		#endif
+		TString fmt("%s = %.#f (indirect)");
+		Int_t sigDigits = RootHelper::getSigDigits(var);
+		fmt.ReplaceAll("#", TString::Format("%d", sigDigits).Data());
+		TString formatted = TString::Format(fmt.Data(), var->GetName(), var->evaluate());
+		const char* formattedString = formatted.Data();
+		TText* t = box->AddText(formattedString);
+		t->SetTextColor(kGray+1);
+		currentLine++;
+	}
+}
+
+TPaveText* GraphicsHelper::makeParametersPaveText(const RooArgList& params, Double_t xmin, Double_t xmax, Double_t ymax){
+	params.Print("V");
+
+	Bool_t showConstants = kTRUE;
+	const char* options = "NEULP";
+	TIterator* pIter = params.createIterator();
+
+	// Calculate bottom Legend coordinate (ymin)
+	Double_t ymin = ymax;
+	while (RooAbsArg* var = (RooAbsArg*) pIter->Next()) {
+		if (showConstants || !var->isConstant()) ymin -= LEGEND_LINE_HEIGHT_DENSE;
+	}
+	ymin -= LEGEND_LINE_HEIGHT_DENSE*2; // 2 empty lines
+
+	// Create the box and set its options
+	TPaveText *box = new TPaveText(xmin, ymax, xmax, ymin, "BRNDC"); //
+	box->SetName("myParamBox");
+	box->SetFillColor(EColor::kBlack);
+	box->SetBorderSize(1);
+	box->SetTextSize(TEXT_SIZE_SMALL);
+	box->SetTextAlign(ETextAlign::kHAlignLeft + ETextAlign::kVAlignCenter);
+	box->SetFillStyle(1001);
+	box->SetFillColorAlpha(EColor::kWhite, 0.9);
+
+	// Line counter (to draw horizontal lines later)
+	Int_t linesNumber = 0;
+	std::vector<int> hrLineNumbers;
+
+	// Empty first line (for better padding)
+	box->AddText("");
+	linesNumber++;
+
+	// Add horizontal rule
+	// hrLineNumbers.push_back(linesNumber);
+	// box->AddText("");
+	// linesNumber++;
+
+	// Print other variables (model)
+	pIter = params.createIterator();
+	while (TObject* obj = pIter->Next()) {
+		if (RooAbsArg* var = dynamic_cast<RooAbsArg*>(obj)){
+			if (RooStringVar* stringVar = dynamic_cast<RooStringVar*>(var)){
+				hrLineNumbers.push_back(linesNumber);
+				box->AddText(stringVar->getVal());
+				linesNumber++;
+			} else {
+				printVariable(options, linesNumber, var, box);
+			}
+		}
+	}
+
+	// Empty last line (for better padding)
+	box->AddText("");
+	linesNumber++;
+
+	// Draw horizontal rules
+	for (std::vector<int>::iterator it = hrLineNumbers.begin(); it != hrLineNumbers.end(); ++it){
+		Double_t y = ((Double_t)*it + 0.5)/(Double_t)linesNumber;
+		box->AddLine(0, 1-y, 1, 1-y);
+	}
+
+	delete pIter;
+	return box;
+}
+

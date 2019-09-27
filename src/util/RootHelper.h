@@ -18,6 +18,7 @@
 #include <TStopwatch.h>
 #include <TGFrame.h>
 #include <TGNumberEntry.h>
+#include <TRandom.h>
 #include <RooRealVar.h>
 #include <RooAbsPdf.h>
 
@@ -36,9 +37,15 @@ public:
     static RooRealVar* getParameterNameContains(RooAbsPdf* pdf, const char* nameSubstring);
     static RooAbsArg* findArgNameSubstring(RooAbsCollection* list, const char* nameSubstring);
     static std::pair<TMatrixD,TList*> rooPlotToMatrix(RooRealVar* axis, RooPlot* plot);
+    static RooArgList* getLinearIntensities(RooArgList* recursiveIntensities);
+    static Int_t getSigDigits(RooAbsReal* rooAbsReal);
+    static void setSigDigits(RooAbsReal* rooAbsReal, Int_t sigDigits);
+    static Int_t getRandomInt();
+    static TString* getUUID();
 
 private:
     static TStopwatch* watch;
+    static TRandom* random;
 };
 
 #endif /* ROOTHELPER_H */

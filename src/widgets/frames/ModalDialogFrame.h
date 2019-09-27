@@ -16,7 +16,7 @@ public:
 	virtual ~ModalDialogFrame();
 
 	virtual void closeWindow();
-	void show();
+	void show(Int_t minWidth = 0, Int_t minHeight = 0);
 
 	ClassDef(ModalDialogFrame, 0)
 };

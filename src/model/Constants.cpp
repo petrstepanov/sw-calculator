@@ -61,3 +61,17 @@ char* Constants::applicationIcon[] = { "48 48 17 1", " 	c None", ".	c #93E8FE", 
 
 const char* Constants::ATTR_NO_SAVE_TO_POOL = "noSaveInPool";
 const char* Constants::ATTR_NO_DRAW_ON_PLOT = "noDrawOnPlot";
+
+const char* Constants::ATTR_HIDE_PARAMETER_FROM_UI = "hideParameterFromUi";
+
+//const char* Constants::ATTR_TPAVE_SEPARATOR = "attrTPaveSeparator";
+
+
+const char* Constants::ATTR_FORMAT_SIG_DIGITS_0 = "attrFormatSigDigits0";
+const char* Constants::ATTR_FORMAT_SIG_DIGITS_1 = "attrFormatSigDigits1";
+const char* Constants::ATTR_FORMAT_SIG_DIGITS_2 = "attrFormatSigDigits2";
+const char* Constants::ATTR_FORMAT_SIG_DIGITS_3 = "attrFormatSigDigits3";
+const char* Constants::ATTR_FORMAT_SIG_DIGITS_4 = "attrFormatSigDigits4";
+const char* Constants::ATTR_FORMAT_SIG_DIGITS_5 = "attrFormatSigDigits5";
+
+const char* Constants::LABEL_NO_FILE_LOADED = "no file loaded";

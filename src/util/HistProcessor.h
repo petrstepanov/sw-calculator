@@ -46,8 +46,8 @@ public:
     Bool_t isTwoDetetor(TH1F*);
     Double_t getPdfMaximumX (RooAbsPdf*, const RooArgList&);
     std::pair<Double_t, Double_t> getHistogramSafeFitRange(TH1F*);
-    std::pair<Double_t, Double_t> getSParameter(TH1F* hist, Double_t sWidth, Double_t mean, Bool_t isTwoDetector);
-    std::pair<Double_t, Double_t> getWParameter(TH1F* hist, Double_t wWidth, Double_t wShift, Double_t mean, Bool_t isTwoDetector);
+    RooRealVar* getSParameter(TH1F* hist, Double_t sWidth, Double_t mean, Bool_t isTwoDetector);
+    RooRealVar* getWParameter(TH1F* hist, Double_t wWidth, Double_t wShift, Double_t mean, Bool_t isTwoDetector);
     
 private:
     HistProcessor();                                      // Private so that it can  not be called
