@@ -1,9 +1,14 @@
 # Select compiler command depending on environment
 OS:=$(shell uname)
+CXX=g++
 ifeq ($(OS),Darwin)
   CXX=clang++
-else
-  CXX=g++
+endif
+
+# Path for linking dynamic libraries
+LIBRARY_PATH = ${LD_LIBRARY_PATH}
+ifeq ($(OS),Darwin)
+  LIBRARY_PATH = $(DYLD_LIBRARY_PATH)
 endif
 
 # Define variables for directories
@@ -43,6 +48,7 @@ SHARED_LIBRARY_DS=$(APP_NAME)-library.so.dSYM   # .so debug symbols (generated o
 dir_guard=@mkdir -p $(@D)
 
 # for 'install' target PREFIX is environment variable, but if it is not set, then set default value
+# https://stackoverflow.com/questions/39892692/how-to-implement-make-install-in-a-makefile
 ifeq ($(PREFIX),)
     PREFIX := /usr/local
 endif
@@ -62,15 +68,16 @@ executable: directories $(DICT_FILENAME) $(SHARED_LIBRARY) $(OBJECTS) $(EXECUTAB
 
 $(EXECUTABLE): $(OBJECTS) $(SHARED_LIBRARY)
 	@echo "Linking "$@
+	$(CXX) -o $@ $(OBJECTS) $(SHARED_LIBRARY) $(GLIBS)
 ifeq ($(OS),Darwin)
 	# for macOS just link against the shared library
 	$(CXX) -o $@ $(OBJECTS) $(SHARED_LIBRARY) $(GLIBS)
 	# then change search location of the .so library in the executable - set as same directory (macOS only)
-	install_name_tool -change $(SHARED_LIBRARY) @executable_path/$(SHARED_LIBRARY) $(EXECUTABLE)
+	install_name_tool -change $(SHARED_LIBRARY) $(LIBRARY_PATH)/$(SHARED_LIBRARY) $(EXECUTABLE)
 else
 	# for Linux add runtime shared library search path ./ relative to the executable (gcc only)
 	# https://stackoverflow.com/questions/38058041/correct-usage-of-rpath-relative-vs-absolute
-	$(CXX) -o $@ $(OBJECTS) $(SHARED_LIBRARY) $(GLIBS) -Wl,-rpath,'$$ORIGIN'
+	$(CXX) -o $@ $(OBJECTS) $(SHARED_LIBRARY) $(GLIBS)
 endif
 
 $(DICT_FILENAME): $(HEADERS) $(SRC_DIR)/LinkDef.h
@@ -110,7 +117,7 @@ move_files:
 	# move .so library to /dist folder
 	mv $(SHARED_LIBRARY) $(BIN_DIR)/$(SHARED_LIBRARY)
 
-	# move dictionary .pcm next to the app executable, remove dictionary .cxx
+	# move dictionary .pcm to /dist folder, remove dictionary .cxx
 	mv $(DICT_PCM_FILENAME) $(BIN_DIR)/$(DICT_PCM_FILENAME)
 	rm $(DICT_FILENAME)
 	# copy icon
@@ -123,10 +130,9 @@ ifeq ($(OS),Darwin)
 endif
 
 install:
-	install -d $(DESTDIR)$(PREFIX)/bin/
-	install -m 755 $(EXECUTABLE) $(DESTDIR)$(PREFIX)/bin/
-	install -m 755 $(BIN_DIR)/$(SHARED_LIBRARY) $(DESTDIR)$(PREFIX)/bin/
-	install -m 755 $(BIN_DIR)/$(DICT_PCM_FILENAME) $(DESTDIR)$(PREFIX)/bin/
+	sudo install -m 755 $(EXECUTABLE) $(DESTDIR)$(PREFIX)/bin/
+	sudo install -m 755 $(BIN_DIR)/$(SHARED_LIBRARY) $(LIBRARY_PATH)/
+	sudo install -m 755 $(BIN_DIR)/$(DICT_PCM_FILENAME) $(LIBRARY_PATH)/
 
 # List of special targets that do not generate files
 .PHONY: clean directories move_files move_debug_symbols echo
