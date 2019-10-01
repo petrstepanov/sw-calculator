@@ -133,5 +133,9 @@ install:
 	sudo install -m 755 $(BIN_DIR)/$(SHARED_LIBRARY) $(DYNAMIC_LIBRARY_PATH)/
 	sudo install -m 755 $(BIN_DIR)/$(DICT_PCM_FILENAME) $(DYNAMIC_LIBRARY_PATH)/
 
+linux-install-app:
+	xdg-icon-resource install --context apps --size 128 ./resources/sw-calculator.png sw-calculator
+	xdg-desktop-menu install ./resources/sw-calculator.desktop
+
 # List of special targets that do not generate files
 .PHONY: clean directories move_files move_debug_symbols echo
