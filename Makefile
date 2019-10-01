@@ -6,10 +6,9 @@ ifeq ($(OS),Darwin)
 endif
 
 # Path for linking dynamic libraries
-LIBRARY_PATH = ${LD_LIBRARY_PATH}
-ifeq ($(OS),Darwin)
-  LIBRARY_PATH = $(DYLD_LIBRARY_PATH)
-endif
+# macOS system integrity protection blocks access to $(DYLD_LIBRARY_PATH)
+# https://github.com/nteract/nteract/issues/1523#issuecomment-284027093
+DYNAMIC_LIBRARY_PATH = $(ROOTSYS)/lib
 
 # Define variables for directories
 SRC_DIR=src
@@ -69,16 +68,16 @@ executable: directories $(DICT_FILENAME) $(SHARED_LIBRARY) $(OBJECTS) $(EXECUTAB
 $(EXECUTABLE): $(OBJECTS) $(SHARED_LIBRARY)
 	@echo "Linking "$@
 	$(CXX) -o $@ $(OBJECTS) $(SHARED_LIBRARY) $(GLIBS)
-ifeq ($(OS),Darwin)
+#ifeq ($(OS),Darwin)
 	# for macOS just link against the shared library
-	$(CXX) -o $@ $(OBJECTS) $(SHARED_LIBRARY) $(GLIBS)
+	# $(CXX) -o $@ $(OBJECTS) $(SHARED_LIBRARY) $(GLIBS)
 	# then change search location of the .so library in the executable - set as same directory (macOS only)
-	install_name_tool -change $(SHARED_LIBRARY) $(LIBRARY_PATH)/$(SHARED_LIBRARY) $(EXECUTABLE)
-else
+	# install_name_tool -change $(SHARED_LIBRARY) @executable_path/$(SHARED_LIBRARY) $(EXECUTABLE)
+#else
 	# for Linux add runtime shared library search path ./ relative to the executable (gcc only)
 	# https://stackoverflow.com/questions/38058041/correct-usage-of-rpath-relative-vs-absolute
-	$(CXX) -o $@ $(OBJECTS) $(SHARED_LIBRARY) $(GLIBS)
-endif
+	# $(CXX) -o $@ $(OBJECTS) $(SHARED_LIBRARY) $(GLIBS) -Wl,-rpath,'$$ORIGIN'
+#endif
 
 $(DICT_FILENAME): $(HEADERS) $(SRC_DIR)/LinkDef.h
 	rootcling -f $@ -c $(CXXFLAGS) -p $^
@@ -131,8 +130,8 @@ endif
 
 install:
 	sudo install -m 755 $(EXECUTABLE) $(DESTDIR)$(PREFIX)/bin/
-	sudo install -m 755 $(BIN_DIR)/$(SHARED_LIBRARY) $(LIBRARY_PATH)/
-	sudo install -m 755 $(BIN_DIR)/$(DICT_PCM_FILENAME) $(LIBRARY_PATH)/
+	sudo install -m 755 $(BIN_DIR)/$(SHARED_LIBRARY) $(DYNAMIC_LIBRARY_PATH)/
+	sudo install -m 755 $(BIN_DIR)/$(DICT_PCM_FILENAME) $(DYNAMIC_LIBRARY_PATH)/
 
 # List of special targets that do not generate files
 .PHONY: clean directories move_files move_debug_symbols echo
