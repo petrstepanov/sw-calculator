@@ -1,0 +1,9 @@
+[Desktop Entry]
+Version=1.0
+Type=Application
+Name=SW Calculator
+Comment=Doppler spectra fitting software
+Icon=sw-calculator
+Exec=sw-calculator
+Terminal=true
+Categories=Science
