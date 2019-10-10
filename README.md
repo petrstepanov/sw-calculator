@@ -2,7 +2,7 @@
 
 Program calculates S and W parameters of the 511 annihilation peak of the annihilation radiation. It is possible to estimate the binding electron energies by fitting the CDB spectrum with the contributions from e+ annihilation on electrons with different wave functions. Electrons from conduction band contribute into the spectrum as an inverted parabola. Upon the shape of the parabola we calculate Fermi energy. Check our [research group website SelimLab](http://physics.bgsu.edu/~faselim/).
 
-<img src="http://petrstepanov.com/static/sw-calculator.png" alt="SW Calculator desktop application" style="width: 100%;"/>
+<img src="http://petrstepanov.com/static/screenshot-sw-calculator.png" alt="SW Calculator desktop application" style="width: 100%;"/>
 
 Application is written in C++ with CERN ROOT libraries and GUI. In order to run the app first we need to install ROOT libraries. Unfortunately it is impossible to do static link your applications object files with the ROOT libraries as well as build their static versions. Moreover, sometimes source headers should be available at runtime.
 
