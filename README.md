@@ -28,7 +28,7 @@ Not yet implemented. Contributors that familiar with CMAKE are welome.
 
 ## Users Guide
 
-Not yet implemented
+Not yet implemented.
 
 ---
 
