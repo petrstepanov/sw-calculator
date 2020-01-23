@@ -12,15 +12,22 @@ Currently it is possible to run application either on macOS or Linux. I will try
 
 1. Install CERN ROOT on your system. Details can be found [here](https://medium.com/@petrstepanov/install-cern-root-roofit-on-macos-and-linux-for-dummies-df787fd41ef4).
 
-2. Click on "Clone or download" button on the top right. Extract the archive. Navigate to the extracted folder. In terminal run following:
+2. Open your Terminal and clone the program folder on your hard drive:
 
+```
+mkdir -p ~/Downloads && cd ~/Downloads
+git clone https://github.com/petrstepanov/sw-calculator
+cd ./sw-calculator
+```
+
+3. Compile the source code and link with ROOT libraries into a binary executable:
 ```
 make
 make install
 ```
-In order to launch the application type in termianl `sw-calculator`.
+4. In order to launch the application type `sw-calculator` in Terminal.
 
-3. Optionally you can add an application launcher to the list of your system apps. On Linux execute `make install-linux-launcher`. To install a launcher on macOS run `resources/sw-calculator.pkg`.
+5. Optionally add an application launcher to the list of your system apps. On Linux execute `make install-linux-launcher`. On macOS run `resources/sw-calculator.pkg`.
 
 ## Installation on Windows
 
