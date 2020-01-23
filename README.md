@@ -29,9 +29,15 @@ make install
 
 5. Optionally add an application launcher to the list of your system apps. On Linux execute `make install-linux-launcher`. On macOS run `resources/sw-calculator.pkg`.
 
-## Installation on Windows
+## Installation on Windows 10
 
-Not yet implemented. Contributors that familiar with CMAKE are welome.
+1. Install Windows Subsystem for Linux (WSL). Install Ubuntu linux inside WSL  as described [here](https://medium.com/@petrstepanov/install-cern-root-roofit-on-macos-and-linux-for-dummies-df787fd41ef4).
+
+2. Install CERN ROOT in Ubuntu WSL from precompiled binaries. Read more [here](https://medium.com/@petrstepanov/install-cern-root-roofit-on-macos-and-linux-for-dummies-df787fd41ef4#cbb8).
+
+3. In Windows 10 open _Start → Ubuntu_ to launch bash. Type `sw-calculator`.
+
+P.S. Running the program on older versions of Windows is currently not possible. If you are familiar with CMAKE please contribute :-) 
 
 ## Users Guide
 
