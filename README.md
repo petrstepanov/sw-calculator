@@ -8,6 +8,14 @@ Application is written in C++ with CERN ROOT libraries and GUI. In order to run 
 
 Currently it is possible to run application either on macOS or Linux. I will try to compile the windows binary whenever the native Windows ROOT 6 build will be released.
 
+## Installation on Windows 10
+
+1. Install Ubuntu linux inside Windows Subsystem for Linux (WSL) as described [here](https://medium.com/@petrstepanov/install-cern-root-roofit-on-macos-and-linux-for-dummies-df787fd41ef4).
+
+2. Open _Start → Ubuntu_ to launch linux Terminal. Proceed with Installation on Linux below.
+
+P.S. Running the program on older versions of Windows is currently not possible. If you are familiar with CMAKE please contribute :-) 
+
 ## Installation on Linux or macOS
 
 1. Install CERN ROOT on your system. Details can be found [here](https://medium.com/@petrstepanov/install-cern-root-roofit-on-macos-and-linux-for-dummies-df787fd41ef4).
@@ -28,16 +36,6 @@ make install
 4. In order to launch the application type `sw-calculator` in Terminal.
 
 5. Optionally add an application launcher to the list of your system apps. On Linux execute `make install-linux-launcher`. On macOS run `resources/sw-calculator.pkg`.
-
-## Installation on Windows 10
-
-1. Install Windows Subsystem for Linux (WSL). Install Ubuntu linux inside WSL  as described [here](https://medium.com/@petrstepanov/install-cern-root-roofit-on-macos-and-linux-for-dummies-df787fd41ef4).
-
-2. Install CERN ROOT in Ubuntu WSL from precompiled binaries. Read more [here](https://medium.com/@petrstepanov/install-cern-root-roofit-on-macos-and-linux-for-dummies-df787fd41ef4#cbb8).
-
-3. In Windows 10 open _Start → Ubuntu_ to launch bash. Type `sw-calculator`.
-
-P.S. Running the program on older versions of Windows is currently not possible. If you are familiar with CMAKE please contribute :-) 
 
 ## Users Guide
 
