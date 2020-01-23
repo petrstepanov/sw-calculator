@@ -10,7 +10,7 @@ Currently it is possible to run application either on macOS or Linux. I will try
 
 ## Installation on Windows 10
 
-1. Install Ubuntu linux inside Windows Subsystem for Linux (WSL) as described [here](https://medium.com/@petrstepanov/install-cern-root-roofit-on-macos-and-linux-for-dummies-df787fd41ef4).
+1. Install Ubuntu linux inside Windows Subsystem for Linux (WSL) as described [here](https://medium.com/@petrstepanov/installing-cern-root-in-windows-subsystem-for-linux-wsl-e83533a10a18).
 
 2. Open _Start → Ubuntu_ to launch linux Terminal. Proceed with Installation on Linux below.
 
