@@ -2,32 +2,36 @@
 OS:=$(shell uname)
 CXX=g++
 ifeq ($(OS),Darwin)
-  CXX=clang++
+	CXX=clang++
 endif
 
-# Path for linking dynamic libraries
-# macOS system integrity protection blocks access to $(DYLD_LIBRARY_PATH)
-# https://github.com/nteract/nteract/issues/1523#issuecomment-284027093
-DYNAMIC_LIBRARY_PATH = $(ROOTSYS)/lib
+# Variables for compiling and linking
+CXXFLAGS=`root-config --cflags` -fPIC
+LDFLAGS=`root-config --ldflags`
+LIBS=`root-config --glibs` -lRooFit -lRooFitCore -lHtml -lMinuit -lFumili
+INCDIR=`root-config --incdir`
 
 # Define variables for directories
 SRC_DIR=src
 OBJ_DIR=build
 BIN_DIR=dist
 
-# Replace with your application name
+# Set the name of your executable
 APP_NAME=sw-calculator
 
-DICT_NAME=$(APP_NAME)-dictionary
-DICT_FILENAME=$(DICT_NAME).cxx             # app-dictionary.cxx
-DICT_PCM_FILENAME=$(DICT_NAME)_rdict.pcm   # app-dictionary_rdict.pcm
+# Set variables with dictionary .cxx and .pcm filenames 
+DICT_CXX_FILENAME=$(APP_NAME)-dictionary.cxx        # app-dictionary.cxx
+DICT_PCM_FILENAME=$(APP_NAME)-dictionary_rdict.pcm  # app-dictionary_rdict.pcm
 
-# Compiler flags, library search paths and ROOT shared libraries names
-CXXFLAGS=`root-config --cflags` -fPIC
-LDFLAGS=`root-config --ldflags`
-GLIBS=`root-config --glibs` -lRooFit -lRooFitCore -lHtml -lMinuit -lFumili
+# Shared library and its debug symbols filenames
+SHARED_LIBRARY=$(APP_NAME)-library.so               # app-library.so
+SHARED_LIBRARY_DS=$(APP_NAME)-library.so.dSYM       # app-library.so.dSYM
 
-# Build lists of header, source and object files
+# Binary executable file names with path
+EXECUTABLE=$(BIN_DIR)/$(APP_NAME)                   # dist/app
+EXECUTABLE_LOCAL=$(BIN_DIR)/$(APP_NAME)-local       # dist/app-local
+
+# Define list of header files (.h), source files (.cpp) and object files (.o)
 H_EXT = h
 HEADERS = $(shell find $(SRC_DIR) -type f -name *.$(H_EXT))
 HEADERS := $(filter-out $(SRC_DIR)/LinkDef.h,$(HEADERS))
@@ -38,63 +42,46 @@ SOURCES = $(shell find $(SRC_DIR) -type f -name *.$(SRC_EXT))
 OBJECTS_TEMP = $(SOURCES:.cpp=.o)
 OBJECTS = $(patsubst $(SRC_DIR)/%,$(OBJ_DIR)/%,$(OBJECTS_TEMP))
 
-# Executable and shared library files path and name
-EXECUTABLE=$(BIN_DIR)/$(APP_NAME)
-EXECUTABLE_LOCAL=$(BIN_DIR)/$(APP_NAME)-local
-SHARED_LIBRARY=$(APP_NAME)-library.so           # app-library.so
-SHARED_LIBRARY_DS=$(APP_NAME)-library.so.dSYM   # .so debug symbols (generated on macOS)
-
-# convenience variable for making directories
+# Convenience variable for creating new directories
 dir_guard=@mkdir -p $(@D)
 
-# for 'install' target PREFIX is environment variable, but if it is not set, then set default value
+# Path for installing the shared library and dictionary .pcm
+# Tip: macOS system integrity protection blocks access to $(DYLD_LIBRARY_PATH)
+#      so instead we use $(ROOTSYS)/lib
+# https://github.com/nteract/nteract/issues/1523#issuecomment-284027093
+DYNAMIC_LIBRARY_PATH = $(ROOTSYS)/lib
+
+# Path for installing the executable binary 
 # https://stackoverflow.com/questions/39892692/how-to-implement-make-install-in-a-makefile
 ifeq ($(PREFIX),)
-    PREFIX := /usr/local
+	PREFIX := /usr/local
 endif
 
-# Empty target ensures that list of all 'end products' are called
+# Default target builds production executable
 all: production
 
 # Add -O3 optimization level for the production release
 production: CXXFLAGS+=-O3
-production: directories $(DICT_FILENAME) $(SHARED_LIBRARY) $(OBJECTS) $(EXECUTABLE) move_files
+production: directories $(DICT_CXX_FILENAME) $(SHARED_LIBRARY) $(OBJECTS) $(EXECUTABLE) move_files
 
-# Add -O3 optimization level for the release
+# Add -O3 optimization level for the test release
 release: CXXFLAGS+=-O3
-release: directories $(DICT_FILENAME) $(SHARED_LIBRARY) $(OBJECTS) $(EXECUTABLE_LOCAL) move_files
+release: directories $(DICT_CXX_FILENAME) $(SHARED_LIBRARY) $(OBJECTS) $(EXECUTABLE_LOCAL) move_files
 
 # Also might add flags for debug optimizations: -Og -ggdb -DDEBUG
 debug: CXXFLAGS+=-g
-debug: directories $(DICT_FILENAME) $(SHARED_LIBRARY) $(OBJECTS) $(EXECUTABLE_LOCAL) move_files move_debug_symbols
+debug: directories $(DICT_CXX_FILENAME) $(SHARED_LIBRARY) $(OBJECTS) $(EXECUTABLE_LOCAL) move_files move_debug_symbols
 
-# Link executable for release
-$(EXECUTABLE): $(OBJECTS) $(SHARED_LIBRARY)
-	@echo "Linking "$@
-	$(CXX) -o $@ $(OBJECTS) $(SHARED_LIBRARY) $(GLIBS)
+# Target for dictionary generation (creates .cxx and .pcm)
+$(DICT_CXX_FILENAME): $(HEADERS) $(SRC_DIR)/LinkDef.h
+	rootcling -f $@ $^
 
-# Link executable for debug. 
-# We don't install .so to DYLD path. Instead we keep it relative to the executable
-# And assign relative .so search path (./) to the executable 
-$(EXECUTABLE_LOCAL):
-ifeq ($(OS),Darwin)
-	# for macOS just link against the shared library
-	$(CXX) -o $@ $(OBJECTS) $(SHARED_LIBRARY) $(GLIBS)
-	# then change search location of the .so library in the executable - set as same directory (macOS only)
-	install_name_tool -change $(SHARED_LIBRARY) @executable_path/$(SHARED_LIBRARY) $(EXECUTABLE_LOCAL)
-else
-	# for Linux add runtime shared library search path ./ relative to the executable (gcc only)
-	# https://stackoverflow.com/questions/38058041/correct-usage-of-rpath-relative-vs-absolute
-	$(CXX) -o $@ $(OBJECTS) $(SHARED_LIBRARY) $(GLIBS) -Wl,-rpath,'$$ORIGIN'
-endif
-	
-$(DICT_FILENAME): $(HEADERS) $(SRC_DIR)/LinkDef.h
-	rootcling -f $@ -c $(CXXFLAGS) -p $^
+# Target for compiling the shared library
+# Official ROOT docs are missing $(LIBS) parameter https://root.cern.ch/interacting-shared-libraries-rootcling
+$(SHARED_LIBRARY): $(DICT_CXX_FILENAME) $(SOURCES)
+	$(CXX) -shared -o $@ $(LDFLAGS) $(CXXFLAGS) -I$(INCDIR) $^
 
-# https://root.cern.ch/interacting-shared-libraries-rootcling (they forgot $(GLIBS) damn)
-$(SHARED_LIBRARY): $(DICT_FILENAME) $(SOURCES)
-	$(CXX) -shared -o $@ $(LDFLAGS) $(CXXFLAGS) $(GLIBS) $^
-
+# Target for compiling the object files
 $(OBJ_DIR)/%.o: $(SRC_DIR)/%.cpp
 	$(dir_guard)
 	@echo "Compiling "$@
@@ -103,49 +90,72 @@ $(OBJ_DIR)/%.o: $(SRC_DIR)/%.cpp
 # compile with debug symbols
 #	$(CXX) $(CXXFLAGS) -c -g $< -o $@
 # just compile
-	$(CXX) $(CXXFLAGS) -c $< -o $@
+	$(CXX) -c $(CXXFLAGS) $< -o $@
 
-clean:
-	rm -f -r $(OBJ_DIR)
-	rm -f -r $(BIN_DIR)
-	rm -f $(DICT_FILENAME)
-	rm -f $(DICT_PCM_FILENAME)
-	rm -f $(SHARED_LIBRARY)
-	rm -f -r $(SHARED_LIBRARY_DS)
+# Target for linking the production executable
+$(EXECUTABLE): $(OBJECTS) $(SHARED_LIBRARY)
+	@echo "Linking "$@
+	$(CXX) -o $@ $(OBJECTS) $(SHARED_LIBRARY) $(LIBS)
 
-directories:
-	mkdir -p $(OBJ_DIR)
-	mkdir -p $(BIN_DIR)
+# Target for linking the test release and development executable 
+# We assign relative .so search path (./) to the executable 
+$(EXECUTABLE_LOCAL):
+ifeq ($(OS),Darwin)
+	# for macOS just link against the shared library
+	$(CXX) -o $@ $(OBJECTS) $(SHARED_LIBRARY) $(LIBS)
+	# then change search location of the .so library in the executable - set as same directory
+	install_name_tool -change $(SHARED_LIBRARY) @executable_path/$(SHARED_LIBRARY) $(EXECUTABLE_LOCAL)
+else
+	# for Linux add runtime shared library search path ./ relative to the executable
+	# https://stackoverflow.com/questions/38058041/correct-usage-of-rpath-relative-vs-absolute
+	$(CXX) -o $@ $(OBJECTS) $(SHARED_LIBRARY) $(LIBS) -Wl,-rpath,'$$ORIGIN'
+endif
 
-echo:
-	$(info SOURCES: $(SOURCES))
-	$(info HEADERS: $(HEADERS))
-
+# Target moves .so and .pcm files to ./dist
 move_files:
-	# move .so library to /dist folder
+	# move .so library to ./dist folder
 	mv $(SHARED_LIBRARY) $(BIN_DIR)/$(SHARED_LIBRARY)
-
-	# move dictionary .pcm to /dist folder, remove dictionary .cxx
+	# move dictionary .pcm to ./dist folder, remove dictionary .cxx
 	mv $(DICT_PCM_FILENAME) $(BIN_DIR)/$(DICT_PCM_FILENAME)
-	rm $(DICT_FILENAME)
-	# copy icon
-	# cp resources/$(APP_NAME).xpm $(BIN_DIR)/$(APP_NAME).xpm
+	# remove dictionary .cxx code (don't need it anymore)
+	rm $(DICT_CXX_FILENAME)
 	
+# Target moves .so.dSYM debug symbols to /dist folder
 move_debug_symbols:
 ifeq ($(OS),Darwin)
-	# move .so.dSYM debub symbols to /dist folder
 	mv $(SHARED_LIBRARY_DS) $(BIN_DIR)/$(SHARED_LIBRARY_DS)
 endif
 
+# Target installs the executable and moves shared library to $ROOTSYS/lib
 install:
 	# run 'make install' or 'sudo -E make install' to preserve user environment 
 	sudo install -m 755 $(EXECUTABLE) $(DESTDIR)$(PREFIX)/bin/
 	sudo install -m 755 $(BIN_DIR)/$(SHARED_LIBRARY) $(DYNAMIC_LIBRARY_PATH)/
 	sudo install -m 755 $(BIN_DIR)/$(DICT_PCM_FILENAME) $(DYNAMIC_LIBRARY_PATH)/
 
+# Target to copy the application icon and create the launcher on Linux
 install-linux-launcher:
 	xdg-icon-resource install --context apps --size 128 ./resources/tlist-processor.png tlist-processor
 	xdg-desktop-menu install ./resources/tlist-processor.desktop
+
+# Target that cleand the buld
+clean:
+	rm -f -r $(OBJ_DIR)
+	rm -f -r $(BIN_DIR)
+	rm -f $(DICT_CXX_FILENAME)
+	rm -f $(DICT_PCM_FILENAME)
+	rm -f $(SHARED_LIBRARY)
+	rm -f -r $(SHARED_LIBRARY_DS)
+
+# Target for creating the ./build and ./dist directories 
+directories:
+	mkdir -p $(OBJ_DIR)
+	mkdir -p $(BIN_DIR)
+
+# Target for test output
+echo:
+	$(info SOURCES: $(SOURCES))
+	$(info HEADERS: $(HEADERS))
 
 # List of special targets that do not generate files
 .PHONY: clean directories move_files move_debug_symbols echo
