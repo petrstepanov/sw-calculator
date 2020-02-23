@@ -79,7 +79,8 @@ $(DICT_CXX_FILENAME): $(HEADERS) $(SRC_DIR)/LinkDef.h
 # Target for compiling the shared library
 # Official ROOT docs are missing $(LIBS) parameter https://root.cern.ch/interacting-shared-libraries-rootcling
 $(SHARED_LIBRARY): $(DICT_CXX_FILENAME) $(SOURCES)
-	$(CXX) -shared -o $@ $(LDFLAGS) $(CXXFLAGS) -I$(INCDIR) $^
+	$(CXX) -shared -o $@ $(LDFLAGS) $(CXXFLAGS) $(LIBS) $^
+	# $(CXX) -shared -o $@ $(LDFLAGS) $(CXXFLAGS) -I$(INCDIR) $^
 
 # Target for compiling the object files
 $(OBJ_DIR)/%.o: $(SRC_DIR)/%.cpp
