@@ -136,8 +136,8 @@ install:
 
 # Target to copy the application icon and create the launcher on Linux
 install-linux-launcher:
-	xdg-icon-resource install --context apps --size 128 ./resources/tlist-processor.png tlist-processor
-	xdg-desktop-menu install ./resources/tlist-processor.desktop
+	xdg-icon-resource install --context apps --size 128 ./resources/$(APP_NAME).png $(APP_NAME)
+	xdg-desktop-menu install ./resources/$(APP_NAME).desktop
 
 # Target that cleand the buld
 clean:

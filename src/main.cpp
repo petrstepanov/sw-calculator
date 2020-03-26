@@ -4,7 +4,6 @@
 #include "widgets/swCalculatorWidget/SWCalculatorView.h"
 #include "widgets/MyMainFrame.h"
 #include "model/Constants.h"
-#include "model/Model.h"
 
 int main(int argc, char **argv) {
     TApplication* app = new TApplication(Constants::applicationName, &argc, argv);
