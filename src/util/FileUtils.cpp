@@ -24,8 +24,9 @@
 #include "../model/Constants.h"
 #include "../util/StringUtils.h"
 #include "RootHelper.h"
-#include "TMath.h"
-#include "TMatrixD.h"
+#include <TMath.h>
+#include <TMatrixD.h>
+#include <TObjString.h>
 
 FileUtils::FileUtils(){};
 
@@ -121,10 +122,9 @@ TH1F* FileUtils::importTH1(const char* path, int eColumn, int cColumn){
 
 	// Make Histogram
 	Int_t id = (new TDatime())->Get();
-	const char* name = TString::Format("hist%d", id).Data();
 	TString* pathString = new TString(path);
-	const char* title = StringUtils::stripFileName(pathString)->Data();
-	TH1F* hist = new TH1F(name, title, bins, energyMin - binWidth / 2, energyMax + binWidth / 2);
+	TString* title = StringUtils::stripFileName(pathString);
+	TH1F* hist = new TH1F(TString::Format("hist%d", id), title->Data(), bins, energyMin - binWidth / 2, energyMax + binWidth / 2);
 	// TH1I (const char *name, const char *title, Int_t nbinsx, Double_t xlow, Double_t xup)
 	// bin = 0;       underflow bin
 	// bin = 1;       first bin with low-edge xlow INCLUDED
@@ -184,7 +184,8 @@ void FileUtils::savePlotsToFile(RooPlot* spectrumPlot, RooPlot* residualsPlot, c
 
 	for (Int_t i=0; i<columnNames->GetSize(); i++){
 		TObject* object = columnNames->At(i);
-		if (TObjString* str = dynamic_cast<TObjString*>(object)){
+		if (object->InheritsFrom(TObjString::Class())){
+			TObjString* str = (TObjString*)object;
 			outputFile << (str->String()).Data();
 		}
 		if (i != columnNames->GetSize()-1){

@@ -1,3 +1,5 @@
+# Manulally written GNU Makefile for CERN ROOT program compilation
+
 # Select compiler command depending on environment
 OS:=$(shell uname)
 CXX=g++

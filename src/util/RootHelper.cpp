@@ -24,6 +24,7 @@
 #include <TMatrixDUtils.h>
 #include <TString.h>
 #include <TList.h>
+#include <TObjString.h>
 
 #include <RooHist.h>
 #include <RooPlot.h>
@@ -159,7 +160,8 @@ std::pair<TMatrixD,TList*> RootHelper::rooPlotToMatrix(RooRealVar* axis, RooPlot
 	TList* columnNames = new TList();
 
 	// Fill first column with channel center bin coordinates
-	columnNames->Add(new TObjString("channel"));
+	TObjString* channelObjString = new TObjString("channel");
+	columnNames->Add(channelObjString);
 	TMatrixDColumn column(matrix, currentColumn); // get first column
 	for (int i = 0; i < numberOfRows; i++){
 		column(i) = (Double_t)binning->binCenter(i);
@@ -171,9 +173,11 @@ std::pair<TMatrixD,TList*> RootHelper::rooPlotToMatrix(RooRealVar* axis, RooPlot
 		TObject* object = plot->getObject(p);
 		if (RooHist* hist = dynamic_cast<RooHist*>(object)){
 			TString columnValueName = TString::Format("%s_value", hist->GetName());
-			columnNames->Add(new TObjString(columnValueName.Data()));
+			TObjString* columnValueObjString = new TObjString(columnValueName.Data());
+			columnNames->Add(columnValueObjString);
 			TString columnErrorName = TString::Format("%s_error", hist->GetName());
-			columnNames->Add(new TObjString(columnErrorName.Data()));
+			TObjString* columnErrorObjString = new TObjString(columnErrorName.Data());
+			columnNames->Add(columnErrorObjString);
 			TMatrixDColumn columnValue(matrix, currentColumn);
 			TMatrixDColumn columnError(matrix, currentColumn+1);
 			for (int i = 0; i < numberOfRows; i++){

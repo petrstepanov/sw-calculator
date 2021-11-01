@@ -42,6 +42,7 @@
 #include <TMath.h>
 #include <TLegend.h>
 #include <iostream>
+#include <TLine.h>
 
 SWCalculatorPresenter::SWCalculatorPresenter(SWCalculatorView* view) : AbstractPresenter<Model, SWCalculatorView>(view) {
 	model = instantinateModel();
