@@ -26,6 +26,10 @@ class ImportSourceSpectrumPresenter : public AbstractImportSpectrumPresenter {
         
         void setModelFileName(TString* fileName);        
         void setModelHist(TH1F* hist);
+
+        // TODO: need or not?
+        // void onRangeSliderChange(Int_t minBin, Int_t maxBin);
+
 };
 
 #endif /* IMPORTSOURCESPECTRUMPRESENTER_H */

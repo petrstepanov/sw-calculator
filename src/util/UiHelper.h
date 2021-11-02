@@ -15,6 +15,7 @@
 #define UIHELPER_H
 
 #include <TGFrame.h>
+#include <TGMsgBox.h>
 #include <TGFileDialog.h>
 #include <TGLabel.h>
 #include <TGWindow.h>
@@ -26,7 +27,7 @@ public:
     static void setLabelColor(TGLabel* label, const char* color);
     static TGCompositeFrame* getParentFrame(TGFrame* frame);
     static Int_t getUId();
-    int showOkDialog(const char* message);
+    int showOkDialog(const char* message = "Lorem Ipsum", EMsgBoxIcon icon = EMsgBoxIcon::kMBIconAsterisk);
     TGFileInfo* getFileFromDialog();
     void setMainFrame(TGWindow* window);
     TGWindow* getMainFrame();

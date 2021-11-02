@@ -41,11 +41,90 @@ FileUtils* FileUtils::getInstance(){
 	return instance;
 }
 
-TH1F* FileUtils::importTH1(const char* path, int eColumn, int cColumn){
-	std::ifstream ifs;
-	std::string str;
+InputFileType FileUtils::detectFileType(const char* path){
+	std::ifstream myfile (path);
+	std::string line = "";
 
-	ifs.open(path, std::ifstream::in);
+	std::getline(myfile, line);
+	myfile.close();
+
+	// Currently three file types are suported
+	if (line.find("$SPEC_ID") != std::string::npos){
+		return InputFileType::Maestro;
+	}
+	if (line.find("Start ") != std::string::npos) {
+		return InputFileType::CanberraSingle;
+	}
+	if (line.find(", Count") != std::string::npos) {
+		return InputFileType::CanberraCoincidence;
+	}
+	return InputFileType::Undefined;
+}
+
+TH1F* FileUtils::importTH1(const char* path){
+	// Determine file type
+	InputFileType fileType = detectFileType(path);
+
+	switch(fileType) {
+		case InputFileType::Maestro:
+			return importTH1Maestro(path);
+			break;
+		case InputFileType::CanberraSingle:
+			return importTH1Canberra(path, 2, 3);
+			break;
+		case InputFileType::CanberraCoincidence:
+			return importTH1Canberra(path, 1, 2);
+			break;
+	    }
+	return NULL;
+}
+
+TH1F* FileUtils::importTH1Maestro(const char* path){
+	std::ifstream myfile (path);
+	std::string line = "";
+
+	// Skip first 8 lines
+	for (int i=1; i<=8; i++){
+		std::getline(myfile, line);
+	}
+
+	// Line #9 contains numbers: A, B, ...
+	// Formula for the energy is: E = N*B + A, where N is channel number (line number)
+	Double_t A = 0, B = 0;
+	myfile >> A;
+	myfile >> B;
+
+	// Skip next line
+	std::getline(myfile, line);
+	std::getline(myfile, line);
+
+	// Next line contains number of channels (preceeded by zero => read 2 times)
+	Int_t nChannels;
+	myfile >> nChannels; myfile >> nChannels;
+
+	// Obtain minimum and maximum energy number from file
+	Double_t energyMin = 1*B + A;
+	Double_t energyMax = nChannels*B + A;
+	Double_t binWidth = (energyMax - energyMin)/(nChannels-1);
+
+	Int_t id = (new TDatime())->Get();
+	TString* pathString = new TString(path);
+	TString* title = StringUtils::stripFileName(pathString);
+	TH1F* hist = new TH1F(TString::Format("hist%d", id), title->Data(), nChannels, energyMin - binWidth / 2, energyMax + binWidth / 2);
+
+	for (int channel = 1; channel <= nChannels; channel++){
+		int count = 0;
+		myfile >> count;
+		hist->SetBinContent(channel, count);
+	}
+	myfile.close();
+
+	return hist;
+}
+
+TH1F* FileUtils::importTH1Canberra(const char* path, int eColumn, int cColumn){
+	std::ifstream ifs (path);
+	std::string str;
 
 	if (!ifs.is_open()){
 		std::cout << "importTH1: file \"" << path << "\" not found." << std::endl;

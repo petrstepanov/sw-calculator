@@ -14,6 +14,7 @@
 #include "ImportSourceSpectrumView.h"
 #include "../../util/GraphicsHelper.h"
 
+ClassImp(ImportSourceSpectrumView);
 
 ImportSourceSpectrumView::ImportSourceSpectrumView(const TGWindow *w) : AbstractImportSpectrumView(w){
     presenter = instantinatePresenter();

@@ -34,11 +34,17 @@ public:
     
     // View functions
     void onOpenFileClicked();
-    void onImportSpectrumClicked();
+
+    // TODO: implement in all inherited classes
+    void onRangeSliderChange(Int_t minBin, Int_t maxBin);
+    // void onImportSpectrumClicked();
     
     // Different implementations for importing Kapton spectrum and regular spectrum
     virtual void setModelFileName(TString* fileNamePath){};
     virtual void setModelHist(TH1F* hist){};
+
+private:
+    TH1F* currentHist;
 };
 
 #endif /* ABSTRACTIMPORTSPECTRUMPRESENTER_H */

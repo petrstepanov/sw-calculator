@@ -24,6 +24,7 @@
 #include <TCanvas.h>
 #include <TRootEmbeddedCanvas.h>
 #include <iostream>
+#include <TGDoubleSlider.h>
 //#include "AbstractImportSpectrumPresenter.h"
 
 // Omit circular dependency
@@ -36,10 +37,14 @@ class AbstractImportSpectrumView : public AbstractView<AbstractImportSpectrumPre
     TGTextButton* btnOpenFile;
     TGLabel* lblFileName;
     TGTextView* txtFileBrowser;
-    TGNumberEntry* numEnergyColumn;
-    TGNumberEntry* numCountsColumn;
-    TGTextButton* btnImportSpectrum;
+//    TGNumberEntry* numEnergyColumn;
+//    TGNumberEntry* numCountsColumn;
+//     TGTextButton* btnImportSpectrum;
     TCanvas* canvasHist;
+    TGDoubleHSlider* rangeSlider;
+
+    // Hack temporary
+    TGTextButton* btnSetRange;
 
   public:
     AbstractImportSpectrumView(const TGWindow *w);
@@ -49,7 +54,7 @@ class AbstractImportSpectrumView : public AbstractView<AbstractImportSpectrumPre
     // Override base class virtual functions
     void initUI();
 
-    AbstractImportSpectrumPresenter* instantinatePresenter();
+    AbstractImportSpectrumPresenter* instantinatePresenter() override;
 
     // Calls from Presenter
     void loadFile(TString* fileNamePath);
@@ -57,12 +62,16 @@ class AbstractImportSpectrumView : public AbstractView<AbstractImportSpectrumPre
     Int_t getEnergyColumnNumber();
     Int_t getCountsColumnNumber();
     void drawHistogram(TH1F* hist);
+    void initRangeSlider(Int_t min, Int_t max);
+    void onRangeSliderChange();
+    void onSetRangeClicked();
+
     // Calls to Presenter
     void onOpenFileClicked();
     void onImportSpectrumClicked();
     virtual Int_t getHistogramColor();
 
-    // ClassDef(AbstractImportSpectrumView,0);  
+ClassDefOverride(AbstractImportSpectrumView, 0)
 };
 
 #endif /* ABSTRACTIMPORTSPECTRUMVIEW_H */

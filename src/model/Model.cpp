@@ -72,6 +72,11 @@ TString* Model::getSourceFileName(){
 
 void Model::setHist(TH1F* hist){
 	// Save original histogram to Model
+	// Delete old hist
+//	if (fitProperties.hist != NULL){
+//		delete fitProperties.hist;
+//	}
+
     fitProperties.hist = hist;
     parametersPool = new ParametersPool();
     histogramImported(hist);

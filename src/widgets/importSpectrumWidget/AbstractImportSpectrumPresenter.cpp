@@ -28,22 +28,56 @@ void AbstractImportSpectrumPresenter::onOpenFileClicked(){
     this->setModelFileName(fileNamePath);
     // Update View to reflect 
     view->loadFile(fileNamePath);
+    
+    // Import histogram
+    TString* fileName = view->getFileName();
+	FileUtils* fileUtils = FileUtils::getInstance();
+	TH1F* hist = fileUtils->importTH1(fileName->Data());
+	if (!hist){
+		UiHelper* ui = UiHelper::getInstance();
+		ui->showOkDialog("File type is not supported.", EMsgBoxIcon::kMBIconStop);
+		return;
+	}
+
+	hist->Print("V");
+
+	// Save histogram that goes to Model (bad manners but easy...)
+	currentHist = hist;
+
+	// Update Model
+	// Corresponding overridden method setModelHist() will be called
+	setModelHist(hist);
+
+	view->initRangeSlider(1, hist->GetXaxis()->GetNbins());
+
+	// Update View
+	view->drawHistogram(hist);
 }
 
-void AbstractImportSpectrumPresenter::onImportSpectrumClicked(){
-    // Import Histogram
-    Int_t energyColumn = view->getEnergyColumnNumber();
-    Int_t countsColumn = view->getCountsColumnNumber();
-    TString* fileName = view->getFileName();
-    FileUtils* fileUtils = FileUtils::getInstance();
-    TH1F* hist = fileUtils->importTH1(fileName->Data(), energyColumn, countsColumn);
-    if (!hist){
-        return;
-    }
-    
-    // Update Model
-    setModelHist(hist);
-    
-    // Update View
-    view->drawHistogram(hist);
+void AbstractImportSpectrumPresenter::onRangeSliderChange(Int_t minBin, Int_t maxBin){
+	// Set Range directly in bins, not doubles
+	// Because slider is set up in bins
+	currentHist->GetXaxis()->SetRange(minBin, maxBin);
+	view->drawHistogram(currentHist);
+	std::cout << minBin << " " << maxBin << std::endl;
+
+	setModelHist(currentHist);
 }
+
+//void AbstractImportSpectrumPresenter::onImportSpectrumClicked(){
+//    // Import Histogram
+//    Int_t energyColumn = view->getEnergyColumnNumber();
+//    Int_t countsColumn = view->getCountsColumnNumber();
+//    TString* fileName = view->getFileName();
+//    FileUtils* fileUtils = FileUtils::getInstance();
+//    TH1F* hist = fileUtils->importTH1(fileName->Data(), energyColumn, countsColumn);
+//    if (!hist){
+//        return;
+//    }
+//
+//    // Update Model
+//    setModelHist(hist);
+//
+//    // Update View
+//    view->drawHistogram(hist);
+//}

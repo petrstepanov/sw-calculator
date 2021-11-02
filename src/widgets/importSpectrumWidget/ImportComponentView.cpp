@@ -14,6 +14,8 @@
 #include "ImportComponentView.h"
 #include "../../util/GraphicsHelper.h"
 
+ClassImp(ImportComponentView);
+
 ImportComponentView::ImportComponentView(const TGWindow *w) : AbstractImportSpectrumView(w){
     presenter = instantinatePresenter();
 }

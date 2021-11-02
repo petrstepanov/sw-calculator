@@ -12,7 +12,6 @@
  */
 
 #include "UiHelper.h"
-#include <TGMsgBox.h>
 #include <TGFileDialog.h>
 #include "../model/Constants.h"
 #include <iostream>
@@ -38,9 +37,9 @@ TGFileInfo* UiHelper::getFileFromDialog(){
     return fileInfo;
 }
 
-int UiHelper::showOkDialog(const char* message){
+int UiHelper::showOkDialog(const char* message, EMsgBoxIcon icon){
     int retval;
-    new TGMsgBox(gClient->GetRoot(), mainFrame ? mainFrame : gClient->GetRoot(), Constants::applicationName, message, kMBIconAsterisk, kMBOk, &retval);
+    new TGMsgBox(gClient->GetRoot(), mainFrame ? mainFrame : gClient->GetRoot(), Constants::applicationName, message, icon, kMBOk, &retval);
     return retval;
 }
 

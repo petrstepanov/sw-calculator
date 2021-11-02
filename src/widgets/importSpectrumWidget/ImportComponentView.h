@@ -22,9 +22,11 @@ class ImportComponentView : public AbstractImportSpectrumView {
 public:
     ImportComponentView(const TGWindow *p = 0);
 
-    AbstractImportSpectrumPresenter* instantinatePresenter();
+    AbstractImportSpectrumPresenter* instantinatePresenter() override;
     
-    Int_t getHistogramColor();
+    Int_t getHistogramColor() override;
+
+ClassDefOverride(ImportComponentView, 0)
 };
 
 #endif /* IMPORTSPECTRUMVIEW_H */
