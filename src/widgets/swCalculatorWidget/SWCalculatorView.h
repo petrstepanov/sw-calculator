@@ -30,17 +30,24 @@
 #include <RooCurve.h>
 #include <RooFitResult.h>
 #include <RooPlot.h>
+#include <THStack.h>
 #include "../../model/Model.h"
 #include <TGDoubleSlider.h>
 #include <TGTextEntry.h>
 #include <TGDoubleSlider.h>
 #include <TGTextBuffer.h>
+#include <TRootEmbeddedCanvas.h>
 #include "../AbstractView.h"
 #include "SWCalculatorPresenter.h"
 #include "../rooRealVarWidget/RooRealVarView.h"
 #include "../../util/HistProcessor.h"
 
 class SWCalculatorPresenter;
+
+enum class CanvasMode {
+	onePad,
+	twoPads
+};
 
 class SWCalculatorView : public AbstractView<SWCalculatorPresenter> {
   protected:
@@ -95,10 +102,11 @@ class SWCalculatorView : public AbstractView<SWCalculatorPresenter> {
     // Plot and display params
      TGTextButton* btnSaveData;
     TGTextButton* btnSaveImage;
-    TCanvas* canvasPlot;
     TGDoubleHSlider* zoomSlider;
     TGNumberEntry* displayMin;
     TGNumberEntry* displayMax;
+
+    // Histogram stack for displaying original histogram and source contributiuon
 //    TGTextBuffer* tbMin;
 //    TGTextBuffer* tbMax;
 
@@ -109,17 +117,22 @@ class SWCalculatorView : public AbstractView<SWCalculatorPresenter> {
 //    TGTextButton*  btnResetZoom;
     RooPlot* fitFrame;
     RooPlot* chiFrame;
-    TPad* padData;
-    TPad* padChi2;
+
+    CanvasMode currentCanvasMode;
+
+    TRootEmbeddedCanvas *embedCanvas;
 
     // Calls from Presenter
     void setTabEnabled(Int_t, Bool_t);
     void setToolbarEnabled(Bool_t isEnabled);
 
-    void setFitRange(Double_t min, Double_t max);
-    void setFitRangeLimits(Double_t min, Double_t max);
+    void setFitRange(Double_t minBin, Double_t maxBin, Double_t min, Double_t max);
+    void setFitRangeLimits(Double_t minBin, Double_t maxBin);
     void reflectTwoDetector(Bool_t isTwoDetector);
     void setComponentHistogram(TH1F* hist);
+
+    void setCanvasMode(CanvasMode mode);
+    void setCanvasText(const char* text);
 
     void setConvolutionType(ConvolutionType t);
 
@@ -128,7 +141,6 @@ class SWCalculatorView : public AbstractView<SWCalculatorPresenter> {
     void displayVariables(RooArgList* variables);
     void displayChi2(Chi2Struct chi2Struct);
     void displaySW(RooRealVar* s, RooRealVar* w);
-    void updateCanvas();
     void setDisplayLimits(Float_t min, Float_t max);
     TCanvas* getCanvas();
     void clearFitResults();
@@ -143,6 +155,8 @@ class SWCalculatorView : public AbstractView<SWCalculatorPresenter> {
     void onDisplayMaxChange(char*);
     void onSliderChange();
     void updateCanvasLimits(Double_t min, Double_t max);
+
+    void drawHistograms(TH1* hist, TH1* sourceHist);
 
     ClassDef(SWCalculatorView,0);
 };

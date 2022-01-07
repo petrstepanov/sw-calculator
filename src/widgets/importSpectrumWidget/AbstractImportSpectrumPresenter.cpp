@@ -48,36 +48,24 @@ void AbstractImportSpectrumPresenter::onOpenFileClicked(){
 	// Corresponding overridden method setModelHist() will be called
 	setModelHist(hist);
 
-	view->initRangeSlider(1, hist->GetXaxis()->GetNbins());
-
 	// Update View
 	view->drawHistogram(hist);
 }
 
-void AbstractImportSpectrumPresenter::onRangeSliderChange(Int_t minBin, Int_t maxBin){
-	// Set Range directly in bins, not doubles
-	// Because slider is set up in bins
-	currentHist->GetXaxis()->SetRange(minBin, maxBin);
-	view->drawHistogram(currentHist);
-	std::cout << minBin << " " << maxBin << std::endl;
+void AbstractImportSpectrumPresenter::onImportSpectrumClicked(){
+    // Import Histogram
+    // Int_t energyColumn = view->getEnergyColumnNumber();
+    // Int_t countsColumn = view->getCountsColumnNumber();
+    TString* fileName = view->getFileName();
+    FileUtils* fileUtils = FileUtils::getInstance();
+    TH1F* hist = fileUtils->importTH1(fileName->Data());
+    if (!hist){
+        return;
+    }
 
-	setModelHist(currentHist);
+    // Update Model
+    setModelHist(hist);
+
+    // Update View
+    view->drawHistogram(hist);
 }
-
-//void AbstractImportSpectrumPresenter::onImportSpectrumClicked(){
-//    // Import Histogram
-//    Int_t energyColumn = view->getEnergyColumnNumber();
-//    Int_t countsColumn = view->getCountsColumnNumber();
-//    TString* fileName = view->getFileName();
-//    FileUtils* fileUtils = FileUtils::getInstance();
-//    TH1F* hist = fileUtils->importTH1(fileName->Data(), energyColumn, countsColumn);
-//    if (!hist){
-//        return;
-//    }
-//
-//    // Update Model
-//    setModelHist(hist);
-//
-//    // Update View
-//    view->drawHistogram(hist);
-//}

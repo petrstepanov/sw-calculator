@@ -26,5 +26,5 @@ AbstractImportSpectrumPresenter* ImportSourceSpectrumView::instantinatePresenter
 };
 
 Int_t ImportSourceSpectrumView::getHistogramColor(){
-    return GraphicsHelper::colorWarning->GetNumber();
+    return GraphicsHelper::sourceHistColor;
 }

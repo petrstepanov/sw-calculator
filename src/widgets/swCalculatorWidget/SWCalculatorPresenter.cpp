@@ -58,7 +58,7 @@ void SWCalculatorPresenter::onInitModel() {
 	model->Connect("sourceHistogramImported(TH1F*)", "SWCalculatorPresenter", this, "onModelSourceHistogramImported(TH1F*)");
 	model->Connect("componentHistogramImported(TH1F*)", "SWCalculatorPresenter", this, "onModelComponentHistogramImported(TH1F*)");
 
-	model->Connect("fitRangeLimitsSet(DoublePair*)", "SWCalculatorPresenter", this, "onModelFitRangeLimitsSet(DoublePair*)");
+//	model->Connect("fitRangeLimitsSet(DoublePair*)", "SWCalculatorPresenter", this, "onModelFitRangeLimitsSet(DoublePair*)");
 	model->Connect("fitRangeSet(DoublePair*)", "SWCalculatorPresenter", this, "onModelFitRangeSet(DoublePair*)");
 
 	model->Connect("twoDetectorSet(Bool_t)", "SWCalculatorPresenter", this, "onModelTwoDetectorSet(Bool_t)");
@@ -69,11 +69,11 @@ void SWCalculatorPresenter::onInitModel() {
 	model->Connect("numberOfDampingExponentsSet(Int_t)", "SWCalculatorPresenter", this, "onModelNumberOfDampingExponentsSet(Int_t)");
 
 	// Restore view from model
- 	std::pair<Double_t, Double_t> fitRangeLimits = model->getFitRangeLimits();
-	view->setFitRangeLimits(fitRangeLimits.first, fitRangeLimits.second);
+ 	// std::pair<Double_t, Double_t> fitRangeLimits = model->getFitRange();
+	// view->setFitRangeLimits(fitRangeLimits.first, fitRangeLimits.second);
 
-	std::pair<Double_t, Double_t> fitRange = model->getFitRange();
-	view->setFitRange(fitRange.first, fitRange.second);
+	// std::pair<Double_t, Double_t> fitRange = model->getFitRange();
+	// view->setFitRange(fitRange.first, fitRange.second);
 
 	view->setConvolutionType(model->getConvolutionType());
 
@@ -109,6 +109,7 @@ void SWCalculatorPresenter::onViewEditParametersClicked() {
 }
 
 void SWCalculatorPresenter::onViewFitSpectrumClicked() {
+	view->setCanvasText("Fitting...");
 	// Testing purposes - let model generate data
 	// data = static_cast<RooAddPdf*>(model)->generateBinned(*x,1000000) ;
 
@@ -142,9 +143,10 @@ void SWCalculatorPresenter::onViewFitSpectrumClicked() {
 
 	// Chi2 fit
 	RootHelper::startTimer();  // Start tracking Time
-	RooChi2Var* chi2 = new RooChi2Var("chi2", "chi2", *(pdfProvider->getPdf()), *data, RooFit::NumCPU(RootHelper::getNumCpu()));
+	RooChi2Var* chi2 = new RooChi2Var("chi2", "chi2", *(pdfProvider->getPdf()), *data);
+	// RooChi2Var* chi2 = new RooChi2Var("chi2", "chi2", *(pdfProvider->getPdf()), *data, RooFit::NumCPU(RootHelper::getNumCpu()));
 	RooMinimizer* m = new RooMinimizer(*chi2);
-	m->setMinimizerType("Minuit2");
+	// m->setMinimizerType("Minuit2");
 
 	// Print Chi2 fit results
 	Int_t resultMigrad = m->migrad();
@@ -405,16 +407,22 @@ void SWCalculatorPresenter::onViewFitSpectrumClicked() {
 		spectrumPlot->addObject(paramsPaveText);
 	}
 
+	// Set two pads mode
+	view->setCanvasMode(CanvasMode::twoPads);
+
 	// Draw data plot on canvas
-	view->padData->cd();
+	view->embedCanvas->GetCanvas()->cd(1);
 	spectrumPlot->Draw();
 
 	// Draw data plot on canvas
-	view->padChi2->cd();
+	view->embedCanvas->GetCanvas()->cd(2);
 	residualsPlot->Draw();
 
 	// Update canvas
-	view->updateCanvas();
+	view->embedCanvas->GetCanvas()->cd(1)->Modified();
+	view->embedCanvas->GetCanvas()->cd(1)->Update();
+	view->embedCanvas->GetCanvas()->cd(2)->Modified();
+	view->embedCanvas->GetCanvas()->cd(2)->Update();
 
 	view->initRooPlots(spectrumPlot, residualsPlot);
 	view->setToolbarEnabled(kTRUE);
@@ -532,12 +540,35 @@ void SWCalculatorPresenter::onViewRemoveHistComponentClicked(){
 // Slots for Model Signals
 
 void SWCalculatorPresenter::onModelHistogramImported(TH1F* hist){
-	view->numFitSlider->SetScale(hist->GetNbinsX());
+	// TODO: wtf is this, also move this crap to the view?
+	view->numFitSlider->SetScale(3);
+
+	// Enable tabs
 	view->setTabEnabled(1, true);
 	view->setTabEnabled(2, true);
+
+	// Prepare canvas for range selection
+	view->setCanvasMode(CanvasMode::onePad);
+
+	// Draw histogram(s) on canvas (original and contribution from source if set)
+	TH1* sourceHist = model->getFitProperties().sourceHist;
+	view->drawHistograms(hist, sourceHist);
+
+	// Update slider
+	Int_t firstBin = hist->GetXaxis()->GetFirst();
+	Int_t lastBin = hist->GetXaxis()->GetLast();
+	view->setFitRangeLimits(firstBin, lastBin);
+
+	Double_t loEdge = hist->GetXaxis()->GetBinCenter(firstBin);
+	Double_t hiEdge = hist->GetXaxis()->GetBinCenter(lastBin);
+	view->setFitRange(firstBin, lastBin, loEdge, hiEdge);
 }
 
-void SWCalculatorPresenter::onModelSourceHistogramImported(TH1F* hist){
+void SWCalculatorPresenter::onModelSourceHistogramImported(TH1F* sourceHist){
+	// Draw histogram(s) on canvas (original and contribution from source if set)
+	TH1* hist = model->getFitProperties().hist;
+	view->drawHistograms(hist, sourceHist);
+
 	buildFittingModel();
 }
 
@@ -546,9 +577,9 @@ void SWCalculatorPresenter::onModelComponentHistogramImported(TH1F* hist){
 	buildFittingModel();
 }
 
-void SWCalculatorPresenter::onModelFitRangeLimitsSet(DoublePair* fitRangeLimits){
-	view->setFitRangeLimits(fitRangeLimits->first, fitRangeLimits->second);
-}
+//void SWCalculatorPresenter::onModelFitRangeLimitsSet(DoublePair* fitRangeLimits){
+//	view->setFitRangeLimits(fitRangeLimits->first, fitRangeLimits->second);
+//}
 
 void SWCalculatorPresenter::onModelConvolutionTypeSet(Int_t convolutionType){
 	view->setConvolutionType((ConvolutionType)convolutionType);
@@ -556,8 +587,12 @@ void SWCalculatorPresenter::onModelConvolutionTypeSet(Int_t convolutionType){
 }
 
 void SWCalculatorPresenter::onModelFitRangeSet(DoublePair* fitRange){
-	view->setFitRange(fitRange->first, fitRange->second);
-	buildFittingModel();
+	Double_t min = model->getFitProperties().hist->GetXaxis()->GetBinLowEdge(fitRange->first);
+	Double_t max = model->getFitProperties().hist->GetXaxis()->GetBinLowEdge(fitRange->second);
+
+	view->setCanvasMode(CanvasMode::onePad);
+	view->setFitRange(fitRange->first, fitRange->second, min, max);
+	// buildFittingModel();
 }
 
 void SWCalculatorPresenter::onModelTwoDetectorSet(Bool_t isTwoDetector){

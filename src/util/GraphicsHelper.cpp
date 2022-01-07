@@ -53,6 +53,9 @@ const Margin GraphicsHelper::padMargins = { 0.10, 0.02, 0.15, 0.05 }; // left, r
 const Int_t GraphicsHelper::colorSet[7] = { kViolet + 6, kSpring - 5, kAzure + 8,
 		kPink + 1, kGray + 1, kViolet - 4, kRed - 7 };
 
+Color_t GraphicsHelper::histColor = kAzure+6;
+Color_t GraphicsHelper::sourceHistColor = kRed-7;
+
 TColor* GraphicsHelper::colorPrimary = new TColor(0.232, 0.757, 0.832);
 TColor* GraphicsHelper::colorWarning = new TColor(0.832, 0.769, 0.232);
 TColor* GraphicsHelper::colorGray = new TColor(0.5, 0.5, 0.5);

@@ -31,8 +31,8 @@ enum ConvolutionType {
 
 // Struct of properties needed to build the fitting model
 struct FitProperties {
-	RooRealVar* fitMin;
-	RooRealVar* fitMax;
+	Int_t minFitBin;
+	Int_t maxFitBin;
 	Bool_t isTwoDetector;
 	ConvolutionType convolutionType;
     Bool_t hasParabola;
@@ -59,11 +59,11 @@ public:
     Bool_t isTwoDetector();
 
     // Fit properties
-    void setFitRangeLimits(Double_t fitMinLo, Double_t fitMinHi, Double_t fitMaxLo, Double_t fitMaxHi);
-    void setFitRangeLimits(Double_t fitMinLo, Double_t fitMaxHi);
-    std::pair<Double_t, Double_t> getFitRangeLimits();
+    // void setFitRangeLimits(Double_t fitMinLo, Double_t fitMinHi, Double_t fitMaxLo, Double_t fitMaxHi);
+//    void setFitRange(Int_t minBin, Int_t fitMaxHi);
+//    std::pair<Double_t, Double_t> getFitRangeLimits();
 
-    void setFitRange(Double_t min, Double_t max);
+    void setFitRange(Int_t min, Int_t max);
     std::pair<Double_t, Double_t> getFitRange();
 
     void setConvolutionType(ConvolutionType t);
@@ -97,7 +97,7 @@ public:
     void sourceHistogramImported(TH1F* hist); // *SIGNAL*
     void componentHistogramImported(TH1F* hist); // *SIGNAL*
     void twoDetectorSet(Bool_t isTwoDetector); // *SIGNAL*
-    void fitRangeLimitsSet(DoublePair* pair); // *SIGNAL*
+    // void fitRangeLimitsSet(DoublePair* pair); // *SIGNAL*
     void fitRangeSet(DoublePair* pair); // *SIGNAL*
     void convolutionTypeSet(Int_t convolutionType); // *SIGNAL*
     void hasParabolaSet(Bool_t b); // *SIGNAL*

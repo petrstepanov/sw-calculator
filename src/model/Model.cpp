@@ -39,8 +39,8 @@ Model::Model(){
 //	chiHist = nullptr;
 
     // Fitting model properties
-	fitProperties.fitMin = new RooRealVar("fitMin", "Fit energy minimum", -400, -500, 0, "keV");
-	fitProperties.fitMax = new RooRealVar("fitMax", "Fit energy maximum", 400, 0, 500, "keV");
+//	fitProperties.fitMin = 0;
+//	fitProperties.fitMax = 0;
 	fitProperties.isTwoDetector = kFALSE;
 	fitProperties.convolutionType = kNoConvolution;
 	fitProperties.hasParabola = kFALSE;
@@ -92,6 +92,7 @@ void Model::setComponentHist(TH1F* componentHist){
     componentHistogramImported(componentHist);
 }
 
+// TODO: reimplement calls to this function
 void Model::setTwoDetector(Bool_t isTwoDetector){
     fitProperties.isTwoDetector = isTwoDetector;
 }
@@ -100,44 +101,19 @@ Bool_t Model::isTwoDetector(){
     return fitProperties.isTwoDetector;
 }
 
-void Model::setFitRangeLimits(Double_t fitMinLo, Double_t fitMinHi, Double_t fitMaxLo, Double_t fitMaxHi){
-	// Set inner fit range limits
-    fitProperties.fitMin->setMax(fitMinHi);
-    fitProperties.fitMax->setMin(fitMaxLo);
+void Model::setFitRange(Int_t minBin, Int_t maxBin){
+	// Set histogram range in bins
+	fitProperties.hist->GetXaxis()->SetRange(minBin, maxBin);
 
-	// Set outer fit range limits
-    setFitRangeLimits(fitMinLo, fitMaxHi);
-}
-
-void Model::setFitRangeLimits(Double_t fitMinLo, Double_t fitMaxHi){
-	// Set fit range limits
-    fitProperties.fitMin->setMin(fitMinLo);
-    fitProperties.fitMax->setMax(fitMaxHi);
-
-    // Emit new fit range limits
-    DoublePair* limits = new DoublePair(fitProperties.fitMin->getMin(), fitProperties.fitMax->getMax());
-    fitRangeLimitsSet(limits);
-
-    // Fit maximum value could have changed (via RooRealVar logic)
-    DoublePair* fitRange = new DoublePair(fitProperties.fitMin->getVal(), fitProperties.fitMax->getVal());
-    fitRangeSet(fitRange);
-}
-
-std::pair<Double_t, Double_t> Model::getFitRangeLimits(){
-	return std::make_pair(fitProperties.fitMin->getMin(), fitProperties.fitMax->getMax());
-}
-
-void Model::setFitRange(Double_t fitMin, Double_t fitMax){
-    fitProperties.fitMin->setVal(fitMin);
-    fitProperties.fitMax->setVal(fitMax);
-
-    // Fit maximum value could have changed (via RooRealVar logic)
-    DoublePair* fitRange = new DoublePair(fitProperties.fitMin->getVal(), fitProperties.fitMax->getVal());
+    // Notfy the view about the fit range change
+	Int_t first = fitProperties.hist->GetXaxis()->GetFirst();
+	Int_t last = fitProperties.hist->GetXaxis()->GetLast();
+    DoublePair* fitRange = new DoublePair(first, last);
     fitRangeSet(fitRange);
 }
 
 std::pair<Double_t, Double_t> Model::getFitRange(){
-	return std::make_pair(fitProperties.fitMin->getVal(), fitProperties.fitMax->getVal());
+	return std::make_pair(fitProperties.hist->GetXaxis()->GetFirst(), fitProperties.hist->GetXaxis()->GetLast());
 }
 
 
@@ -202,9 +178,9 @@ void Model::fitRangeSet(DoublePair* pair){
 	Emit("fitRangeSet(DoublePair*)", pair);
 }
 
-void Model::fitRangeLimitsSet(DoublePair* pair){
-	Emit("fitRangeLimitsSet(DoublePair*)", pair);
-}
+//void Model::fitRangeLimitsSet(DoublePair* pair){
+//	Emit("fitRangeLimitsSet(DoublePair*)", pair);
+//}
 
 void Model::histogramImported(TH1F* hist){
 	Emit("histogramImported(TH1F*)", hist);

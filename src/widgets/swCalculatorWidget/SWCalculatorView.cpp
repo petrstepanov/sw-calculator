@@ -29,7 +29,6 @@
 #include "../../util/Debug.h"
 #include <map>
 #include <sstream>
-#include <TRootEmbeddedCanvas.h>
 #include <TG3DLine.h>
 #include "../../roofit/PdfProvider.h"
 
@@ -42,6 +41,9 @@ SWCalculatorView::SWCalculatorView(const TGWindow* w) : AbstractView<SWCalculato
     initUI();
 	presenter = instantinatePresenter();
 	connectSignals();
+
+	// Instantiate
+	// currentCanvasMode = CanvasMode::onePad;
 }
 
 SWCalculatorPresenter* SWCalculatorView::instantinatePresenter(){
@@ -69,18 +71,19 @@ void SWCalculatorView::initUI(){
     tabFit = tabsWidget->AddTab("Fit panel");
     tabFit->SetLayoutManager(new TGVerticalLayout(tabFit));
 
-    // Fit Range Row
-    tabFit->AddFrame(new TGLabel(tabFit, "Spectrum fitting range, keV"), new TGLayoutHints(kLHintsNormal, dx, dx, 2*dy, 0));
+    // Fit Range Row (now in bins!)
+    // TODO: display real values as labels
+    tabFit->AddFrame(new TGLabel(tabFit, "Spectrum fitting range, bins"), new TGLayoutHints(kLHintsNormal, dx, dx, 2*dy, 0));
     TGHorizontalFrame *frameFitRange = new TGHorizontalFrame(tabFit);
-    numFitMin = new TGNumberEntry(frameFitRange, -9999, 6, UiHelper::getUId(), TGNumberFormat::kNESRealTwo,
-            TGNumberFormat::kNEAAnyNumber,
+    numFitMin = new TGNumberEntry(frameFitRange, 1, 5, UiHelper::getUId(), TGNumberFormat::kNESInteger,
+            TGNumberFormat::kNEAPositive,
             TGNumberFormat::kNELLimitMinMax,
-            -9999, 9999);
+            1, 9999);
 
-    numFitMax = new TGNumberEntry(frameFitRange, 9999, 6, UiHelper::getUId(), TGNumberFormat::kNESRealTwo,
-            TGNumberFormat::kNEAAnyNumber,
+    numFitMax = new TGNumberEntry(frameFitRange, 100, 5, UiHelper::getUId(), TGNumberFormat::kNESInteger,
+            TGNumberFormat::kNEAPositive,
             TGNumberFormat::kNELLimitMinMax,
-            -9999, 9999);
+            1, 9999);
 
     numFitSlider = new TGDoubleHSlider(frameFitRange, 100, kDoubleScaleBoth);
 
@@ -313,34 +316,19 @@ void SWCalculatorView::initUI(){
     frameExportButtons->AddFrame(btnSaveImage, new TGLayoutHints(kLHintsRight | kLHintsTop, 0, dx, 0, 0));
 
     // Save data file button
-    btnSaveData = new TGTextButton(frameExportButtons, "Save data columns");
+    btnSaveData = new TGTextButton(frameExportButtons, "Export as ASCII");
     btnSaveData->SetEnabled(false);
     frameExportButtons->AddFrame(btnSaveData, new TGLayoutHints(kLHintsRight | kLHintsTop, 0, dx, 0, 0));  // left, right, top, bottom
 
     setToolbarEnabled(kFALSE);
 
     // Attach Right Canvas (Plot)
-    TRootEmbeddedCanvas *embedPlot = new TRootEmbeddedCanvas("embedPlot", frameRightVertical);
-    frameRightVertical->AddFrame(embedPlot, new TGLayoutHints(kLHintsLeft | kLHintsTop | kLHintsExpandX | kLHintsExpandY, 0, dx, dx, dx));
+    embedCanvas = new TRootEmbeddedCanvas("embedCanvas", frameRightVertical);
+    frameRightVertical->AddFrame(embedCanvas, new TGLayoutHints(kLHintsLeft | kLHintsTop | kLHintsExpandX | kLHintsExpandY, 0, dx, dx, dx));
 
     frameRightVertical->AddFrame(frameExportButtons, new TGLayoutHints(kLHintsExpandX, 0, 0, 0, 0));
 
     AddFrame(frameRightVertical, new TGLayoutHints(kLHintsLeft | kLHintsTop | kLHintsExpandX | kLHintsExpandY, 0, 0, 0, dx));
-
-    // Initialize pads on canvas
-    canvasPlot = embedPlot->GetCanvas();
-    canvasPlot->Divide(1, 2);
-
-    canvasPlot->cd(1)->SetPad("padData", "Pad for data", 0.0, 1/(1+GraphicsHelper::TOP_TO_BOTTOM_PAD_HEIGHT_RATIO), 1.0, 1.0, kWhite);
-    gPad->SetMargin((GraphicsHelper::padMargins).left,
-    		(GraphicsHelper::padMargins).right, (GraphicsHelper::padMargins).bottom, (GraphicsHelper::padMargins).top);
-	gPad->SetLogy();
-    padData = (TPad*)canvasPlot->GetPad(1);
-
-    canvasPlot->cd(2)->SetPad("padChi2", "Pad for chi^2", 0.0, 0.0, 1.0, 1/(1+GraphicsHelper::TOP_TO_BOTTOM_PAD_HEIGHT_RATIO), kWhite);
-    gPad->SetMargin((GraphicsHelper::padMargins).left, (GraphicsHelper::padMargins).right, (GraphicsHelper::padMargins).bottom, (GraphicsHelper::padMargins).top);
-    padChi2 = (TPad*)canvasPlot->GetPad(2);
-
     // You should call, for example HideFrame(TGFrame *f), only after the frames have been laid out and the sub windows
     // of the composite frame have been mapped via method MapSubwindows()
     // RootHelper::hideFrame(resolutionFwhmFrame);
@@ -368,6 +356,7 @@ void SWCalculatorView::connectSignals(){
     btnSaveData->Connect("Clicked()", "SWCalculatorPresenter", presenter, "onViewSaveDataClicked()");
     btnSaveImage->Connect("Clicked()", "SWCalculatorPresenter", presenter, "onViewSaveImageClicked()");
 
+    // tabsWidget->Connect("Selected(Int_t)", presenter->Class_Name(), presenter, onViewFitTabActive);
 
 	// Local signals within view
 	// numFitMin->GetNumberEntry()->Connect("TextChanged(char*)", "SWCalculatorView", this, "onNumFitMinChanged()");
@@ -378,38 +367,43 @@ void SWCalculatorView::connectSignals(){
     zoomSlider->Connect("PositionChanged()", "SWCalculatorView", this, "onSliderChange()");
 }
 
-
 void SWCalculatorView::setTabEnabled(Int_t tabNumber, Bool_t isEnabled){
     tabsWidget->SetEnabled(tabNumber, isEnabled);
 }
 
-void SWCalculatorView::setFitRange(Double_t min, Double_t max){
-	numFitMin->SetNumber(min);
-	numFitMax->SetNumber(max);
-	numFitSlider->SetPosition(min, max);
-}
-
 void SWCalculatorView::setFitRangeLimits(Double_t min, Double_t max){
+	// Set peak selection limits
 	numFitMin->SetLimitValues(min, max);
 	numFitMax->SetLimitValues(min, max);
 	numFitSlider->SetRange(min, max);
 }
 
-//void SWCalculatorView::setFitMinMaxValues(Bool_t isTwoDetector){
-//    if (isTwoDetector){
-//        // Set fit values
-//        Int_t leftLimitMin = TMath::Abs(numFitMin->GetNumMin());
-//        Int_t rightLimitMax = TMath::Abs(numFitMax->GetNumMax());
-//
-//        Int_t limit = TMath::Min(leftLimitMin, rightLimitMax);
-//        if (numFitMin->GetNumber() < -limit) numFitMin->SetNumber(-limit);
-//        if (numFitMax->GetNumber() > limit) numFitMax->SetNumber(limit);
-//    }
-//    else {
-//        numFitMin->SetNumber(496);
-//        numFitMax->SetNumber(526);
-//    }
-//}
+void SWCalculatorView::setFitRange(Double_t minBin, Double_t maxBin, Double_t min, Double_t max){
+	// Set peak selection initial values
+	numFitMin->SetNumber(minBin);
+	numFitMax->SetNumber(maxBin);
+	numFitSlider->SetPosition(minBin, maxBin);
+
+	// Update Canvas to reflect histogram range
+    // Delete all primitives but keep subpads
+	TCanvas* canvas = embedCanvas->GetCanvas();
+
+	TList* primitives = canvas->GetListOfPrimitives();
+    if (primitives){
+      TListIter next(primitives);
+      TObject *object;
+      while ((object=next())) {
+        if (object->InheritsFrom(THStack::Class())){
+          // Not deleting primitives but removing them from the list - safer.
+          // https://root.cern/root/roottalk/roottalk00/2082.html
+			THStack* hStack = (THStack*)object;
+			hStack->GetXaxis()->SetLimits(min, max);
+        }
+      }
+    }
+	canvas->Modified();
+	canvas->Update();
+}
 
 void SWCalculatorView::setDisplayLimits(Float_t min, Float_t max) {
     // Update slider position
@@ -460,7 +454,7 @@ void SWCalculatorView::setToolbarEnabled(Bool_t isEnabled){
 }
 
 TCanvas* SWCalculatorView::getCanvas() {
-    return canvasPlot;
+    return embedCanvas->GetCanvas();
 }
 
 void SWCalculatorView::reflectTwoDetector(Bool_t isTwoDetector){
@@ -481,6 +475,46 @@ void SWCalculatorView::setComponentHistogram(TH1F* hist){
 		histComponentLabel->SetText(Constants::LABEL_NO_FILE_LOADED);
 		removeHistogramButton->SetEnabled(kFALSE);
 	}
+}
+
+void SWCalculatorView::setCanvasText(const char* text){
+	TText* t = new TText(0.5, 0.5, text);
+	// t->SetNDC();
+	t->SetTextAlign(ETextAlign::kHAlignCenter + ETextAlign::kVAlignCenter);
+
+	setCanvasMode(CanvasMode::onePad);
+	TCanvas* canvas = embedCanvas->GetCanvas();
+	canvas->cd();
+	t->Draw();
+	canvas->Modified();
+	canvas->Update();
+}
+
+
+void SWCalculatorView::setCanvasMode(CanvasMode mode){
+	if (currentCanvasMode == mode) return;
+	TCanvas* canvas = embedCanvas->GetCanvas();
+
+	canvas->Clear();
+	if (mode == CanvasMode::onePad){
+		// Initialize one pad on canvas (for setting limits)
+	    canvas->SetMargin((GraphicsHelper::padMargins).left,
+	    		(GraphicsHelper::padMargins).right, (GraphicsHelper::padMargins).bottom, (GraphicsHelper::padMargins).top);
+		canvas->SetLogy();
+	}
+	else {
+	    // Initialize two pads on canvas (for fitting)
+		canvas->Divide(1, 2);
+
+	    canvas->cd(1)->SetPad("padData", "Pad for data", 0.0, 1/(1+GraphicsHelper::TOP_TO_BOTTOM_PAD_HEIGHT_RATIO), 1.0, 1.0, kWhite);
+	    gPad->SetMargin((GraphicsHelper::padMargins).left,
+	    		(GraphicsHelper::padMargins).right, (GraphicsHelper::padMargins).bottom, (GraphicsHelper::padMargins).top);
+		gPad->SetLogy();
+
+	    canvas->cd(2)->SetPad("padChi2", "Pad for chi^2", 0.0, 0.0, 1.0, 1/(1+GraphicsHelper::TOP_TO_BOTTOM_PAD_HEIGHT_RATIO), kWhite);
+	    gPad->SetMargin((GraphicsHelper::padMargins).left, (GraphicsHelper::padMargins).right, (GraphicsHelper::padMargins).bottom, (GraphicsHelper::padMargins).top);
+	}
+	currentCanvasMode = mode;
 }
 
 void SWCalculatorView::setConvolutionType(ConvolutionType convolutionType){
@@ -541,11 +575,6 @@ void SWCalculatorView::displaySW(RooRealVar* s, RooRealVar* w) {
     txtFitResult->AddLineFast(dashedLine);
 }
 
-void SWCalculatorView::updateCanvas() {
-	canvasPlot->Modified();
-	canvasPlot->Update();
-}
-
 // Scroll output textarea to the very bottom
 void SWCalculatorView::scrollOutputDown(){
     txtFitResult->Update();
@@ -563,10 +592,34 @@ void SWCalculatorView::clearFitResults() {
 void SWCalculatorView::updateCanvasLimits(Double_t min, Double_t max) {
     fitFrame->GetXaxis()->SetRangeUser(min, max);
     chiFrame->GetXaxis()->SetRangeUser(min, max);
-    padData->Modified();
-    padData->Update();
-    padChi2->Modified();
-    padChi2->Update();
+
+    TCanvas* c = embedCanvas->GetCanvas();
+    c->cd(1)->Modified();
+    c->cd(1)->Update();
+    c->cd(2)->Modified();
+    c->cd(2)->Update();
+}
+
+void SWCalculatorView::drawHistograms(TH1* hist, TH1* sourceHist){
+	TCanvas* canvas = embedCanvas->GetCanvas();
+	canvas->cd();
+
+	// Make stack of regualr and source histagrams (if set)
+    THStack* hStack = new THStack("hs", "");
+    TH1* histCopy = (TH1*)hist->Clone();
+    histCopy->SetLineColor(GraphicsHelper::histColor);
+    hStack->Add(histCopy);
+    if (sourceHist){
+        TH1* sourceHistCopy = (TH1*)sourceHist->Clone();
+        sourceHistCopy->SetLineColor(GraphicsHelper::sourceHistColor);
+        hStack->Add(sourceHistCopy);
+    }
+
+    hStack->Draw("nostack");
+
+	canvas->BuildLegend();
+	canvas->Modified();
+	canvas->Update();
 }
 
 SWCalculatorView::~SWCalculatorView() {

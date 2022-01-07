@@ -115,9 +115,18 @@ TH1F* FileUtils::importTH1Maestro(const char* path){
 	for (int channel = 1; channel <= nChannels; channel++){
 		int count = 0;
 		myfile >> count;
-		hist->SetBinContent(channel, count);
+		for (int j=0; j<count; j++){
+			Double_t binCenter = hist->GetXaxis()->GetBinCenter(channel);
+			hist->Fill(binCenter);
+		}
 	}
 	myfile.close();
+
+	#ifdef USEDEBUG
+		std::cout << "FileUtils::importTH1Maestro()" << std::endl;
+		std::cout << "imported histogram" << std::endl;
+		hist->Print("V");
+	#endif
 
 	return hist;
 }

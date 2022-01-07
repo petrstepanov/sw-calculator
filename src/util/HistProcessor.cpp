@@ -86,32 +86,31 @@ TH1F* HistProcessor::removeHistNegatives(const char *newname, TH1F* hist){
 	return newHist;
 }
 
-TH1F* HistProcessor::cutHist(const char *newname, TH1F* hist, Double_t xMin, Double_t xMax){
+TH1F* HistProcessor::cutHist(const char *newname, TH1F* hist){
 	#ifdef USEDEBUG
 		std::cout << "HistProcessor::cutHist" << std::endl;
+		std::cout << "original histogram" << std::endl;
 		hist->Print();
-		std::cout << "low edge: " << hist->GetXaxis()->GetBinLowEdge(1) << ", up edge: " << hist->GetXaxis()->GetBinUpEdge(hist->GetNbinsX()) << std::endl;
-		std::cout << "cut range: (" << xMin << "; " << xMax << ")" << std::endl;
+		std::cout << "all bins: (" << 1 << "; " << hist->GetXaxis()->GetNbins() << ")" << std::endl;
+		std::cout << "cut bins: (" << hist->GetXaxis()->GetFirst() << "; " << hist->GetXaxis()->GetLast() << ")" << std::endl;
 	#endif
 
-	Int_t minBin = 1;
-	while (xMin > hist->GetXaxis()->GetBinCenter(minBin)){minBin++;}
-
-	Int_t maxBin = hist->GetXaxis()->GetNbins();
-	while (xMax < hist->GetXaxis()->GetBinCenter(maxBin)){maxBin--;}
-
-	Int_t nBins = maxBin - minBin + 1;
+	Int_t minBin = hist->GetXaxis()->GetFirst();
+	Int_t maxBin = hist->GetXaxis()->GetLast();
 
 	// Construct new histogram
 	Double_t lowEdge = hist->GetXaxis()->GetBinLowEdge(minBin);
 	Double_t upEdge = hist->GetXaxis()->GetBinUpEdge(maxBin);
 
-	Int_t id = (new TDatime())->Get();
+	// Int_t id = (new TDatime())->Get();
 
-	RootHelper::deleteObject(newname);
-	TH1F* trimmedHist = new TH1F(newname, "Cut histogram", nBins, lowEdge, upEdge);
-	for (Int_t i = 1; i <= nBins; i++){
-		trimmedHist->SetBinContent(i, hist->GetBinContent(i+minBin-1));
+	// RootHelper::deleteObject(newname);
+	TH1F* trimmedHist = new TH1F(newname, "Cut histogram", maxBin-minBin+1, lowEdge, upEdge);
+	for (Int_t i = 1; i <= trimmedHist->GetXaxis()->GetNbins(); i++){
+		for (int v=0; v < hist->GetBinContent(i+minBin-1); v++){
+			Double_t binCenter = hist->GetBinCenter(i+minBin-1);
+			trimmedHist->Fill(binCenter);
+		}
 		trimmedHist->SetBinError(i, hist->GetBinError(i+minBin-1));
 	}
 
@@ -319,6 +318,7 @@ RooRealVar* HistProcessor::getWParameter(TH1F* hist, Double_t wWidth, Double_t w
 }
 
 Bool_t HistProcessor::isTwoDetetor(TH1F* hist){
+	// TODO: check this after adjusting fitting limits
 	TAxis* x = hist->GetXaxis();
 	Bool_t isSingleDetector = (x->GetXmin() < 511) && (x->GetXmax() > 511);
 	return !isSingleDetector;

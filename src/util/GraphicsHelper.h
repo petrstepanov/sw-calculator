@@ -47,6 +47,9 @@ public:
     static const Margin padMargins;
     static const Int_t colorSet[7];
 
+    static Color_t histColor;
+    static Color_t sourceHistColor;
+
     static TColor* colorPrimary;
     static TColor* colorWarning;
     static TColor* colorGray;

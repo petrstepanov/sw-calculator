@@ -39,9 +39,9 @@ class AbstractImportSpectrumView : public AbstractView<AbstractImportSpectrumPre
     TGTextView* txtFileBrowser;
 //    TGNumberEntry* numEnergyColumn;
 //    TGNumberEntry* numCountsColumn;
-//     TGTextButton* btnImportSpectrum;
+    TGTextButton* btnImportSpectrum;
     TCanvas* canvasHist;
-    TGDoubleHSlider* rangeSlider;
+    // TGDoubleHSlider* rangeSlider;
 
     // Hack temporary
     TGTextButton* btnSetRange;
@@ -59,12 +59,12 @@ class AbstractImportSpectrumView : public AbstractView<AbstractImportSpectrumPre
     // Calls from Presenter
     void loadFile(TString* fileNamePath);
     TString* getFileName();
-    Int_t getEnergyColumnNumber();
-    Int_t getCountsColumnNumber();
+    // Int_t getEnergyColumnNumber();
+    // Int_t getCountsColumnNumber();
     void drawHistogram(TH1F* hist);
-    void initRangeSlider(Int_t min, Int_t max);
-    void onRangeSliderChange();
-    void onSetRangeClicked();
+    // void initRangeSlider(Int_t min, Int_t max);
+    // void onRangeSliderChange();
+    // void onSetRangeClicked();
 
     // Calls to Presenter
     void onOpenFileClicked();

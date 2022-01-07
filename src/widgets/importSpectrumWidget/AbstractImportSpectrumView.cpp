@@ -77,13 +77,13 @@ void AbstractImportSpectrumView::initUI(){
 //    AddFrame(frameCountsColumn, new TGLayoutHints(kLHintsExpandX, 0, 0, dy, dy));
 
     // Import Spectrum button
-//    btnImportSpectrum = new TGTextButton(this, "Import Spectrum");
-//    btnImportSpectrum->Connect("Clicked()", "AbstractImportSpectrumView", this, "onImportSpectrumClicked()");
-//    btnImportSpectrum->SetEnabled(kFALSE);
-//    AddFrame(btnImportSpectrum, new TGLayoutHints(kLHintsExpandX, 0, 0, dy, dy));
+    btnImportSpectrum = new TGTextButton(this, "Import Spectrum");
+    btnImportSpectrum->Connect("Clicked()", this->ClassName(), this, "onImportSpectrumClicked()");
+    btnImportSpectrum->SetEnabled(kFALSE);
+    AddFrame(btnImportSpectrum, new TGLayoutHints(kLHintsExpandX, 0, 0, dy, dy));
 
     // Histogram preview label
-    AddFrame(new TGLabel(this, "Graphical preview:"), new TGLayoutHints(kLHintsLeft, 0, 0, dy*2, 0));
+    AddFrame(new TGLabel(this, "Preview:"), new TGLayoutHints(kLHintsLeft, 0, 0, dy*2, 0));
 
     // Histogram canvas
     TRootEmbeddedCanvas* embedHist = new TRootEmbeddedCanvas("embedHist", this);
@@ -93,20 +93,10 @@ void AbstractImportSpectrumView::initUI(){
     canvasHist->SetLogy();
     AddFrame(embedHist, new TGLayoutHints(kLHintsExpandX | kLHintsExpandY, 0, 0, dy, 0));
 
-    // Select peak to be fitted with sliders
-    AddFrame(new TGLabel(this, "Adjust sliders to select fitting peak:"), new TGLayoutHints(kLHintsLeft, 0, 0, dy*2, 0));
-
-    rangeSlider = new TGDoubleHSlider(this, 190, kDoubleScaleBoth, UiHelper::getUId());
-    std::cout << this->ClassName() << std::endl;
-
-    // Tip: PositionChanged() freezes the debugger... so we're using Released() instead
-    rangeSlider->Connect("PositionChanged()", this->ClassName(), this, "onRangeSliderChange()");
-    AddFrame(rangeSlider, new TGLayoutHints(kLHintsLeft | kLHintsTop | kLHintsExpandX, dx, dx, 0, 0));
-
     // Temp hack
-    btnSetRange = new TGTextButton(this, " Set Range ");
-    btnSetRange->Connect("Clicked()", this->ClassName(), this, "onSetRangeClicked()");
-    AddFrame(btnSetRange, new TGLayoutHints(kLHintsLeft | kLHintsCenterY));
+//    btnSetRange = new TGTextButton(this, " Set Range ");
+//    btnSetRange->Connect("Clicked()", this->ClassName(), this, "onSetRangeClicked()");
+//    AddFrame(btnSetRange, new TGLayoutHints(kLHintsLeft | kLHintsCenterY));
 }
 
 AbstractImportSpectrumPresenter* AbstractImportSpectrumView::instantinatePresenter() {
@@ -119,9 +109,9 @@ void AbstractImportSpectrumView::onOpenFileClicked(){
     presenter->onOpenFileClicked();
 }
 
-//void AbstractImportSpectrumView::onImportSpectrumClicked(){
-//    presenter->onImportSpectrumClicked();
-//}
+void AbstractImportSpectrumView::onImportSpectrumClicked(){
+    presenter->onImportSpectrumClicked();
+}
 
 // Calls from Presenter
 void AbstractImportSpectrumView::loadFile(TString* fileNamePath){
@@ -150,25 +140,9 @@ TString* AbstractImportSpectrumView::getFileName(){
     return new TString(s);
 }
 
-void AbstractImportSpectrumView::initRangeSlider(Int_t minBin, Int_t maxBin){
-    rangeSlider->SetRange(minBin, maxBin);
-    rangeSlider->SetPosition(minBin, maxBin);
-    rangeSlider->SetScale(1);
-}
-
-void AbstractImportSpectrumView::onRangeSliderChange(){
-	Double_t min = rangeSlider->GetMinPosition();
-    Double_t max = rangeSlider->GetMaxPosition();
-	presenter->onRangeSliderChange(min, max);
-}
-
-void AbstractImportSpectrumView::onSetRangeClicked(){
-	Double_t min = 1094;
-    Double_t max = 2094;
-	presenter->onRangeSliderChange(min, max);
-}
-
-void AbstractImportSpectrumView::drawHistogram(TH1F* hist){
+void AbstractImportSpectrumView::drawHistogram(TH1F* h){
+	// Copy histogram so we dont modify original histogram colors in the Model
+	TH1* hist = new TH1F(*h);
     canvasHist->cd();
     hist->SetLineColor(getHistogramColor());
     hist->SetFillColorAlpha(getHistogramColor(), 0.2);

@@ -49,7 +49,8 @@ PdfProvider::PdfProvider(FitProperties fitProperties) : observable(0), mean(0), 
 	// Histograms can be acessed via gROOT->FindObject. So proper way to treat them is pass by reference?
 	// Problem: if you pass histogram by value then you copy it but it still has the same ROOT name? Mess.
 	// So we pass histograms by reference. But here cutHist() always creates new histogram! So we avoid changes in model.
-	fitHistogram = histProcessor->cutHist("fitHistogram", fitProperties.hist, fitProperties.fitMin->getVal(), fitProperties.fitMax->getVal());
+	fitHistogram = histProcessor->cutHist("fitHistogram", fitProperties.hist);
+	fitHistogram->Print();
 
 	// Initialize pdfs in material
 	initObservableAndMean();
@@ -98,7 +99,8 @@ void PdfProvider::initMaterialPdf(Bool_t hasParabola, TH1F* componentHist, const
 	// Component Histogram PDF
 	if (componentHist){
 		HistProcessor* histProcessor = HistProcessor::getInstance();
-		TH1F* componentHistogram = histProcessor->cutHist("componentHistogram", componentHist, observable->getMin(), observable->getMax());
+		componentHist->GetXaxis()->SetRangeUser(observable->getMin(), observable->getMax());
+		TH1F* componentHistogram = histProcessor->cutHist("componentHistogram", componentHist);
 		componentHistogram = histProcessor->removeHistNegatives("componentHistogramNoNegatives", componentHistogram);
 
 		RooDataHist* componentDataHist = new RooDataHist("componentDataHist", "Component Data Hist", RooArgList(*observable), componentHistogram);
@@ -168,7 +170,8 @@ void PdfProvider::initSourceContribution(TH1F* sourceHist){
 
 	// cutHist() always returns copy of the histogram so we ensure we don't change the model
 	HistProcessor* histProcessor = HistProcessor::getInstance();
-	TH1F* sourceHistogram = histProcessor->cutHist("sourceHistogram", sourceHist,  observable->getMin(),  observable->getMax());
+	sourceHist->GetXaxis()->SetRangeUser(observable->getMin(), observable->getMax());
+	TH1F* sourceHistogram = histProcessor->cutHist("sourceHistogram", sourceHist);
 //	histProcessor->liftHistAboveZero(sourceHistogram);
 	sourceHistogram = histProcessor->removeHistNegatives("sourceHistogramNoNegatives", sourceHistogram);
 
@@ -269,7 +272,7 @@ void PdfProvider::initConvolutedModel(ConvolutionType convolutionType) {
 
 	// Convolute components in material
 	RooRealVar* resolutionFWHM = new RooRealVar("resolutionFWHM", "Resolution function FWHM", 2, 0.5, 4, "keV");
-	resolutionFWHM->setConstant(kTRUE);
+	// resolutionFWHM->setConstant(kTRUE);
 	RooFormulaVar* resFunctSigma = new RooFormulaVar("resFunctSigma", "@0*@1", RooArgList(*resolutionFWHM, *Constants::rooFwhmToSigma));
 
 	resolutionFunction = new RooGaussian("resolutionPdf", "Resolution function", *observable, *mean, *resFunctSigma);

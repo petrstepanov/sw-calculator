@@ -36,8 +36,7 @@ public:
     void onOpenFileClicked();
 
     // TODO: implement in all inherited classes
-    void onRangeSliderChange(Int_t minBin, Int_t maxBin);
-    // void onImportSpectrumClicked();
+    void onImportSpectrumClicked();
     
     // Different implementations for importing Kapton spectrum and regular spectrum
     virtual void setModelFileName(TString* fileNamePath){};
