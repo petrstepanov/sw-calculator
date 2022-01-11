@@ -498,8 +498,9 @@ void SWCalculatorView::setCanvasMode(CanvasMode mode){
 	canvas->Clear();
 	if (mode == CanvasMode::onePad){
 		// Initialize one pad on canvas (for setting limits)
-	    canvas->SetMargin((GraphicsHelper::padMargins).left,
-	    		(GraphicsHelper::padMargins).right, (GraphicsHelper::padMargins).bottom, (GraphicsHelper::padMargins).top);
+//	    canvas->SetMargin((GraphicsHelper::padMargins).left,
+//	    		(GraphicsHelper::padMargins).right, (GraphicsHelper::padMargins).bottom, (GraphicsHelper::padMargins).top);
+		canvas->SetRightMargin((GraphicsHelper::padMargins).right);
 		canvas->SetLogy();
 	}
 	else {
@@ -606,16 +607,28 @@ void SWCalculatorView::drawHistograms(TH1* hist, TH1* sourceHist){
 
 	// Make stack of regualr and source histagrams (if set)
     THStack* hStack = new THStack("hs", "");
-    TH1* histCopy = (TH1*)hist->Clone();
-    histCopy->SetLineColor(GraphicsHelper::histColor);
+
+    // Draw acquisitioned histogram
+    TH1* histCopy = new TH1F();
+    hist->Copy(*histCopy);
+    // histCopy->SetLineColor(GraphicsHelper::histColor);
+    histCopy->SetLineColor(kBlack);
     hStack->Add(histCopy);
+    hStack->SetTitle("Spectrum Preview");
+
+    // Draw source histogram on the same canvas (if exists)
     if (sourceHist){
         TH1* sourceHistCopy = (TH1*)sourceHist->Clone();
-        sourceHistCopy->SetLineColor(GraphicsHelper::sourceHistColor);
+        // sourceHistCopy->SetLineColor(GraphicsHelper::sourceHistColor);
+        sourceHistCopy->SetLineColor(EColor::kBlack);
+        sourceHistCopy->SetLineStyle(ELineStyle::kDashed);
         hStack->Add(sourceHistCopy);
+        hStack->SetTitle("Spectra Preview");
     }
 
     hStack->Draw("nostack");
+    hStack->GetXaxis()->SetTitle("Energy, keV");
+    hStack->GetYaxis()->SetTitle("Counts");
 
 	canvas->BuildLegend();
 	canvas->Modified();

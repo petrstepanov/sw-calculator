@@ -12,6 +12,8 @@
 #include "../../model/Constants.h"
 #include "../../util/UiHelper.h"
 #include <TSystem.h>
+#include <TGClient.h>
+#include <TGResourcePool.h>
 
 ClassImp(AbstractImportSpectrumView);
 
@@ -40,7 +42,7 @@ void AbstractImportSpectrumView::initUI(){
     AddFrame(frameOpenFile, new TGLayoutHints(kLHintsExpandX, 0, 0, 0, dy));
 
     // File browser label
-    AddFrame(new TGLabel(this, "ASCII file preview:"), new TGLayoutHints(kLHintsLeft, 0, 0, dy*2, 0));
+    AddFrame(new TGLabel(this, "ASCII file:"), new TGLayoutHints(kLHintsLeft, 0, 0, dy*2, 0));
 
     // File browser
     txtFileBrowser = new TGTextView(this);
@@ -77,22 +79,37 @@ void AbstractImportSpectrumView::initUI(){
 //    AddFrame(frameCountsColumn, new TGLayoutHints(kLHintsExpandX, 0, 0, dy, dy));
 
     // Import Spectrum button
-    btnImportSpectrum = new TGTextButton(this, "Import Spectrum");
-    btnImportSpectrum->Connect("Clicked()", this->ClassName(), this, "onImportSpectrumClicked()");
-    btnImportSpectrum->SetEnabled(kFALSE);
-    AddFrame(btnImportSpectrum, new TGLayoutHints(kLHintsExpandX, 0, 0, dy, dy));
+    // btnImportSpectrum = new TGTextButton(this, "Import Spectrum");
+    // btnImportSpectrum->Connect("Clicked()", this->ClassName(), this, "onImportSpectrumClicked()");
+    // btnImportSpectrum->SetEnabled(kFALSE);
+    // AddFrame(btnImportSpectrum, new TGLayoutHints(kLHintsExpandX, 0, 0, dy, dy));
 
     // Histogram preview label
-    AddFrame(new TGLabel(this, "Preview:"), new TGLayoutHints(kLHintsLeft, 0, 0, dy*2, 0));
+    AddFrame(new TGLabel(this, "Graphic preview:"), new TGLayoutHints(kLHintsLeft, 0, 0, dy*2, 0));
 
     // Histogram canvas
-    TRootEmbeddedCanvas* embedHist = new TRootEmbeddedCanvas("embedHist", this);
+    // Following options do not draw lines in TGFrame::Draw3dRectangle():
+    // EFrameType::kChildFrame, EFrameType::kTransientFrame no: EFrameType::kSunkenFrame
+    TRootEmbeddedCanvas* embedHist = new TRootEmbeddedCanvas("embedHist", this, 10, 10, EFrameType::kChildFrame);
+    embedHist->SetHeight(210);
+    AddFrame(embedHist, new TGLayoutHints(kLHintsExpandX, 0, 0, dy, 0));
+
+    // Bitwise calculator https://bitwisecmd.com/
+    // embedHist->ChangeOptions(kFixedHeight);
 
     canvasHist = embedHist->GetCanvas();
-    canvasHist->SetMargin(0.09, 0.04, 0.14, 0.1);
+//    canvasHist->SetEditable(0);
+    canvasHist->SetBorderMode(0);
+    canvasHist->SetBorderSize(0);
+    Pixel_t bgColor = TColor::GetColor(232, 232, 232);
+    canvasHist->SetFillColor(bgColor);
+    canvasHist->SetTopMargin(0.05); // 0.1
+    canvasHist->SetBottomMargin(0.15);
+    canvasHist->SetLeftMargin(0.1);
+    canvasHist->SetRightMargin(0.01); // 0.05
     canvasHist->SetLogy();
-    AddFrame(embedHist, new TGLayoutHints(kLHintsExpandX | kLHintsExpandY, 0, 0, dy, 0));
-
+    // GraphicsHelper::drawXCanvas(canvasHist);
+    // canvasHist->Update();
     // Temp hack
 //    btnSetRange = new TGTextButton(this, " Set Range ");
 //    btnSetRange->Connect("Clicked()", this->ClassName(), this, "onSetRangeClicked()");
@@ -142,19 +159,32 @@ TString* AbstractImportSpectrumView::getFileName(){
 
 void AbstractImportSpectrumView::drawHistogram(TH1F* h){
 	// Copy histogram so we dont modify original histogram colors in the Model
-	TH1* hist = new TH1F(*h);
+	TH1* hist = new TH1F();
+	h->Copy(*hist); // Copy h into hist
+	hist->SetTitle("");
+	hist->GetXaxis()->SetTitle("Energy, keV");
+	hist->GetYaxis()->SetTitle("Counts");
+
     canvasHist->cd();
-    hist->SetLineColor(getHistogramColor());
-    hist->SetFillColorAlpha(getHistogramColor(), 0.2);
-    hist->GetXaxis()->SetLabelOffset(0.03);
-    hist->GetYaxis()->SetLabelOffset(0.015);
+    canvasHist->SetFrameFillStyle(EFillStyle::kFEmpty);
+
+    // hist->SetLineColor(getHistogramColor());
+    hist->SetLineColor(kGray+1);
+    hist->GetXaxis()->SetLabelOffset(0.02);
+    hist->GetYaxis()->SetLabelOffset(0.01);
+
+    hist->GetXaxis()->SetLabelSize(0.06);
+    hist->GetYaxis()->SetLabelSize(0.06);
+
+    hist->GetXaxis()->SetTitleOffset(1.2);
+    hist->GetXaxis()->SetTitleSize(0.06);
+    hist->GetYaxis()->SetTitleOffset(0.85);
+    hist->GetYaxis()->SetTitleSize(0.06);
     hist->Draw();
-    GraphicsHelper* graphicsHelper = GraphicsHelper::getInstance();
 
-    hist->GetXaxis()->SetLabelSize(2*GraphicsHelper::TEXT_SIZE_NORMAL);
-    hist->GetYaxis()->SetLabelSize(2*GraphicsHelper::TEXT_SIZE_NORMAL);
+    GraphicsHelper::alignStats(canvasHist, Alignment::TOP_RIGHT, Decoration::TRANSPARENT, 0.07, 0.35);
 
-    hist->SetStats(0);
+//     canvasHist->Modified();
     canvasHist->Update();
 }
 

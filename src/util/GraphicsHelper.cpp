@@ -20,8 +20,12 @@
 #include <TBox.h>
 #include <TLatex.h>
 #include <TMath.h>
+#include <TLegend.h>
+#include <TH1.h>
+#include <TLine.h>
 #include <TString.h>
 #include <RooRealVar.h>
+#include <TPaveStats.h>
 #include <RooStringVar.h>
 #include <RooFormulaVar.h>
 #include <RooFormula.h>
@@ -264,3 +268,135 @@ TPaveText* GraphicsHelper::makeParametersPaveText(const RooArgList& params, Doub
 	return box;
 }
 
+Int_t GraphicsHelper::getNumberOfLines(TPave* pave){
+	if(TPaveText* paveText = dynamic_cast<TPaveText*>(pave)) {
+		return paveText->GetListOfLines()->GetSize();
+	}
+	else if (TLegend* legend = dynamic_cast<TLegend*>(pave)){
+		return legend->GetNRows();
+	}
+	return 1;
+}
+
+TLegend* GraphicsHelper::getPadLegend(TVirtualPad* pad){
+  // ROOT creates legend always with name "TPave" - thats how we find it on the pad
+  TLegend* legend = (TLegend*)pad->FindObject("TPave");
+  return legend;
+}
+
+TPaveStats* GraphicsHelper::getPadStats(TVirtualPad* pad){
+  // Update Pad - in case the histogram was just drawn - need to update
+  pad->Update();
+
+  // By default ROOT names the statistics box "stats". So we just find and return this object.
+  TPaveStats *pave = (TPaveStats*)pad->GetPrimitive("stats");
+
+  // SCENARIO 1: If statistics box was found and not produced for histogram (say, made for TGraph) - we just return it
+  if (pave && !pave->GetParent()->InheritsFrom("TH1")){
+    return pave;
+  }
+
+  // SCENARIO 2: If statistics box was drawn for a histogram then it is not a direct primitive of a canvas.
+  //             Stats is a primitive of a histogram. pad->getPrimitive() searches across primitives recursively.
+  //             Therefore we need to "disconnect it" from the histogram, rename it to "mystats" and add to canvas with different name.
+
+  // If previously renamed PaveStats, detached it from histogram and added to the pad primitives - simply return it
+  TPaveStats *paveDetachedFromHistAndRenamed = (TPaveStats*)pad->GetPrimitive("mystats");
+  if (paveDetachedFromHistAndRenamed) return paveDetachedFromHistAndRenamed;
+
+  // Otherwise perform this trick:
+  // Remove PaveText from histogram primitives, rename it and add to the list of Pad primitives
+  if (!pave) return NULL;
+
+  pave->SetName("mystats");                     // rename
+  ((TH1*) pave->GetParent())->SetStats(kFALSE); // disconnect from the histogram.
+  pad->GetListOfPrimitives()->Add(pave);        // attach to pad primitives
+
+  return pave;
+
+  // If not found search object by file type
+  // for (TObject* object : *(pad->GetListOfPrimitives())){
+  //  std::cout << object->GetName() << std::endl;
+  //  if (object->InheritsFrom(TPaveStats::Class())){
+  //    return (TPaveStats*) object;
+  //  }
+  // }
+
+  // return NULL;
+}
+
+void GraphicsHelper::alignPave(TPave* pave, TVirtualPad* pad, Alignment alignment, Decoration decoration, Double_t statsLineHeight, Double_t statsWidth){
+  if (!pave){
+    // Try finding Legend first
+    pave = getPadLegend(pad);
+    if (!pave){
+      // Next try finding pad
+      pave = getPadStats(pad);
+    }
+    if (!pave){
+      std::cout << "alignPave: could not find neither legend nor pave on canvas" << std::endl;
+      return;
+    }
+  }
+
+  // Update
+  pad->Modified();
+  pad->Update();
+
+  // Legend height needs recalculation
+  // it depends on the number of hte lines in the legend
+  // std::cout << "Number of lines: " << getNumberOfLines(pave) << std::endl;
+  Double_t legendHeight = statsLineHeight*getNumberOfLines(pave); // stats->GetY2NDC() - stats->GetY1NDC();
+  Double_t legendWidth = statsWidth == 0 ? (pave->GetX2NDC() - pave->GetX1NDC()): statsWidth;
+  // std::cout << legendWidth << "x" << legendHeight << std::endl;
+
+  Double_t dx = (decoration == Decoration::TRANSPARENT) ? 0.04 : 0;
+  Double_t dy = (decoration == Decoration::TRANSPARENT) ? 0.04 : 0;
+  if (alignment == Alignment::TOP_LEFT){
+    pave->SetX1NDC(pad->GetLeftMargin() + dx);
+    pave->SetY1NDC(1 - pad->GetTopMargin() - legendHeight - dy);
+    pave->SetX2NDC(pad->GetLeftMargin() + legendWidth + dx);
+    pave->SetY2NDC(1 - pad->GetTopMargin() - dy);
+  }
+  else if (alignment == Alignment::BOTTOM_RIGHT){
+    pave->SetX1NDC(1 - pad->GetRightMargin() - legendWidth);
+    pave->SetY1NDC(pad->GetBottomMargin() + 2*dy);
+    pave->SetX2NDC(1 - pad->GetRightMargin());
+    pave->SetY2NDC(pad->GetBottomMargin() + 2*dy + legendHeight);
+  }
+  else if (alignment == Alignment::TOP_RIGHT){
+    pave->SetX1NDC(1 - pad->GetRightMargin() - legendWidth - dx);
+    pave->SetY1NDC(1 - pad->GetTopMargin() - legendHeight - dy);
+    pave->SetX2NDC(1 - pad->GetRightMargin() - dx);
+    pave->SetY2NDC(1 - pad->GetTopMargin() - dy);
+  }
+
+  if (decoration == Decoration::TRANSPARENT){
+    pave->SetLineWidth(0);
+    pave->SetFillStyle(0);
+  }
+  pad->Modified();
+  pad->Update();
+}
+
+void GraphicsHelper::alignStats(TVirtualPad* pad, Alignment alignment, Decoration decoration, Double_t statsLineHeight, Double_t statsWidth){
+  // Find stats box on canvas
+  TPave* stats = getPadStats(pad);
+  alignPave(stats, pad, alignment, decoration, statsLineHeight, statsWidth);
+}
+
+void GraphicsHelper::drawXCanvas(TVirtualPad* pad){
+	TLine* line = new TLine();
+	line->SetLineColor(kGray+1);
+
+	pad->cd();
+
+	// Canvas border workaround
+	Double_t zero = 0, one = 1;
+	line->DrawLineNDC(zero, zero, one-0.01, zero)->Draw();
+	line->DrawLineNDC(one-0.01, zero, one-0.01, one-0.01)->Draw();
+	line->DrawLineNDC(one-0.01, one-0.01, zero, one-0.01)->Draw();
+	line->DrawLineNDC(zero, one, zero, zero)->Draw();
+	line->DrawLineNDC(zero, zero, one, one)->Draw();
+	line->DrawLineNDC(zero, one, one, zero)->Draw();
+}

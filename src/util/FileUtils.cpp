@@ -213,6 +213,8 @@ TH1F* FileUtils::importTH1Canberra(const char* path, int eColumn, int cColumn){
 	TString* pathString = new TString(path);
 	TString* title = StringUtils::stripFileName(pathString);
 	TH1F* hist = new TH1F(TString::Format("hist%d", id), title->Data(), bins, energyMin - binWidth / 2, energyMax + binWidth / 2);
+	hist->GetXaxis()->SetTitle("Energy, keV");
+	hist->GetYaxis()->SetTitle("Counts");
 	// TH1I (const char *name, const char *title, Int_t nbinsx, Double_t xlow, Double_t xup)
 	// bin = 0;       underflow bin
 	// bin = 1;       first bin with low-edge xlow INCLUDED

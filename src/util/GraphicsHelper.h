@@ -18,12 +18,26 @@
 #include <RooPlot.h>
 #include <TPaveText.h>
 #include <RooArgList.h>
+#include <TVirtualPad.h>
+#include <TPaveStats.h>
 
 struct Margin {
 	Double_t left;
 	Double_t right;
 	Double_t bottom;
 	Double_t top;
+};
+
+enum class Alignment {
+	TOP_LEFT,
+	TOP_RIGHT,
+	BOTTOM_LEFT,
+	BOTTOM_RIGHT
+};
+
+enum class Decoration {
+	DEFAULT,
+	TRANSPARENT
 };
 
 class GraphicsHelper {
@@ -66,6 +80,13 @@ public:
 			Double_t wShift, Double_t mean, Double_t yMin, Double_t yMax,
 			Bool_t isTwoDetector);
 	static TPaveText* makeParametersPaveText(const RooArgList& params, Double_t xmin, Double_t xmax, Double_t ymax);
+
+	static Int_t getNumberOfLines(TPave* pave);
+	static TLegend* getPadLegend(TVirtualPad* pad);
+	static TPaveStats* getPadStats(TVirtualPad* pad);
+	static void alignPave(TPave* pave, TVirtualPad* pad, Alignment alignment, Decoration decoration, Double_t statsLineHeight, Double_t statsWidth);
+	static void alignStats(TVirtualPad* pad, Alignment alignment = Alignment::TOP_RIGHT, Decoration decoration = Decoration::DEFAULT, Double_t statsLineHeight = 0.07, Double_t statsWidth = 0);
+	static void drawXCanvas(TVirtualPad* pad);
 
 private:
 	GraphicsHelper();
