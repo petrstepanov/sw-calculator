@@ -319,9 +319,10 @@ RooRealVar* HistProcessor::getWParameter(TH1F* hist, Double_t wWidth, Double_t w
 
 Bool_t HistProcessor::isTwoDetetor(TH1F* hist){
 	// TODO: check this after adjusting fitting limits
-	TAxis* x = hist->GetXaxis();
-	Bool_t isSingleDetector = (x->GetXmin() < 511) && (x->GetXmax() > 511);
-	return !isSingleDetector;
+	if (hist->GetXaxis()->GetXmin() < 511 && hist->GetXaxis()->GetXmax() > 511){
+		return kFALSE;
+	}
+	return kTRUE;
 }
 
 Double_t HistProcessor::getPdfMaximumX(RooAbsPdf* pdf, const RooArgList& args){

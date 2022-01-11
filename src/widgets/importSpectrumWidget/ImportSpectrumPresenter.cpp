@@ -21,9 +21,9 @@ void ImportSpectrumPresenter::setModelHist(TH1F* hist){
 	model->setHist(hist);
 
     // Determine if spectrum is two detector or not
-    // HistProcessor* histProcessor = HistProcessor::getInstance();
-    // Bool_t isTwoDetector = histProcessor->isTwoDetetor(hist);
-	// model->setTwoDetector(isTwoDetector);
+     HistProcessor* histProcessor = HistProcessor::getInstance();
+     Bool_t isTwoDetector = histProcessor->isTwoDetetor(hist);
+	 model->setTwoDetector(isTwoDetector);
 
 	// Set low and up fit range limits
 
