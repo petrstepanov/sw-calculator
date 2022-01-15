@@ -81,7 +81,6 @@ void PdfProvider::initObservableAndMean(){
 
 	// Set binning for different types of convolution
 	observable->setBins(fitHistogram->GetNbinsX());
-	observable->setBins(2048, "cache");
 
 	// Set mean
 	Double_t m = fitHistogram->GetBinCenter(fitHistogram->GetMaximumBin());
@@ -312,11 +311,12 @@ void PdfProvider::initConvolutedModel(ConvolutionType convolutionType) {
 
 	resolutionFunction = new RooGaussian("resolutionPdf", "Resolution function", *observable, *mean, *resFunctSigma);
 	if (convolutionType == kFFTConvolution){
+	    observable->setBins(2048, "cache");
 	    pdfFinal = new RooFFTConvPdf("modelConvoluted", "Convoluted with resolution function", *observable, *pdfInMaterial, *resolutionFunction);
 	}
 	else if (convolutionType == kNumericConvolution){
 	    pdfFinal = new RooNumConvPdf("modelConvoluted", "Convoluted with resolution function", *observable, *pdfInMaterial, *resolutionFunction);
-	    ((RooNumConvPdf*)pdfFinal)->setConvolutionWindow(*mean, *resolutionFWHM, 2);
+	    ((RooNumConvPdf*)pdfFinal)->setConvolutionWindow(*mean, *resFunctSigma, 5);
 	}
 }
 
