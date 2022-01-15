@@ -65,8 +65,9 @@ void SWCalculatorPresenter::onInitModel() {
 	model->Connect("componentHistogramImported(TH1F*)",  this->ClassName(), this, "onModelComponentHistogramImported(TH1F*)");
 	model->Connect("fitRangeSet(DoublePair*)",           this->ClassName(), this, "onModelFitRangeSet(DoublePair*)");
 
-	model->Connect("twoDetectorSet(Bool_t)",             this->ClassName(), this, "onModelTwoDetectorSet(Bool_t)");
+	// model->Connect("twoDetectorSet(Bool_t)",             this->ClassName(), this, "onModelTwoDetectorSet(Bool_t)");
 	model->Connect("convolutionTypeSet(Int_t)",          this->ClassName(), this, "onModelConvolutionTypeSet(Int_t)");
+    model->Connect("backgroundTypeSet(Int_t)",           this->ClassName(), this, "onModelBackgroundTypeSet(Int_t)");
 	model->Connect("hasParabolaSet(Bool_t)",             this->ClassName(), this, "onModelHasParabolaSet(Bool_t)");
 	model->Connect("numberOfGaussiansSet(Int_t)",        this->ClassName(), this, "onModelNumberOfGaussiansSet(Int_t)");
 	model->Connect("numberOfExponentsSet(Int_t)",        this->ClassName(), this, "onModelNumberOfExponentsSet(Int_t)");
@@ -81,6 +82,7 @@ void SWCalculatorPresenter::onInitModel() {
 	// view->setFitRange(fitRange.first, fitRange.second);
 
 	view->setConvolutionType(model->getConvolutionType());
+    view->setBackgroundType(model->getSingleBackgroundType());
 
 	view->hasParabola->SetOn(model->getHasParabola());
 	view->numGauss->SetNumber(model->getNumberOfGaussians());
@@ -101,13 +103,19 @@ void SWCalculatorPresenter::buildFittingModel(){
 	model->getParametersPool()->synchronizePdfParameters(pdfParameters);
 }
 
-// Slots for View Signals
-void SWCalculatorPresenter::onViewEditParametersClicked() {
-    // Check if model needs recompiled
-    if (needRebuildPDF()){
+void SWCalculatorPresenter::rebuildModelIfNeeded(){
+    // If fitting properties in the model changed - recompile the fitting PDF
+    // In order to compare of changes we store "old" fit properties struct
+    if (!(oldFitProperties == model->getFitProperties())){
         buildFittingModel();
         oldFitProperties = model->getFitProperties();
     }
+}
+
+// Slots for View Signals
+void SWCalculatorPresenter::onViewEditParametersClicked() {
+    // Check if model needs recompiled
+    rebuildModelIfNeeded();
 
 	ModalDialogFrame* dialog = new ModalDialogFrame(gClient->GetRoot(), view->GetMainFrame(), "Model Parameters");
 	RooRealVar* observable = pdfProvider->getObservable();
@@ -120,10 +128,9 @@ void SWCalculatorPresenter::onViewEditParametersClicked() {
 }
 
 void SWCalculatorPresenter::onViewFitSpectrumClicked() {
-    if (needRebuildPDF()){
-        buildFittingModel();
-        oldFitProperties = model->getFitProperties();
-    }
+    // Check if model needs recompiled
+    view->drawText("Building Fit Model...");
+    rebuildModelIfNeeded();
 
     // Draw Text
 	view->drawText("Fitting...");
@@ -507,6 +514,12 @@ void SWCalculatorPresenter::onViewConvolutionSelected(Int_t i){
 	model->setConvolutionType(convolutionType);
 }
 
+void SWCalculatorPresenter::onViewSingleBgTypeSelected(Int_t i){
+    BackgroundType bgType = static_cast<BackgroundType>(i);
+    // Fix: TGButtonGroup signal fires twice?
+    model->setSingleBackgroundType(bgType);
+}
+
 void SWCalculatorPresenter::onViewHasParabolaSet(Bool_t b){
 	model->setHasParabola(b);
 }
@@ -555,14 +568,19 @@ void SWCalculatorPresenter::onModelHistogramImported(TH1F* hist){
 //    Int_t maxBin = model->getFitProperties().maxFitBin;
 	view->drawHistograms(hist, sourceHist);
 
-	// Update slider
+	// Update view fit range slider
 	Int_t firstBin = hist->GetXaxis()->GetFirst();
 	Int_t lastBin = hist->GetXaxis()->GetLast();
 	view->setFitRangeLimits(firstBin, lastBin);
 
+	// Update view histograms (THStack) range
 	Double_t loEdge = hist->GetXaxis()->GetBinCenter(firstBin);
 	Double_t hiEdge = hist->GetXaxis()->GetBinCenter(lastBin);
 	view->setFitRange(firstBin, lastBin, loEdge, hiEdge);
+
+	// Reflect single detector or coincidence UI
+	Bool_t isTwoDetector = HistProcessor::isTwoDetector(hist);
+    view->reflectTwoDetector(isTwoDetector);
 }
 
 void SWCalculatorPresenter::onModelSourceHistogramImported(TH1F* sourceHist){
@@ -587,6 +605,11 @@ void SWCalculatorPresenter::onModelConvolutionTypeSet(Int_t convolutionType){
 	// buildFittingModel();
 }
 
+void SWCalculatorPresenter::onModelBackgroundTypeSet(Int_t backgroundType){
+    view->setBackgroundType((BackgroundType)backgroundType);
+    // buildFittingModel();
+}
+
 void SWCalculatorPresenter::onModelFitRangeSet(DoublePair* fitRange){
 	Double_t minEnergy = model->getFitProperties().hist->GetXaxis()->GetBinLowEdge(fitRange->first);
 	Double_t maxEnergy = model->getFitProperties().hist->GetXaxis()->GetBinLowEdge(fitRange->second);
@@ -601,9 +624,9 @@ void SWCalculatorPresenter::onModelFitRangeSet(DoublePair* fitRange){
 	// buildFittingModel();
 }
 
-void SWCalculatorPresenter::onModelTwoDetectorSet(Bool_t isTwoDetector){
-	view->reflectTwoDetector(isTwoDetector);
-}
+//void SWCalculatorPresenter::onModelTwoDetectorSet(Bool_t isTwoDetector){
+//
+//}
 
 void SWCalculatorPresenter::onModelHasParabolaSet(Bool_t b){
 	view->hasParabola->SetOn(b);
@@ -623,23 +646,6 @@ void SWCalculatorPresenter::onModelNumberOfExponentsSet(Int_t num){
 void SWCalculatorPresenter::onModelNumberOfDampingExponentsSet(Int_t num){
 	view->numDampExponent->SetNumber(num);
 	// buildFittingModel();
-}
-
-Bool_t SWCalculatorPresenter::needRebuildPDF(){
-    FitProperties fitProperties = model->getFitProperties();
-
-    if (oldFitProperties.componentHist != fitProperties.componentHist) return true;
-    if (oldFitProperties.convolutionType != fitProperties.convolutionType) return true;
-    if (oldFitProperties.hasParabola != fitProperties.hasParabola) return true;
-    if (oldFitProperties.hist != fitProperties.hist) return true;
-    if (oldFitProperties.maxFitBin != fitProperties.maxFitBin) return true;
-    if (oldFitProperties.minFitBin != fitProperties.minFitBin) return true;
-    if (oldFitProperties.numberOfDampingExponents != fitProperties.numberOfDampingExponents) return true;
-    if (oldFitProperties.numberOfExponents != fitProperties.numberOfExponents) return true;
-    if (oldFitProperties.numberOfGaussians != fitProperties.numberOfGaussians) return true;
-    if (oldFitProperties.sourceHist != fitProperties.sourceHist) return true;
-
-    return false;
 }
 
 //void SWCalculatorPresenter::onModelFitPropertiesChanged(){

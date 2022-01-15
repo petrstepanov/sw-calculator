@@ -24,6 +24,10 @@ ParametersPool::ParametersPool() {
 	parametersPool = new RooArgSet();
 }
 
+RooArgSet* ParametersPool::getParameters(){
+    return parametersPool;
+}
+
 void ParametersPool::synchronizePdfParameters(RooArgSet* modelParameters) {
 	// Update Model Parameter values from
 	TIterator* it = modelParameters->createIterator();

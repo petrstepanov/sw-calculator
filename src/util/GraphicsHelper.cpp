@@ -226,8 +226,8 @@ TPaveText* GraphicsHelper::makeParametersPaveText(const RooArgList& params, Doub
 	box->SetBorderSize(1);
 //	box->SetTextFont(getFontCode(FONT_REGULAR));
 	box->SetTextAlign(ETextAlign::kHAlignLeft + ETextAlign::kVAlignCenter);
-	box->SetFillStyle(1001);
-	box->SetFillColorAlpha(EColor::kWhite, 0.9);
+	box->SetFillStyle(EFillStyle::kFDotted1);
+	box->SetFillColor(EColor::kWhite);
 
 	// Line counter (to draw horizontal lines later)
 	Int_t linesNumber = 0;

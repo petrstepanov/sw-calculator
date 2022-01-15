@@ -66,12 +66,12 @@ void SWCalculatorView::initUI(){
     tabsWidget = new TGTab(this, Constants::leftPanelWidth);
 
     // Import spectrum tab
-    TGCompositeFrame *tabImport = tabsWidget->AddTab("Material spectrum");
+    TGCompositeFrame *tabImport = tabsWidget->AddTab("Studied Spectrum");
     tabImport->SetLayoutManager(new TGVerticalLayout(tabImport));
     tabImport->AddFrame(new ImportSpectrumView(tabImport), new TGLayoutHints(kLHintsExpandX | kLHintsExpandY, dx, dx, dy*2, dy*2));
 
     // Import Kapton spectrum tab
-    TGCompositeFrame *tabImportKapton = tabsWidget->AddTab("Source contribution");
+    TGCompositeFrame *tabImportKapton = tabsWidget->AddTab("Source Contribution");
     tabImportKapton->SetLayoutManager(new TGVerticalLayout(tabImportKapton));
     tabImportKapton->AddFrame(new ImportSourceSpectrumView(tabImportKapton), new TGLayoutHints(kLHintsExpandX | kLHintsExpandY, dx, dx, dy*2, dy*2));
 
@@ -148,13 +148,23 @@ void SWCalculatorView::initUI(){
     // Separator
     tabFit->AddFrame(new TGHorizontal3DLine(tabFit), new TGLayoutHints(kLHintsExpandX, dx, dx, dy, 0));
 
+    // Background type (for single detector experiment)
+    singleDetectorBackgroundFrame = new TGHorizontalFrame(tabFit);
+    singleDetectorBackgroundFrame->AddFrame(new TGLabel(singleDetectorBackgroundFrame, "Background:"), new TGLayoutHints(kLHintsLeft | kLHintsBottom, dx+1, 3*dx));
+
+    bgTypeButtonGroup = new TGButtonGroup(singleDetectorBackgroundFrame, 1, 3, 0, kLHintsLeft | kLHintsTop); // rows, columns, spacing
+    new TGRadioButton(bgTypeButtonGroup, "Erf", BackgroundType::kErf);
+    new TGRadioButton(bgTypeButtonGroup, "Atan", BackgroundType::kAtan);
+    new TGRadioButton(bgTypeButtonGroup, "Step", BackgroundType::kStep);
+    singleDetectorBackgroundFrame->AddFrame(bgTypeButtonGroup, new TGLayoutHints(kLHintsNormal));
+
+    tabFit->AddFrame(singleDetectorBackgroundFrame, new TGLayoutHints(kLHintsNormal, dx, dx, 0, dy));
+
     // Convolution type and resolution function
     TGHorizontalFrame* convolutionParamsFrame = new TGHorizontalFrame(tabFit);
-
-    // Initialize a map with std::initialzer_list
     convolutionParamsFrame->AddFrame(new TGLabel(convolutionParamsFrame, "Convolution:"), new TGLayoutHints(kLHintsLeft | kLHintsBottom, dx+1, 3*dx));
 
-
+    // Initialize a map with std::initialzer_list
 //    comboConvolutionType = new TGComboBox(convolutionParamsFrame, 0);
 //    const std::map<Int_t, TString> convolutionTypesMap = {
 //    		{ConvolutionType::kNoConvolution, "None"},
@@ -168,10 +178,10 @@ void SWCalculatorView::initUI(){
 //    convolutionParamsFrame->AddFrame(comboConvolutionType, new TGLayoutHints(kLHintsLeft | kLHintsCenterY, dx, 0, 0, 2));
 
     // Create button Group with Matrix layout. ButtonGroup spacings are a mess.
-    convTypeButtonGroup = new TGButtonGroup(convolutionParamsFrame, 1, 3, 0, kLHintsLeft | kLHintsTop); // rows, columns, spacing
+    convTypeButtonGroup = new TGButtonGroup(convolutionParamsFrame, 1, 2, 0, kLHintsLeft | kLHintsTop); // rows, columns, spacing
     new TGRadioButton(convTypeButtonGroup, "None", ConvolutionType::kNoConvolution);
     new TGRadioButton(convTypeButtonGroup, "Fourier", ConvolutionType::kFFTConvolution);
-    new TGRadioButton(convTypeButtonGroup, "Numeric", ConvolutionType::kNumericConvolution);
+    // new TGRadioButton(convTypeButtonGroup, "Numeric", ConvolutionType::kNumericConvolution);
     convolutionParamsFrame->AddFrame(convTypeButtonGroup, new TGLayoutHints(kLHintsNormal));
 
     tabFit->AddFrame(convolutionParamsFrame, new TGLayoutHints(kLHintsNormal, dx, dx, 0, dy));
@@ -321,12 +331,10 @@ void SWCalculatorView::initUI(){
 
     // Save image button
     btnSaveImage = new TGTextButton(toolbarFrame, "Save image");
-    btnSaveImage->SetEnabled(false);
     toolbarFrame->AddFrame(btnSaveImage, new TGLayoutHints(kLHintsRight | kLHintsTop, 0, dx, 0, 0));
 
     // Save data file button
     btnSaveData = new TGTextButton(toolbarFrame, "Export as ASCII");
-    btnSaveData->SetEnabled(false);
     toolbarFrame->AddFrame(btnSaveData, new TGLayoutHints(kLHintsRight | kLHintsTop, 0, dx, 0, 0));  // left, right, top, bottom
 
     // Attach Right Canvas (Plot)
@@ -342,6 +350,9 @@ void SWCalculatorView::initUI(){
 
     // Disable toolbar on uiReady event
     Connect(this->GetMainFrame()->ClassName(), "uiReady()", this->ClassName(), this, "setToolbarEnabled(=kFALSE)");
+
+    // Draw welcome text
+    drawText("No Spectra Loaded", "Click 'Open File...' on the left to import a spectrum") ;
 }
 
 void SWCalculatorView::connectSignals(){
@@ -350,6 +361,7 @@ void SWCalculatorView::connectSignals(){
 	numFitSlider->Connect("PositionChanged()", "SWCalculatorPresenter", presenter, "onViewFitSliderRangeSet()");
 	// comboConvolutionType->Connect("Selected(Int_t)", "SWCalculatorPresenter", presenter, "onViewConvolutionSelected(Int_t)");
 	convTypeButtonGroup->Connect("Pressed(Int_t)", "SWCalculatorPresenter", presenter, "onViewConvolutionSelected(Int_t)");
+    bgTypeButtonGroup->Connect("Pressed(Int_t)", "SWCalculatorPresenter", presenter, "onViewSingleBgTypeSelected(Int_t)");
 
 	hasParabola->Connect("Toggled(Bool_t)", "SWCalculatorPresenter", presenter, "onViewHasParabolaSet(Bool_t)");
 	numGauss->Connect("ValueSet(Long_t)", "SWCalculatorPresenter", presenter, "onViewNumGaussSet()");
@@ -498,10 +510,14 @@ TCanvas* SWCalculatorView::getCanvas() {
 }
 
 void SWCalculatorView::reflectTwoDetector(Bool_t isTwoDetector){
-	const char* text = isTwoDetector ? "2 x" : "";
+    // Update S and W label ranges
+    const char* text = isTwoDetector ? "2 x" : "";
     lblRescale1->SetText(text);
     lblRescale2->SetText(text);
     lblRescale3->SetText(text);
+
+    // Show or hide single detector background panel
+    isTwoDetector ? UiHelper::hideFrame(singleDetectorBackgroundFrame) : UiHelper::showFrame(singleDetectorBackgroundFrame);
 }
 
 void SWCalculatorView::setComponentHistogram(TH1F* hist){
@@ -517,16 +533,34 @@ void SWCalculatorView::setComponentHistogram(TH1F* hist){
 	}
 }
 
-void SWCalculatorView::drawText(const char* text){
-    // Set single pad mode
+void SWCalculatorView::drawText(const char* heading, const char* caption){
+    // Ensure single pad mode
     setCanvasMode(CanvasMode::onePad);
 
-	TText* t = new TText(0.55, 0.5, text);
-	t->SetNDC();
-	t->SetTextAlign(ETextAlign::kHAlignCenter + ETextAlign::kVAlignCenter);
+    // Clear the canvas
+    TCanvas* canvas = embedCanvas->GetCanvas();
+    canvas->Clear();
 
-	TCanvas* canvas = embedCanvas->GetCanvas();
+    // Draw heading
+	TText* t = new TText(0.5, caption==0 ? 0.5 : 0.55, heading);
+    t->SetTextAlign(ETextAlign::kHAlignCenter + ETextAlign::kVAlignCenter);
+    t->SetNDC();
+	t->SetTextFont(42); // non bold
+    t->SetTextSize(0.07);
+    t->SetTextColor(EColor::kGray);
 	t->Draw();
+
+	// Draw caption
+	if (caption){
+	    TText* t2 = new TText(0.5, 0.45, caption);
+	    t2->SetTextAlign(ETextAlign::kHAlignCenter + ETextAlign::kVAlignCenter);
+	    t2->SetNDC();
+	    t2->SetTextFont(62); // non bold
+	    t2->SetTextSize(0.028);
+	    t2->SetTextColor(EColor::kBlack);
+	    t2->Draw();
+	}
+
 	canvas->Modified();
 	canvas->Update();
 }
@@ -543,6 +577,7 @@ void SWCalculatorView::setCanvasMode(CanvasMode mode){
 //	    canvas->SetMargin((GraphicsHelper::padMargins).left,
 //	    		(GraphicsHelper::padMargins).right, (GraphicsHelper::padMargins).bottom, (GraphicsHelper::padMargins).top);
 		canvas->SetRightMargin((GraphicsHelper::padMargins).right);
+        canvas->SetTopMargin((GraphicsHelper::padMargins).top);
 		canvas->SetLogy();
 	}
 	else {
@@ -558,10 +593,17 @@ void SWCalculatorView::setCanvasMode(CanvasMode mode){
 	    gPad->SetMargin((GraphicsHelper::padMargins).left, (GraphicsHelper::padMargins).right, (GraphicsHelper::padMargins).bottom, (GraphicsHelper::padMargins).top);
 	}
 	currentCanvasMode = mode;
+
+//    canvas->Modified();
+//    canvas->Update();
 }
 
 void SWCalculatorView::setConvolutionType(ConvolutionType convolutionType){
 	convTypeButtonGroup->SetButton(convolutionType);
+}
+
+void SWCalculatorView::setBackgroundType(BackgroundType backgroundType){
+    bgTypeButtonGroup->SetButton(backgroundType);
 }
 
 void SWCalculatorView::displayFilename(TString* fileName) {
@@ -701,12 +743,12 @@ void SWCalculatorView::drawHistograms(TH1* hist, TH1* sourceHist){
 	line->DrawLineNDC((x1+x2)/2, y1, (x1+x2)/2, y2)->Draw();
 
     // Add title
-    TText* t = new TText(0.5, 0.95, sourceHist ? "Studied Material and Source Contribution Spectra" : "Studied Material Spectrum");
-    t->SetNDC();
-    t->SetTextFont(42);
-    t->SetTextSize(0.035);
-    t->SetTextAlign(ETextAlign::kHAlignCenter + ETextAlign::kVAlignCenter);
-    t->Draw();
+//    TText* t = new TText(0.5, 0.95, sourceHist ? "Studied Material and Source Contribution Spectra" : "Studied Material Spectrum");
+//    t->SetNDC();
+//    t->SetTextFont(42);
+//    t->SetTextSize(0.035);
+//    t->SetTextAlign(ETextAlign::kHAlignCenter + ETextAlign::kVAlignCenter);
+//    t->Draw();
 
     canvas->Modified();
     canvas->Update();

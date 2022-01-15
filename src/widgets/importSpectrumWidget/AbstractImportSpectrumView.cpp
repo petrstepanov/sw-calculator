@@ -29,7 +29,7 @@ void AbstractImportSpectrumView::initUI(){
     // Open File Frame
     TGHorizontalFrame* frameOpenFile = new TGHorizontalFrame(this);
     {
-        btnOpenFile = new TGTextButton(frameOpenFile, " Open File ");
+        btnOpenFile = new TGTextButton(frameOpenFile, " Open File...");
         btnOpenFile->Connect("Clicked()", "AbstractImportSpectrumView", this, "onOpenFileClicked()");
 
         lblFileName = new TGLabel(frameOpenFile, Constants::LABEL_NO_FILE_LOADED);
@@ -43,7 +43,7 @@ void AbstractImportSpectrumView::initUI(){
     AddFrame(frameOpenFile, new TGLayoutHints(kLHintsExpandX, 0, 0, 0, dy));
 
     // File browser label
-    AddFrame(new TGLabel(this, "ASCII file:"), new TGLayoutHints(kLHintsLeft, 0, 0, dy*2, 0));
+    AddFrame(new TGLabel(this, "ASCII file listing:"), new TGLayoutHints(kLHintsLeft, 0, 0, dy*2, 0));
 
     // File browser
     txtFileBrowser = new TGTextView(this);
@@ -86,7 +86,7 @@ void AbstractImportSpectrumView::initUI(){
     // AddFrame(btnImportSpectrum, new TGLayoutHints(kLHintsExpandX, 0, 0, dy, dy));
 
     // Histogram preview label
-    AddFrame(new TGLabel(this, "Graphic preview:"), new TGLayoutHints(kLHintsLeft, 0, 0, dy*2, 0));
+    AddFrame(new TGLabel(this, "Spectrum plot:"), new TGLayoutHints(kLHintsLeft, 0, 0, dy*2, 0));
 
     // Histogram canvas
     embedCanvas = new TRootEmbeddedCanvas("embedHist", this, 10, 10, EFrameType::kTransientFrame); // EFrameType::kTransientFrame - no border

@@ -24,7 +24,7 @@
 class ParametersPool {
 public:
     ParametersPool();
-
+    RooArgSet* getParameters();
     void synchronizePdfParameters(RooArgSet* modelParameters);
 
 private:

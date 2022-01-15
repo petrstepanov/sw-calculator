@@ -24,6 +24,10 @@
 #include "DoublePair.h"
 #include "ParametersPool.h"
 
+enum BackgroundType {
+    kErf, kAtan, kStep
+};
+
 enum ConvolutionType {
     kNoConvolution, kFFTConvolution, kNumericConvolution
 };
@@ -33,6 +37,7 @@ struct FitProperties {
     Int_t minFitBin;
     Int_t maxFitBin;
     ConvolutionType convolutionType;
+    BackgroundType singleBgType;
     Bool_t hasParabola;
     Int_t numberOfGaussians;
     Int_t numberOfExponents;
@@ -40,6 +45,21 @@ struct FitProperties {
     TH1F *hist;
     TH1F *sourceHist;
     TH1F *componentHist;
+
+    bool operator==(const FitProperties& rhs) const {
+        if (componentHist != rhs.componentHist) return false;
+        if (convolutionType != rhs.convolutionType) return false;
+        if (singleBgType != rhs.singleBgType) return false;
+        if (hasParabola != rhs.hasParabola) return false;
+        if (hist != rhs.hist) return false;
+        if (maxFitBin != rhs.maxFitBin) return false;
+        if (minFitBin != rhs.minFitBin) return false;
+        if (numberOfDampingExponents != rhs.numberOfDampingExponents) return false;
+        if (numberOfExponents != rhs.numberOfExponents) return false;
+        if (numberOfGaussians != rhs.numberOfGaussians) return false;
+        if (sourceHist != rhs.sourceHist) return false;
+        return true;
+    }
 };
 
 // To benefit from signals/slots mechanism classes must inherit from TQObject
@@ -84,6 +104,10 @@ public:
     void setConvolutionType(ConvolutionType t);
     ConvolutionType getConvolutionType();
 
+    void setSingleBackgroundType(BackgroundType t);
+    BackgroundType getSingleBackgroundType();
+
+
     void setHasParabola(Bool_t hasParabola);
     Bool_t getHasParabola();
 
@@ -111,14 +135,15 @@ public:
     void histogramImported(TH1F *hist);              // *SIGNAL*
     void sourceHistogramImported(TH1F *hist);        // *SIGNAL*
     void componentHistogramImported(TH1F *hist);     // *SIGNAL*
-    void twoDetectorSet(Bool_t isTwoDetector);       // *SIGNAL*
+    // void twoDetectorSet(Bool_t isTwoDetector);    // *SIGNAL*
     void fitRangeSet(DoublePair *pair);              // *SIGNAL*
     void convolutionTypeSet(Int_t convolutionType);  // *SIGNAL*
+    void backgroundTypeSet(Int_t backgroundType);    // *SIGNAL*
     void hasParabolaSet(Bool_t b);                   // *SIGNAL*
     void numberOfGaussiansSet(Int_t num);            // *SIGNAL*
     void numberOfExponentsSet(Int_t num); 			 // *SIGNAL*
     void numberOfDampingExponentsSet(Int_t num);     // *SIGNAL*
-    // void fitPropertiesChanged();                     // *SIGNAL*
+    // void fitPropertiesChanged();                  // *SIGNAL*
 
 ClassDef(Model, 0)
 };

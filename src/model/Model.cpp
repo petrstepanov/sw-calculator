@@ -34,7 +34,8 @@ Model::Model(){
     // wWidth = 2;
     // wShift = 1;
 
-	fitProperties.convolutionType = kNoConvolution;
+	fitProperties.convolutionType = ConvolutionType::kNoConvolution;
+    fitProperties.singleBgType = BackgroundType::kErf;
 	fitProperties.hasParabola = kFALSE;
 	fitProperties.numberOfGaussians = 1;
 	fitProperties.numberOfExponents = 0;
@@ -123,6 +124,7 @@ void Model::setFitRange(Int_t minBin, Int_t maxBin){
         fitProperties.maxFitBin = maxBin;
 
         // Reset Parameters Pool because we can be fitting another peak
+        // Actually just remove mean from pool for now
         parametersPool = new ParametersPool();
 
         // Notfy the view about the fit range change
@@ -155,6 +157,21 @@ void Model::setConvolutionType(ConvolutionType t){
 ConvolutionType Model::getConvolutionType(){
 	return fitProperties.convolutionType;
 }
+
+void Model::setSingleBackgroundType(BackgroundType t){
+    if (fitProperties.singleBgType != t){
+        fitProperties.singleBgType = t;
+
+        // Emit signals to presenters
+        // fitPropertiesChanged();
+        backgroundTypeSet(t);
+    }
+}
+
+BackgroundType Model::getSingleBackgroundType(){
+    return fitProperties.singleBgType;
+}
+
 
 void Model::setHasParabola(Bool_t b){
     if (fitProperties.hasParabola != b){
@@ -238,12 +255,16 @@ void Model::componentHistogramImported(TH1F* hist){
 	Emit("componentHistogramImported(TH1F*)", hist);
 }
 
-void Model::twoDetectorSet(Bool_t isTwoDetector){
-	Emit("twoDetectorSet(Bool_t)", isTwoDetector);
-}
+//void Model::twoDetectorSet(Bool_t isTwoDetector){
+//	Emit("twoDetectorSet(Bool_t)", isTwoDetector);
+//}
 
 void Model::convolutionTypeSet(Int_t t){
 	Emit("convolutionTypeSet(Int_t)", t);
+}
+
+void Model::backgroundTypeSet(Int_t t){
+    Emit("backgroundTypeSet(Int_t)", t);
 }
 
 void Model::hasParabolaSet(Bool_t b){

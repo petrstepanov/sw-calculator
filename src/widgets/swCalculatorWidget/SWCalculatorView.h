@@ -54,6 +54,7 @@ class SWCalculatorView : public AbstractView<SWCalculatorPresenter> {
     void initUI();
     THStack* tHStack; // For drawing original and source contribution histograms
     TGHorizontalFrame* toolbarFrame;
+    TGHorizontalFrame* singleDetectorBackgroundFrame;
     void setCanvasMode(CanvasMode mode);
 
   public:
@@ -95,6 +96,7 @@ class SWCalculatorView : public AbstractView<SWCalculatorPresenter> {
     TGTextButton* removeHistogramButton;
 
     // Convolution radios
+    TGButtonGroup* bgTypeButtonGroup;
     TGButtonGroup* convTypeButtonGroup;
 
     // Fit
@@ -139,6 +141,7 @@ class SWCalculatorView : public AbstractView<SWCalculatorPresenter> {
     void setComponentHistogram(TH1F* hist);
 
     void setConvolutionType(ConvolutionType t);
+    void setBackgroundType(BackgroundType t);
 
     void displayFitParameters(RooFitResult* fitResult);
     void displayVariable(RooRealVar* variable);
@@ -161,7 +164,7 @@ class SWCalculatorView : public AbstractView<SWCalculatorPresenter> {
     void updateCanvasLimits(Double_t min, Double_t max);
 
     void drawHistograms(TH1* hist, TH1* sourceHist);
-    void drawText(const char* text);
+    void drawText(const char* text, const char* text2 = 0);
     void drawFitResult(RooPlot* spectrumPlot, RooPlot* residualsPlot);
 
     ClassDef(SWCalculatorView,0);

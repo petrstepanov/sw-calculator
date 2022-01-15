@@ -84,7 +84,7 @@ private:
     void initMaterialPdf(Bool_t hasParabola, TH1F* componentHist, const Int_t, const Int_t numLorentz, const Int_t numLorentzSum);
     void initSourceContribution(TH1F* sourceHist);
     void initConvolutedModel(ConvolutionType convolutionType);
-    void initSingleDetectorBackground();
+    void initSingleDetectorBackground(BackgroundType bgType);
     void initTwoDetectorBackground();
 
     Double_t getDefaultAValue(Double_t aMin, Double_t aMax, Int_t currentIndex, Int_t maxIndex);

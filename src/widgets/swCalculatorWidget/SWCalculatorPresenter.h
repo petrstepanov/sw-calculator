@@ -30,8 +30,7 @@ private:
 
     // Saving a copy of the old fit properties to see if the fitting PDF model should be rebuild or not
     FitProperties oldFitProperties;
-    Bool_t needRebuildPDF();
-
+    void rebuildModelIfNeeded();
     // RooPlot* spectrumPlot, residualsPlot;
 
 public:
@@ -46,6 +45,7 @@ public:
     void onViewFitSliderRangeSet();
     void onViewFitRangeSet();
     void onViewConvolutionSelected(Int_t convolutionType);
+    void onViewSingleBgTypeSelected(Int_t i);
     void onViewHasParabolaSet(Bool_t b);
     void onViewNumGaussSet();
     void onViewNumExponentSet();
@@ -70,6 +70,8 @@ public:
 	void onModelFitRangeSet(DoublePair* fitFange);
 
 	void onModelConvolutionTypeSet(Int_t);
+	void onModelBackgroundTypeSet(Int_t);
+
 	void onModelHasParabolaSet(Bool_t b);
 	void onModelNumberOfGaussiansSet(Int_t);
 	void onModelNumberOfExponentsSet(Int_t);

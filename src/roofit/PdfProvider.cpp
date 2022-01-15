@@ -21,6 +21,7 @@
 #include "pdfs/BackgroundPdf.h"
 #include "../util/RootHelper.h"
 #include "../roofit/AddPdf.h"
+#include "../roofit/pdfs/StepPdf.h"
 #include "../model/Constants.h"
 #include "../util/HistProcessor.h"
 #include "../util/StringUtils.h"
@@ -61,7 +62,7 @@ PdfProvider::PdfProvider(FitProperties fitProperties) : observable(0), mean(0), 
 	if (HistProcessor::isTwoDetector(fitProperties.hist)) {
         initTwoDetectorBackground();
 	} else {
-        initSingleDetectorBackground();
+        initSingleDetectorBackground(fitProperties.singleBgType);
 	}
 
 	// Convolute (or not) before adding source contribution histogram
@@ -198,7 +199,7 @@ void PdfProvider::initSourceContribution(TH1F* sourceHist){
 	pdfFinal->fixAddCoefNormalization(RooArgSet(*observable));
 }
 
-void PdfProvider::initSingleDetectorBackground() {
+void PdfProvider::initSingleDetectorBackground(BackgroundType bgType) {
 	// Ore-Powell background
 //    RooRealVar* threeGammaInt = new RooRealVar("threeGammaInt", "Three Gamma fraction", 10, 1, 100);
 //    BackgroundPdf* bgPdf = new BackgroundPdf("bgPdf", "Ore-Powell background", *observable, *threeGammaInt);
@@ -216,7 +217,7 @@ void PdfProvider::initSingleDetectorBackground() {
     Double_t flatBgContribution = rectAreaBelowHistogram/integral*100;
 
 	Double_t flatBackgroundContribution = flatBgContribution/integral;
-	RooRealVar* intFlatBackground = new RooRealVar("intFlatBackground", "Flat background fraction", flatBgContribution, flatBgContribution/1.5, TMath::Max(100., flatBgContribution*1.5), "%");
+	RooRealVar* intFlatBackground = new RooRealVar("intFlatBackground", "Flat background fraction", flatBgContribution, flatBgContribution/1.5, TMath::Min(100., flatBgContribution*1.5), "%");
     RooFormulaVar* intFlatBackgroundNorm = new RooFormulaVar("intFlatBackgroundNorm", "Constant background fraction normalized", "@0/100", RooArgList(*intFlatBackground));
 
     // Calculate "atan" background contribution
@@ -224,34 +225,43 @@ void PdfProvider::initSingleDetectorBackground() {
     Double_t rightWingValue = fitHistogram->GetBinContent(fitHistogram->GetNbinsX());
     Double_t peakCenter = fitHistogram->GetBinCenter(fitHistogram->GetMaximumBin());
 
-    // Atan can be higher on left wing or right wing
-    Double_t atanArea = 0;
-    RooGenericPdf* atanBackgroundPdf;
-    // TODO: if no convolution then erf (but stretched somehow corresponding to the resolution function of the detector?)
-    // TODO: if convolution then simply step function
-    if (leftWingValue < rightWingValue){
-        // Atan Contribution is right rectangle area
-        atanArea = (fitHistogram->GetXaxis()->GetXmax()-peakCenter)*TMath::Abs(leftWingValue-rightWingValue);
-        atanBackgroundPdf = new RooGenericPdf("erfBackgroundPdf", "Erf background pdf", "erf((@0 - @1))", RooArgList(*observable, *mean));
-        // atanBackgroundPdf = new RooGenericPdf("atanBackgroundPdf", "Arctangent background pdf", "@2/2 + (-1)*atan((@0 - @1))", RooArgList(*observable, *mean, *Constants::pi));
-    } else {
-        atanArea = (peakCenter-fitHistogram->GetXaxis()->GetXmin())*TMath::Abs(leftWingValue-rightWingValue);
-        atanBackgroundPdf = new RooGenericPdf("erfBackgroundPdf", "Erf background pdf", "1-erf((@0 - @1))", RooArgList(*observable, *mean));
-//        atanBackgroundPdf = new RooGenericPdf("atanBackgroundPdf", "Arctangent background pdf", "@2/2 + (-1)*erf((@0 - @1))", RooArgList(*observable, *mean, *Constants::pi));
+    RooAbsPdf* asymBackgroundPdf;
+    // Should we introduce another mean here?
+    RooRealVar* bgMean = mean; // new RooRealVar("asymBgMean", "Asymmetric background mean", mean->getVal(), mean->getMin(), mean->getMax(), "keV");
+    if (bgType == BackgroundType::kErf){
+        (leftWingValue < rightWingValue) ?
+            asymBackgroundPdf = new RooGenericPdf("erfBgPdf", "Erf background pdf", "erf((@0 - @1))", RooArgList(*observable, *bgMean)) :
+            asymBackgroundPdf = new RooGenericPdf("erfBgPdf", "Erf background pdf", "1-erf((@0 - @1))", RooArgList(*observable, *bgMean));
     }
-    Double_t atanContribution = atanArea/integral*100;
+    else if (bgType == BackgroundType::kAtan){
+        (leftWingValue < rightWingValue) ?
+            asymBackgroundPdf = new RooGenericPdf("atanBgPdf", "Atan background pdf", "@2/2 + atan((@0 - @1))", RooArgList(*observable, *bgMean, *Constants::pi)) :
+            asymBackgroundPdf = new RooGenericPdf("atanBgPdf", "Atan background pdf", "@2/2 + (-1)*erf((@0 - @1))", RooArgList(*observable, *bgMean, *Constants::pi));
+    }
+    else { // bgType == BackgroundType::kStep
+        (leftWingValue < rightWingValue) ?
+            asymBackgroundPdf = new StepPdf("stepBgPdf", "Step background pdf", *observable, *bgMean, kFALSE) :
+            asymBackgroundPdf = new StepPdf("stepBgPdf", "Step background pdf", *observable, *bgMean, kTRUE);
+    }
+
+    // Estimate asymmetric background contribution
+    Double_t asymArea = (leftWingValue < rightWingValue) ?
+            (fitHistogram->GetXaxis()->GetXmax()-peakCenter)*TMath::Abs(leftWingValue-rightWingValue): // Background looks like: ____----
+            (peakCenter-fitHistogram->GetXaxis()->GetXmin())*TMath::Abs(leftWingValue-rightWingValue); // Background looks like: ----____
+
+    Double_t asymContribution = asymArea/integral*100;
 
 //	backgroundComponents->add(*atanBackgroundPdf);
-	RooRealVar* intAtanBackground = new RooRealVar("intErfBackground", "Intensity of erf background", atanContribution, atanContribution/5, atanContribution*5, "%");
-    RooFormulaVar* intAtanBackgroundNorm = new RooFormulaVar("intErfBackgroundNorm", "Intensity of erf background normalized", "@0/100", RooArgList(*intAtanBackground));
+	RooRealVar* intAsymBackground = new RooRealVar("intStepBackground", "Intensity of step background", asymContribution, asymContribution/5, asymContribution*5, "%");
+    RooFormulaVar* intAsymBackgroundNorm = new RooFormulaVar("intErfBackgroundNorm", "Intensity of step background normalized", "@0/100", RooArgList(*intAsymBackground));
 
     if (pdfInMaterial){
-		pdfInMaterial = new RooAddPdf("withBackgroundPdf", "Material components and background", RooArgList(*atanBackgroundPdf, *flatBackgroundPdf, *pdfInMaterial), RooArgList(*intAtanBackgroundNorm, *intFlatBackgroundNorm));
+		pdfInMaterial = new RooAddPdf("withBackgroundPdf", "Material components and background", RooArgList(*asymBackgroundPdf, *flatBackgroundPdf, *pdfInMaterial), RooArgList(*intAsymBackgroundNorm, *intFlatBackgroundNorm));
 		pdfInMaterial->setAttribute(Constants::ATTR_NO_DRAW_ON_PLOT, kTRUE);
 		pdfInMaterial->fixAddCoefNormalization(RooArgSet(*observable));
     }
     else {
-    	pdfInMaterial = new RooAddPdf("backgroundPdf", "Background", RooArgList(*atanBackgroundPdf, *flatBackgroundPdf), RooArgList(*intAtanBackgroundNorm));
+    	pdfInMaterial = new RooAddPdf("backgroundPdf", "Background", RooArgList(*asymBackgroundPdf, *flatBackgroundPdf), RooArgList(*intAsymBackgroundNorm));
     }
 }
 
@@ -310,14 +320,14 @@ void PdfProvider::initConvolutedModel(ConvolutionType convolutionType) {
 	// resolutionFWHM->setConstant(kTRUE);
 	RooFormulaVar* resFunctSigma = new RooFormulaVar("resFunctSigma", "@0*@1", RooArgList(*resolutionFWHM, *Constants::rooFwhmToSigma));
 
+    RooConstVar* gaussMean = new RooConstVar("gaussMean", "Mean of Gaussian", 0);
 	if (convolutionType == kFFTConvolution){
 	    observable->setBins(2048, "cache");
-	    resolutionFunction = new RooGaussian("resolutionPdf", "Resolution function", *observable, *mean, *resFunctSigma);
+	    resolutionFunction = new RooGaussian("resolutionPdf", "Resolution function", *observable, *gaussMean, *resFunctSigma);
 	    pdfFinal = new RooFFTConvPdf("modelConvoluted", "Convoluted with resolution function", *observable, *pdfInMaterial, *resolutionFunction);
 	}
 	else if (convolutionType == kNumericConvolution){
 	    // Redefine mean at zero (different than for FFTConv)
-	    RooConstVar* gaussMean = new RooConstVar("gaussMean", "Mean of Gaussian", 0);
         resolutionFunction = new RooGaussian("resolutionPdf", "Resolution function", *observable, *gaussMean, *resFunctSigma);
 	    pdfFinal = new RooNumConvPdf("modelConvoluted", "Convoluted with resolution function", *observable, *pdfInMaterial, *resolutionFunction);
 	    ((RooNumConvPdf*)pdfFinal)->setConvolutionWindow(*mean, *resFunctSigma, 5);
