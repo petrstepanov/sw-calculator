@@ -6,16 +6,17 @@
 
 #include "AbstractImportSpectrumView.h"
 #include "AbstractImportSpectrumPresenter.h"
-#include <TRootEmbeddedCanvas.h>
+
 #include "../../util/StringUtils.h"
 #include "../../util/GraphicsHelper.h"
 #include "../../model/Constants.h"
 #include "../../util/UiHelper.h"
 #include <TSystem.h>
 #include <TGClient.h>
+
 #include <TGResourcePool.h>
 
-ClassImp(AbstractImportSpectrumView);
+ClassImpQ(AbstractImportSpectrumView);
 
 AbstractImportSpectrumView::AbstractImportSpectrumView(const TGWindow* w) : AbstractView<AbstractImportSpectrumPresenter>(w){
     initUI();
@@ -88,32 +89,55 @@ void AbstractImportSpectrumView::initUI(){
     AddFrame(new TGLabel(this, "Graphic preview:"), new TGLayoutHints(kLHintsLeft, 0, 0, dy*2, 0));
 
     // Histogram canvas
-    // Following options do not draw lines in TGFrame::Draw3dRectangle():
-    // EFrameType::kChildFrame, EFrameType::kTransientFrame no: EFrameType::kSunkenFrame
-    TRootEmbeddedCanvas* embedHist = new TRootEmbeddedCanvas("embedHist", this, 10, 10, EFrameType::kChildFrame);
-    embedHist->SetHeight(210);
-    AddFrame(embedHist, new TGLayoutHints(kLHintsExpandX, 0, 0, dy, 0));
+    embedCanvas = new TRootEmbeddedCanvas("embedHist", this, 10, 10, EFrameType::kTransientFrame); // EFrameType::kTransientFrame - no border
+    embedCanvas->SetHeight(210);
+    AddFrame(embedCanvas, new TGLayoutHints(kLHintsExpandX | kLHintsBottom, 0, 0, dy, 0));
+
+    // TGCanvas* canvas = new TGCanvas(this);
 
     // Bitwise calculator https://bitwisecmd.com/
     // embedHist->ChangeOptions(kFixedHeight);
 
-    canvasHist = embedHist->GetCanvas();
-//    canvasHist->SetEditable(0);
-    canvasHist->SetBorderMode(0);
-    canvasHist->SetBorderSize(0);
+    TCanvas* canvas = embedCanvas->GetCanvas();
+//    canvas->SetEditable(0);
+//    canvas->SetBorderMode(0);
+//    canvas->SetBorderSize(0);
+
+    // Make canvas same color as the UI panels
     Pixel_t bgColor = TColor::GetColor(232, 232, 232);
-    canvasHist->SetFillColor(bgColor);
-    canvasHist->SetTopMargin(0.05); // 0.1
-    canvasHist->SetBottomMargin(0.15);
-    canvasHist->SetLeftMargin(0.1);
-    canvasHist->SetRightMargin(0.01); // 0.05
-    canvasHist->SetLogy();
-    // GraphicsHelper::drawXCanvas(canvasHist);
-    // canvasHist->Update();
-    // Temp hack
-//    btnSetRange = new TGTextButton(this, " Set Range ");
-//    btnSetRange->Connect("Clicked()", this->ClassName(), this, "onSetRangeClicked()");
-//    AddFrame(btnSetRange, new TGLayoutHints(kLHintsLeft | kLHintsCenterY));
+    canvas->SetFillColor(bgColor);
+
+    // Set canvas margins and log y axis
+    canvas->SetTopMargin(0.05); // 0.1
+    canvas->SetBottomMargin(0.15);
+    canvas->SetLeftMargin(0.1);
+    canvas->SetRightMargin(0.01); // 0.05
+    canvas->SetLogy();
+//    canvas->SetBorderMode(0);
+//    canvas->SetBorderSize(0);
+//    canvas->SetFrameBorderMode(0);
+//    canvas->SetFrameBorderSize(0);
+//    canvas->Modified();
+//    canvas->Update();
+
+    // Map windows so we can get the real pixel width of the embedded canvas
+//    MapSubwindows();
+//    Layout();
+
+//    ((TGFrame *)this)->Connect("ProcessedConfigure(Event_t*)",
+//                               "AbstractImportSpectrumView", this, "OnProcessedConfigure(Event_t*)");
+//
+//    ((TGFrame *)this)->Connect("ProcessedEvent(Event_t*)",
+//                               "AbstractImportSpectrumView", this, "OnProcessedEvent(Event_t*)");
+//
+//    canvas->Modified();
+//    canvas->Update();
+
+    // Global slots
+    // Connection from all objects of a class you should write
+    // Can be "MyMainFrame" or "ModalDialogFrame"
+    std::cout << this->GetMainFrame()->ClassName() << std::endl;
+    TQObject::Connect(this->GetMainFrame()->ClassName(), "uiReady()", this->ClassName(), this, "handleUiReady()");
 }
 
 AbstractImportSpectrumPresenter* AbstractImportSpectrumView::instantinatePresenter() {
@@ -126,9 +150,9 @@ void AbstractImportSpectrumView::onOpenFileClicked(){
     presenter->onOpenFileClicked();
 }
 
-void AbstractImportSpectrumView::onImportSpectrumClicked(){
-    presenter->onImportSpectrumClicked();
-}
+//void AbstractImportSpectrumView::onImportSpectrumClicked(){
+//    presenter->onImportSpectrumClicked();
+//}
 
 // Calls from Presenter
 void AbstractImportSpectrumView::loadFile(TString* fileNamePath){
@@ -160,13 +184,15 @@ TString* AbstractImportSpectrumView::getFileName(){
 void AbstractImportSpectrumView::drawHistogram(TH1F* h){
 	// Copy histogram so we dont modify original histogram colors in the Model
 	TH1* hist = new TH1F();
+	h->Print("base");
+
 	h->Copy(*hist); // Copy h into hist
+	hist->Print("base");
 	hist->SetTitle("");
 	hist->GetXaxis()->SetTitle("Energy, keV");
 	hist->GetYaxis()->SetTitle("Counts");
 
-    canvasHist->cd();
-    canvasHist->SetFrameFillStyle(EFillStyle::kFEmpty);
+    embedCanvas->GetCanvas()->cd();
 
     // hist->SetLineColor(getHistogramColor());
     hist->SetLineColor(kGray+1);
@@ -180,14 +206,17 @@ void AbstractImportSpectrumView::drawHistogram(TH1F* h){
     hist->GetXaxis()->SetTitleSize(0.06);
     hist->GetYaxis()->SetTitleOffset(0.85);
     hist->GetYaxis()->SetTitleSize(0.06);
+
+    gStyle->SetOptStat("in");
     hist->Draw();
 
-    GraphicsHelper::alignStats(canvasHist, Alignment::TOP_RIGHT, Decoration::TRANSPARENT, 0.07, 0.35);
-
-//     canvasHist->Modified();
-    canvasHist->Update();
+    GraphicsHelper::alignStats(embedCanvas->GetCanvas(), Alignment::TOP_RIGHT, Decoration::TRANSPARENT, 0.07, 0.35);
 }
 
 Int_t AbstractImportSpectrumView::getHistogramColor(){
     return GraphicsHelper::colorPrimary->GetNumber();
+}
+
+void AbstractImportSpectrumView::handleUiReady(){
+    GraphicsHelper::drawXCanvas(embedCanvas);
 }

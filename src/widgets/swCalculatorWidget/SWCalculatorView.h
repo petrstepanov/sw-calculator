@@ -52,6 +52,7 @@ enum class CanvasMode {
 class SWCalculatorView : public AbstractView<SWCalculatorPresenter> {
   protected:
     void initUI();
+    THStack* tHStack; // For drawing original and source contribution histograms
 
   public:
     SWCalculatorView(const TGWindow *w = 0);
@@ -124,7 +125,7 @@ class SWCalculatorView : public AbstractView<SWCalculatorPresenter> {
 
     // Calls from Presenter
     void setTabEnabled(Int_t, Bool_t);
-    void setToolbarEnabled(Bool_t isEnabled);
+    void setToolbarEnabled(Bool_t isEnabled = kFALSE);
 
     void setFitRange(Double_t minBin, Double_t maxBin, Double_t min, Double_t max);
     void setFitRangeLimits(Double_t minBin, Double_t maxBin);

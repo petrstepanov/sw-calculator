@@ -49,7 +49,7 @@ PdfProvider::PdfProvider(FitProperties fitProperties) : observable(0), mean(0), 
 	// Histograms can be acessed via gROOT->FindObject. So proper way to treat them is pass by reference?
 	// Problem: if you pass histogram by value then you copy it but it still has the same ROOT name? Mess.
 	// So we pass histograms by reference. But here cutHist() always creates new histogram! So we avoid changes in model.
-	fitHistogram = histProcessor->cutHist("fitHistogram", fitProperties.hist);
+	fitHistogram = histProcessor->cutHist("fitHistogram", fitProperties.hist, fitProperties.minFitBin, fitProperties.maxFitBin);
 	fitHistogram->Print();
 
 	// Initialize pdfs in material
@@ -57,10 +57,10 @@ PdfProvider::PdfProvider(FitProperties fitProperties) : observable(0), mean(0), 
 	initMaterialPdf(fitProperties.hasParabola, fitProperties.componentHist, fitProperties.numberOfGaussians, fitProperties.numberOfExponents, fitProperties.numberOfDampingExponents);
 
 	// Add correspondent background
-	if (fitProperties.isTwoDetector == kFALSE) {
-		initSingleDetectorBackground();
+	if (HistProcessor::isTwoDetector(fitProperties.hist)) {
+        initTwoDetectorBackground();
 	} else {
-		initTwoDetectorBackground();
+        initSingleDetectorBackground();
 	}
 
 	// Convolute (or not) before adding source contribution histogram
@@ -98,9 +98,13 @@ void PdfProvider::initMaterialPdf(Bool_t hasParabola, TH1F* componentHist, const
 
 	// Component Histogram PDF
 	if (componentHist){
+	    // Trim component histogram one bin wider on each end than the original spectrum
 		HistProcessor* histProcessor = HistProcessor::getInstance();
-		componentHist->GetXaxis()->SetRangeUser(observable->getMin(), observable->getMax());
-		TH1F* componentHistogram = histProcessor->cutHist("componentHistogram", componentHist);
+		Int_t minBin = componentHist->GetXaxis()->FindBin(observable->getMin());
+        Int_t maxBin = componentHist->GetXaxis()->FindBin(observable->getMax());
+        // Do not use ranges anymore - complicates things on view side
+		// componentHist->GetXaxis()->SetRangeUser(observable->getMin(), observable->getMax());
+		TH1F* componentHistogram = histProcessor->cutHist("componentHistogram", componentHist, minBin, maxBin);
 		componentHistogram = histProcessor->removeHistNegatives("componentHistogramNoNegatives", componentHistogram);
 
 		RooDataHist* componentDataHist = new RooDataHist("componentDataHist", "Component Data Hist", RooArgList(*observable), componentHistogram);
@@ -169,9 +173,11 @@ void PdfProvider::initSourceContribution(TH1F* sourceHist){
 	if (!sourceHist) return;
 
 	// cutHist() always returns copy of the histogram so we ensure we don't change the model
-	HistProcessor* histProcessor = HistProcessor::getInstance();
-	sourceHist->GetXaxis()->SetRangeUser(observable->getMin(), observable->getMax());
-	TH1F* sourceHistogram = histProcessor->cutHist("sourceHistogram", sourceHist);
+    HistProcessor* histProcessor = HistProcessor::getInstance();
+    Int_t minBin = sourceHist->GetXaxis()->FindBin(observable->getMin());
+    Int_t maxBin = sourceHist->GetXaxis()->FindBin(observable->getMax());
+	// sourceHist->GetXaxis()->SetRangeUser(observable->getMin(), observable->getMax());
+	TH1F* sourceHistogram = histProcessor->cutHist("sourceHistogram", sourceHist, minBin, maxBin);
 //	histProcessor->liftHistAboveZero(sourceHistogram);
 	sourceHistogram = histProcessor->removeHistNegatives("sourceHistogramNoNegatives", sourceHistogram);
 
@@ -297,7 +303,8 @@ RooArgList* PdfProvider::getIndirectParameters() {
 	TIterator* it = pdfInMaterial->getComponents()->createIterator();
 	while (TObject* tempObj = it->Next()) {
 		if (IndirectParamPdf* paramPdf = dynamic_cast<IndirectParamPdf*>(tempObj)) {
-			RooArgList* list = paramPdf->getParameters(fitProperties.isTwoDetector);
+		    Bool_t isTwoDetector = HistProcessor::isTwoDetector(fitProperties.hist);
+			RooArgList* list = paramPdf->getParameters(isTwoDetector);
 			parameters->add(*list);
 		}
 	}

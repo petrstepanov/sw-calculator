@@ -30,7 +30,7 @@ public:
     static HistProcessor* getInstance();
 
     Double_t liftHist(TH1F* hist, Double_t lift);
-    TH1F* cutHist(const char *newname, TH1F* hist);
+    TH1F* cutHist(const char *newname, TH1F* hist, Int_t minBin, Int_t maxBin);
     TH1F* cutHistBasement(const char *newname, TH1F* hist, Int_t, Int_t);
     RooCurve* subtractCurves(const char *newname, RooCurve*, RooCurve*);
     TH1F* subtractCurve(const char *newname, TH1F*, RooCurve*);
@@ -43,7 +43,7 @@ public:
     Double_t calcBackgroundFraction(TH1F*);
     Chi2Struct getChi2(TH1F*, RooCurve*, RooAbsPdf*);
     std::pair<Double_t, Double_t> calcIntegral(TH1F*, Double_t, Double_t);
-    Bool_t isTwoDetetor(TH1F*);
+    static Bool_t isTwoDetector(TH1* hist);
     Double_t getPdfMaximumX (RooAbsPdf*, const RooArgList&);
     std::pair<Double_t, Double_t> getHistogramSafeFitRange(TH1F*);
     RooRealVar* getSParameter(TH1F* hist, Double_t sWidth, Double_t mean, Bool_t isTwoDetector);

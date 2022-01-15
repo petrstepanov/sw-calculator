@@ -36,7 +36,7 @@ public:
     void onOpenFileClicked();
 
     // TODO: implement in all inherited classes
-    void onImportSpectrumClicked();
+//    void onImportSpectrumClicked();
     
     // Different implementations for importing Kapton spectrum and regular spectrum
     virtual void setModelFileName(TString* fileNamePath){};
@@ -44,6 +44,8 @@ public:
 
 private:
     TH1F* currentHist;
+
+    ClassDef(AbstractImportSpectrumPresenter, 0)
 };
 
 #endif /* ABSTRACTIMPORTSPECTRUMPRESENTER_H */

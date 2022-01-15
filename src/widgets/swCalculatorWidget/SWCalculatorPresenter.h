@@ -22,6 +22,15 @@
 class SWCalculatorView;
 
 class SWCalculatorPresenter : public AbstractPresenter<Model, SWCalculatorView> {
+
+private:
+    PdfProvider* pdfProvider;
+    void buildFittingModel();
+
+    // Saving a copy of the old fit properties to see if the fitting PDF model should be rebuild or not
+    FitProperties oldFitProperties;
+    Bool_t needRebuildPDF();
+
 public:
     SWCalculatorPresenter(SWCalculatorView* view);
 
@@ -62,10 +71,9 @@ public:
 	void onModelNumberOfGaussiansSet(Int_t);
 	void onModelNumberOfExponentsSet(Int_t);
 	void onModelNumberOfDampingExponentsSet(Int_t);
+	void onModelFitPropertiesChanged();
 
-private:
-	PdfProvider* pdfProvider;
-	void buildFittingModel();
+	ClassDef(SWCalculatorPresenter,1)
 };
 
 #endif /* SWCALCULATORPRESENTER_H */

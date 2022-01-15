@@ -1,4 +1,4 @@
-/*
+ /*
  * To change this license header, choose License Headers in Project Properties.
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
@@ -11,6 +11,8 @@
 #include "../../util/UiHelper.h"
 #include "../../util/FileUtils.h"
 
+ClassImp(AbstractImportSpectrumPresenter)
+
 AbstractImportSpectrumPresenter::AbstractImportSpectrumPresenter(AbstractImportSpectrumView* view) : 
     AbstractPresenter<Model, AbstractImportSpectrumView>(view) {
 	model = instantinateModel();
@@ -19,7 +21,7 @@ AbstractImportSpectrumPresenter::AbstractImportSpectrumPresenter(AbstractImportS
 void AbstractImportSpectrumPresenter::onOpenFileClicked(){
     // Get FileInfo from open file dialog
     UiHelper* uiHelper = UiHelper::getInstance();
-    TGFileInfo* fileInfo = uiHelper->getFileFromDialog();
+    TGFileInfo* fileInfo = uiHelper->getFileFromDialog(view->GetMainFrame());
     if (!fileInfo->fFilename){
         return;
     }
@@ -34,38 +36,30 @@ void AbstractImportSpectrumPresenter::onOpenFileClicked(){
 	FileUtils* fileUtils = FileUtils::getInstance();
 	TH1F* hist = fileUtils->importTH1(fileName->Data());
 	if (!hist){
-		UiHelper* ui = UiHelper::getInstance();
-		ui->showOkDialog("File type is not supported.", EMsgBoxIcon::kMBIconStop);
+		UiHelper::showOkDialog(view->GetMainFrame(), "File type is not supported.", EMsgBoxIcon::kMBIconStop);
 		return;
 	}
 
-	hist->Print("V");
+	hist->Print("base");
 
-	// Save histogram that goes to Model (bad manners but easy...)
-	currentHist = hist;
-
-	// Update Model
-	// Corresponding overridden method setModelHist() will be called
+	// Update Model. Corresponding overridden method setModelHist() will be called.
 	setModelHist(hist);
-
-	// Update View
-	view->drawHistogram(hist);
 }
 
-void AbstractImportSpectrumPresenter::onImportSpectrumClicked(){
-    // Import Histogram
-    // Int_t energyColumn = view->getEnergyColumnNumber();
-    // Int_t countsColumn = view->getCountsColumnNumber();
-    TString* fileName = view->getFileName();
-    FileUtils* fileUtils = FileUtils::getInstance();
-    TH1F* hist = fileUtils->importTH1(fileName->Data());
-    if (!hist){
-        return;
-    }
-
-    // Update Model
-    setModelHist(hist);
-
-    // Update View
-    view->drawHistogram(hist);
-}
+//void AbstractImportSpectrumPresenter::onImportSpectrumClicked(){
+//    // Import Histogram
+//    // Int_t energyColumn = view->getEnergyColumnNumber();
+//    // Int_t countsColumn = view->getCountsColumnNumber();
+//    TString* fileName = view->getFileName();
+//    FileUtils* fileUtils = FileUtils::getInstance();
+//    TH1F* hist = fileUtils->importTH1(fileName->Data());
+//    if (!hist){
+//        return;
+//    }
+//
+//    // Update Model
+//    setModelHist(hist);
+//
+//    // Update View
+//    view->drawHistogram(hist);
+//}

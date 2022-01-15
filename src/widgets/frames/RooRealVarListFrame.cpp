@@ -9,13 +9,13 @@
 #include "RooRealVarFrame.h"
 #include "../AbstractView.h"
 #include "../../util/RootHelper.h"
+#include "../../util/UiHelper.h"
 #include "../../model/Constants.h"
 #include <TGLabel.h>
 #include <TObject.h>
 #include <TG3DLine.h>
 #include <TGResourcePool.h>
 #include <TGFont.h>
-//#include <GuiTypes.h>
 
 ClassImp(RooRealVarListFrame);
 
@@ -50,21 +50,21 @@ void RooRealVarListFrame::initUI(){
 	valueLabel->SetWidth(90);
 	valueLabel->SetTextJustify(kTextLeft);
 	valueLabel->SetTextFont(menuHiliteFont);
-	headerFrame->AddFrame(valueLabel, new TGLayoutHints(kLHintsLeft | kLHintsCenterY, dx, dx));
+	headerFrame->AddFrame(valueLabel, new TGLayoutHints(kLHintsLeft | kLHintsCenterY, EPadding::dx, EPadding::dx));
 
 	TGLabel* limitsLabel = new TGLabel(headerFrame, "Limits");
 	limitsLabel->ChangeOptions(nameLabel->GetOptions() | kFixedWidth);
 	limitsLabel->SetWidth(189);
 	limitsLabel->SetTextJustify(kTextLeft);
 	limitsLabel->SetTextFont(menuHiliteFont);
-	headerFrame->AddFrame(limitsLabel, new TGLayoutHints(kLHintsLeft | kLHintsCenterY, dx, dx));
+	headerFrame->AddFrame(limitsLabel, new TGLayoutHints(kLHintsLeft | kLHintsCenterY, EPadding::dx, EPadding::dx));
 
 	TGLabel* fixedLabel = new TGLabel(headerFrame, "Fixed");
 	fixedLabel->SetTextFont(menuHiliteFont);
-	headerFrame->AddFrame(fixedLabel, new TGLayoutHints(kLHintsLeft | kLHintsCenterY, dx));
+	headerFrame->AddFrame(fixedLabel, new TGLayoutHints(kLHintsLeft | kLHintsCenterY, EPadding::dx));
 
-	this->AddFrame(headerFrame, new TGLayoutHints(kLHintsLeft | kLHintsExpandX, 0, 0, dy, dy));
-	this->AddFrame(new TGHorizontal3DLine(this), new TGLayoutHints(kLHintsExpandX, 0, 0, dy, dy));
+	this->AddFrame(headerFrame, new TGLayoutHints(kLHintsLeft | kLHintsExpandX, 0, 0, EPadding::dy, EPadding::dy));
+	this->AddFrame(new TGHorizontal3DLine(this), new TGLayoutHints(kLHintsExpandX, 0, 0, EPadding::dy, EPadding::dy));
 
 	// List of RooRealVars
 	TIterator* it = parameters->createIterator();
@@ -77,7 +77,7 @@ void RooRealVarListFrame::initUI(){
 		// TODISS: put in dissertation (mess top peak with higher statistics)
 		if (var && !var->getAttribute(Constants::ATTR_HIDE_PARAMETER_FROM_UI)){
 			RooRealVarFrame* frame = new RooRealVarFrame(this, var);
-			this->AddFrame(frame, new TGLayoutHints(kLHintsLeft | kLHintsExpandX, 0, 0, dy, dy));
+			this->AddFrame(frame, new TGLayoutHints(kLHintsLeft | kLHintsExpandX, 0, 0, EPadding::dy, EPadding::dy));
 		}
 	}
 }

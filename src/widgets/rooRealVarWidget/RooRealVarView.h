@@ -54,7 +54,7 @@ public:
     void onMaximumChange(char* c);
     void onSetConstant(Bool_t isConstant);
 
-    // ClassDef(RooRealVarView,0);    
+    ClassDef(RooRealVarView,0);
 };
 
 #endif /* ROOREALVARVIEW_H */

@@ -15,26 +15,26 @@
 #define ABSTRACTVIEW_H
 
 #include <TGFrame.h>
-#include <iostream>
-#include "../util/Debug.h"
 
-enum Padding {
-	dx = 10, dy = 5
-};
+// AbstractView inherits from TGCompositeFrame -> TQObject. Therefore its descendants can utilize QT signals
 
 template<class P> class AbstractView: public TGCompositeFrame {
-protected:
-	P* presenter;
-	virtual P* instantinatePresenter()=0;
-
 public:
-	AbstractView(const TGWindow *w = 0) : TGCompositeFrame(w) {
-		presenter = nullptr;
-	}
+    AbstractView(const TGWindow *w = 0) : TGCompositeFrame(w) {
+        presenter = nullptr;
+    }
 
-	~AbstractView() {
-		delete presenter;
-	}
+    ~AbstractView() {
+        delete presenter;
+    }
+
+protected:
+    P* presenter;
+
+    virtual P* instantinatePresenter()=0;
+
+    // ClassDef(AbstractView,0)
 };
 
+// ClassImp(AbstractView);
 #endif /* ABSTRACTVIEW_H */

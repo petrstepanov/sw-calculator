@@ -29,9 +29,6 @@ public:
     static Int_t getNumCpu();
     static void startTimer(void);
     static void stopAndPrintTimer();
-    static TGCompositeFrame* getParentFrame(TGFrame* frame);
-    static void showFrame(TGFrame* frame);
-    static void hideFrame(TGFrame* frame);
     static TGNumberFormat::EStyle getNumberFormatStyle(Double_t value);
     static void setRooRealVarValueLimits(RooRealVar* var, Double_t value, Double_t min, Double_t max);
     static RooRealVar* getParameterNameContains(RooAbsPdf* pdf, const char* nameSubstring);

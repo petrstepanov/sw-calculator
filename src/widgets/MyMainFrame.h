@@ -24,8 +24,8 @@ public:
     void addChildFrame(TGFrame* child);
     void exit();
 
-private:
-    void mapAndResize();
+    // Signals
+    void uiReady(); // *SIGNAL*
 
     ClassDef(MyMainFrame, 0);
 };

@@ -39,11 +39,20 @@ void ModalDialogFrame::show(Int_t minWidth, Int_t minHeight){
 	CenterOnParent();
 	MapWindow();
 
+    // Signal that notifies child widgets that layout is ready
+	// width and heights of the widgets should be calculated in pixels at this point
+    uiReady();
+
 	// Disable main window
 	gClient->WaitFor(this);
 }
 
 void ModalDialogFrame::closeWindow(){
 //	delete this;
-		DeleteWindow();
+	DeleteWindow();
+}
+
+// Emit UI ready signal (canvases and widgets should have specified width and height in pixels and layed out)
+void ModalDialogFrame::uiReady(){
+	Emit("uiReady()");
 }

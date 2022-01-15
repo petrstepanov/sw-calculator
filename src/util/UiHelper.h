@@ -17,27 +17,32 @@
 #include <TGFrame.h>
 #include <TGMsgBox.h>
 #include <TGFileDialog.h>
+#include <TGFrame.h>
 #include <TGLabel.h>
 #include <TGWindow.h>
 #include "../widgets/frames/ModalDialogFrame.h"
+
+enum EPadding {
+    dx = 10,
+    dy = 5
+};
 
 class UiHelper {
 public:   
     static UiHelper* getInstance();
     static void setLabelColor(TGLabel* label, const char* color);
-    static TGCompositeFrame* getParentFrame(TGFrame* frame);
     static Int_t getUId();
-    int showOkDialog(const char* message = "Lorem Ipsum", EMsgBoxIcon icon = EMsgBoxIcon::kMBIconAsterisk);
-    TGFileInfo* getFileFromDialog();
-    void setMainFrame(TGWindow* window);
-    TGWindow* getMainFrame();
-    ModalDialogFrame* getDialog(const char* windowName = "");
+    static int showOkDialog(const TGWindow* mainFrame = NULL, const char* message = "Hello World!", EMsgBoxIcon icon = EMsgBoxIcon::kMBIconAsterisk);
+    TGFileInfo* getFileFromDialog(const TGWindow* mainFrame = NULL);
+    static TGCompositeFrame* getParentFrame(TGFrame* frame);
+    static void showFrame(TGFrame* frame);
+    static void hideFrame(TGFrame* frame);
         
 private:
     UiHelper();
     static Int_t uid;
     static UiHelper* instance;
-    TGWindow* mainFrame = nullptr;
+//    TGWindow* mainFrame = nullptr;
 };
 
 #endif /* UIHELPER_H */

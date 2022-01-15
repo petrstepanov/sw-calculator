@@ -62,9 +62,10 @@ InputFileType FileUtils::detectFileType(const char* path){
 }
 
 TH1F* FileUtils::importTH1(const char* path){
-	// Determine file type
+	// Determine input file type
 	InputFileType fileType = detectFileType(path);
 
+	// Read histogram from file (depending on file type)
 	switch(fileType) {
 		case InputFileType::Maestro:
 			return importTH1Maestro(path);
@@ -110,7 +111,7 @@ TH1F* FileUtils::importTH1Maestro(const char* path){
 	Int_t id = (new TDatime())->Get();
 	TString* pathString = new TString(path);
 	TString* title = StringUtils::stripFileName(pathString);
-	TH1F* hist = new TH1F(TString::Format("hist%d", id), title->Data(), nChannels, energyMin - binWidth / 2, energyMax + binWidth / 2);
+	TH1F* hist = new TH1F(TString::Format("hist_%d", id), title->Data(), nChannels, energyMin - binWidth / 2, energyMax + binWidth / 2);
 
 	for (int channel = 1; channel <= nChannels; channel++){
 		int count = 0;
@@ -212,7 +213,7 @@ TH1F* FileUtils::importTH1Canberra(const char* path, int eColumn, int cColumn){
 	Int_t id = (new TDatime())->Get();
 	TString* pathString = new TString(path);
 	TString* title = StringUtils::stripFileName(pathString);
-	TH1F* hist = new TH1F(TString::Format("hist%d", id), title->Data(), bins, energyMin - binWidth / 2, energyMax + binWidth / 2);
+	TH1F* hist = new TH1F(TString::Format("hist_%d", id), title->Data(), bins, energyMin - binWidth / 2, energyMax + binWidth / 2);
 	hist->GetXaxis()->SetTitle("Energy, keV");
 	hist->GetYaxis()->SetTitle("Counts");
 	// TH1I (const char *name, const char *title, Int_t nbinsx, Double_t xlow, Double_t xup)

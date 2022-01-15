@@ -18,6 +18,8 @@ public:
 	virtual void closeWindow();
 	void show(Int_t minWidth = 0, Int_t minHeight = 0);
 
+	void uiReady(); // **SIGNAL**
+
 	ClassDef(ModalDialogFrame, 0)
 };
 

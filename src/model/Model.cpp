@@ -34,14 +34,6 @@ Model::Model(){
     // wWidth = 2;
     // wShift = 1;
 
-    // Histograms
-//	peakHistNoBg = nullptr;
-//	chiHist = nullptr;
-
-    // Fitting model properties
-//	fitProperties.fitMin = 0;
-//	fitProperties.fitMax = 0;
-	fitProperties.isTwoDetector = kFALSE;
 	fitProperties.convolutionType = kNoConvolution;
 	fitProperties.hasParabola = kFALSE;
 	fitProperties.numberOfGaussians = 1;
@@ -52,6 +44,7 @@ Model::Model(){
 	fitProperties.componentHist = nullptr;
 
 	parametersPool = nullptr;
+	// needsRebuild = kTRUE;
 };
 
 void Model::setFileName(TString* fileName){
@@ -71,57 +64,75 @@ TString* Model::getSourceFileName(){
 }
 
 void Model::setHist(TH1F* hist){
-	// Save original histogram to Model
-	// Delete old hist
-//	if (fitProperties.hist != NULL){
-//		delete fitProperties.hist;
-//	}
+    if (fitProperties.hist != hist){
+        fitProperties.hist = hist;
 
-    fitProperties.hist = hist;
-    parametersPool = new ParametersPool();
-    histogramImported(hist);
+        // Make new parameters pool
+        parametersPool = new ParametersPool();
+
+        // Emit signals to presenters
+        // fitPropertiesChanged();
+        histogramImported(hist);
+    }
 }
 
 void Model::setSourceHist(TH1F* sourceHist){
-    fitProperties.sourceHist = sourceHist;
-    sourceHistogramImported(sourceHist);
+    if (fitProperties.sourceHist != sourceHist){
+        fitProperties.sourceHist = sourceHist;
+
+        // Emit signals to presenters
+        // fitPropertiesChanged();
+        sourceHistogramImported(sourceHist);
+    }
 }
 
 void Model::setComponentHist(TH1F* componentHist){
-    fitProperties.componentHist = componentHist;
-    componentHistogramImported(componentHist);
-}
+    if (fitProperties.componentHist != componentHist){
+        fitProperties.componentHist = componentHist;
 
-// TODO: reimplement calls to this function
-void Model::setTwoDetector(Bool_t isTwoDetector){
-    fitProperties.isTwoDetector = isTwoDetector;
-}
-
-Bool_t Model::isTwoDetector(){
-    return fitProperties.isTwoDetector;
+        // Emit signals to presenters
+        // fitPropertiesChanged();
+        componentHistogramImported(componentHist);
+    }
 }
 
 void Model::setFitRange(Int_t minBin, Int_t maxBin){
-	// Set histogram range in bins
-	fitProperties.hist->GetXaxis()->SetRange(minBin, maxBin);
+    // Check histogram exists
+    if (!fitProperties.hist) return;
 
-    // Notfy the view about the fit range change
-	Int_t first = fitProperties.hist->GetXaxis()->GetFirst();
-	Int_t last = fitProperties.hist->GetXaxis()->GetLast();
-    DoublePair* fitRange = new DoublePair(first, last);
-    fitRangeSet(fitRange);
+    if (fitProperties.hist->GetXaxis()->GetFirst() != minBin || fitProperties.hist->GetXaxis()->GetLast() != maxBin){
+        // Do not mess with hist ranges here because it complicates things when displaying hists in the view
+        // fitProperties.hist->GetXaxis()->SetRange(minBin, maxBin);
+
+        // Instead store min and max bins as a parameters in the FitProperties struct
+        fitProperties.minFitBin = minBin;
+        fitProperties.maxFitBin = maxBin;
+
+        // Notfy the view about the fit range change
+        // Int_t first = fitProperties.hist->GetXaxis()->GetFirst();
+        // Int_t last = fitProperties.hist->GetXaxis()->GetLast();
+        DoublePair* range = new DoublePair(minBin, maxBin);
+
+        // Emit signals to presenters
+        fitRangeSet(range);
+    }
 }
 
 std::pair<Double_t, Double_t> Model::getFitRange(){
-	return std::make_pair(fitProperties.hist->GetXaxis()->GetFirst(), fitProperties.hist->GetXaxis()->GetLast());
+	// return std::make_pair(fitProperties.hist->GetXaxis()->GetFirst(), fitProperties.hist->GetXaxis()->GetLast());
+    return std::make_pair(fitProperties.minFitBin, fitProperties.maxFitBin);
 }
-
 
 // Fit Properties setters getters
 
 void Model::setConvolutionType(ConvolutionType t){
-	fitProperties.convolutionType = t;
-	convolutionTypeSet(t);
+    if (fitProperties.convolutionType != t){
+        fitProperties.convolutionType = t;
+
+        // Emit signals to presenters
+        // fitPropertiesChanged();
+        convolutionTypeSet(t);
+    }
 }
 
 ConvolutionType Model::getConvolutionType(){
@@ -129,8 +140,13 @@ ConvolutionType Model::getConvolutionType(){
 }
 
 void Model::setHasParabola(Bool_t b){
-	fitProperties.hasParabola = b;
-	hasParabolaSet(b);
+    if (fitProperties.hasParabola != b){
+        fitProperties.hasParabola = b;
+
+        // Emit signals to presenters
+        // fitPropertiesChanged();
+        hasParabolaSet(b);
+    }
 }
 
 Bool_t Model::getHasParabola(){
@@ -138,8 +154,13 @@ Bool_t Model::getHasParabola(){
 }
 
 void Model::setNumberOfGaussians(Int_t num){
-	fitProperties.numberOfGaussians = num;
-	numberOfGaussiansSet(num);
+    if (fitProperties.numberOfGaussians != num){
+        fitProperties.numberOfGaussians = num;
+
+        // Emit signals to presenters
+        // fitPropertiesChanged();
+        numberOfGaussiansSet(num);
+    }
 }
 
 Int_t Model::getNumberOfGaussians(){
@@ -147,8 +168,13 @@ Int_t Model::getNumberOfGaussians(){
 }
 
 void Model::setNumberOfExponents(Int_t num){
-	fitProperties.numberOfExponents = num;
-	numberOfExponentsSet(num);
+    if (fitProperties.numberOfExponents != num){
+        fitProperties.numberOfExponents = num;
+
+        // Emit signals to presenters
+        // fitPropertiesChanged();
+        numberOfExponentsSet(num);
+    }
 }
 
 Int_t Model::getNumberOfExponents(){
@@ -156,8 +182,13 @@ Int_t Model::getNumberOfExponents(){
 }
 
 void Model::setNumberOfDampingExponents(Int_t num){
-	fitProperties.numberOfDampingExponents = num;
-	numberOfDampingExponentsSet(num);
+    if (fitProperties.numberOfDampingExponents != num){
+        fitProperties.numberOfDampingExponents = num;
+
+        // Emit signals to presenters
+        // fitPropertiesChanged();
+        numberOfDampingExponentsSet(num);
+    }
 }
 
 Int_t Model::getNumberOfDampingExponents(){
@@ -172,15 +203,11 @@ ParametersPool* Model::getParametersPool(){
 	return parametersPool;
 }
 
-// SIGNALS
+// SIGNALS TO PRESENTERS
 
 void Model::fitRangeSet(DoublePair* pair){
 	Emit("fitRangeSet(DoublePair*)", pair);
 }
-
-//void Model::fitRangeLimitsSet(DoublePair* pair){
-//	Emit("fitRangeLimitsSet(DoublePair*)", pair);
-//}
 
 void Model::histogramImported(TH1F* hist){
 	Emit("histogramImported(TH1F*)", hist);
@@ -217,3 +244,7 @@ void Model::numberOfExponentsSet(Int_t num){
 void Model::numberOfDampingExponentsSet(Int_t num){
 	Emit("numberOfDampingExponentsSet(Int_t)", num);
 }
+
+//void Model::fitPropertiesChanged(){
+//    Emit("fitPropertiesChanged()");
+//}

@@ -23,9 +23,11 @@
 #include <TLegend.h>
 #include <TH1.h>
 #include <TLine.h>
+#include <TBox.h>
 #include <TString.h>
 #include <RooRealVar.h>
 #include <TPaveStats.h>
+#include <TCanvas.h>
 #include <RooStringVar.h>
 #include <RooFormulaVar.h>
 #include <RooFormula.h>
@@ -325,20 +327,24 @@ TPaveStats* GraphicsHelper::getPadStats(TVirtualPad* pad){
   // return NULL;
 }
 
-void GraphicsHelper::alignPave(TPave* pave, TVirtualPad* pad, Alignment alignment, Decoration decoration, Double_t statsLineHeight, Double_t statsWidth){
-  if (!pave){
-    // Try finding Legend first
-    pave = getPadLegend(pad);
-    if (!pave){
-      // Next try finding pad
-      pave = getPadStats(pad);
-    }
-    if (!pave){
-      std::cout << "alignPave: could not find neither legend nor pave on canvas" << std::endl;
-      return;
-    }
-  }
+void GraphicsHelper::alignPave(TVirtualPad* pad, Alignment alignment, Decoration decoration, Double_t statsLineHeight, Double_t statsWidth){
+	// Try finding Legend first
+	TPave* pave = getPadLegend(pad);
 
+	// Next try finding pad
+	if (!pave){
+		pave = getPadStats(pad);
+	}
+
+	if (!pave){
+		std::cout << "alignPave: could not find neither legend nor pave on canvas" << std::endl;
+		return;
+	}
+	alignPave(pave, pad, alignment, decoration, statsLineHeight, statsWidth);
+}
+
+
+void GraphicsHelper::alignPave(TPave* pave, TVirtualPad* pad, Alignment alignment, Decoration decoration, Double_t statsLineHeight, Double_t statsWidth){
   // Update
   pad->Modified();
   pad->Update();
@@ -385,18 +391,25 @@ void GraphicsHelper::alignStats(TVirtualPad* pad, Alignment alignment, Decoratio
   alignPave(stats, pad, alignment, decoration, statsLineHeight, statsWidth);
 }
 
-void GraphicsHelper::drawXCanvas(TVirtualPad* pad){
+void GraphicsHelper::drawXCanvas(TRootEmbeddedCanvas* embedCanvas){
+	TCanvas* canvas = embedCanvas->GetCanvas();
+	canvas->cd();
+
+	// Create main ine object for drawing
 	TLine* line = new TLine();
 	line->SetLineColor(kGray+1);
 
-	pad->cd();
+	Double_t ww = embedCanvas->GetWidth();
+	Double_t wh = embedCanvas->GetHeight();
 
-	// Canvas border workaround
-	Double_t zero = 0, one = 1;
-	line->DrawLineNDC(zero, zero, one-0.01, zero)->Draw();
-	line->DrawLineNDC(one-0.01, zero, one-0.01, one-0.01)->Draw();
-	line->DrawLineNDC(one-0.01, one-0.01, zero, one-0.01)->Draw();
-	line->DrawLineNDC(zero, one, zero, zero)->Draw();
-	line->DrawLineNDC(zero, zero, one, one)->Draw();
-	line->DrawLineNDC(zero, one, one, zero)->Draw();
+	Double_t hPx = 1.0/ww; // NDC one pixel in horizontal length
+	Double_t vPx = 1.0/wh; // NDC one pixel in vertical length
+
+	line->DrawLineNDC(0, vPx, 1-hPx, vPx)->Draw();
+	line->DrawLineNDC(1-hPx, vPx, 1-hPx, 1-vPx)->Draw();
+	line->DrawLineNDC(1-hPx, 1-vPx, 0, 1-vPx)->Draw();
+	line->DrawLineNDC(0, 1-vPx, 0, vPx)->Draw();
+
+	line->DrawLineNDC(0, vPx, 1-hPx, 1-vPx)->Draw();
+	line->DrawLineNDC(0, 1-vPx, 1-hPx, vPx)->Draw();
 }

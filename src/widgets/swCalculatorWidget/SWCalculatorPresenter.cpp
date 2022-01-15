@@ -44,9 +44,14 @@
 #include <iostream>
 #include <TLine.h>
 
+ClassImp(SWCalculatorPresenter);
+
 SWCalculatorPresenter::SWCalculatorPresenter(SWCalculatorView* view) : AbstractPresenter<Model, SWCalculatorView>(view) {
 	model = instantinateModel();
 	onInitModel();
+
+	// Assign empty fit properties to the saved struct
+	oldFitProperties = FitProperties();
 }
 
 Model* SWCalculatorPresenter::instantinateModel() {
@@ -54,19 +59,18 @@ Model* SWCalculatorPresenter::instantinateModel() {
 }
 
 void SWCalculatorPresenter::onInitModel() {
-	model->Connect("histogramImported(TH1F*)", "SWCalculatorPresenter", this, "onModelHistogramImported(TH1F*)");
-	model->Connect("sourceHistogramImported(TH1F*)", "SWCalculatorPresenter", this, "onModelSourceHistogramImported(TH1F*)");
-	model->Connect("componentHistogramImported(TH1F*)", "SWCalculatorPresenter", this, "onModelComponentHistogramImported(TH1F*)");
+    model->Connect("histogramImported(TH1F*)",           this->ClassName(), this, "onModelHistogramImported(TH1F*)");
+	model->Connect("sourceHistogramImported(TH1F*)",     this->ClassName(), this, "onModelSourceHistogramImported(TH1F*)");
+	model->Connect("componentHistogramImported(TH1F*)",  this->ClassName(), this, "onModelComponentHistogramImported(TH1F*)");
+	model->Connect("fitRangeSet(DoublePair*)",           this->ClassName(), this, "onModelFitRangeSet(DoublePair*)");
 
-//	model->Connect("fitRangeLimitsSet(DoublePair*)", "SWCalculatorPresenter", this, "onModelFitRangeLimitsSet(DoublePair*)");
-	model->Connect("fitRangeSet(DoublePair*)", "SWCalculatorPresenter", this, "onModelFitRangeSet(DoublePair*)");
-
-	model->Connect("twoDetectorSet(Bool_t)", "SWCalculatorPresenter", this, "onModelTwoDetectorSet(Bool_t)");
-	model->Connect("convolutionTypeSet(Int_t)", "SWCalculatorPresenter", this, "onModelConvolutionTypeSet(Int_t)");
-	model->Connect("hasParabolaSet(Bool_t)", "SWCalculatorPresenter", this, "onModelHasParabolaSet(Bool_t)");
-	model->Connect("numberOfGaussiansSet(Int_t)", "SWCalculatorPresenter", this, "onModelNumberOfGaussiansSet(Int_t)");
-	model->Connect("numberOfExponentsSet(Int_t)", "SWCalculatorPresenter", this, "onModelNumberOfExponentsSet(Int_t)");
-	model->Connect("numberOfDampingExponentsSet(Int_t)", "SWCalculatorPresenter", this, "onModelNumberOfDampingExponentsSet(Int_t)");
+	model->Connect("twoDetectorSet(Bool_t)",             this->ClassName(), this, "onModelTwoDetectorSet(Bool_t)");
+	model->Connect("convolutionTypeSet(Int_t)",          this->ClassName(), this, "onModelConvolutionTypeSet(Int_t)");
+	model->Connect("hasParabolaSet(Bool_t)",             this->ClassName(), this, "onModelHasParabolaSet(Bool_t)");
+	model->Connect("numberOfGaussiansSet(Int_t)",        this->ClassName(), this, "onModelNumberOfGaussiansSet(Int_t)");
+	model->Connect("numberOfExponentsSet(Int_t)",        this->ClassName(), this, "onModelNumberOfExponentsSet(Int_t)");
+	model->Connect("numberOfDampingExponentsSet(Int_t)", this->ClassName(), this, "onModelNumberOfDampingExponentsSet(Int_t)");
+	// model->Connect("fitPropertiesChanged()",             this->ClassName(), this, "onModelFitPropertiesChanged()");
 
 	// Restore view from model
  	// std::pair<Double_t, Double_t> fitRangeLimits = model->getFitRange();
@@ -98,7 +102,7 @@ void SWCalculatorPresenter::buildFittingModel(){
 
 // Slots for View Signals
 void SWCalculatorPresenter::onViewEditParametersClicked() {
-	ModalDialogFrame* dialog = UiHelper::getInstance()->getDialog("Model Parameters");
+	ModalDialogFrame* dialog = new ModalDialogFrame(gClient->GetRoot(), view->GetMainFrame(), "Model Parameters");
 	RooRealVar* observable = pdfProvider->getObservable();
 	RooAbsPdf* pdf = pdfProvider->getPdf();
 	RooArgSet* parameters = pdf->getParameters(RooArgSet(*observable));
@@ -109,6 +113,11 @@ void SWCalculatorPresenter::onViewEditParametersClicked() {
 }
 
 void SWCalculatorPresenter::onViewFitSpectrumClicked() {
+    if (needRebuildPDF()){
+        buildFittingModel();
+        oldFitProperties = model->getFitProperties();
+    }
+
 	view->setCanvasText("Fitting...");
 	// Testing purposes - let model generate data
 	// data = static_cast<RooAddPdf*>(model)->generateBinned(*x,1000000) ;
@@ -167,7 +176,8 @@ void SWCalculatorPresenter::onViewFitSpectrumClicked() {
 
 	// Evaluate Counts axis limits
 	Double_t yAxisMin, yAxisMax;
-	if (model->isTwoDetector()) {
+	Bool_t isTwoDetector = HistProcessor::isTwoDetector(model->getFitProperties().hist);
+	if (isTwoDetector) {
 //        yAxisMin=0.1;
 //        while (yAxisMin * 10 < fitHist->GetBinContent(fitHist->GetMinimumBin()) + 1) yAxisMin *= 10;        
 //        Double_t logYAxisMax = 1.15 * TMath::Log10(fitHist->GetBinContent(fitHist->GetMaximumBin())); // Max limit is 15% larger hist maximum
@@ -193,8 +203,6 @@ void SWCalculatorPresenter::onViewFitSpectrumClicked() {
 		Double_t wShift = view->numWShift->GetNumber();
 
 		// Energy value of the maximum of the convoluted model
-		Bool_t isTwoDetector = model->isTwoDetector();
-
 		graphicsHelper->drawSWRegions(spectrumPlot, sWidth, wWidth, wShift, modelMean, yAxisMin, yAxisMax, isTwoDetector);
 	}
 
@@ -328,11 +336,10 @@ void SWCalculatorPresenter::onViewFitSpectrumClicked() {
 	Double_t sWidth = view->numSWidth->GetNumber();
 	Double_t wWidth = view->numWWidth->GetNumber();
 	Double_t wShift = view->numWShift->GetNumber();
-	Bool_t isTwoDetector = model->isTwoDetector();
 	RooRealVar* s = histProcessor->getSParameter(fitHistNoBg, sWidth, modelMean, isTwoDetector);
 	RooRealVar* w = histProcessor->getWParameter(fitHistNoBg, wWidth, wShift, modelMean, isTwoDetector);
 
-	// Calculate linear intensitiesv
+	// Calculate linear intensities
 	RooArgList* recursiveIntensities = pdfProvider->getIntensitiesInMaterial();
 	RooArgList* linearIntensities = RootHelper::getLinearIntensities(recursiveIntensities);
 
@@ -435,7 +442,7 @@ void SWCalculatorPresenter::onViewSaveDataClicked() {
 	FileUtils::savePlotsToFile(view->fitFrame, view->chiFrame, fileName.Data(), pdfProvider->getObservable());
 
 	UiHelper* uiHelper = UiHelper::getInstance();
-    uiHelper->showOkDialog("Canvas exported to ASCII data columns successfully");
+    uiHelper->showOkDialog(view->GetMainFrame(), "Canvas exported to ASCII data columns successfully");
 }
 
 
@@ -464,7 +471,7 @@ void SWCalculatorPresenter::onViewSaveImageClicked() {
 
 	// Show ok dialog
 	UiHelper* uiHelper = UiHelper::getInstance();
-	uiHelper->showOkDialog("PNG and PDF images saved. Canvas exported as ROOT file.");
+	uiHelper->showOkDialog(view->GetMainFrame(), "PNG and PDF images saved. Canvas exported as ROOT file.");
 }
 
 void SWCalculatorPresenter::onViewSaveResultsClicked() {
@@ -478,7 +485,12 @@ void SWCalculatorPresenter::onViewSaveResultsClicked() {
 
     Bool_t ok = view->txtFitResult->SaveFile(resultsFilename.Data());
     UiHelper* uiHelper = UiHelper::getInstance();
-    uiHelper->showOkDialog(ok ? "Results saved successfully" : "Error saving results file");
+
+    if (ok){
+        uiHelper->showOkDialog(view->GetMainFrame(), "Results saved successfully");
+    } else {
+        uiHelper->showOkDialog(view->GetMainFrame(), "Error saving results file", EMsgBoxIcon::kMBIconExclamation);
+    }
 }
 
 void SWCalculatorPresenter::onViewClearResultsClicked() {
@@ -525,7 +537,7 @@ void SWCalculatorPresenter::onViewNumDampExponentSet(){
 }
 
 void SWCalculatorPresenter::onViewAddHistComponentClicked(){
-	ModalDialogFrame* dialog = UiHelper::getInstance()->getDialog("Add model component");
+	ModalDialogFrame* dialog = new ModalDialogFrame(gClient->GetRoot(), view->GetMainFrame(), "Add Model Component");
 	ImportComponentView* importComponentView = new ImportComponentView(dialog);
 
 	dialog->AddFrame(importComponentView, new TGLayoutHints(kLHintsExpandX | kLHintsExpandY, dx, dx, dy*2, dy*2));
@@ -552,6 +564,8 @@ void SWCalculatorPresenter::onModelHistogramImported(TH1F* hist){
 
 	// Draw histogram(s) on canvas (original and contribution from source if set)
 	TH1* sourceHist = model->getFitProperties().sourceHist;
+//	Int_t minBin = model->getFitProperties().minFitBin;
+//    Int_t maxBin = model->getFitProperties().maxFitBin;
 	view->drawHistograms(hist, sourceHist);
 
 	// Update slider
@@ -569,12 +583,12 @@ void SWCalculatorPresenter::onModelSourceHistogramImported(TH1F* sourceHist){
 	TH1* hist = model->getFitProperties().hist;
 	view->drawHistograms(hist, sourceHist);
 
-	buildFittingModel();
+	// buildFittingModel();
 }
 
 void SWCalculatorPresenter::onModelComponentHistogramImported(TH1F* hist){
 	view->setComponentHistogram(hist);
-	buildFittingModel();
+	// buildFittingModel();
 }
 
 //void SWCalculatorPresenter::onModelFitRangeLimitsSet(DoublePair* fitRangeLimits){
@@ -583,15 +597,15 @@ void SWCalculatorPresenter::onModelComponentHistogramImported(TH1F* hist){
 
 void SWCalculatorPresenter::onModelConvolutionTypeSet(Int_t convolutionType){
 	view->setConvolutionType((ConvolutionType)convolutionType);
-	buildFittingModel();
+	// buildFittingModel();
 }
 
 void SWCalculatorPresenter::onModelFitRangeSet(DoublePair* fitRange){
-	Double_t min = model->getFitProperties().hist->GetXaxis()->GetBinLowEdge(fitRange->first);
-	Double_t max = model->getFitProperties().hist->GetXaxis()->GetBinLowEdge(fitRange->second);
+	Double_t minEnergy = model->getFitProperties().hist->GetXaxis()->GetBinLowEdge(fitRange->first);
+	Double_t maxEnergy = model->getFitProperties().hist->GetXaxis()->GetBinLowEdge(fitRange->second);
 
 	view->setCanvasMode(CanvasMode::onePad);
-	view->setFitRange(fitRange->first, fitRange->second, min, max);
+	view->setFitRange(fitRange->first, fitRange->second, minEnergy, maxEnergy);
 	// buildFittingModel();
 }
 
@@ -601,20 +615,41 @@ void SWCalculatorPresenter::onModelTwoDetectorSet(Bool_t isTwoDetector){
 
 void SWCalculatorPresenter::onModelHasParabolaSet(Bool_t b){
 	view->hasParabola->SetOn(b);
-	buildFittingModel();
+	// buildFittingModel();
 }
 
 void SWCalculatorPresenter::onModelNumberOfGaussiansSet(Int_t num){
 	view->numGauss->SetNumber(num);
-	buildFittingModel();
+	// buildFittingModel();
 }
 
 void SWCalculatorPresenter::onModelNumberOfExponentsSet(Int_t num){
 	view->numExponent->SetNumber(num);
-	buildFittingModel();
+	// buildFittingModel();
 }
 
 void SWCalculatorPresenter::onModelNumberOfDampingExponentsSet(Int_t num){
 	view->numDampExponent->SetNumber(num);
-	buildFittingModel();
+	// buildFittingModel();
 }
+
+Bool_t SWCalculatorPresenter::needRebuildPDF(){
+    FitProperties fitProperties = model->getFitProperties();
+
+    if (oldFitProperties.componentHist != fitProperties.componentHist) return true;
+    if (oldFitProperties.convolutionType != fitProperties.convolutionType) return true;
+    if (oldFitProperties.hasParabola != fitProperties.hasParabola) return true;
+    if (oldFitProperties.hist != fitProperties.hist) return true;
+    if (oldFitProperties.maxFitBin != fitProperties.maxFitBin) return true;
+    if (oldFitProperties.minFitBin != fitProperties.minFitBin) return true;
+    if (oldFitProperties.numberOfDampingExponents != fitProperties.numberOfDampingExponents) return true;
+    if (oldFitProperties.numberOfExponents != fitProperties.numberOfExponents) return true;
+    if (oldFitProperties.numberOfGaussians != fitProperties.numberOfGaussians) return true;
+    if (oldFitProperties.sourceHist != fitProperties.sourceHist) return true;
+
+    return false;
+}
+
+//void SWCalculatorPresenter::onModelFitPropertiesChanged(){
+//	buildFittingModel();
+//}

@@ -20,6 +20,7 @@
 #include <RooArgList.h>
 #include <TVirtualPad.h>
 #include <TPaveStats.h>
+#include <TRootEmbeddedCanvas.h>
 
 struct Margin {
 	Double_t left;
@@ -84,9 +85,10 @@ public:
 	static Int_t getNumberOfLines(TPave* pave);
 	static TLegend* getPadLegend(TVirtualPad* pad);
 	static TPaveStats* getPadStats(TVirtualPad* pad);
-	static void alignPave(TPave* pave, TVirtualPad* pad, Alignment alignment, Decoration decoration, Double_t statsLineHeight, Double_t statsWidth);
+	static void alignPave(TPave* pave, TVirtualPad* pad, Alignment alignment = Alignment::TOP_RIGHT, Decoration decoration = Decoration::DEFAULT, Double_t statsLineHeight = 0.07, Double_t statsWidth = 0);
+	static void alignPave(TVirtualPad* pad, Alignment alignment = Alignment::TOP_RIGHT, Decoration decoration = Decoration::DEFAULT, Double_t statsLineHeight = 0.07, Double_t statsWidth = 0);
 	static void alignStats(TVirtualPad* pad, Alignment alignment = Alignment::TOP_RIGHT, Decoration decoration = Decoration::DEFAULT, Double_t statsLineHeight = 0.07, Double_t statsWidth = 0);
-	static void drawXCanvas(TVirtualPad* pad);
+	static void drawXCanvas(TRootEmbeddedCanvas* c);
 
 private:
 	GraphicsHelper();

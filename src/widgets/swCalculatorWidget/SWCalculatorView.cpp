@@ -30,10 +30,13 @@
 #include <map>
 #include <sstream>
 #include <TG3DLine.h>
+#include <TLine.h>
+#include <TFrame.h>
 #include "../../roofit/PdfProvider.h"
 
 using namespace RooFit;
 
+// https://root.cern/manual/signal_slot/
 ClassImp(SWCalculatorView);
 
 //SWCalculatorView::SWCalculatorView(const TGWindow* w) : TGMainFrame(w, Constants::windowWidth, Constants::windowHeight){
@@ -42,7 +45,9 @@ SWCalculatorView::SWCalculatorView(const TGWindow* w) : AbstractView<SWCalculato
 	presenter = instantinatePresenter();
 	connectSignals();
 
-	// Instantiate
+	// Instantiate THStack for displaying imported histograms
+	tHStack = new THStack("hs", "asd;asdasd;asdasd222");
+
 	// currentCanvasMode = CanvasMode::onePad;
 }
 
@@ -320,8 +325,6 @@ void SWCalculatorView::initUI(){
     btnSaveData->SetEnabled(false);
     frameExportButtons->AddFrame(btnSaveData, new TGLayoutHints(kLHintsRight | kLHintsTop, 0, dx, 0, 0));  // left, right, top, bottom
 
-    setToolbarEnabled(kFALSE);
-
     // Attach Right Canvas (Plot)
     embedCanvas = new TRootEmbeddedCanvas("embedCanvas", frameRightVertical);
     frameRightVertical->AddFrame(embedCanvas, new TGLayoutHints(kLHintsLeft | kLHintsTop | kLHintsExpandX | kLHintsExpandY, 0, dx, dx, dx));
@@ -332,6 +335,9 @@ void SWCalculatorView::initUI(){
     // You should call, for example HideFrame(TGFrame *f), only after the frames have been laid out and the sub windows
     // of the composite frame have been mapped via method MapSubwindows()
     // RootHelper::hideFrame(resolutionFwhmFrame);
+
+    // Disable toolbar on uiReady event
+    Connect(this->GetMainFrame()->ClassName(), "uiReady()", this->ClassName(), this, "setToolbarEnabled(=kFALSE)");
 }
 
 void SWCalculatorView::connectSignals(){
@@ -378,7 +384,7 @@ void SWCalculatorView::setFitRangeLimits(Double_t min, Double_t max){
 	numFitSlider->SetRange(min, max);
 }
 
-void SWCalculatorView::setFitRange(Double_t minBin, Double_t maxBin, Double_t min, Double_t max){
+void SWCalculatorView::setFitRange(Double_t minBin, Double_t maxBin, Double_t minEnergy, Double_t maxEnergy){
 	// Set peak selection initial values
 	numFitMin->SetNumber(minBin);
 	numFitMax->SetNumber(maxBin);
@@ -386,21 +392,24 @@ void SWCalculatorView::setFitRange(Double_t minBin, Double_t maxBin, Double_t mi
 
 	// Update Canvas to reflect histogram range
     // Delete all primitives but keep subpads
-	TCanvas* canvas = embedCanvas->GetCanvas();
 
-	TList* primitives = canvas->GetListOfPrimitives();
-    if (primitives){
-      TListIter next(primitives);
-      TObject *object;
-      while ((object=next())) {
-        if (object->InheritsFrom(THStack::Class())){
-          // Not deleting primitives but removing them from the list - safer.
-          // https://root.cern/root/roottalk/roottalk00/2082.html
-			THStack* hStack = (THStack*)object;
-			hStack->GetXaxis()->SetLimits(min, max);
-        }
-      }
-    }
+//	TList* primitives = canvas->GetListOfPrimitives();
+//    if (primitives){
+//      TListIter next(primitives);
+//      TObject *object;
+//      while ((object=next())) {
+//        if (object->InheritsFrom(THStack::Class())){
+//          // Not deleting primitives but removing them from the list - safer.
+//          // https://root.cern/root/roottalk/roottalk00/2082.html
+//			THStack* hStack = (THStack*)object;
+//			hStack->GetXaxis()->SetLimits(minEnergy, maxEnergy);
+//        }
+//      }
+//    }
+
+	tHStack->GetXaxis()->SetLimits(minEnergy, maxEnergy);
+
+    TCanvas* canvas = embedCanvas->GetCanvas();
 	canvas->Modified();
 	canvas->Update();
 }
@@ -451,6 +460,7 @@ void SWCalculatorView::setToolbarEnabled(Bool_t isEnabled){
     btnSaveImage->SetEnabled(isEnabled);
     displayMin->SetState(isEnabled);
     displayMax->SetState(isEnabled);
+    isEnabled ? UiHelper::showFrame(zoomSlider) : UiHelper::hideFrame(zoomSlider);
 }
 
 TCanvas* SWCalculatorView::getCanvas() {
@@ -485,6 +495,7 @@ void SWCalculatorView::setCanvasText(const char* text){
 	setCanvasMode(CanvasMode::onePad);
 	TCanvas* canvas = embedCanvas->GetCanvas();
 	canvas->cd();
+	canvas->Clear();
 	t->Draw();
 	canvas->Modified();
 	canvas->Update();
@@ -606,31 +617,50 @@ void SWCalculatorView::drawHistograms(TH1* hist, TH1* sourceHist){
 	canvas->cd();
 
 	// Make stack of regualr and source histagrams (if set)
-    THStack* hStack = new THStack("hs", "");
+    // THStack* hStack = new THStack("hs", "");
+    // hist->Print("base");
 
-    // Draw acquisitioned histogram
+	// Clear histogram stack
+	if (tHStack->GetHists()){
+	    tHStack->GetHists()->RemoveAll();
+	}
+
+    // Add acquisitioned histogram to the stack
     TH1* histCopy = new TH1F();
     hist->Copy(*histCopy);
-    // histCopy->SetLineColor(GraphicsHelper::histColor);
     histCopy->SetLineColor(kBlack);
-    hStack->Add(histCopy);
-    hStack->SetTitle("Spectrum Preview");
+    tHStack->Add(histCopy);
+    tHStack->SetTitle("Spectrum Preview");
 
-    // Draw source histogram on the same canvas (if exists)
+    // Add source contribution histogram to the stack (if exists)
     if (sourceHist){
+        sourceHist->Print("base");
         TH1* sourceHistCopy = (TH1*)sourceHist->Clone();
-        // sourceHistCopy->SetLineColor(GraphicsHelper::sourceHistColor);
         sourceHistCopy->SetLineColor(EColor::kBlack);
         sourceHistCopy->SetLineStyle(ELineStyle::kDashed);
-        hStack->Add(sourceHistCopy);
-        hStack->SetTitle("Spectra Preview");
+        tHStack->Add(sourceHistCopy);
+        tHStack->SetTitle("Spectra Preview");
     }
 
-    hStack->Draw("nostack");
-    hStack->GetXaxis()->SetTitle("Energy, keV");
-    hStack->GetYaxis()->SetTitle("Counts");
+    // Set stack limits?
+
+    tHStack->Draw("nostack");
 
 	canvas->BuildLegend();
+	GraphicsHelper::alignPave(canvas, Alignment::TOP_RIGHT, Decoration::DEFAULT, 0.07, 0.35);
+
+    // Draw "crosshair"
+    Double_t x1 = canvas->GetLeftMargin();
+    Double_t x2 = 1-canvas->GetRightMargin();
+    Double_t y1 = canvas->GetBottomMargin();
+    Double_t y2 = 1-canvas->GetTopMargin();
+
+    TLine* line = new TLine();
+	line->SetLineColor(kGray+1);
+	line->SetLineStyle(ELineStyle::kDotted);
+	line->DrawLineNDC((x1+x2)/2, y1, (x1+x2)/2, y2)->Draw();
+
+
 	canvas->Modified();
 	canvas->Update();
 }

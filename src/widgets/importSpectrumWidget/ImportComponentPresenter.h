@@ -18,7 +18,6 @@
 #include "ImportSpectrumView.h"
 #include <TString.h>
 
-//class ImpoertSpectrumView;
 
 class ImportComponentPresenter : public AbstractImportSpectrumPresenter {
     public:
@@ -27,8 +26,10 @@ class ImportComponentPresenter : public AbstractImportSpectrumPresenter {
         void setModelFileName(TString* fileName);        
         void setModelHist(TH1F* hist);
 
-        // TODO: need or not?
-        // void onRangeSliderChange(Int_t minBin, Int_t maxBin);
+        // Slots for Model signals
+        void onModelComponentHistogramImported(TH1F* hist);
+
+        ClassDef(ImportComponentPresenter,0)
 };
 
 #endif /* ImportComponentPresenter_H */

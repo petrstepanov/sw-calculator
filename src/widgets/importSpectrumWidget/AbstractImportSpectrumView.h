@@ -20,11 +20,13 @@
 #include <TGButton.h>
 #include <TGLabel.h>
 #include <TGTextView.h>
+#include <TRootEmbeddedCanvas.h>
 #include <TGNumberEntry.h>
 #include <TCanvas.h>
 #include <TRootEmbeddedCanvas.h>
 #include <iostream>
 #include <TGDoubleSlider.h>
+#include <TGFrame.h>
 //#include "AbstractImportSpectrumPresenter.h"
 
 // Omit circular dependency
@@ -40,11 +42,11 @@ class AbstractImportSpectrumView : public AbstractView<AbstractImportSpectrumPre
 //    TGNumberEntry* numEnergyColumn;
 //    TGNumberEntry* numCountsColumn;
     TGTextButton* btnImportSpectrum;
-    TCanvas* canvasHist;
     // TGDoubleHSlider* rangeSlider;
 
     // Hack temporary
     TGTextButton* btnSetRange;
+    TRootEmbeddedCanvas* embedCanvas;
 
   public:
     AbstractImportSpectrumView(const TGWindow *w);
@@ -68,10 +70,18 @@ class AbstractImportSpectrumView : public AbstractView<AbstractImportSpectrumPre
 
     // Calls to Presenter
     void onOpenFileClicked();
-    void onImportSpectrumClicked();
+//    void onImportSpectrumClicked();
     virtual Int_t getHistogramColor();
 
-ClassDefOverride(AbstractImportSpectrumView, 0)
+//    void OnProcessedConfigure(Event_t* event);
+//    void OnProcessed(Event_t* event);
+
+    void handleUiReady();
+
+    // https://root-forum.cern.ch/t/classdef-variants/44736/2
+    // ClassDefOverride: Use this one if your class definition use the c++ `override` keyword for virtual functions
+    // If you use the regular ClassDef, the compiler might warn that the function declared in the ClassDef are missing the override keyword
+    ClassDefOverride(AbstractImportSpectrumView, 0)
 };
 
 #endif /* ABSTRACTIMPORTSPECTRUMVIEW_H */

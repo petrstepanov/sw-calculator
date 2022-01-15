@@ -86,17 +86,16 @@ TH1F* HistProcessor::removeHistNegatives(const char *newname, TH1F* hist){
 	return newHist;
 }
 
-TH1F* HistProcessor::cutHist(const char *newname, TH1F* hist){
+TH1F* HistProcessor::cutHist(const char *newname, TH1F* hist, Int_t minBin, Int_t maxBin){
 	#ifdef USEDEBUG
 		std::cout << "HistProcessor::cutHist" << std::endl;
 		std::cout << "original histogram" << std::endl;
-		hist->Print();
-		std::cout << "all bins: (" << 1 << "; " << hist->GetXaxis()->GetNbins() << ")" << std::endl;
-		std::cout << "cut bins: (" << hist->GetXaxis()->GetFirst() << "; " << hist->GetXaxis()->GetLast() << ")" << std::endl;
+		hist->Print("base");
+//		hist->Print("range");
 	#endif
 
-	Int_t minBin = hist->GetXaxis()->GetFirst();
-	Int_t maxBin = hist->GetXaxis()->GetLast();
+//	Int_t minBin = hist->GetXaxis()->GetFirst();
+//	Int_t maxBin = hist->GetXaxis()->GetLast();
 
 	// Construct new histogram
 	Double_t lowEdge = hist->GetXaxis()->GetBinLowEdge(minBin);
@@ -115,9 +114,9 @@ TH1F* HistProcessor::cutHist(const char *newname, TH1F* hist){
 	}
 
 	#ifdef USEDEBUG
-		trimmedHist->Print();
-		std::cout << "low edge: " << trimmedHist->GetXaxis()->GetBinLowEdge(1) << ", up edge: " << trimmedHist->GetXaxis()->GetBinUpEdge(trimmedHist->GetNbinsX()) << std::endl;
-	#endif
+	    trimmedHist->Print("base");
+//	    trimmedHist->Print("range");
+    #endif
 
 	return trimmedHist;
 }
@@ -317,8 +316,7 @@ RooRealVar* HistProcessor::getWParameter(TH1F* hist, Double_t wWidth, Double_t w
 	return wRealVar;
 }
 
-Bool_t HistProcessor::isTwoDetetor(TH1F* hist){
-	// TODO: check this after adjusting fitting limits
+Bool_t HistProcessor::isTwoDetector(TH1* hist){
 	if (hist->GetXaxis()->GetXmin() < 511 && hist->GetXaxis()->GetXmax() > 511){
 		return kFALSE;
 	}

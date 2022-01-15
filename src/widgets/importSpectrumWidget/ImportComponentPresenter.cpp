@@ -8,8 +8,11 @@
 #include "../../util/HistProcessor.h"
 #include "../../model/Model.h"
 
+ClassImp(ImportComponentPresenter)
+
 ImportComponentPresenter::ImportComponentPresenter(AbstractImportSpectrumView* view) : AbstractImportSpectrumPresenter(view){
 //	model = instantinateModel();
+    model->Connect("componentHistogramImported(TH1F*)", this->ClassName(), this, "onModelComponentHistogramImported(TH1F*)");
 }
         
 void ImportComponentPresenter::setModelFileName(TString* fileName){
@@ -20,4 +23,11 @@ void ImportComponentPresenter::setModelHist(TH1F* hist){
 	// Save original histogram to Model
 	model->setComponentHist(hist);
 };
-    
+
+
+// Slots for Model Signals
+
+void ImportComponentPresenter::onModelComponentHistogramImported(TH1F* hist){
+    hist->Print("base");
+    view->drawHistogram(hist);
+}

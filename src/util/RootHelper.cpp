@@ -62,22 +62,6 @@ void RootHelper::stopAndPrintTimer(){
     watch->Print();
 }
 
-TGCompositeFrame* RootHelper::getParentFrame(TGFrame* frame){
-	const TGWindow* parentWindow = frame->GetParent();
-	TGCompositeFrame* parentFrame = dynamic_cast<TGCompositeFrame*>(const_cast<TGWindow*>(parentWindow));
-	return parentFrame;
-}
-
-void RootHelper::showFrame(TGFrame* frame){
-	TGCompositeFrame* parentFrame = RootHelper::getParentFrame(frame);
-	parentFrame->ShowFrame(frame);
-}
-
-void RootHelper::hideFrame(TGFrame* frame){
-	TGCompositeFrame* parentFrame = RootHelper::getParentFrame(frame);
-	parentFrame->HideFrame(frame);
-}
-
 TGNumberFormat::EStyle RootHelper::getNumberFormatStyle(Double_t value){
 	Int_t numberOfDecimals = MathUtil::numberOfDecimals(value);
 	switch (numberOfDecimals){

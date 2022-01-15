@@ -26,7 +26,8 @@ public:
     
     Int_t getHistogramColor() override;
 
-ClassDefOverride(ImportSourceSpectrumView, 0)
+    // https://root-forum.cern.ch/t/classdef-variants/44736/2
+    ClassDefOverride(ImportSourceSpectrumView, 0)
 };
 
 #endif /* IMPORTSOURCESPECTRUMVIEW_H */

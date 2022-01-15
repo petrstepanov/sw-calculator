@@ -13,9 +13,10 @@
 
 #include "RooRealVarView.h"
 #include "RooRealVarPresenter.h"
+#include "../../util/UiHelper.h"
 #include <RooRealVar.h>
 
-// ClassImp(RooRealVarView)
+ClassImp(RooRealVarView)
 
 RooRealVarView::RooRealVarView(const TGWindow* w) : AbstractView<RooRealVarPresenter>(w){
     initUI();
@@ -36,12 +37,12 @@ void RooRealVarView::initUI() {
     // Name label
     description = new TGLabel(this, ""); // Variable name
     description->SetTextJustify(kTextLeft);
-    AddFrame(description, new TGLayoutHints(kLHintsLeft | kLHintsTop | kLHintsExpandX, 0, dx, 3*dy/5));
+    AddFrame(description, new TGLayoutHints(kLHintsLeft | kLHintsTop | kLHintsExpandX, 0, EPadding::dx, 3*EPadding::dy/5));
 
     // Description label
     description = new TGLabel(this, ""); // Variable name
     description->SetTextJustify(kTextLeft);
-    AddFrame(description, new TGLayoutHints(kLHintsLeft | kLHintsTop | kLHintsExpandX, 0, dx, 3*dy/5));
+    AddFrame(description, new TGLayoutHints(kLHintsLeft | kLHintsTop | kLHintsExpandX, 0, EPadding::dx, 3*EPadding::dy/5));
 
     Double_t doubleMin = std::numeric_limits<Double_t>::min();
     Double_t doubleMax = std::numeric_limits<Double_t>::min();
@@ -52,7 +53,7 @@ void RooRealVarView::initUI() {
                 TGNumberFormat::kNELLimitMinMax,
                 doubleMin, doubleMax);
     value->GetNumberEntry()->Connect("TextChanged(char*)", "RooRealVarView", this, "onValueChange(char*)");
-    AddFrame(value, new TGLayoutHints(kLHintsLeft | kLHintsTop, dx, dx));
+    AddFrame(value, new TGLayoutHints(kLHintsLeft | kLHintsTop, EPadding::dx, EPadding::dx));
 
     // Minimum value
     minValue = new TGNumberEntry(this, 0, 5, -1, TGNumberFormat::kNESRealTwo,
@@ -60,10 +61,10 @@ void RooRealVarView::initUI() {
                 TGNumberFormat::kNELLimitMax,
                 doubleMin, doubleMax);
     minValue->GetNumberEntry()->Connect("TextChanged(char*)", "RooRealVarView", this, "onMinimumChange(char*)");
-    AddFrame(minValue, new TGLayoutHints(kLHintsLeft | kLHintsTop, dx, dx));
+    AddFrame(minValue, new TGLayoutHints(kLHintsLeft | kLHintsTop, EPadding::dx, EPadding::dx));
 
     // Dash label
-    AddFrame(new TGLabel(this, "-"), new TGLayoutHints(kLHintsLeft | kLHintsTop, 0, 0, 3*dy/5));
+    AddFrame(new TGLabel(this, "-"), new TGLayoutHints(kLHintsLeft | kLHintsTop, 0, 0, 3*EPadding::dy/5));
 
     // Minimum value
     maxValue = new TGNumberEntry(this, 0, 5, -1, TGNumberFormat::kNESRealTwo,
@@ -71,11 +72,11 @@ void RooRealVarView::initUI() {
                 TGNumberFormat::kNELLimitMin,
                 doubleMin, doubleMax);
     maxValue->GetNumberEntry()->Connect("TextChanged(char*)", "RooRealVarView", this, "onMaximumChange(char*)");
-    AddFrame(maxValue, new TGLayoutHints(kLHintsLeft | kLHintsTop, dx, dx));
+    AddFrame(maxValue, new TGLayoutHints(kLHintsLeft | kLHintsTop, EPadding::dx, EPadding::dx));
 
     // Fixed checkbox
     fixed = new TGCheckButton(this, "fixed");
-    AddFrame(fixed, new TGLayoutHints(kLHintsRight | kLHintsTop, 0, 0, 2*dy/5, 0));
+    AddFrame(fixed, new TGLayoutHints(kLHintsRight | kLHintsTop, 0, 0, 2*EPadding::dy/5, 0));
     fixed->Connect("Toggled(Bool_t)", "RooRealVarView", this, "onSetConstant(Bool_t)");
 }
 
