@@ -29,6 +29,7 @@
 #include <RooPolynomial.h>
 #include <RooGaussian.h>
 #include <RooAddPdf.h>
+#include <RooConstVar.h>
 #include <RooFFTConvPdf.h>
 #include <RooNumConvPdf.h>
 #include <RooGenericPdf.h>
@@ -309,12 +310,15 @@ void PdfProvider::initConvolutedModel(ConvolutionType convolutionType) {
 	// resolutionFWHM->setConstant(kTRUE);
 	RooFormulaVar* resFunctSigma = new RooFormulaVar("resFunctSigma", "@0*@1", RooArgList(*resolutionFWHM, *Constants::rooFwhmToSigma));
 
-	resolutionFunction = new RooGaussian("resolutionPdf", "Resolution function", *observable, *mean, *resFunctSigma);
 	if (convolutionType == kFFTConvolution){
 	    observable->setBins(2048, "cache");
+	    resolutionFunction = new RooGaussian("resolutionPdf", "Resolution function", *observable, *mean, *resFunctSigma);
 	    pdfFinal = new RooFFTConvPdf("modelConvoluted", "Convoluted with resolution function", *observable, *pdfInMaterial, *resolutionFunction);
 	}
 	else if (convolutionType == kNumericConvolution){
+	    // Redefine mean at zero (different than for FFTConv)
+	    RooConstVar* gaussMean = new RooConstVar("gaussMean", "Mean of Gaussian", 0);
+        resolutionFunction = new RooGaussian("resolutionPdf", "Resolution function", *observable, *gaussMean, *resFunctSigma);
 	    pdfFinal = new RooNumConvPdf("modelConvoluted", "Convoluted with resolution function", *observable, *pdfInMaterial, *resolutionFunction);
 	    ((RooNumConvPdf*)pdfFinal)->setConvolutionWindow(*mean, *resFunctSigma, 5);
 	}
