@@ -97,17 +97,22 @@ void Model::setComponentHist(TH1F* componentHist){
 }
 
 void Model::setFitRange(Int_t minBin, Int_t maxBin){
-    // Make sure fit range limits not interfe
-    // If changed min bin
-    if (minBin > fitProperties.minFitBin && minBin > fitProperties.maxFitBin){
-        minBin = fitProperties.maxFitBin - 1;
-    }
-    if (maxBin < fitProperties.maxFitBin && maxBin < fitProperties.minFitBin){
-        maxBin = fitProperties.minFitBin + 1;
-    }
-
     // Check histogram exists
     if (!fitProperties.hist) return;
+
+    // Make sure fit range is within the histogram limits
+    if (minBin < 1) minBin = 1;
+    if (maxBin > fitProperties.hist->GetXaxis()->GetNbins()) maxBin = fitProperties.hist->GetXaxis()->GetNbins();
+
+    // If changed min bin and it is over the max bin
+    if (minBin > fitProperties.minFitBin && minBin >= fitProperties.maxFitBin){
+        minBin = fitProperties.maxFitBin - 1;
+    }
+
+    // If changed max bin and it is below the min bin
+    if (maxBin < fitProperties.maxFitBin && maxBin <= fitProperties.minFitBin){
+        maxBin = fitProperties.minFitBin + 1;
+    }
 
     if (fitProperties.hist->GetXaxis()->GetFirst() != minBin || fitProperties.hist->GetXaxis()->GetLast() != maxBin){
         // Do not mess with hist ranges here because it complicates things when displaying hists in the view
