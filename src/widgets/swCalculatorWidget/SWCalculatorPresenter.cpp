@@ -504,9 +504,7 @@ void SWCalculatorPresenter::onViewFitRangeSet(){
 void SWCalculatorPresenter::onViewConvolutionSelected(Int_t i){
 	ConvolutionType convolutionType = static_cast<ConvolutionType>(i);
 	// Fix: TGButtonGroup signal fires twice?
-	if (model->getConvolutionType() != convolutionType){
-		model->setConvolutionType(convolutionType);
-	}
+	model->setConvolutionType(convolutionType);
 }
 
 void SWCalculatorPresenter::onViewHasParabolaSet(Bool_t b){

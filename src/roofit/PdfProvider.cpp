@@ -75,7 +75,9 @@ PdfProvider::~PdfProvider(){
 
 void PdfProvider::initObservableAndMean(){
 	// Define energy axis (observable)
-	observable = new RooRealVar("observable", "Energy axis", fitHistogram->GetXaxis()->GetXmin(), fitHistogram->GetXaxis()->GetXmax(), "keV");
+    Double_t eMin = fitHistogram->GetXaxis()->GetXmin();
+    Double_t eMax = fitHistogram->GetXaxis()->GetXmax();
+	observable = new RooRealVar("observable", "Energy axis", eMin, eMax, "keV");
 
 	// Set binning for different types of convolution
 	observable->setBins(fitHistogram->GetNbinsX());
@@ -83,7 +85,9 @@ void PdfProvider::initObservableAndMean(){
 
 	// Set mean
 	Double_t m = fitHistogram->GetBinCenter(fitHistogram->GetMaximumBin());
-	mean = new RooRealVar("mean", "Spectrum peak position", m, m-1, m+1);
+	Double_t mMin = fitHistogram->GetXaxis()->GetBinLowEdge(fitHistogram->GetMaximumBin()-2);
+    Double_t mMax = fitHistogram->GetXaxis()->GetBinUpEdge(fitHistogram->GetMaximumBin()+2);
+	mean = new RooRealVar("mean", "Spectrum peak position", m, mMin, mMax);
 }
 
 void PdfProvider::initMaterialPdf(Bool_t hasParabola, TH1F* componentHist, const Int_t numGauss, const Int_t numLorentz, const Int_t numLorentzSum) {
@@ -204,17 +208,42 @@ void PdfProvider::initSingleDetectorBackground() {
 //    pdfList->add(*bgPdf);
 //    coeffList->add(*bgPdfFraction);
 
-	// Constant background
+	// Calculate constant background contribution
 	RooPolynomial* flatBackgroundPdf = new RooPolynomial("flatBackgroundPdf", "Flat background", *observable, RooArgSet());
 //	backgroundComponents->add(*flatBackgroundPdf);
-	RooRealVar* intFlatBackground = new RooRealVar("intFlatBackground", "Flat background fraction", 10, 0, 20, "%");
+	Double_t rectAreaBelowHistogram = (fitHistogram->GetXaxis()->GetXmax() - fitHistogram->GetXaxis()->GetXmin()) * fitHistogram->GetMinimum();
+    Double_t integral = fitHistogram->Integral("width");
+    Double_t flatBgContribution = rectAreaBelowHistogram/integral*100;
+
+	Double_t flatBackgroundContribution = flatBgContribution/integral;
+	RooRealVar* intFlatBackground = new RooRealVar("intFlatBackground", "Flat background fraction", flatBgContribution, flatBgContribution/1.5, TMath::Max(100., flatBgContribution*1.5), "%");
     RooFormulaVar* intFlatBackgroundNorm = new RooFormulaVar("intFlatBackgroundNorm", "Constant background fraction normalized", "@0/100", RooArgList(*intFlatBackground));
 
-	// Atan background
-	RooGenericPdf* atanBackgroundPdf = new RooGenericPdf("atanBackgroundPdf", "Arctangent background pdf", "@2/2 + (-1)*atan((@0 - @1))", RooArgList(*observable, *mean, *Constants::pi));
+    // Calculate "atan" background contribution
+    Double_t leftWingValue = fitHistogram->GetBinContent(1);
+    Double_t rightWingValue = fitHistogram->GetBinContent(fitHistogram->GetNbinsX());
+    Double_t peakCenter = fitHistogram->GetBinCenter(fitHistogram->GetMaximumBin());
+
+    // Atan can be higher on left wing or right wing
+    Double_t atanArea = 0;
+    RooGenericPdf* atanBackgroundPdf;
+    // TODO: if no convolution then erf (but stretched somehow corresponding to the resolution function of the detector?)
+    // TODO: if convolution then simply step function
+    if (leftWingValue < rightWingValue){
+        // Atan Contribution is right rectangle area
+        atanArea = (fitHistogram->GetXaxis()->GetXmax()-peakCenter)*TMath::Abs(leftWingValue-rightWingValue);
+        atanBackgroundPdf = new RooGenericPdf("erfBackgroundPdf", "Erf background pdf", "erf((@0 - @1))", RooArgList(*observable, *mean));
+        // atanBackgroundPdf = new RooGenericPdf("atanBackgroundPdf", "Arctangent background pdf", "@2/2 + (-1)*atan((@0 - @1))", RooArgList(*observable, *mean, *Constants::pi));
+    } else {
+        atanArea = (peakCenter-fitHistogram->GetXaxis()->GetXmin())*TMath::Abs(leftWingValue-rightWingValue);
+        atanBackgroundPdf = new RooGenericPdf("erfBackgroundPdf", "Erf background pdf", "1-erf((@0 - @1))", RooArgList(*observable, *mean));
+//        atanBackgroundPdf = new RooGenericPdf("atanBackgroundPdf", "Arctangent background pdf", "@2/2 + (-1)*erf((@0 - @1))", RooArgList(*observable, *mean, *Constants::pi));
+    }
+    Double_t atanContribution = atanArea/integral*100;
+
 //	backgroundComponents->add(*atanBackgroundPdf);
-	RooRealVar* intAtanBackground = new RooRealVar("intAtanBackground", "Intensity of arctangent background", 1, 0, 10, "%");
-    RooFormulaVar* intAtanBackgroundNorm = new RooFormulaVar("intAtanBackgroundNorm", "Intensity of arctangent background normalized", "@0/100", RooArgList(*intAtanBackground));
+	RooRealVar* intAtanBackground = new RooRealVar("intErfBackground", "Intensity of erf background", atanContribution, atanContribution/5, atanContribution*5, "%");
+    RooFormulaVar* intAtanBackgroundNorm = new RooFormulaVar("intErfBackgroundNorm", "Intensity of erf background normalized", "@0/100", RooArgList(*intAtanBackground));
 
     if (pdfInMaterial){
 		pdfInMaterial = new RooAddPdf("withBackgroundPdf", "Material components and background", RooArgList(*atanBackgroundPdf, *flatBackgroundPdf, *pdfInMaterial), RooArgList(*intAtanBackgroundNorm, *intFlatBackgroundNorm));
@@ -282,7 +311,13 @@ void PdfProvider::initConvolutedModel(ConvolutionType convolutionType) {
 	RooFormulaVar* resFunctSigma = new RooFormulaVar("resFunctSigma", "@0*@1", RooArgList(*resolutionFWHM, *Constants::rooFwhmToSigma));
 
 	resolutionFunction = new RooGaussian("resolutionPdf", "Resolution function", *observable, *mean, *resFunctSigma);
-	pdfFinal = new RooFFTConvPdf("modelConvoluted", "Convoluted with resolution function", *observable, *pdfInMaterial, *resolutionFunction);
+	if (convolutionType == kFFTConvolution){
+	    pdfFinal = new RooFFTConvPdf("modelConvoluted", "Convoluted with resolution function", *observable, *pdfInMaterial, *resolutionFunction);
+	}
+	else if (convolutionType == kNumericConvolution){
+	    pdfFinal = new RooNumConvPdf("modelConvoluted", "Convoluted with resolution function", *observable, *pdfInMaterial, *resolutionFunction);
+	    ((RooNumConvPdf*)pdfFinal)->setConvolutionWindow(*mean, *resolutionFWHM, 2);
+	}
 }
 
 // Getters

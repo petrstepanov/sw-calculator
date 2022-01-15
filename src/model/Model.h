@@ -25,7 +25,7 @@
 #include "ParametersPool.h"
 
 enum ConvolutionType {
-    kNoConvolution, kFFTConvolution
+    kNoConvolution, kFFTConvolution, kNumericConvolution
 };
 
 // Struct of properties needed to build the fitting model

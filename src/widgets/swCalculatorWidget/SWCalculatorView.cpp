@@ -170,7 +170,8 @@ void SWCalculatorView::initUI(){
     // Create button Group with Matrix layout. ButtonGroup spacings are a mess.
     convTypeButtonGroup = new TGButtonGroup(convolutionParamsFrame, 1, 2, 0, kLHintsLeft | kLHintsTop); // rows, columns, spacing
     new TGRadioButton(convTypeButtonGroup, "None", ConvolutionType::kNoConvolution);
-    new TGRadioButton(convTypeButtonGroup, "Numeric FFT", ConvolutionType::kFFTConvolution);
+    new TGRadioButton(convTypeButtonGroup, "Fourier", ConvolutionType::kFFTConvolution);
+    new TGRadioButton(convTypeButtonGroup, "Numeric", ConvolutionType::kNumericConvolution);
     convolutionParamsFrame->AddFrame(convTypeButtonGroup, new TGLayoutHints(kLHintsNormal));
 
     tabFit->AddFrame(convolutionParamsFrame, new TGLayoutHints(kLHintsNormal, dx, dx, 0, dy));

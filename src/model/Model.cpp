@@ -122,6 +122,9 @@ void Model::setFitRange(Int_t minBin, Int_t maxBin){
         fitProperties.minFitBin = minBin;
         fitProperties.maxFitBin = maxBin;
 
+        // Reset Parameters Pool because we can be fitting another peak
+        parametersPool = new ParametersPool();
+
         // Notfy the view about the fit range change
         // Int_t first = fitProperties.hist->GetXaxis()->GetFirst();
         // Int_t last = fitProperties.hist->GetXaxis()->GetLast();
