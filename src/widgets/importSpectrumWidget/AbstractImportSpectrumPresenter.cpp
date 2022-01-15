@@ -40,7 +40,7 @@ void AbstractImportSpectrumPresenter::onOpenFileClicked(){
 		return;
 	}
 
-	hist->Print("base");
+	// hist->Print("base");
 
 	// Update Model. Corresponding overridden method setModelHist() will be called.
 	setModelHist(hist);

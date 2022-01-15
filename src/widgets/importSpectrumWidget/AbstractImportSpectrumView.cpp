@@ -136,7 +136,7 @@ void AbstractImportSpectrumView::initUI(){
     // Global slots
     // Connection from all objects of a class you should write
     // Can be "MyMainFrame" or "ModalDialogFrame"
-    std::cout << this->GetMainFrame()->ClassName() << std::endl;
+    // std::cout << this->GetMainFrame()->ClassName() << std::endl;
     TQObject::Connect(this->GetMainFrame()->ClassName(), "uiReady()", this->ClassName(), this, "handleUiReady()");
 }
 

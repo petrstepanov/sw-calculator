@@ -46,7 +46,10 @@ SWCalculatorView::SWCalculatorView(const TGWindow* w) : AbstractView<SWCalculato
 	connectSignals();
 
 	// Instantiate THStack for displaying imported histograms
-	tHStack = new THStack("hs", "asd;asdasd;asdasd222");
+	tHStack = new THStack("hs", "");
+
+	// Tweak display styles
+	// Question: Is this same for RooPlot and regular canvas?
 
 	// currentCanvasMode = CanvasMode::onePad;
 }
@@ -63,7 +66,7 @@ void SWCalculatorView::initUI(){
     tabsWidget = new TGTab(this, Constants::leftPanelWidth);
 
     // Import spectrum tab
-    TGCompositeFrame *tabImport = tabsWidget->AddTab("Experimental spectrum");
+    TGCompositeFrame *tabImport = tabsWidget->AddTab("Material spectrum");
     tabImport->SetLayoutManager(new TGVerticalLayout(tabImport));
     tabImport->AddFrame(new ImportSpectrumView(tabImport), new TGLayoutHints(kLHintsExpandX | kLHintsExpandY, dx, dx, dy*2, dy*2));
 
@@ -73,7 +76,7 @@ void SWCalculatorView::initUI(){
     tabImportKapton->AddFrame(new ImportSourceSpectrumView(tabImportKapton), new TGLayoutHints(kLHintsExpandX | kLHintsExpandY, dx, dx, dy*2, dy*2));
 
     // Fit Data tab
-    tabFit = tabsWidget->AddTab("Fit panel");
+    tabFit = tabsWidget->AddTab("Analysis");
     tabFit->SetLayoutManager(new TGVerticalLayout(tabFit));
 
     // Fit Range Row (now in bins!)
@@ -267,43 +270,43 @@ void SWCalculatorView::initUI(){
 
     // Right panel
     TGVerticalFrame* frameRightVertical = new TGVerticalFrame(this);
-    TGHorizontalFrame* frameExportButtons = new TGHorizontalFrame(frameRightVertical);
+    toolbarFrame = new TGHorizontalFrame(frameRightVertical);
 
-//    numDisplayMin = new TGNumberEntry(frameExportButtons, 0, 6, -1, TGNumberFormat::kNESRealOne,
+//    numDisplayMin = new TGNumberEntry(toolbarFrame, 0, 6, -1, TGNumberFormat::kNESRealOne,
 //            TGNumberFormat::kNEAAnyNumber,
 //            TGNumberFormat::kNELLimitMinMax,
 //            -9999, 9999);
-//    numDisplayMax = new TGNumberEntry(frameExportButtons, 0, 6, -1, TGNumberFormat::kNESRealOne,
+//    numDisplayMax = new TGNumberEntry(toolbarFrame, 0, 6, -1, TGNumberFormat::kNESRealOne,
 //            TGNumberFormat::kNEAAnyNumber,
 //            TGNumberFormat::kNELLimitMinMax,
 //            -9999, 9999);
-//    btnApplyZoom = new TGTextButton(frameExportButtons, "Apply Display Range");
+//    btnApplyZoom = new TGTextButton(toolbarFrame, "Apply Display Range");
 //    btnApplyZoom->Connect("Clicked()", "SWCalculatorView", this, "onApplyZoomClicked()");
-//    btnResetZoom = new TGTextButton(frameExportButtons, "Reset");
+//    btnResetZoom = new TGTextButton(toolbarFrame, "Reset");
 //    btnResetZoom->Connect("Clicked()", "SWCalculatorView", this, "onResetZoomClicked()");
 
-//    frameExportButtons->AddFrame(numDisplayMin, new TGLayoutHints(kLHintsLeft | kLHintsTop, 0, dx, 0, 0));  // left, right, top, bottom
-//    frameExportButtons->AddFrame(new TGLabel(frameExportButtons, "-"), new TGLayoutHints(kLHintsLeft | kLHintsTop, 0, dx, dy, 0));  // left, right, top, bottom
-//    frameExportButtons->AddFrame(numDisplayMax, new TGLayoutHints(kLHintsLeft | kLHintsTop, 0, dx, 0, 0));  // left, right, top, bottom
-//    frameExportButtons->AddFrame(btnApplyZoom, new TGLayoutHints(kLHintsLeft | kLHintsTop, dx, dx, 0, 0));  // left, right, top, bottom
-//    frameExportButtons->AddFrame(btnResetZoom, new TGLayoutHints(kLHintsLeft | kLHintsTop, 0, dx, 0, 0));  // left, right, top, bottom
+//    toolbarFrame->AddFrame(numDisplayMin, new TGLayoutHints(kLHintsLeft | kLHintsTop, 0, dx, 0, 0));  // left, right, top, bottom
+//    toolbarFrame->AddFrame(new TGLabel(toolbarFrame, "-"), new TGLayoutHints(kLHintsLeft | kLHintsTop, 0, dx, dy, 0));  // left, right, top, bottom
+//    toolbarFrame->AddFrame(numDisplayMax, new TGLayoutHints(kLHintsLeft | kLHintsTop, 0, dx, 0, 0));  // left, right, top, bottom
+//    toolbarFrame->AddFrame(btnApplyZoom, new TGLayoutHints(kLHintsLeft | kLHintsTop, dx, dx, 0, 0));  // left, right, top, bottom
+//    toolbarFrame->AddFrame(btnResetZoom, new TGLayoutHints(kLHintsLeft | kLHintsTop, 0, dx, 0, 0));  // left, right, top, bottom
 
-    displayMin = new TGNumberEntry(frameExportButtons, 0, 5, UiHelper::getUId(), TGNumberFormat::kNESRealOne,
+    displayMin = new TGNumberEntry(toolbarFrame, 0, 5, UiHelper::getUId(), TGNumberFormat::kNESRealOne,
         TGNumberFormat::kNEAAnyNumber,
         TGNumberFormat::kNELLimitMinMax,
         -1000, 1000);
-    frameExportButtons->AddFrame(displayMin, new TGLayoutHints(kLHintsLeft | kLHintsTop, 0, dx, 0, 0));
+    toolbarFrame->AddFrame(displayMin, new TGLayoutHints(kLHintsLeft | kLHintsTop, 0, dx, 0, 0));
 
-    zoomSlider = new TGDoubleHSlider(frameExportButtons, 190, kDoubleScaleBoth, UiHelper::getUId(), kHorizontalFrame, GetDefaultFrameBackground(), kFALSE, kFALSE);
+    zoomSlider = new TGDoubleHSlider(toolbarFrame, 190, kDoubleScaleBoth, UiHelper::getUId(), kHorizontalFrame, GetDefaultFrameBackground(), kFALSE, kFALSE);
     zoomSlider->SetRange(-60,60);
     zoomSlider->SetPosition(-60,60);
-    frameExportButtons->AddFrame(zoomSlider, new TGLayoutHints(kLHintsLeft | kLHintsTop | kLHintsExpandX, dx, dx, 0, 0));
+    toolbarFrame->AddFrame(zoomSlider, new TGLayoutHints(kLHintsLeft | kLHintsTop | kLHintsExpandX, dx, dx, 0, 0));
 
-    displayMax = new TGNumberEntry(frameExportButtons, 0, 5, UiHelper::getUId(), TGNumberFormat::kNESRealOne,
+    displayMax = new TGNumberEntry(toolbarFrame, 0, 5, UiHelper::getUId(), TGNumberFormat::kNESRealOne,
         TGNumberFormat::kNEAAnyNumber,
         TGNumberFormat::kNELLimitMinMax,
         -1000, 1000);
-    frameExportButtons->AddFrame(displayMax, new TGLayoutHints(kLHintsLeft | kLHintsTop, 0, dx, 0, 0));
+    toolbarFrame->AddFrame(displayMax, new TGLayoutHints(kLHintsLeft | kLHintsTop, 0, dx, 0, 0));
 //    tbMin->AddText(0, "0.0");
 //    tbMax->AddText(0, "0.0");
 //
@@ -316,20 +319,20 @@ void SWCalculatorView::initUI(){
 //    tbMax->AddText(0, buf);
 
     // Save image button
-    btnSaveImage = new TGTextButton(frameExportButtons, "Save image");
+    btnSaveImage = new TGTextButton(toolbarFrame, "Save image");
     btnSaveImage->SetEnabled(false);
-    frameExportButtons->AddFrame(btnSaveImage, new TGLayoutHints(kLHintsRight | kLHintsTop, 0, dx, 0, 0));
+    toolbarFrame->AddFrame(btnSaveImage, new TGLayoutHints(kLHintsRight | kLHintsTop, 0, dx, 0, 0));
 
     // Save data file button
-    btnSaveData = new TGTextButton(frameExportButtons, "Export as ASCII");
+    btnSaveData = new TGTextButton(toolbarFrame, "Export as ASCII");
     btnSaveData->SetEnabled(false);
-    frameExportButtons->AddFrame(btnSaveData, new TGLayoutHints(kLHintsRight | kLHintsTop, 0, dx, 0, 0));  // left, right, top, bottom
+    toolbarFrame->AddFrame(btnSaveData, new TGLayoutHints(kLHintsRight | kLHintsTop, 0, dx, 0, 0));  // left, right, top, bottom
 
     // Attach Right Canvas (Plot)
     embedCanvas = new TRootEmbeddedCanvas("embedCanvas", frameRightVertical);
-    frameRightVertical->AddFrame(embedCanvas, new TGLayoutHints(kLHintsLeft | kLHintsTop | kLHintsExpandX | kLHintsExpandY, 0, dx, dx, dx));
+    frameRightVertical->AddFrame(embedCanvas, new TGLayoutHints(kLHintsLeft | kLHintsTop | kLHintsExpandX | kLHintsExpandY, 0, dx, dx, 0));
 
-    frameRightVertical->AddFrame(frameExportButtons, new TGLayoutHints(kLHintsExpandX, 0, 0, 0, 0));
+    frameRightVertical->AddFrame(toolbarFrame, new TGLayoutHints(kLHintsExpandX, 0, 0, dx, 0));
 
     AddFrame(frameRightVertical, new TGLayoutHints(kLHintsLeft | kLHintsTop | kLHintsExpandX | kLHintsExpandY, 0, 0, 0, dx));
     // You should call, for example HideFrame(TGFrame *f), only after the frames have been laid out and the sub windows
@@ -377,6 +380,31 @@ void SWCalculatorView::setTabEnabled(Int_t tabNumber, Bool_t isEnabled){
     tabsWidget->SetEnabled(tabNumber, isEnabled);
 }
 
+void SWCalculatorView::drawFitResult(RooPlot* spectrumPlot, RooPlot* residualsPlot){
+    this->spectrumPlot = spectrumPlot;
+    this->residualsPlot = spectrumPlot;
+
+    // Set two pads mode
+    setCanvasMode(CanvasMode::twoPads);
+
+    // Draw data plot on canvas
+    embedCanvas->GetCanvas()->cd(1);
+    spectrumPlot->Draw();
+
+    // Draw data plot on canvas
+    embedCanvas->GetCanvas()->cd(2);
+    residualsPlot->Draw();
+
+    // Update canvas
+    embedCanvas->GetCanvas()->cd(1)->Modified();
+    embedCanvas->GetCanvas()->cd(1)->Update();
+    embedCanvas->GetCanvas()->cd(2)->Modified();
+    embedCanvas->GetCanvas()->cd(2)->Update();
+
+    // view->initRooPlots(spectrumPlot, residualsPlot);
+    setToolbarEnabled(kTRUE);
+}
+
 void SWCalculatorView::setFitRangeLimits(Double_t min, Double_t max){
 	// Set peak selection limits
 	numFitMin->SetLimitValues(min, max);
@@ -385,7 +413,7 @@ void SWCalculatorView::setFitRangeLimits(Double_t min, Double_t max){
 }
 
 void SWCalculatorView::setFitRange(Double_t minBin, Double_t maxBin, Double_t minEnergy, Double_t maxEnergy){
-	// Set peak selection initial values
+    // Set peak selection initial values
 	numFitMin->SetNumber(minBin);
 	numFitMax->SetNumber(maxBin);
 	numFitSlider->SetPosition(minBin, maxBin);
@@ -450,17 +478,18 @@ void SWCalculatorView::onSliderChange() {
     updateCanvasLimits(zoomSlider->GetMinPosition(), zoomSlider->GetMaxPosition());
 }
 
-void SWCalculatorView::initRooPlots(RooPlot* fitFrame, RooPlot* chiFrame) {
-    this->fitFrame = fitFrame;
-    this->chiFrame = chiFrame;
-}
+//void SWCalculatorView::initRooPlots(RooPlot* fitFrame, RooPlot* chiFrame) {
+//    this->fitFrame = fitFrame;
+//    this->chiFrame = chiFrame;
+//}
 
 void SWCalculatorView::setToolbarEnabled(Bool_t isEnabled){
-    btnSaveData->SetEnabled(isEnabled);
-    btnSaveImage->SetEnabled(isEnabled);
-    displayMin->SetState(isEnabled);
-    displayMax->SetState(isEnabled);
-    isEnabled ? UiHelper::showFrame(zoomSlider) : UiHelper::hideFrame(zoomSlider);
+    isEnabled ? UiHelper::showFrame(toolbarFrame) : UiHelper::hideFrame(toolbarFrame);
+//    btnSaveData->SetEnabled(isEnabled);
+//    btnSaveImage->SetEnabled(isEnabled);
+//    displayMin->SetState(isEnabled);
+//    displayMax->SetState(isEnabled);
+//    isEnabled ? UiHelper::showFrame(zoomSlider) : UiHelper::hideFrame(zoomSlider);
 }
 
 TCanvas* SWCalculatorView::getCanvas() {
@@ -487,26 +516,27 @@ void SWCalculatorView::setComponentHistogram(TH1F* hist){
 	}
 }
 
-void SWCalculatorView::setCanvasText(const char* text){
-	TText* t = new TText(0.5, 0.5, text);
-	// t->SetNDC();
+void SWCalculatorView::drawText(const char* text){
+    // Set single pad mode
+    setCanvasMode(CanvasMode::onePad);
+
+	TText* t = new TText(0.55, 0.5, text);
+	t->SetNDC();
 	t->SetTextAlign(ETextAlign::kHAlignCenter + ETextAlign::kVAlignCenter);
 
-	setCanvasMode(CanvasMode::onePad);
 	TCanvas* canvas = embedCanvas->GetCanvas();
-	canvas->cd();
-	canvas->Clear();
 	t->Draw();
 	canvas->Modified();
 	canvas->Update();
 }
 
-
 void SWCalculatorView::setCanvasMode(CanvasMode mode){
 	if (currentCanvasMode == mode) return;
 	TCanvas* canvas = embedCanvas->GetCanvas();
 
+	// Clear current canvas
 	canvas->Clear();
+
 	if (mode == CanvasMode::onePad){
 		// Initialize one pad on canvas (for setting limits)
 //	    canvas->SetMargin((GraphicsHelper::padMargins).left,
@@ -602,8 +632,8 @@ void SWCalculatorView::clearFitResults() {
 }
 
 void SWCalculatorView::updateCanvasLimits(Double_t min, Double_t max) {
-    fitFrame->GetXaxis()->SetRangeUser(min, max);
-    chiFrame->GetXaxis()->SetRangeUser(min, max);
+    spectrumPlot->GetXaxis()->SetRangeUser(min, max);
+    residualsPlot->GetXaxis()->SetRangeUser(min, max);
 
     TCanvas* c = embedCanvas->GetCanvas();
     c->cd(1)->Modified();
@@ -613,7 +643,10 @@ void SWCalculatorView::updateCanvasLimits(Double_t min, Double_t max) {
 }
 
 void SWCalculatorView::drawHistograms(TH1* hist, TH1* sourceHist){
-	TCanvas* canvas = embedCanvas->GetCanvas();
+    // Initialize single-pad mode
+    setCanvasMode(CanvasMode::onePad);
+
+    TCanvas* canvas = embedCanvas->GetCanvas();
 	canvas->cd();
 
 	// Make stack of regualr and source histagrams (if set)
@@ -629,8 +662,11 @@ void SWCalculatorView::drawHistograms(TH1* hist, TH1* sourceHist){
     TH1* histCopy = new TH1F();
     hist->Copy(*histCopy);
     histCopy->SetLineColor(kBlack);
+    // histCopy->SetTitleOffset(offset, "")
     tHStack->Add(histCopy);
-    tHStack->SetTitle("Spectrum Preview");
+
+    // Disable title on the THStack. We draw our own title
+    tHStack->SetTitle(" ");
 
     // Add source contribution histogram to the stack (if exists)
     if (sourceHist){
@@ -639,12 +675,15 @@ void SWCalculatorView::drawHistograms(TH1* hist, TH1* sourceHist){
         sourceHistCopy->SetLineColor(EColor::kBlack);
         sourceHistCopy->SetLineStyle(ELineStyle::kDashed);
         tHStack->Add(sourceHistCopy);
-        tHStack->SetTitle("Spectra Preview");
+//        tHStack->SetTitle("");
     }
 
-    // Set stack limits?
-
+    // Draw THStack
     tHStack->Draw("nostack");
+
+    // Set THStack axis titles - after Draw() only
+    tHStack->GetXaxis()->SetTitle("Energy, keV");
+    tHStack->GetYaxis()->SetTitle("Counts");
 
 	canvas->BuildLegend();
 	GraphicsHelper::alignPave(canvas, Alignment::TOP_RIGHT, Decoration::DEFAULT, 0.07, 0.35);
@@ -660,9 +699,18 @@ void SWCalculatorView::drawHistograms(TH1* hist, TH1* sourceHist){
 	line->SetLineStyle(ELineStyle::kDotted);
 	line->DrawLineNDC((x1+x2)/2, y1, (x1+x2)/2, y2)->Draw();
 
+    // Add title
+    TText* t = new TText(0.5, 0.95, sourceHist ? "Studied Material and Source Contribution Spectra" : "Studied Material Spectrum");
+    t->SetNDC();
+    t->SetTextFont(42);
+    t->SetTextSize(0.035);
+    t->SetTextAlign(ETextAlign::kHAlignCenter + ETextAlign::kVAlignCenter);
+    t->Draw();
 
-	canvas->Modified();
-	canvas->Update();
+    canvas->Modified();
+    canvas->Update();
+
+    setToolbarEnabled(kFALSE);
 }
 
 SWCalculatorView::~SWCalculatorView() {

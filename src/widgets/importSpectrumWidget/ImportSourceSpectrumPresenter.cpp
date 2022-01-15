@@ -32,6 +32,6 @@ void ImportSourceSpectrumPresenter::setModelHist(TH1F* hist){
 // Slots for Model Signals
 
 void ImportSourceSpectrumPresenter::onModelSourceHistogramImported(TH1F* hist){
-    hist->Print("base");
+    // hist->Print("base");
     view->drawHistogram(hist);
 }

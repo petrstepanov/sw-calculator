@@ -53,10 +53,15 @@ class SWCalculatorView : public AbstractView<SWCalculatorPresenter> {
   protected:
     void initUI();
     THStack* tHStack; // For drawing original and source contribution histograms
+    TGHorizontalFrame* toolbarFrame;
+    void setCanvasMode(CanvasMode mode);
 
   public:
     SWCalculatorView(const TGWindow *w = 0);
     virtual ~SWCalculatorView();
+
+    RooPlot* spectrumPlot;
+    RooPlot* residualsPlot;
 
     // Override base class virtual functions
     SWCalculatorPresenter* instantinatePresenter();
@@ -116,9 +121,10 @@ class SWCalculatorView : public AbstractView<SWCalculatorPresenter> {
 //    TGCheckButton* hasOrtho;
 //    TGTextButton*  btnApplyZoom;
 //    TGTextButton*  btnResetZoom;
-    RooPlot* fitFrame;
-    RooPlot* chiFrame;
+//    RooPlot* fitFrame;
+//    RooPlot* chiFrame;
 
+    // Enum that stores canvas type (single or double pad)
     CanvasMode currentCanvasMode;
 
     TRootEmbeddedCanvas *embedCanvas;
@@ -131,9 +137,6 @@ class SWCalculatorView : public AbstractView<SWCalculatorPresenter> {
     void setFitRangeLimits(Double_t minBin, Double_t maxBin);
     void reflectTwoDetector(Bool_t isTwoDetector);
     void setComponentHistogram(TH1F* hist);
-
-    void setCanvasMode(CanvasMode mode);
-    void setCanvasText(const char* text);
 
     void setConvolutionType(ConvolutionType t);
 
@@ -148,7 +151,7 @@ class SWCalculatorView : public AbstractView<SWCalculatorPresenter> {
     void scrollOutputDown();
 
     // Calls to Presenter
-    void initRooPlots(RooPlot* fitFrame, RooPlot* chiFrame);
+    // void initRooPlots(RooPlot* fitFrame, RooPlot* chiFrame);
 
     // Local view functions for widgt interactions
     void displayFilename(TString* fileName);
@@ -158,6 +161,8 @@ class SWCalculatorView : public AbstractView<SWCalculatorPresenter> {
     void updateCanvasLimits(Double_t min, Double_t max);
 
     void drawHistograms(TH1* hist, TH1* sourceHist);
+    void drawText(const char* text);
+    void drawFitResult(RooPlot* spectrumPlot, RooPlot* residualsPlot);
 
     ClassDef(SWCalculatorView,0);
 };

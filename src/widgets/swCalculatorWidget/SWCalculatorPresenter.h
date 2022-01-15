@@ -18,6 +18,7 @@
 #include "SWCalculatorView.h"
 #include "../../model/Model.h"
 #include "../../roofit/PdfProvider.h"
+#include <RooPlot.h>
 
 class SWCalculatorView;
 
@@ -30,6 +31,8 @@ private:
     // Saving a copy of the old fit properties to see if the fitting PDF model should be rebuild or not
     FitProperties oldFitProperties;
     Bool_t needRebuildPDF();
+
+    // RooPlot* spectrumPlot, residualsPlot;
 
 public:
     SWCalculatorPresenter(SWCalculatorView* view);

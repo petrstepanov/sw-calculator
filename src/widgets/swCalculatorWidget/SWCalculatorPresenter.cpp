@@ -43,6 +43,7 @@
 #include <TLegend.h>
 #include <iostream>
 #include <TLine.h>
+#include <TSystem.h>
 
 ClassImp(SWCalculatorPresenter);
 
@@ -102,6 +103,12 @@ void SWCalculatorPresenter::buildFittingModel(){
 
 // Slots for View Signals
 void SWCalculatorPresenter::onViewEditParametersClicked() {
+    // Check if model needs recompiled
+    if (needRebuildPDF()){
+        buildFittingModel();
+        oldFitProperties = model->getFitProperties();
+    }
+
 	ModalDialogFrame* dialog = new ModalDialogFrame(gClient->GetRoot(), view->GetMainFrame(), "Model Parameters");
 	RooRealVar* observable = pdfProvider->getObservable();
 	RooAbsPdf* pdf = pdfProvider->getPdf();
@@ -118,7 +125,10 @@ void SWCalculatorPresenter::onViewFitSpectrumClicked() {
         oldFitProperties = model->getFitProperties();
     }
 
-	view->setCanvasText("Fitting...");
+    // Draw Text
+	view->drawText("Fitting...");
+	gSystem->ProcessEvents();
+
 	// Testing purposes - let model generate data
 	// data = static_cast<RooAddPdf*>(model)->generateBinned(*x,1000000) ;
 
@@ -414,32 +424,14 @@ void SWCalculatorPresenter::onViewFitSpectrumClicked() {
 		spectrumPlot->addObject(paramsPaveText);
 	}
 
-	// Set two pads mode
-	view->setCanvasMode(CanvasMode::twoPads);
-
-	// Draw data plot on canvas
-	view->embedCanvas->GetCanvas()->cd(1);
-	spectrumPlot->Draw();
-
-	// Draw data plot on canvas
-	view->embedCanvas->GetCanvas()->cd(2);
-	residualsPlot->Draw();
-
-	// Update canvas
-	view->embedCanvas->GetCanvas()->cd(1)->Modified();
-	view->embedCanvas->GetCanvas()->cd(1)->Update();
-	view->embedCanvas->GetCanvas()->cd(2)->Modified();
-	view->embedCanvas->GetCanvas()->cd(2)->Update();
-
-	view->initRooPlots(spectrumPlot, residualsPlot);
-	view->setToolbarEnabled(kTRUE);
-	view->setDisplayLimits(fitHist->GetXaxis()->GetXmin(), fitHist->GetXaxis()->GetXmax());
+    view->drawFitResult(spectrumPlot, residualsPlot);
+    view->setDisplayLimits(fitHist->GetXaxis()->GetXmin(), fitHist->GetXaxis()->GetXmax());
 	RootHelper::stopAndPrintTimer();
 }
 
 void SWCalculatorPresenter::onViewSaveDataClicked() {
 	TString fileName = TString::Format("%s-data-columns.txt", model->getFileName()->Data());
-	FileUtils::savePlotsToFile(view->fitFrame, view->chiFrame, fileName.Data(), pdfProvider->getObservable());
+	FileUtils::savePlotsToFile(view->spectrumPlot, view->residualsPlot, fileName.Data(), pdfProvider->getObservable());
 
 	UiHelper* uiHelper = UiHelper::getInstance();
     uiHelper->showOkDialog(view->GetMainFrame(), "Canvas exported to ASCII data columns successfully");
@@ -559,9 +551,6 @@ void SWCalculatorPresenter::onModelHistogramImported(TH1F* hist){
 	view->setTabEnabled(1, true);
 	view->setTabEnabled(2, true);
 
-	// Prepare canvas for range selection
-	view->setCanvasMode(CanvasMode::onePad);
-
 	// Draw histogram(s) on canvas (original and contribution from source if set)
 	TH1* sourceHist = model->getFitProperties().sourceHist;
 //	Int_t minBin = model->getFitProperties().minFitBin;
@@ -604,7 +593,12 @@ void SWCalculatorPresenter::onModelFitRangeSet(DoublePair* fitRange){
 	Double_t minEnergy = model->getFitProperties().hist->GetXaxis()->GetBinLowEdge(fitRange->first);
 	Double_t maxEnergy = model->getFitProperties().hist->GetXaxis()->GetBinLowEdge(fitRange->second);
 
-	view->setCanvasMode(CanvasMode::onePad);
+	// If view is in two-pad fitting mode draw material and source histogtrams first
+    if (view->currentCanvasMode != CanvasMode::onePad){
+        view->drawHistograms(model->getFitProperties().hist, model->getFitProperties().sourceHist);
+    }
+
+
 	view->setFitRange(fitRange->first, fitRange->second, minEnergy, maxEnergy);
 	// buildFittingModel();
 }
