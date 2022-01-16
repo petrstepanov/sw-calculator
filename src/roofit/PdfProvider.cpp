@@ -13,15 +13,16 @@
 
 #include "PdfProvider.h"
 
-#include "pdfs/ParabolaPdf.h"
-#include "pdfs/GaussianPdf.h"
-#include "pdfs/LorentzianPdf.h"
-#include "pdfs/DampLorentzPdf.h"
-#include "pdfs/OrthogonalPdf.h"
-#include "pdfs/BackgroundPdf.h"
+#include "./pdfs/ParabolaPdf.h"
+#include "./pdfs/GaussianPdf.h"
+#include "./pdfs/LorentzianPdf.h"
+#include "./pdfs/DampLorentzPdf.h"
+#include "./pdfs/OrthogonalPdf.h"
+#include "./pdfs/BackgroundPdf.h"
+#include "./pdfs/StepPdf.h"
+#include "./pdfs/DeltaPdf.h"
 #include "../util/RootHelper.h"
 #include "../roofit/AddPdf.h"
-#include "../roofit/pdfs/StepPdf.h"
 #include "../model/Constants.h"
 #include "../util/HistProcessor.h"
 #include "../util/StringUtils.h"
@@ -40,6 +41,7 @@
 #include <TIterator.h>
 #include <TMath.h>
 #include <TH1F.h>
+#include <Math/IntegratorOptions.h>
 
 PdfProvider::PdfProvider(FitProperties fitProperties) : observable(0), mean(0), resolutionFunction(0), sourcePdf(0), fitHistogram(0), pdfInMaterial(0), pdfFinal(0), intSource(0){
 	// Define variables
@@ -56,7 +58,7 @@ PdfProvider::PdfProvider(FitProperties fitProperties) : observable(0), mean(0), 
 
 	// Initialize pdfs in material
 	initObservableAndMean();
-	initMaterialPdf(fitProperties.hasParabola, fitProperties.componentHist, fitProperties.numberOfGaussians, fitProperties.numberOfExponents, fitProperties.numberOfDampingExponents);
+	initMaterialPdf(fitProperties.hasParabola, fitProperties.hasDelta, fitProperties.componentHist, fitProperties.numberOfGaussians, fitProperties.numberOfExponents, fitProperties.numberOfDampingExponents);
 
 	// Add correspondent background
 	if (HistProcessor::isTwoDetector(fitProperties.hist)) {
@@ -91,7 +93,7 @@ void PdfProvider::initObservableAndMean(){
 	mean = new RooRealVar("mean", "Spectrum peak position", m, mMin, mMax);
 }
 
-void PdfProvider::initMaterialPdf(Bool_t hasParabola, TH1F* componentHist, const Int_t numGauss, const Int_t numLorentz, const Int_t numLorentzSum) {
+void PdfProvider::initMaterialPdf(Bool_t hasParabola, Bool_t hasDelta, TH1F* componentHist, const Int_t numGauss, const Int_t numLorentz, const Int_t numLorentzSum) {
 	RooArgList* pdfsInMaterial = new RooArgList();
 
 	// Parabola PDF
@@ -100,6 +102,17 @@ void PdfProvider::initMaterialPdf(Bool_t hasParabola, TH1F* componentHist, const
 		ParabolaPdf* parabolaPdf = new ParabolaPdf("Parabola", "Parabola", *observable, *mean, *parabolaRoot);
 		pdfsInMaterial->add(*parabolaPdf);
 	}
+
+    // Delta PDF
+    if (hasDelta) {
+        // Trying a very narrow Gaussian instead of a delta function because
+        // there were integration problems of my custom DeltaPdf
+        RooConstVar* diracSigma = new RooConstVar("deltaFunctionSigma", "Delta-function sigma", 0.01);
+        RooGaussian* diracPdf = new RooGaussian("deltaFunctionPdf", "Dirac delta-function", *observable, *mean, *diracSigma);
+        pdfsInMaterial->add(*diracPdf);
+        // DeltaPdf* deltaPdf = new DeltaPdf("Delta", "Dirac delta-function", *observable, *mean);
+        // pdfsInMaterial->add(*deltaPdf);
+    }
 
 	// Component Histogram PDF
 	if (componentHist){
@@ -310,27 +323,32 @@ void PdfProvider::initTwoDetectorBackground() {
 
 
 void PdfProvider::initConvolutedModel(ConvolutionType convolutionType) {
+    // Maybe: we need to increase the integrator points to be able to integrate a very narrow function
+    ROOT::Math::IntegratorOneDimOptions::SetDefaultNPoints(100);
+
 	if (convolutionType == kNoConvolution){
 		pdfFinal = pdfInMaterial;
 		return;
 	}
 
 	// Convolute components in material
-	RooRealVar* resolutionFWHM = new RooRealVar("resolutionFWHM", "Resolution function FWHM", 2, 0.5, 4, "keV");
-	// resolutionFWHM->setConstant(kTRUE);
-	RooFormulaVar* resFunctSigma = new RooFormulaVar("resFunctSigma", "@0*@1", RooArgList(*resolutionFWHM, *Constants::rooFwhmToSigma));
+	RooRealVar* resFunctFWHM = new RooRealVar("resolutionFWHM", "Resolution function FWHM", 2, 0.5, 4, "keV"); // resolutionFWHM->setConstant(kTRUE);
+	RooFormulaVar* resFunctSigma = new RooFormulaVar("resFunctSigma", "@0*@1", RooArgList(*resFunctFWHM, *Constants::rooFwhmToSigma));
+    RooRealVar* resFunctMean = new RooRealVar("gaussMean", "Mean of Gaussian", 0);\
+    resFunctMean->setAttribute(Constants::ATTR_HIDE_PARAMETER_FROM_UI);
+    resolutionFunction = new RooGaussian("resolutionPdf", "Resolution function", *observable, *resFunctMean, *resFunctSigma);
 
-    RooConstVar* gaussMean = new RooConstVar("gaussMean", "Mean of Gaussian", 0);
 	if (convolutionType == kFFTConvolution){
-	    observable->setBins(2048, "cache");
-	    resolutionFunction = new RooGaussian("resolutionPdf", "Resolution function", *observable, *gaussMean, *resFunctSigma);
+	    // Tested: we need more FFT convolution bins to account on the narrow "delta" function
+	    Int_t nConvolutionBins = fitProperties.hasDelta ? 4096 : 2048;
+	    observable->setBins(nConvolutionBins, "cache");
 	    pdfFinal = new RooFFTConvPdf("modelConvoluted", "Convoluted with resolution function", *observable, *pdfInMaterial, *resolutionFunction);
 	}
 	else if (convolutionType == kNumericConvolution){
 	    // Redefine mean at zero (different than for FFTConv)
-        resolutionFunction = new RooGaussian("resolutionPdf", "Resolution function", *observable, *gaussMean, *resFunctSigma);
 	    pdfFinal = new RooNumConvPdf("modelConvoluted", "Convoluted with resolution function", *observable, *pdfInMaterial, *resolutionFunction);
-	    ((RooNumConvPdf*)pdfFinal)->setConvolutionWindow(*mean, *resFunctSigma, 5);
+	    // Set convolution window as described here: https://root.cern/doc/master/classRooNumConvPdf.html
+	    // ((RooNumConvPdf*)pdfFinal)->setConvolutionWindow(*mean, *resFunctSigma, 5);
 	}
 }
 

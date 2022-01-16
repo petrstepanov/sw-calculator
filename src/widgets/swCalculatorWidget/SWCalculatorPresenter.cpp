@@ -36,6 +36,7 @@
 #include <RooMinimizer.h>
 #include <RooFitResult.h>
 #include <RooRealVar.h>
+#include <RooConstVar.h>
 #include <RooArgSet.h>
 #include <RooNumIntConfig.h>
 #include <RooCategory.h>
@@ -64,15 +65,15 @@ void SWCalculatorPresenter::onInitModel() {
 	model->Connect("sourceHistogramImported(TH1F*)",     this->ClassName(), this, "onModelSourceHistogramImported(TH1F*)");
 	model->Connect("componentHistogramImported(TH1F*)",  this->ClassName(), this, "onModelComponentHistogramImported(TH1F*)");
 	model->Connect("fitRangeSet(DoublePair*)",           this->ClassName(), this, "onModelFitRangeSet(DoublePair*)");
-
-	// model->Connect("twoDetectorSet(Bool_t)",             this->ClassName(), this, "onModelTwoDetectorSet(Bool_t)");
 	model->Connect("convolutionTypeSet(Int_t)",          this->ClassName(), this, "onModelConvolutionTypeSet(Int_t)");
     model->Connect("backgroundTypeSet(Int_t)",           this->ClassName(), this, "onModelBackgroundTypeSet(Int_t)");
 	model->Connect("hasParabolaSet(Bool_t)",             this->ClassName(), this, "onModelHasParabolaSet(Bool_t)");
+    model->Connect("hasDeltaSet(Bool_t)",                this->ClassName(), this, "onModelHasDeltaSet(Bool_t)");
 	model->Connect("numberOfGaussiansSet(Int_t)",        this->ClassName(), this, "onModelNumberOfGaussiansSet(Int_t)");
 	model->Connect("numberOfExponentsSet(Int_t)",        this->ClassName(), this, "onModelNumberOfExponentsSet(Int_t)");
 	model->Connect("numberOfDampingExponentsSet(Int_t)", this->ClassName(), this, "onModelNumberOfDampingExponentsSet(Int_t)");
-	// model->Connect("fitPropertiesChanged()",             this->ClassName(), this, "onModelFitPropertiesChanged()");
+	// model->Connect("fitPropertiesChanged()",          this->ClassName(), this, "onModelFitPropertiesChanged()");
+    // model->Connect("twoDetectorSet(Bool_t)",          this->ClassName(), this, "onModelTwoDetectorSet(Bool_t)");
 
 	// Restore view from model
  	// std::pair<Double_t, Double_t> fitRangeLimits = model->getFitRange();
@@ -85,6 +86,7 @@ void SWCalculatorPresenter::onInitModel() {
     view->setBackgroundType(model->getSingleBackgroundType());
 
 	view->hasParabola->SetOn(model->getHasParabola());
+    view->hasDelta->SetOn(model->getHasDelta());
 	view->numGauss->SetNumber(model->getNumberOfGaussians());
 	view->numExponent->SetNumber(model->getNumberOfExponents());
 	view->numDampExponent->SetNumber(model->getNumberOfDampingExponents());
@@ -233,8 +235,8 @@ void SWCalculatorPresenter::onViewFitSpectrumClicked() {
 
 	// Plot fitting pdf
 	if (pdf){
-		pdf->plotOn(spectrumPlot, RooFit::LineColor(kOrange + 6), RooFit::LineWidth(1), RooFit::Name("pdf"));
-		legend->AddEntry(spectrumPlot->findObject("pdf"), "Fitting model", "l");
+		pdf->plotOn(spectrumPlot, RooFit::LineColor(kOrange + 6), RooFit::LineWidth(2), RooFit::Name("pdf"));
+		legend->AddEntry(spectrumPlot->findObject("pdf"), "Fit model", "l");
 	}
 	RooCurve* curveFit = spectrumPlot->getCurve("pdf");
 
@@ -255,23 +257,30 @@ void SWCalculatorPresenter::onViewFitSpectrumClicked() {
 			if (component && component->getAttribute(Constants::ATTR_NO_DRAW_ON_PLOT)==kFALSE) {
 				Double_t precision = strcmp(component->GetName(), "Parabola") == 0 ? 1E-8 : 1E-3;
 				RooCmdArg precisionCmdArg =  RooFit::Precision(precision);
-				pdfInMaterial->plotOn(spectrumPlot, RooFit::Components(*component), RooFit::LineStyle(kDashed), RooFit::LineColor(GraphicsHelper::colorSet[i++]), RooFit::LineWidth(1), RooFit::Name(component->GetName()), RooFit::Normalization(relativeNormalization, RooAbsReal::Relative), precisionCmdArg);
+				pdfInMaterial->plotOn(spectrumPlot, RooFit::Components(*component), RooFit::LineStyle(kDashed), RooFit::LineColor(GraphicsHelper::colorSet[i++]), RooFit::LineWidth(2), RooFit::Name(component->GetName()), RooFit::Normalization(relativeNormalization, RooAbsReal::Relative), precisionCmdArg);
 				legend->AddEntry(spectrumPlot->findObject(component->GetName()), component->GetTitle(), "l");
 			}
 		}
 	}
 
 	// Plot Resolution Function
-	RooAbsPdf* resolutionFunction = pdfProvider->getResolutionFunction();
-	if (resolutionFunction) {
-		resolutionFunction->plotOn(spectrumPlot, RooFit::LineStyle(kDashed), RooFit::LineColor(kGray), RooFit::LineWidth(1), RooFit::Name(resolutionFunction->GetName())); //, RooFit::Normalization(totalFitCounts, RooAbsReal::NumEvent)); Normalization(1.0,RooAbsReal::RelativeExpected)
+	// RooAbsPdf* resolutionFunction = ;
+	if (pdfProvider->getResolutionFunction()) {
+	    // Hack: Shift resolution function mean from 0 to spectrum center. Otherwise won't see it on single dimensional spectra
+	    RooAbsPdf* resolutionFunction = (RooAbsPdf*)pdfProvider->getResolutionFunction()->Clone("rfCopy");
+	    RooRealVar* gaussMean = (RooRealVar*)resolutionFunction->getParameters(RooArgSet())->find("gaussMean");
+	    gaussMean->setVal(pdfProvider->getMean()->getVal());
+		resolutionFunction->plotOn(spectrumPlot, RooFit::LineStyle(kDashed), RooFit::LineColor(kGray), RooFit::LineWidth(2), RooFit::Name(resolutionFunction->GetName())); //, RooFit::Normalization(totalFitCounts, RooAbsReal::NumEvent)); Normalization(1.0,RooAbsReal::RelativeExpected)
+		// Hack: Revert the resolution function mean to 0
+        gaussMean->setVal(0);
+
 		legend->AddEntry(spectrumPlot->findObject(resolutionFunction->GetName()), resolutionFunction->GetTitle(), "l");
 	}
 
 	// Plot Source contribution
 	RooAbsPdf* sourcePdf = pdfProvider->getSourcePdf();
 	if (sourcePdf) {
-		pdf->plotOn(spectrumPlot, RooFit::Components(*sourcePdf), RooFit::LineStyle(kDashed), RooFit::LineColor(kBlack+3), RooFit::LineWidth(1), RooFit::Name(sourcePdf->GetName()));
+		pdf->plotOn(spectrumPlot, RooFit::Components(*sourcePdf), RooFit::LineStyle(kDashed), RooFit::LineColor(kBlack+3), RooFit::LineWidth(2), RooFit::Name(sourcePdf->GetName()));
 		legend->AddEntry(spectrumPlot->findObject(sourcePdf->GetName()), sourcePdf->GetTitle(), "l");
 	}
 
@@ -282,7 +291,7 @@ void SWCalculatorPresenter::onViewFitSpectrumClicked() {
 //	// Single-dimentional experiment case - plot background
 //	if (!model->isTwoDetector()) {
 //		// Plot Convoluted Model background (its added after convolution graph because otherwise it changes backgroud)
-//		pdfNonConvoluted->plotOn(spectrumPlot, RooFit::Components(*(pdfProvider->getBackgroundComponents())), RooFit::LineStyle(kDashed), RooFit::LineColor(kPink - 4), RooFit::LineWidth(1), RooFit::Name("bg"));
+//		pdfNonConvoluted->plotOn(spectrumPlot, RooFit::Components(*(pdfProvider->getBackgroundComponents())), RooFit::LineStyle(kDashed), RooFit::LineColor(kPink - 4), RooFit::LineWidth(2), RooFit::Name("bg"));
 //		legend->AddEntry(spectrumPlot->findObject("bg"), "Atan background", "l");
 //		// Plot fit without background
 //		RooCurve* curveBg = spectrumPlot->getCurve("bg");
@@ -524,6 +533,10 @@ void SWCalculatorPresenter::onViewHasParabolaSet(Bool_t b){
 	model->setHasParabola(b);
 }
 
+void SWCalculatorPresenter::onViewHasDeltaSet(Bool_t b){
+    model->setHasDelta(b);
+}
+
 void SWCalculatorPresenter::onViewNumGaussSet(){
 	Int_t value = view->numGauss->GetNumberEntry()->GetIntNumber();
 	model->setNumberOfGaussians(value);
@@ -631,6 +644,11 @@ void SWCalculatorPresenter::onModelFitRangeSet(DoublePair* fitRange){
 void SWCalculatorPresenter::onModelHasParabolaSet(Bool_t b){
 	view->hasParabola->SetOn(b);
 	// buildFittingModel();
+}
+
+void SWCalculatorPresenter::onModelHasDeltaSet(Bool_t b){
+    view->hasDelta->SetOn(b);
+    // buildFittingModel();
 }
 
 void SWCalculatorPresenter::onModelNumberOfGaussiansSet(Int_t num){

@@ -39,6 +39,7 @@ struct FitProperties {
     ConvolutionType convolutionType;
     BackgroundType singleBgType;
     Bool_t hasParabola;
+    Bool_t hasDelta;
     Int_t numberOfGaussians;
     Int_t numberOfExponents;
     Int_t numberOfDampingExponents;
@@ -51,6 +52,7 @@ struct FitProperties {
         if (convolutionType != rhs.convolutionType) return false;
         if (singleBgType != rhs.singleBgType) return false;
         if (hasParabola != rhs.hasParabola) return false;
+        if (hasDelta != rhs.hasDelta) return false;
         if (hist != rhs.hist) return false;
         if (maxFitBin != rhs.maxFitBin) return false;
         if (minFitBin != rhs.minFitBin) return false;
@@ -111,6 +113,9 @@ public:
     void setHasParabola(Bool_t hasParabola);
     Bool_t getHasParabola();
 
+    void setHasDelta(Bool_t hasDelta);
+    Bool_t getHasDelta();
+
     void setNumberOfGaussians(Int_t num);
     Int_t getNumberOfGaussians();
 
@@ -140,6 +145,7 @@ public:
     void convolutionTypeSet(Int_t convolutionType);  // *SIGNAL*
     void backgroundTypeSet(Int_t backgroundType);    // *SIGNAL*
     void hasParabolaSet(Bool_t b);                   // *SIGNAL*
+    void hasDeltaSet(Bool_t b);                      // *SIGNAL*
     void numberOfGaussiansSet(Int_t num);            // *SIGNAL*
     void numberOfExponentsSet(Int_t num); 			 // *SIGNAL*
     void numberOfDampingExponentsSet(Int_t num);     // *SIGNAL*

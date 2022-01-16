@@ -27,7 +27,7 @@ class Constants {
     static constexpr Double_t a_B = 0.529177;           // Bohr radius, Å
     
     static const UInt_t windowWidth = 1200;
-    static const UInt_t windowHeight = 600;
+    static const UInt_t windowHeight = 680;
     static const UInt_t leftPanelWidth = 420;
     
     static const Double_t sigmaToFwhm;

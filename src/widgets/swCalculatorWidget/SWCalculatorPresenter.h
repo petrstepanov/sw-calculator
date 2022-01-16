@@ -47,6 +47,7 @@ public:
     void onViewConvolutionSelected(Int_t convolutionType);
     void onViewSingleBgTypeSelected(Int_t i);
     void onViewHasParabolaSet(Bool_t b);
+    void onViewHasDeltaSet(Bool_t b);
     void onViewNumGaussSet();
     void onViewNumExponentSet();
     void onViewNumDampExponentSet();
@@ -73,6 +74,7 @@ public:
 	void onModelBackgroundTypeSet(Int_t);
 
 	void onModelHasParabolaSet(Bool_t b);
+    void onModelHasDeltaSet(Bool_t b);
 	void onModelNumberOfGaussiansSet(Int_t);
 	void onModelNumberOfExponentsSet(Int_t);
 	void onModelNumberOfDampingExponentsSet(Int_t);

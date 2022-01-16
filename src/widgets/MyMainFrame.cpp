@@ -41,7 +41,7 @@ MyMainFrame::MyMainFrame() : TGMainFrame(gClient->GetRoot(), Constants::windowWi
 	MapSubwindows();
 	Layout();
 	// Issue - GetDefaultSize() returns zeros on Ubuntu 18.04.
-    Resize(Constants::windowWidth, Constants::windowHeight);
+    // Resize(Constants::windowWidth, Constants::windowHeight);
     // Maps the window "id" and all of its subwindows that have had map requests on the screen
     // and put this window on the top of of the stack of all windows
     MapWindow();

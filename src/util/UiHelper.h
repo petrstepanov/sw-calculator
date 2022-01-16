@@ -40,7 +40,6 @@ public:
         
 private:
     UiHelper();
-    static Int_t uid;
     static UiHelper* instance;
 //    TGWindow* mainFrame = nullptr;
 };

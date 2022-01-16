@@ -81,7 +81,7 @@ private:
     
 
     void initObservableAndMean();
-    void initMaterialPdf(Bool_t hasParabola, TH1F* componentHist, const Int_t, const Int_t numLorentz, const Int_t numLorentzSum);
+    void initMaterialPdf(Bool_t hasParabola, Bool_t hasDelta, TH1F* componentHist, const Int_t, const Int_t numLorentz, const Int_t numLorentzSum);
     void initSourceContribution(TH1F* sourceHist);
     void initConvolutedModel(ConvolutionType convolutionType);
     void initSingleDetectorBackground(BackgroundType bgType);

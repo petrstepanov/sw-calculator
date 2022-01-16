@@ -87,6 +87,7 @@ class SWCalculatorView : public AbstractView<SWCalculatorPresenter> {
 
     // Model components
     TGCheckButton* hasParabola;
+    TGCheckButton* hasDelta;
     TGNumberEntry* numGauss;
     TGNumberEntry* numExponent;
     TGNumberEntry* numDampExponent;

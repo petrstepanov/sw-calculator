@@ -37,6 +37,7 @@ Model::Model(){
 	fitProperties.convolutionType = ConvolutionType::kNoConvolution;
     fitProperties.singleBgType = BackgroundType::kErf;
 	fitProperties.hasParabola = kFALSE;
+    fitProperties.hasDelta = kFALSE;
 	fitProperties.numberOfGaussians = 1;
 	fitProperties.numberOfExponents = 0;
 	fitProperties.numberOfDampingExponents = 0;
@@ -101,18 +102,21 @@ void Model::setFitRange(Int_t minBin, Int_t maxBin){
     // Check histogram exists
     if (!fitProperties.hist) return;
 
+
+    Int_t minAllowedFitBinsRange = 50;
+
     // Make sure fit range is within the histogram limits
     if (minBin < 1) minBin = 1;
     if (maxBin > fitProperties.hist->GetXaxis()->GetNbins()) maxBin = fitProperties.hist->GetXaxis()->GetNbins();
 
     // If changed min bin and it is over the max bin
-    if (minBin > fitProperties.minFitBin && minBin >= fitProperties.maxFitBin){
-        minBin = fitProperties.maxFitBin - 1;
+    if (minBin > fitProperties.minFitBin && minBin >= fitProperties.maxFitBin - minAllowedFitBinsRange){
+        minBin = fitProperties.maxFitBin - minAllowedFitBinsRange + 1;
     }
 
     // If changed max bin and it is below the min bin
-    if (maxBin < fitProperties.maxFitBin && maxBin <= fitProperties.minFitBin){
-        maxBin = fitProperties.minFitBin + 1;
+    if (maxBin < fitProperties.maxFitBin && maxBin <= fitProperties.minFitBin + minAllowedFitBinsRange){
+        maxBin = fitProperties.minFitBin + minAllowedFitBinsRange + 1;
     }
 
     if (fitProperties.hist->GetXaxis()->GetFirst() != minBin || fitProperties.hist->GetXaxis()->GetLast() != maxBin){
@@ -184,7 +188,21 @@ void Model::setHasParabola(Bool_t b){
 }
 
 Bool_t Model::getHasParabola(){
-	return fitProperties.hasParabola;
+    return fitProperties.hasParabola;
+}
+
+void Model::setHasDelta(Bool_t b){
+    if (fitProperties.hasDelta != b){
+        fitProperties.hasDelta = b;
+
+        // Emit signals to presenters
+        // fitPropertiesChanged();
+        hasDeltaSet(b);
+    }
+}
+
+Bool_t Model::getHasDelta(){
+    return fitProperties.hasDelta;
 }
 
 void Model::setNumberOfGaussians(Int_t num){
@@ -269,6 +287,10 @@ void Model::backgroundTypeSet(Int_t t){
 
 void Model::hasParabolaSet(Bool_t b){
 	Emit("hasParabolaSet(Bool_t)", b);
+}
+
+void Model::hasDeltaSet(Bool_t b){
+    Emit("hasDeltaSet(Bool_t)", b);
 }
 
 void Model::numberOfGaussiansSet(Int_t num){

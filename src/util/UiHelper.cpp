@@ -72,9 +72,8 @@ UiHelper* UiHelper::getInstance() {
 //	return dialog;
 //}
 
-Int_t UiHelper::uid = 0;
-
 Int_t UiHelper::getUId() {
+    static Int_t uid = 0;
     return uid++;
 }
 

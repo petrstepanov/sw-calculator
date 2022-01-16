@@ -5,28 +5,28 @@
  */
 
 /* 
- * File:   SimpleStepPdf.h
+ * File:   SimpleDeltaPdf.h
  * Author: petrstepanov
  *
  * Created on August 2, 2017, 5:34 AM
  */
 
-#ifndef StepPdf_H
-#define StepPdf_H
+#ifndef DeltaPdf_H
+#define DeltaPdf_H
 
 #include <RooAbsPdf.h>
 #include <RooAbsReal.h>
 #include <RooRealProxy.h>
 
-class StepPdf: public RooAbsPdf {
+class DeltaPdf: public RooAbsPdf {
 public:
-//	StepPdf() {};
-	StepPdf(const char *name, const char *title, RooAbsReal& _x, RooAbsReal& _mean, Bool_t isInverted);
-	StepPdf(const StepPdf& other, const char* name = 0);
+//	DeltaPdf() {};
+	DeltaPdf(const char *name, const char *title, RooAbsReal& _x, RooAbsReal& _mean);
+	DeltaPdf(const DeltaPdf& other, const char* name = 0);
 	virtual TObject* clone(const char* newname) const {
-		return new StepPdf(*this, newname);
+		return new DeltaPdf(*this, newname);
 	}
-	inline virtual ~StepPdf() {}
+	inline virtual ~DeltaPdf() {}
 
 	Int_t getAnalyticalIntegral(RooArgSet& allVars, RooArgSet& analVars, const char* rangeName = 0) const;
 	Double_t analyticalIntegral(Int_t code, const char* rangeName = 0) const;
@@ -34,13 +34,14 @@ public:
 protected:
 	RooRealProxy x;
 	RooRealProxy mean;
-	Bool_t isInverted;
 
 	Double_t evaluate() const;
 
 private:
-ClassDef(StepPdf, 1)
+	Double_t epsilon = 0.0001;
+
+ClassDef(DeltaPdf, 1)
 };
 
-#endif /* StepPdf_H */
+#endif /* DeltaPdf_H */
 

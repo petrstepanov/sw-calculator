@@ -55,6 +55,7 @@
 #pragma link C++ class ImportComponentPresenter+;
 
 // PDFs inherited from RooAbsPdf
+#pragma link C++ class DeltaPdf+;
 #pragma link C++ class StepPdf+;
 #pragma link C++ class BackgroundPdf+;
 #pragma link C++ class DampLorentzPdf+;

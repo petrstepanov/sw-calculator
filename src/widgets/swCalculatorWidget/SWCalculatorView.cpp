@@ -152,40 +152,25 @@ void SWCalculatorView::initUI(){
     singleDetectorBackgroundFrame = new TGHorizontalFrame(tabFit);
     singleDetectorBackgroundFrame->AddFrame(new TGLabel(singleDetectorBackgroundFrame, "Background:"), new TGLayoutHints(kLHintsLeft | kLHintsBottom, dx+1, 3*dx));
 
-    bgTypeButtonGroup = new TGButtonGroup(singleDetectorBackgroundFrame, 1, 3, 0, kLHintsLeft | kLHintsTop); // rows, columns, spacing
-    new TGRadioButton(bgTypeButtonGroup, "Erf", BackgroundType::kErf);
-    new TGRadioButton(bgTypeButtonGroup, "Atan", BackgroundType::kAtan);
-    new TGRadioButton(bgTypeButtonGroup, "Step", BackgroundType::kStep);
+    bgTypeButtonGroup = new TGButtonGroup(singleDetectorBackgroundFrame, 1, 3, 0, kLHintsLeft | kLHintsCenterY); // rows, columns, spacing
+    {
+        TGRadioButton* radioButton = new TGRadioButton(bgTypeButtonGroup, "Erf", BackgroundType::kErf);
+        radioButton->SetWidth(75);
+        radioButton->ChangeOptions(EFrameType::kFixedWidth);
+    }
+    {
+        TGRadioButton* radioButton = new TGRadioButton(bgTypeButtonGroup, "Atan", BackgroundType::kAtan);
+        radioButton->SetWidth(75);
+        radioButton->ChangeOptions(EFrameType::kFixedWidth);
+    }
+    {
+        TGRadioButton* radioButton = new TGRadioButton(bgTypeButtonGroup, "Step", BackgroundType::kStep);
+        radioButton->SetWidth(75);
+        radioButton->ChangeOptions(EFrameType::kFixedWidth);
+    }
     singleDetectorBackgroundFrame->AddFrame(bgTypeButtonGroup, new TGLayoutHints(kLHintsNormal));
 
-    tabFit->AddFrame(singleDetectorBackgroundFrame, new TGLayoutHints(kLHintsNormal, dx, dx, 0, dy));
-
-    // Convolution type and resolution function
-    TGHorizontalFrame* convolutionParamsFrame = new TGHorizontalFrame(tabFit);
-    convolutionParamsFrame->AddFrame(new TGLabel(convolutionParamsFrame, "Convolution:"), new TGLayoutHints(kLHintsLeft | kLHintsBottom, dx+1, 3*dx));
-
-    // Initialize a map with std::initialzer_list
-//    comboConvolutionType = new TGComboBox(convolutionParamsFrame, 0);
-//    const std::map<Int_t, TString> convolutionTypesMap = {
-//    		{ConvolutionType::kNoConvolution, "None"},
-//    		{ConvolutionType::kFFTConvolution, "Numerical FFT"}
-//    };
-//    for (auto it = convolutionTypesMap.begin(); it != convolutionTypesMap.end(); ++it) {
-//        comboConvolutionType->AddEntry((it->second).Data(), it->first);
-//    }
-//    comboConvolutionType->Select(ConvolutionType::kNoConvolution, kFALSE);
-//    comboConvolutionType->Resize(120, 20);
-//    convolutionParamsFrame->AddFrame(comboConvolutionType, new TGLayoutHints(kLHintsLeft | kLHintsCenterY, dx, 0, 0, 2));
-
-    // Create button Group with Matrix layout. ButtonGroup spacings are a mess.
-    convTypeButtonGroup = new TGButtonGroup(convolutionParamsFrame, 1, 2, 0, kLHintsLeft | kLHintsTop); // rows, columns, spacing
-    new TGRadioButton(convTypeButtonGroup, "None", ConvolutionType::kNoConvolution);
-    new TGRadioButton(convTypeButtonGroup, "Fourier", ConvolutionType::kFFTConvolution);
-    // new TGRadioButton(convTypeButtonGroup, "Numeric", ConvolutionType::kNumericConvolution);
-    convolutionParamsFrame->AddFrame(convTypeButtonGroup, new TGLayoutHints(kLHintsNormal));
-
-    tabFit->AddFrame(convolutionParamsFrame, new TGLayoutHints(kLHintsNormal, dx, dx, 0, dy));
-
+    tabFit->AddFrame(singleDetectorBackgroundFrame, new TGLayoutHints(kLHintsNormal, dx, dx, 0, dy*2));
 
 //    resolutionFwhmFrame = new TGHorizontalFrame(convolutionParamsFrame);
 //    checkboxResFixed = new TGCheckButton(resolutionFwhmFrame, "fixed");
@@ -206,34 +191,53 @@ void SWCalculatorView::initUI(){
     // Separator
     // tabFit->AddFrame(new TGHorizontal3DLine(tabFit), new TGLayoutHints(kLHintsExpandX, dx, dx, dy, dy));
 
-    // Model parameters
-    TGGroupFrame* modelComponentsGroupFrame = new TGGroupFrame(tabFit, "Model Components");
-    TGHorizontalFrame* modelParamsFrame = new TGHorizontalFrame(modelComponentsGroupFrame);
-    hasParabola = new TGCheckButton(modelParamsFrame, "Parabola");
-    modelParamsFrame->AddFrame(hasParabola, new TGLayoutHints(kLHintsLeft | kLHintsCenterY, 0, 3*dx));
+    // Model parameters group frame
+    TGCompositeFrame* modelComponentsGroupFrame = new TGGroupFrame(tabFit, "Model Components");
+    TGCompositeFrame* modelParamsFrame = new TGVerticalFrame(modelComponentsGroupFrame);
 
-    numGauss = new TGNumberEntry(modelParamsFrame, 0, 1, -1, TGNumberFormat::kNESInteger,
-            TGNumberFormat::kNEANonNegative,
-            TGNumberFormat::kNELLimitMinMax,
-            0, 9);
-    modelParamsFrame->AddFrame(numGauss, new TGLayoutHints(kLHintsLeft | kLHintsCenterY, 0, dx));
-    modelParamsFrame->AddFrame(new TGLabel(modelParamsFrame, "Gauss"), new TGLayoutHints(kLHintsLeft | kLHintsCenterY, 0, 3*dx));
+    // Parabola and Delta function
+    {
+        TGHorizontalFrame* frame = new TGHorizontalFrame(modelParamsFrame);
 
-    numExponent = new TGNumberEntry(modelParamsFrame, 0, 1, UiHelper::getUId(), TGNumberFormat::kNESInteger,
-            TGNumberFormat::kNEANonNegative,
-            TGNumberFormat::kNELLimitMinMax,
-            0, 9);
-    modelParamsFrame->AddFrame(numExponent, new TGLayoutHints(kLHintsLeft | kLHintsCenterY, 0, dx));
-    modelParamsFrame->AddFrame(new TGLabel(modelParamsFrame, "Exponent"), new TGLayoutHints(kLHintsLeft | kLHintsCenterY, 0, 3*dx));
+        hasParabola = new TGCheckButton(frame, "Parabola");
+        frame->AddFrame(hasParabola, new TGLayoutHints(kLHintsLeft | kLHintsCenterY, 0, 3*dx - 3));
 
-    numDampExponent = new TGNumberEntry(modelParamsFrame, 0, 1, UiHelper::getUId(), TGNumberFormat::kNESInteger,
-            TGNumberFormat::kNEANonNegative,
-            TGNumberFormat::kNELLimitMinMax,
-            0, 9);
-    modelParamsFrame->AddFrame(numDampExponent, new TGLayoutHints(kLHintsLeft | kLHintsCenterY, 0, dx));
-    modelParamsFrame->AddFrame(new TGLabel(modelParamsFrame, "Damping Exp"), new TGLayoutHints(kLHintsLeft | kLHintsCenterY, 0, dx));
+        hasDelta = new TGCheckButton(frame, "Delta function");
+        frame->AddFrame(hasDelta, new TGLayoutHints(kLHintsLeft | kLHintsCenterY));
 
-    // Add custom histogram
+        modelParamsFrame->AddFrame(frame, new TGLayoutHints(kLHintsLeft | kLHintsExpandX, 0, 0, dy, dx));
+    }
+
+    // Gauss, Exponent, other pdfs
+    {
+        TGHorizontalFrame* frame = new TGHorizontalFrame(modelParamsFrame);
+
+        numGauss = new TGNumberEntry(frame, 0, 1, UiHelper::getUId(), TGNumberFormat::kNESInteger,
+                TGNumberFormat::kNEANonNegative,
+                TGNumberFormat::kNELLimitMinMax,
+                0, 9);
+        frame->AddFrame(numGauss, new TGLayoutHints(kLHintsLeft | kLHintsCenterY, 0, dx));
+        frame->AddFrame(new TGLabel(frame, "Gauss"), new TGLayoutHints(kLHintsLeft | kLHintsCenterY, 0, 3*dx));
+
+        numExponent = new TGNumberEntry(frame, 0, 1, UiHelper::getUId(), TGNumberFormat::kNESInteger,
+                TGNumberFormat::kNEANonNegative,
+                TGNumberFormat::kNELLimitMinMax,
+                0, 9);
+        frame->AddFrame(numExponent, new TGLayoutHints(kLHintsLeft | kLHintsCenterY, 0, dx));
+        frame->AddFrame(new TGLabel(frame, "Exponent"), new TGLayoutHints(kLHintsLeft | kLHintsCenterY, 0, 3*dx));
+
+        numDampExponent = new TGNumberEntry(frame, 0, 1, UiHelper::getUId(), TGNumberFormat::kNESInteger,
+                TGNumberFormat::kNEANonNegative,
+                TGNumberFormat::kNELLimitMinMax,
+                0, 9);
+        frame->AddFrame(numDampExponent, new TGLayoutHints(kLHintsLeft | kLHintsCenterY, 0, dx));
+        frame->AddFrame(new TGLabel(frame, "Damping Exp"), new TGLayoutHints(kLHintsLeft | kLHintsCenterY));
+
+        modelParamsFrame->AddFrame(frame, new TGLayoutHints(kLHintsNormal, 0, 0, dy, dx));
+    }
+    modelComponentsGroupFrame->AddFrame(modelParamsFrame, new TGLayoutHints(kLHintsNormal | kLHintsExpandX, 0, 0, dy, dy));
+
+    // Add custom histogram pdf
     TGHorizontalFrame* modelHistogramFrame = new TGHorizontalFrame(modelComponentsGroupFrame);
     addHistogramButton = new TGTextButton(modelHistogramFrame, "Add from file...");
     modelHistogramFrame->AddFrame(addHistogramButton, new TGLayoutHints(kLHintsLeft | kLHintsCenterY, 0, dx));
@@ -244,31 +248,72 @@ void SWCalculatorView::initUI(){
     modelHistogramFrame->AddFrame(histComponentLabel, new TGLayoutHints(kLHintsLeft | kLHintsExpandX | kLHintsCenterY, 0, dx));
 
     removeHistogramButton = new TGTextButton(modelHistogramFrame, "Remove");
-    modelHistogramFrame->AddFrame(removeHistogramButton, new TGLayoutHints(kLHintsLeft | kLHintsCenterY, 0, dx));
+    modelHistogramFrame->AddFrame(removeHistogramButton, new TGLayoutHints(kLHintsLeft | kLHintsCenterY, 0));
     removeHistogramButton->SetEnabled(false);
     //	hasOrtho = new TGCheckButton(modelParamsFrame, "Ortho Exps", UiHelper::getUId());
     //	modelParamsFrme->AddFrame(hasOrtho, new TGLayoutHints(kLHintsNormal, 0, 20, 4, 0));
-    modelComponentsGroupFrame->AddFrame(modelParamsFrame, new TGLayoutHints(kLHintsNormal | kLHintsExpandX, 0, 0, dy, dy));
     modelComponentsGroupFrame->AddFrame(modelHistogramFrame, new TGLayoutHints(kLHintsNormal | kLHintsExpandX, 0, 0, dy, dy));
     tabFit->AddFrame(modelComponentsGroupFrame, new TGLayoutHints(kLHintsNormal | kLHintsExpandX, dx, dx, dy, 0));
 
+
+    // Convolution type and resolution function
+    TGHorizontalFrame* convolutionParamsFrame = new TGHorizontalFrame(tabFit);
+    convolutionParamsFrame->AddFrame(new TGLabel(convolutionParamsFrame, "Convolution:"), new TGLayoutHints(kLHintsLeft | kLHintsBottom, dx+1, 3*dx));
+
+    // Initialize a map with std::initialzer_list
+//    comboConvolutionType = new TGComboBox(convolutionParamsFrame, 0);
+//    const std::map<Int_t, TString> convolutionTypesMap = {
+//          {ConvolutionType::kNoConvolution, "None"},
+//          {ConvolutionType::kFFTConvolution, "Numerical FFT"}
+//    };
+//    for (auto it = convolutionTypesMap.begin(); it != convolutionTypesMap.end(); ++it) {
+//        comboConvolutionType->AddEntry((it->second).Data(), it->first);
+//    }
+//    comboConvolutionType->Select(ConvolutionType::kNoConvolution, kFALSE);
+//    comboConvolutionType->Resize(120, 20);
+//    convolutionParamsFrame->AddFrame(comboConvolutionType, new TGLayoutHints(kLHintsLeft | kLHintsCenterY, dx, 0, 0, 2));
+
+    // Create button Group with Matrix layout. ButtonGroup spacings are a mess.
+    convTypeButtonGroup = new TGButtonGroup(convolutionParamsFrame, 1, 2, 0, kLHintsLeft | kLHintsCenterY); // rows, columns, spacing
+    {
+        TGRadioButton* radioButton = new TGRadioButton(convTypeButtonGroup, "None", ConvolutionType::kNoConvolution);
+        radioButton->SetWidth(75);
+        radioButton->ChangeOptions(EFrameType::kFixedWidth);
+    }
+    {
+        TGRadioButton* radioButton = new TGRadioButton(convTypeButtonGroup, "Fourier", ConvolutionType::kFFTConvolution);
+        radioButton->SetWidth(75);
+        radioButton->ChangeOptions(EFrameType::kFixedWidth);
+    }
+    // {
+    //     TGRadioButton* radioButton = new TGRadioButton(convTypeButtonGroup, "Numeric", ConvolutionType::kNumericConvolution);
+    //     radioButton->SetWidth(75);
+    //     radioButton->ChangeOptions(EFrameType::kFixedWidth);
+    // }
+    convolutionParamsFrame->AddFrame(convTypeButtonGroup, new TGLayoutHints(kLHintsNormal));
+    tabFit->AddFrame(convolutionParamsFrame, new TGLayoutHints(kLHintsNormal, dx, dx, 0, dy*2));
+
+    // "Edit Fit Parameters" and "Fit and Plot" buttons
     TGHorizontalFrame* frameFitSpectrum = new TGHorizontalFrame(tabFit);
-    btnEditParameters = new TGTextButton(frameFitSpectrum, "Edit fitting parameters");
+    btnEditParameters = new TGTextButton(frameFitSpectrum, "Edit Fit Parameters");
     frameFitSpectrum->AddFrame(btnEditParameters, new TGLayoutHints(kLHintsNormal | kLHintsExpandX, 0, dx/2));
-    btnFitSpectrum = new TGTextButton(frameFitSpectrum, "Fit and plot");
+    btnFitSpectrum = new TGTextButton(frameFitSpectrum, "Fit and Plot");
     frameFitSpectrum->AddFrame(btnFitSpectrum, new TGLayoutHints(kLHintsNormal | kLHintsExpandX, dx/2));
     tabFit->AddFrame(frameFitSpectrum, new TGLayoutHints(kLHintsExpandX, dx, dx, dy, dy));
 
     // Fit Result TextBox
     txtFitResult = new TGTextEdit(tabFit);
+//    txtFitResult->ChangeOptions(txtFitResult->GetOptions() | EFrameType::kFixedWidth);
+//    txtFitResult->SetMinWidth(700);
+    // txtFitResult->SetWidth(400);
     txtFitResult->SetBackgroundColor(GraphicsHelper::colorAppWindow->GetPixel());
     tabFit->AddFrame(txtFitResult, new TGLayoutHints(kLHintsExpandX | kLHintsExpandY, dx, dx, dy, dy));
 
     TGHorizontalFrame* splitFrame = new TGHorizontalFrame(tabFit);
 
-    btnClearResult = new TGTextButton(splitFrame, "Clear output");
+    btnClearResult = new TGTextButton(splitFrame, "Clear Output");
     splitFrame->AddFrame(btnClearResult, new TGLayoutHints(kLHintsNormal | kLHintsExpandX, 0, dx/2));
-    btnSaveResult = new TGTextButton(splitFrame, "Save output to file");
+    btnSaveResult = new TGTextButton(splitFrame, "Save Output");
     splitFrame->AddFrame(btnSaveResult, new TGLayoutHints(kLHintsNormal | kLHintsExpandX, dx/2));
     tabFit->AddFrame(splitFrame, new TGLayoutHints(kLHintsLeft | kLHintsTop | kLHintsExpandX, dx, dx, dy, 2*dy));
 
@@ -276,7 +321,10 @@ void SWCalculatorView::initUI(){
     tabsWidget->SetTab(0);
     setTabEnabled(1, false);
     setTabEnabled(2, false);
-    tabsWidget->SetWidth(Constants::leftPanelWidth); // Resize(tabsWidget->GetDefaultSize());
+    // Without Layout() tabs widget did not get resized - not sure why. Looked up hint in TGFrame::Resize(Int_t, Int_t)
+    tabsWidget->SetWidth(Constants::leftPanelWidth);
+    tabsWidget->Layout();
+
     AddFrame(tabsWidget, new TGLayoutHints(kLHintsLeft | kLHintsTop | kLHintsExpandY, dx, dx, 2*dy, 2*dy));
 
     // Right panel
@@ -302,7 +350,7 @@ void SWCalculatorView::initUI(){
 //    toolbarFrame->AddFrame(btnApplyZoom, new TGLayoutHints(kLHintsLeft | kLHintsTop, dx, dx, 0, 0));  // left, right, top, bottom
 //    toolbarFrame->AddFrame(btnResetZoom, new TGLayoutHints(kLHintsLeft | kLHintsTop, 0, dx, 0, 0));  // left, right, top, bottom
 
-    displayMin = new TGNumberEntry(toolbarFrame, 0, 5, UiHelper::getUId(), TGNumberFormat::kNESRealOne,
+    displayMin = new TGNumberEntry(toolbarFrame, 0, 6, UiHelper::getUId(), TGNumberFormat::kNESRealOne,
         TGNumberFormat::kNEAAnyNumber,
         TGNumberFormat::kNELLimitMinMax,
         -1000, 1000);
@@ -313,7 +361,7 @@ void SWCalculatorView::initUI(){
     zoomSlider->SetPosition(-60,60);
     toolbarFrame->AddFrame(zoomSlider, new TGLayoutHints(kLHintsLeft | kLHintsTop | kLHintsExpandX, dx, dx, 0, 0));
 
-    displayMax = new TGNumberEntry(toolbarFrame, 0, 5, UiHelper::getUId(), TGNumberFormat::kNESRealOne,
+    displayMax = new TGNumberEntry(toolbarFrame, 0, 6, UiHelper::getUId(), TGNumberFormat::kNESRealOne,
         TGNumberFormat::kNEAAnyNumber,
         TGNumberFormat::kNELLimitMinMax,
         -1000, 1000);
@@ -339,6 +387,7 @@ void SWCalculatorView::initUI(){
 
     // Attach Right Canvas (Plot)
     embedCanvas = new TRootEmbeddedCanvas("embedCanvas", frameRightVertical);
+    embedCanvas->GetCanvas()->SetGridy();
     frameRightVertical->AddFrame(embedCanvas, new TGLayoutHints(kLHintsLeft | kLHintsTop | kLHintsExpandX | kLHintsExpandY, 0, dx, dx, 0));
 
     frameRightVertical->AddFrame(toolbarFrame, new TGLayoutHints(kLHintsExpandX, 0, 0, dx, 0));
@@ -364,6 +413,7 @@ void SWCalculatorView::connectSignals(){
     bgTypeButtonGroup->Connect("Pressed(Int_t)", "SWCalculatorPresenter", presenter, "onViewSingleBgTypeSelected(Int_t)");
 
 	hasParabola->Connect("Toggled(Bool_t)", "SWCalculatorPresenter", presenter, "onViewHasParabolaSet(Bool_t)");
+    hasDelta->Connect("Toggled(Bool_t)", "SWCalculatorPresenter", presenter, "onViewHasDeltaSet(Bool_t)");
 	numGauss->Connect("ValueSet(Long_t)", "SWCalculatorPresenter", presenter, "onViewNumGaussSet()");
 	numExponent->Connect("ValueSet(Long_t)", "SWCalculatorPresenter", presenter, "onViewNumExponentSet()");
 	numDampExponent->Connect("ValueSet(Long_t)", "SWCalculatorPresenter", presenter, "onViewNumDampExponentSet()");
