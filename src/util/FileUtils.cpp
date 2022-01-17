@@ -68,13 +68,13 @@ TH1F* FileUtils::importTH1(const char* path){
 	// Read histogram from file (depending on file type)
 	switch(fileType) {
 		case InputFileType::Maestro:
-			return importTH1Maestro(path);
+		    return importTH1Maestro(path);
 			break;
 		case InputFileType::CanberraSingle:
-			return importTH1Canberra(path, 2, 3);
+		    return importTH1Canberra(path, 2, 3);
 			break;
 		case InputFileType::CanberraCoincidence:
-			return importTH1Canberra(path, 1, 2);
+		    return importTH1Canberra(path, 1, 2);
 			break;
 	    }
 	return NULL;

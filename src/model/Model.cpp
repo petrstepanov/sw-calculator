@@ -65,9 +65,15 @@ TString* Model::getSourceFileName(){
     return strSourceContribFileName;
 }
 
+void Model::setLift(Int_t l){
+    fitProperties.lift = l;
+}
+
 void Model::setHist(TH1F* hist){
     if (fitProperties.hist != hist){
         fitProperties.hist = hist;
+        fitProperties.minFitBin = 1;
+        fitProperties.maxFitBin = hist->GetNbinsX();
 
         // Make new parameters pool
         parametersPool = new ParametersPool();

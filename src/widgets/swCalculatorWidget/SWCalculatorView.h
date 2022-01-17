@@ -56,6 +56,7 @@ class SWCalculatorView : public AbstractView<SWCalculatorPresenter> {
     TGHorizontalFrame* toolbarFrame;
     TGHorizontalFrame* singleDetectorBackgroundFrame;
     void setCanvasMode(CanvasMode mode);
+    void updateStackVerticalLimits();
 
   public:
     SWCalculatorView(const TGWindow *w = 0);
@@ -86,6 +87,7 @@ class SWCalculatorView : public AbstractView<SWCalculatorPresenter> {
     TGNumberEntry* numWShift;
 
     // Model components
+    TGCheckButton* logScaleCheckButton;
     TGCheckButton* hasParabola;
     TGCheckButton* hasDelta;
     TGNumberEntry* numGauss;
@@ -136,8 +138,8 @@ class SWCalculatorView : public AbstractView<SWCalculatorPresenter> {
     void setTabEnabled(Int_t, Bool_t);
     void setToolbarEnabled(Bool_t isEnabled = kFALSE);
 
-    void setFitRange(Double_t minBin, Double_t maxBin, Double_t min, Double_t max);
-    void setFitRangeLimits(Double_t minBin, Double_t maxBin);
+    void updateFitRange(Int_t minBin, Int_t maxBin);
+    void setFitRangeLimits(Int_t minBin, Int_t maxBin);
     void reflectTwoDetector(Bool_t isTwoDetector);
     void setComponentHistogram(TH1F* hist);
 
@@ -154,6 +156,8 @@ class SWCalculatorView : public AbstractView<SWCalculatorPresenter> {
     void clearFitResults();
     void scrollOutputDown();
 
+    void onUiReady();
+
     // Calls to Presenter
     // void initRooPlots(RooPlot* fitFrame, RooPlot* chiFrame);
 
@@ -167,6 +171,8 @@ class SWCalculatorView : public AbstractView<SWCalculatorPresenter> {
     void drawHistograms(TH1* hist, TH1* sourceHist);
     void drawText(const char* text, const char* text2 = 0);
     void drawFitResult(RooPlot* spectrumPlot, RooPlot* residualsPlot);
+
+    void onLogScaleSet(Bool_t isLogScale);
 
     ClassDef(SWCalculatorView,0);
 };

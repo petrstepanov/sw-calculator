@@ -39,8 +39,11 @@ public:
     // Override base class virtual methods
     Model* instantinateModel();
 
+    std::pair<Double_t, Double_t> estimateYAxisLimits(TH1* hist);
+    PdfProvider* getPdfProvider();
+
     void onInitModel();
-    
+    FitProperties getModelFitProperties();
     // Slots for View Signals
     void onViewFitSliderRangeSet();
     void onViewFitRangeSet();

@@ -10,6 +10,7 @@
 #include "../../model/Model.h"
 #include "../../util/UiHelper.h"
 #include "../../util/FileUtils.h"
+#include "../../util/HistProcessor.h"
 
 ClassImp(AbstractImportSpectrumPresenter)
 
@@ -40,7 +41,27 @@ void AbstractImportSpectrumPresenter::onOpenFileClicked(){
 		return;
 	}
 
+	// Display untrimmed histogram in the view's preview
+	view->drawHistogram(hist);
 	// hist->Print("base");
+
+    // Problem: THStack lags plotting histograms with 0 values in log axis
+    //          Error in <THistPainter::PaintInit>: Cannot set Y axis to log scale
+    //          Error in THistPainter::PaintInit: log scale requested with a negative argument (-0.136274)
+    // Problem: RooFit's Chi2 fit cannot work with zero bins
+	// Bad solution: lift histogram up.
+    // Good solution: cut range from the center that does not contain zeros
+
+    if (hist->GetMinimum() <= 0){
+        // Notify user
+        Int_t newMinBin = HistProcessor::getLeftNonZeroBin(hist);
+        Int_t newMaxBin = HistProcessor::getRightNonZeroBin(hist);
+        TString message = TString::Format("Histogram is trimmed to exclude zero and negative bins\nBinning range adjusted to [%d, %d].", newMinBin, newMaxBin);
+        UiHelper::showOkDialog(view->GetMainFrame(), message, EMsgBoxIcon::kMBIconExclamation);
+
+        // Trim hist
+        hist = HistProcessor::cutHistZeros(hist);
+    }
 
 	// Update Model. Corresponding overridden method setModelHist() will be called.
 	setModelHist(hist);

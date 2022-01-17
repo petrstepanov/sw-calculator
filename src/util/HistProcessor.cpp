@@ -1,4 +1,4 @@
-/*
+    /*
  * To change this license header, choose License Headers in Project Properties.
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
@@ -20,6 +20,7 @@
 #include <TMath.h>
 #include <TDatime.h>
 #include "Debug.h"
+#include <cmath>
 
 HistProcessor::HistProcessor(){};
 
@@ -32,6 +33,35 @@ HistProcessor* HistProcessor::getInstance(){
 		instance = new HistProcessor();
 	}
 	return instance;
+}
+
+Int_t HistProcessor::getLeftNonZeroBin(TH1F* hist){
+    // Going from center of the histogram X axis towards the left side
+    for (Int_t bin = hist->GetNbinsX()/2; bin >= 1; bin--){
+        if (hist->GetBinContent(bin) <= 0) return bin+1;
+    }
+    return 1;
+}
+
+Int_t HistProcessor::getRightNonZeroBin(TH1F* hist){
+    // Going from center of the histogram X axis towards the left side
+    for (Int_t bin = hist->GetNbinsX()/2; bin <= hist->GetNbinsX(); bin++){
+        if (hist->GetBinContent(bin) <= 0) return bin-1;
+    }
+    return hist->GetNbinsX();
+}
+
+TH1F* HistProcessor::cutHistZeros(TH1F* hist){
+    // Check if histogram needs trimming
+    Int_t newMinBin = HistProcessor::getLeftNonZeroBin(hist);
+    Int_t newMaxBin = HistProcessor::getRightNonZeroBin(hist);
+
+    if (newMinBin == 1 && newMaxBin == hist->GetNbinsX()) return hist;
+
+    // Histogram needs trimming
+    TString newName = hist->GetName();
+    newName += "-trim";
+    return cutHist(newName, hist, newMinBin, newMaxBin);
 }
 
 TH1F* HistProcessor::cutHistBasement(const char *newname, TH1F* hist, Int_t xMin, Int_t xMax){
@@ -62,13 +92,27 @@ TH1F* HistProcessor::cutHistBasement(const char *newname, TH1F* hist, Int_t xMin
 	return subHist;
 }
 
-Double_t HistProcessor::liftHist(TH1F* hist, Double_t lift){
-	for (UInt_t i = 1; i <= hist->GetNbinsX(); i++){
-		Double_t value = hist->GetBinContent(i);
-		hist->SetBinContent(i, value + lift);
-	}
-	return lift;
+Double_t HistProcessor::getHistMaximumInRange(TH1* hist, Double_t xMin, Double_t xMax){
+    Int_t minBin = hist->FindBin(xMin);
+    Int_t maxBin = hist->FindBin(xMax);
+    return getHistMaximumInRange(hist, minBin, maxBin);
 }
+
+Double_t HistProcessor::getHistMaximumInRange(TH1* hist, Int_t minBin, Int_t maxBin){
+    Double_t max = std::numeric_limits<double>::min();
+    for (Int_t bin = minBin; bin <= maxBin; bin++){
+        max = TMath::Max(max, hist->GetBinContent(bin));
+    }
+    return max;
+}
+
+//Double_t HistProcessor::liftHist(TH1F* hist, Double_t lift){
+//	for (UInt_t i = 1; i <= hist->GetNbinsX(); i++){
+//		Double_t value = hist->GetBinContent(i);
+//		hist->SetBinContent(i, value + lift);
+//	}
+//	return lift;
+//}
 
 TH1F* HistProcessor::removeHistNegatives(const char *newname, TH1F* hist){
 	Double_t xMin = hist->GetXaxis()->GetXmin();
@@ -86,7 +130,7 @@ TH1F* HistProcessor::removeHistNegatives(const char *newname, TH1F* hist){
 	return newHist;
 }
 
-TH1F* HistProcessor::cutHist(const char *newname, TH1F* hist, Int_t minBin, Int_t maxBin){
+TH1F* HistProcessor::cutHist(const char *newname, TH1F* hist, Int_t minBin, Int_t maxBin, Bool_t setBinErrors){
 	#ifdef USEDEBUG
 		std::cout << "HistProcessor::cutHist" << std::endl;
 		std::cout << "original histogram" << std::endl;
@@ -104,13 +148,13 @@ TH1F* HistProcessor::cutHist(const char *newname, TH1F* hist, Int_t minBin, Int_
 	// Int_t id = (new TDatime())->Get();
 
 	// RootHelper::deleteObject(newname);
-	TH1F* trimmedHist = new TH1F(newname, "Cut histogram", maxBin-minBin+1, lowEdge, upEdge);
+	TH1F* trimmedHist = new TH1F(newname, hist->GetTitle(), maxBin-minBin+1, lowEdge, upEdge);
 	for (Int_t i = 1; i <= trimmedHist->GetXaxis()->GetNbins(); i++){
 		for (int v=0; v < hist->GetBinContent(i+minBin-1); v++){
 			Double_t binCenter = hist->GetBinCenter(i+minBin-1);
 			trimmedHist->Fill(binCenter);
 		}
-		trimmedHist->SetBinError(i, hist->GetBinError(i+minBin-1));
+		if (setBinErrors) trimmedHist->SetBinError(i, hist->GetBinError(i+minBin-1));
 	}
 
 	#ifdef USEDEBUG
@@ -305,9 +349,9 @@ std::pair<Double_t, Double_t> HistProcessor::calcIntegral(TH1F* hist, Double_t m
 	return std::make_pair(sum, error);
 }
 
-RooRealVar* HistProcessor::getSParameter(TH1F* hist, Double_t sWidth, Double_t mean, Bool_t isTwoDetector) {
+RooRealVar* HistProcessor::getSParameter(TH1F* hist, Double_t sWidth, Double_t mean) {
 	// Calculate full histogram integral
-	if (isTwoDetector) sWidth*=2;
+	if (isTwoDetector(hist)) sWidth*=2;
 	std::cout << "Calculating S parameter. Mean " << mean << ", sWidth " <<  sWidth << std::endl;
 	std::pair<Double_t, Double_t> fullInt;
 	fullInt.first = hist->IntegralAndError(1, hist->GetXaxis()->GetNbins(), fullInt.second, "width");
@@ -321,9 +365,12 @@ RooRealVar* HistProcessor::getSParameter(TH1F* hist, Double_t sWidth, Double_t m
 	return sRealVar;
 }
 
-RooRealVar* HistProcessor::getWParameter(TH1F* hist, Double_t wWidth, Double_t wShift, Double_t mean, Bool_t isTwoDetector) {
+RooRealVar* HistProcessor::getWParameter(TH1F* hist, Double_t wWidth, Double_t wShift, Double_t mean) {
 	// Calculate full histogram integral
-	if (isTwoDetector){ wWidth*=2; wShift*=2; }
+	if (isTwoDetector(hist)){
+	    wWidth*=2;
+	    wShift*=2;
+	}
 	std::cout << "Calculating W parameter. Mean " << mean << ", wWidth " <<  wWidth << ", wShift " << wShift << std::endl;
 	std::pair<Double_t, Double_t> fullInt;
 	fullInt.first = hist->IntegralAndError(1, hist->GetXaxis()->GetNbins(), fullInt.second, "width");

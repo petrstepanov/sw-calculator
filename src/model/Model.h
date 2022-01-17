@@ -46,6 +46,7 @@ struct FitProperties {
     TH1F *hist;
     TH1F *sourceHist;
     TH1F *componentHist;
+    Int_t lift;
 
     bool operator==(const FitProperties& rhs) const {
         if (componentHist != rhs.componentHist) return false;
@@ -60,6 +61,7 @@ struct FitProperties {
         if (numberOfExponents != rhs.numberOfExponents) return false;
         if (numberOfGaussians != rhs.numberOfGaussians) return false;
         if (sourceHist != rhs.sourceHist) return false;
+        if (lift != rhs.lift) return false;
         return true;
     }
 };
@@ -126,6 +128,9 @@ public:
     Int_t getNumberOfDampingExponents();
 
     void setHist(TH1F *hist);
+//    TH1F* getHist();
+
+    void setLift(Int_t lift);
 //    TH1F* getHist();
 
     void setSourceHist(TH1F *hist);

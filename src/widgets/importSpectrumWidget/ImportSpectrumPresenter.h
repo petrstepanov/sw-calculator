@@ -28,7 +28,7 @@ class ImportSpectrumPresenter : public AbstractImportSpectrumPresenter {
         void setModelHist(TH1F* hist);
 
         // Slots for Model signlals
-        void onModelHistogramImported(TH1F* hist);
+        // void onModelHistogramImported(TH1F* hist);
 
         ClassDef(ImportSpectrumPresenter,0);
 };

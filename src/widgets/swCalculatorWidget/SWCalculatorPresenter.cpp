@@ -92,7 +92,23 @@ void SWCalculatorPresenter::onInitModel() {
 	view->numDampExponent->SetNumber(model->getNumberOfDampingExponents());
 }
 
+FitProperties SWCalculatorPresenter::getModelFitProperties(){
+    return model->getFitProperties();
+}
+
 void SWCalculatorPresenter::buildFittingModel(){
+    // TODO: Check if histogram contains zeros
+    // Lift original histogram because ROOT cannot plot zeros in log scale
+//    if (hist->GetMinimum() < 0){
+//        // TLIST Processor outputs hist with negative values if background on 2D spectrum was subtracted
+//        // Therefore we lift histogram up
+//        Int_t lift = TMath::Abs(hist->GetMinimum())+1; // lift is abs(minimum hist value)     // "lift is how high we lifted the histogram up
+//        HistProcessor::liftHist(hist, lift);
+//        TString message ("Histogram contains zeros. Added %d counts to every bin.", lift);
+//        UiHelper::showOkDialog(view->GetMainFrame(), message.Data());
+//    }
+    // TODO: chi2fitto hist has zeros...????
+
 	// Construct model
 	pdfProvider = new PdfProvider(model->getFitProperties());
 	RooAbsPdf* pdf = pdfProvider->getPdf();
@@ -127,6 +143,41 @@ void SWCalculatorPresenter::onViewEditParametersClicked() {
 
 	dialog->AddFrame(listFrame, new TGLayoutHints(kLHintsLeft | kLHintsExpandX, dx, dx, dy, dy));
 	dialog->show();
+}
+
+std::pair<Double_t, Double_t> SWCalculatorPresenter::estimateYAxisLimits(TH1* hist){
+    FitProperties fitProperties = model->getFitProperties();
+    Bool_t isTwoDetector = HistProcessor::isTwoDetector(fitProperties.hist);
+
+    Double_t yMin, yMax;
+    if (isTwoDetector) {
+        yMin = TMath::Max(0., hist->GetMinimum());
+        if (view->logScaleCheckButton->IsOn()){
+            Double_t logYAxisMax = (1+Constants::histogramTopMargin) * TMath::Log10(hist->GetMaximum());
+            yMax = pow(10, logYAxisMax);
+        }
+        else {
+            yMax = (1+Constants::histogramTopMargin)*hist->GetMinimum();
+        }
+
+    } else {
+        if (view->logScaleCheckButton->IsOn()){
+            Double_t histMinimum = hist->GetMinimum();
+            Double_t logMin = TMath::Log10(histMinimum);
+            yMin = TMath::Power(10, logMin / 2);
+            Double_t logYAxisMax = (1+Constants::histogramTopMargin) * TMath::Log10(hist->GetMaximum());
+            yMax = pow(10, logYAxisMax);
+        }
+        else {
+            yMin = 0;
+            yMax = (1+Constants::histogramTopMargin) * hist->GetMaximum();
+        }
+    }
+    return std::make_pair(yMin, yMax);
+}
+
+PdfProvider* SWCalculatorPresenter::getPdfProvider(){
+    return pdfProvider;
 }
 
 void SWCalculatorPresenter::onViewFitSpectrumClicked() {
@@ -194,25 +245,8 @@ void SWCalculatorPresenter::onViewFitSpectrumClicked() {
 	graphicsHelper->styleAxis(spectrumPlot->GetYaxis(), "Counts", 1.1, 0.012, kTRUE);
 
 	// Evaluate Counts axis limits
-	Double_t yAxisMin, yAxisMax;
-	Bool_t isTwoDetector = HistProcessor::isTwoDetector(model->getFitProperties().hist);
-	if (isTwoDetector) {
-//        yAxisMin=0.1;
-//        while (yAxisMin * 10 < fitHist->GetBinContent(fitHist->GetMinimumBin()) + 1) yAxisMin *= 10;        
-//        Double_t logYAxisMax = 1.15 * TMath::Log10(fitHist->GetBinContent(fitHist->GetMaximumBin())); // Max limit is 15% larger hist maximum
-//        yAxisMax = pow(10, logYAxisMax);  
-		Double_t histMin = fitHist->GetBinContent(fitHist->GetMinimumBin());
-		yAxisMin = histMin < 0 ? 0 : histMin;
-		Double_t logYAxisMax = 1.15 * TMath::Log10(fitHist->GetBinContent(fitHist->GetMaximumBin())); // Max limit is 15% larger hist maximum
-		yAxisMax = pow(10, logYAxisMax);
-
-	} else {
-		Double_t logMin = TMath::Log10(fitHist->GetBinContent(fitHist->GetMinimumBin()));
-		yAxisMin = TMath::Power(10, logMin / 2);
-		Double_t logYAxisMax = 1.05 * TMath::Log10(fitHist->GetBinContent(fitHist->GetMaximumBin())); // Max limit is 15% larger hist maximum
-		yAxisMax = pow(10, logYAxisMax);
-	}
-	std::cout << "Counts axis limits: " << yAxisMin << ", " << yAxisMax << std::endl;
+	std::pair<Double_t, Double_t> yRange = estimateYAxisLimits(fitHist);
+	std::cout << "Counts axis limits: " << yRange.first << ", " << yRange.second << std::endl;
 
 	Double_t modelMean = pdfProvider->getMean()->getValV();
 	{
@@ -222,7 +256,8 @@ void SWCalculatorPresenter::onViewFitSpectrumClicked() {
 		Double_t wShift = view->numWShift->GetNumber();
 
 		// Energy value of the maximum of the convoluted model
-		graphicsHelper->drawSWRegions(spectrumPlot, sWidth, wWidth, wShift, modelMean, yAxisMin, yAxisMax, isTwoDetector);
+	    Bool_t isTwoDetector = HistProcessor::isTwoDetector(model->getFitProperties().hist);
+		graphicsHelper->drawSWRegions(spectrumPlot, sWidth, wWidth, wShift, modelMean, yRange.first, yRange.second, isTwoDetector);
 	}
 
 	// Plot data points first (in transparent color). Essential for normalization of PDFs
@@ -321,7 +356,7 @@ void SWCalculatorPresenter::onViewFitSpectrumClicked() {
 	spectrumPlot->Print("v");
 
 	// Set Y Axis range after all (otherwise throws error?)
-	spectrumPlot->GetYaxis()->SetRangeUser(yAxisMin, yAxisMax);
+	spectrumPlot->GetYaxis()->SetRangeUser(yRange.first, yRange.second);
 
 	// Plot Bottom Frame with Fit Goodness
 	TH1F* resHist = (TH1F*) histProcessor->getResidualHist("resHist", fitHist, curveFit);
@@ -362,8 +397,8 @@ void SWCalculatorPresenter::onViewFitSpectrumClicked() {
 	Double_t sWidth = view->numSWidth->GetNumber();
 	Double_t wWidth = view->numWWidth->GetNumber();
 	Double_t wShift = view->numWShift->GetNumber();
-	RooRealVar* s = histProcessor->getSParameter(fitHistNoBg, sWidth, modelMean, isTwoDetector);
-	RooRealVar* w = histProcessor->getWParameter(fitHistNoBg, wWidth, wShift, modelMean, isTwoDetector);
+	RooRealVar* s = histProcessor->getSParameter(fitHistNoBg, sWidth, modelMean);
+	RooRealVar* w = histProcessor->getWParameter(fitHistNoBg, wWidth, wShift, modelMean);
 
 	// Calculate linear intensities
 	RooArgList* recursiveIntensities = pdfProvider->getIntensitiesInMaterial();
@@ -582,18 +617,19 @@ void SWCalculatorPresenter::onModelHistogramImported(TH1F* hist){
 	view->drawHistograms(hist, sourceHist);
 
 	// Update view fit range slider
-	Int_t firstBin = hist->GetXaxis()->GetFirst();
-	Int_t lastBin = hist->GetXaxis()->GetLast();
-	view->setFitRangeLimits(firstBin, lastBin);
+	// Int_t firstBin = hist->GetXaxis()->GetFirst();
+	// Int_t lastBin = GetXaxis()->GetLast();
+	view->setFitRangeLimits(1, hist->GetNbinsX());
 
 	// Update view histograms (THStack) range
-	Double_t loEdge = hist->GetXaxis()->GetBinCenter(firstBin);
-	Double_t hiEdge = hist->GetXaxis()->GetBinCenter(lastBin);
-	view->setFitRange(firstBin, lastBin, loEdge, hiEdge);
+	view->updateFitRange(1, hist->GetNbinsX());
 
 	// Reflect single detector or coincidence UI
 	Bool_t isTwoDetector = HistProcessor::isTwoDetector(hist);
     view->reflectTwoDetector(isTwoDetector);
+
+    // Show log checkbox
+    UiHelper::showFrame(view->logScaleCheckButton);
 }
 
 void SWCalculatorPresenter::onModelSourceHistogramImported(TH1F* sourceHist){
@@ -624,16 +660,15 @@ void SWCalculatorPresenter::onModelBackgroundTypeSet(Int_t backgroundType){
 }
 
 void SWCalculatorPresenter::onModelFitRangeSet(DoublePair* fitRange){
-	Double_t minEnergy = model->getFitProperties().hist->GetXaxis()->GetBinLowEdge(fitRange->first);
-	Double_t maxEnergy = model->getFitProperties().hist->GetXaxis()->GetBinLowEdge(fitRange->second);
+//	Double_t minEnergy = model->getFitProperties().hist->GetXaxis()->GetBinLowEdge(fitRange->first);
+//	Double_t maxEnergy = model->getFitProperties().hist->GetXaxis()->GetBinLowEdge(fitRange->second);
 
 	// If view is in two-pad fitting mode draw material and source histogtrams first
     if (view->currentCanvasMode != CanvasMode::onePad){
         view->drawHistograms(model->getFitProperties().hist, model->getFitProperties().sourceHist);
     }
 
-
-	view->setFitRange(fitRange->first, fitRange->second, minEnergy, maxEnergy);
+	view->updateFitRange(fitRange->first, fitRange->second);
 	// buildFittingModel();
 }
 

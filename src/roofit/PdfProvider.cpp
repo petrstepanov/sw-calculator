@@ -274,13 +274,8 @@ void PdfProvider::initTwoDetectorBackground() {
 
 	// Calculate histogram ground level and lift it and find ground contribution
 	HistProcessor* histProcessor = HistProcessor::getInstance();
-
-	// lift is how high we lifted the histogram up
-	Double_t lift = fitHistogram->GetMinimum() < 0 ? TMath::Abs(fitHistogram->GetMinimum()) : 0; // lift is abs(minimum hist value)
-	lift++; // cant plot zeros in log scale
-	histProcessor->liftHist(fitHistogram, lift);
-
-	RooRealVar* background = new RooRealVar("background", TString::Format("Background (histogram is lifted %.1f)", lift).Data(), lift+0.5, 0, (Int_t) (lift+0.5)*10, "counts");
+	Int_t lift =  fitProperties.lift;
+	RooRealVar* background = new RooRealVar("background", TString::Format("Background (%d counts added to bins)", lift).Data(), lift+0.5, 0, (Int_t) (lift+0.5)*10, "counts");
 //	groundLevel->setConstant(kTRUE);
 //	groundLevel->setAttribute(Constants::ATTR_NO_SAVE_TO_POOL);
 
@@ -310,7 +305,6 @@ void PdfProvider::initTwoDetectorBackground() {
 		pdfInMaterial = flatPdf;
 	}
 }
-
 
 void PdfProvider::initConvolutedModel(ConvolutionType convolutionType) {
     // Maybe: we need to increase the integrator points to be able to integrate a very narrow function

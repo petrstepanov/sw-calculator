@@ -60,7 +60,6 @@ SWCalculatorView::SWCalculatorView(const TGWindow* w) : AbstractView<SWCalculato
 
 SWCalculatorPresenter* SWCalculatorView::instantinatePresenter(){
     return new SWCalculatorPresenter(this);
-
 }
 
 void SWCalculatorView::initUI(){
@@ -332,7 +331,19 @@ void SWCalculatorView::initUI(){
 
     // Right panel
     TGVerticalFrame* frameRightVertical = new TGVerticalFrame(this);
-    toolbarFrame = new TGHorizontalFrame(frameRightVertical);
+
+    // Attach Right Canvas (Plot)
+    embedCanvas = new TRootEmbeddedCanvas("embedCanvas", frameRightVertical);
+    embedCanvas->GetCanvas()->SetGridy();
+    frameRightVertical->AddFrame(embedCanvas, new TGLayoutHints(kLHintsLeft | kLHintsTop | kLHintsExpandX | kLHintsExpandY, 0, dx, dx, 0));
+
+    // Attach bottom toolbar
+    TGHorizontalFrame* bottomToolbarFrame = new TGHorizontalFrame(frameRightVertical);
+    logScaleCheckButton = new TGCheckButton(bottomToolbarFrame, "Logarithmic scale");
+    logScaleCheckButton->SetOn(kTRUE);
+    bottomToolbarFrame->AddFrame(logScaleCheckButton, new TGLayoutHints(kLHintsLeft | kLHintsCenterY, 0, 5*dx));
+
+    toolbarFrame = new TGHorizontalFrame(bottomToolbarFrame);
 
 //    numDisplayMin = new TGNumberEntry(toolbarFrame, 0, 6, -1, TGNumberFormat::kNESRealOne,
 //            TGNumberFormat::kNEAAnyNumber,
@@ -368,7 +379,7 @@ void SWCalculatorView::initUI(){
         TGNumberFormat::kNEAAnyNumber,
         TGNumberFormat::kNELLimitMinMax,
         -1000, 1000);
-    toolbarFrame->AddFrame(displayMax, new TGLayoutHints(kLHintsLeft | kLHintsTop, 0, dx, 0, 0));
+    toolbarFrame->AddFrame(displayMax, new TGLayoutHints(kLHintsLeft | kLHintsTop, 0, 5*dx, 0, 0));
 //    tbMin->AddText(0, "0.0");
 //    tbMax->AddText(0, "0.0");
 //
@@ -388,12 +399,10 @@ void SWCalculatorView::initUI(){
     btnSaveData = new TGTextButton(toolbarFrame, "Export as ASCII");
     toolbarFrame->AddFrame(btnSaveData, new TGLayoutHints(kLHintsRight | kLHintsTop, 0, dx, 0, 0));  // left, right, top, bottom
 
-    // Attach Right Canvas (Plot)
-    embedCanvas = new TRootEmbeddedCanvas("embedCanvas", frameRightVertical);
-    embedCanvas->GetCanvas()->SetGridy();
-    frameRightVertical->AddFrame(embedCanvas, new TGLayoutHints(kLHintsLeft | kLHintsTop | kLHintsExpandX | kLHintsExpandY, 0, dx, dx, 0));
+    bottomToolbarFrame->AddFrame(toolbarFrame, new TGLayoutHints(kLHintsLeft | kLHintsCenterY | kLHintsExpandX, 0, 0, 0, 0));
 
-    frameRightVertical->AddFrame(toolbarFrame, new TGLayoutHints(kLHintsExpandX, 0, 0, dx, 0));
+    // Attach toolbar
+    frameRightVertical->AddFrame(bottomToolbarFrame, new TGLayoutHints(kLHintsLeft | kLHintsTop | kLHintsExpandX, 0, 0, dy*2));
 
     AddFrame(frameRightVertical, new TGLayoutHints(kLHintsLeft | kLHintsTop | kLHintsExpandX | kLHintsExpandY, 0, 0, 0, dx));
     // You should call, for example HideFrame(TGFrame *f), only after the frames have been laid out and the sub windows
@@ -401,10 +410,15 @@ void SWCalculatorView::initUI(){
     // RootHelper::hideFrame(resolutionFwhmFrame);
 
     // Disable toolbar on uiReady event
-    Connect(this->GetMainFrame()->ClassName(), "uiReady()", this->ClassName(), this, "setToolbarEnabled(=kFALSE)");
+    Connect(this->GetMainFrame()->ClassName(), "uiReady()", this->ClassName(), this, "onUiReady()");
 
     // Draw welcome text
     drawText("No Spectra Loaded", "Click 'Open File...' on the left to import a spectrum") ;
+}
+
+void SWCalculatorView::onUiReady(){
+    setToolbarEnabled(kFALSE);
+    UiHelper::hideFrame(logScaleCheckButton);
 }
 
 void SWCalculatorView::connectSignals(){
@@ -440,6 +454,33 @@ void SWCalculatorView::connectSignals(){
     displayMin->GetNumberEntry()->Connect("TextChanged(char*)", "SWCalculatorView", this, "onDisplayMinChange(char*)");
     displayMax->GetNumberEntry()->Connect("TextChanged(char*)", "SWCalculatorView", this, "onDisplayMaxChange(char*)");
     zoomSlider->Connect("PositionChanged()", this->ClassName(), this, "onSliderChange()");
+
+    logScaleCheckButton->Connect("Toggled(Bool_t)", this->ClassName(), this, "onLogScaleSet(Bool_t)");
+}
+
+void SWCalculatorView::onLogScaleSet(Bool_t isLogScale){
+    // Goal: always have 10% visual margin  above histogram
+    if (isLogScale){
+        gStyle->SetHistTopMargin(2);
+    }
+    else {
+        gStyle->SetHistTopMargin(0.05); // 0.05 is default value
+    }
+
+    if (currentCanvasMode == CanvasMode::onePad){
+        embedCanvas->GetCanvas()->SetLogy(isLogScale);
+        updateStackVerticalLimits();
+        embedCanvas->GetCanvas()->Modified();
+        embedCanvas->GetCanvas()->Update();
+    }
+    else {
+        TH1F* fitHist = presenter->getPdfProvider()->getFitHistogram();
+        std::pair<Double_t, Double_t> yRange = presenter->estimateYAxisLimits(fitHist);
+        embedCanvas->GetCanvas()->cd(1)->SetLogy(isLogScale);
+        spectrumPlot->GetYaxis()->SetRangeUser(yRange.first, yRange.second);
+        embedCanvas->GetCanvas()->cd(1)->Modified();
+        embedCanvas->GetCanvas()->cd(1)->Update();
+    }
 }
 
 void SWCalculatorView::setTabEnabled(Int_t tabNumber, Bool_t isEnabled){
@@ -471,14 +512,15 @@ void SWCalculatorView::drawFitResult(RooPlot* spectrumPlot, RooPlot* residualsPl
     setToolbarEnabled(kTRUE);
 }
 
-void SWCalculatorView::setFitRangeLimits(Double_t min, Double_t max){
+void SWCalculatorView::setFitRangeLimits(Int_t minBin, Int_t maxBin){
 	// Set peak selection limits
-	numFitMin->SetLimitValues(min, max);
-	numFitMax->SetLimitValues(min, max);
-	numFitSlider->SetRange(min, max);
+	numFitMin->SetLimitValues((Double_t)minBin, (Double_t)maxBin);
+	numFitMax->SetLimitValues((Double_t)minBin, (Double_t)maxBin);
+	numFitSlider->SetRange((Double_t)minBin, (Double_t)maxBin);
+    // numFitSlider->SetScale(scale)Range(min, max);
 }
 
-void SWCalculatorView::setFitRange(Double_t minBin, Double_t maxBin, Double_t minEnergy, Double_t maxEnergy){
+void SWCalculatorView::updateFitRange(Int_t minBin, Int_t maxBin){
     // Set peak selection initial values
 	numFitMin->SetNumber(minBin);
 	numFitMax->SetNumber(maxBin);
@@ -501,11 +543,48 @@ void SWCalculatorView::setFitRange(Double_t minBin, Double_t maxBin, Double_t mi
 //      }
 //    }
 
-	tHStack->GetXaxis()->SetLimits(minEnergy, maxEnergy);
+	// Update X axis range
+	TH1* hist = presenter->getModelFitProperties().hist;
+	Double_t minBinLoEdge = hist->GetXaxis()->GetBinLowEdge(minBin);
+    Double_t maxBinHiEdge = hist->GetXaxis()->GetBinUpEdge(maxBin);
+	tHStack->GetXaxis()->SetLimits(minBinLoEdge, maxBinHiEdge);
 
-    TCanvas* canvas = embedCanvas->GetCanvas();
-	canvas->Modified();
-	canvas->Update();
+	// Upddate Y axis range
+	updateStackVerticalLimits();
+
+    embedCanvas->GetCanvas()->Modified();
+    embedCanvas->GetCanvas()->Update();
+}
+
+void SWCalculatorView::updateStackVerticalLimits(){
+    // Update Y axis range dynamically as we change the x range
+    Double_t yMax = std::numeric_limits<double>::min();
+    TList* histsList = tHStack->GetHists();
+    TListIter next(histsList);
+    TObject *object;
+    while ((object=next())) {
+        if (object->InheritsFrom(TH1::Class())){
+            TH1* hist = (TH1*) object;
+            FitProperties fitProperties = presenter->getModelFitProperties();
+            Double_t histMaxInRange = HistProcessor::getHistMaximumInRange(hist, fitProperties.minFitBin, fitProperties.maxFitBin);
+            yMax = TMath::Max(histMaxInRange, yMax);
+        }
+    }
+
+//    FitProperties fitProperties = presenter->getModelFitProperties();
+//    Double_t yMax = HistProcessor::getHistMaximumInRange(fitProperties.hist, fitProperties.minFitBin, fitProperties.maxFitBin);
+//    if (fitProperties.sourceHist) yMax = TMath::Max(yMax, HistProcessor::getHistMaximumInRange(fitProperties.sourceHist, fitProperties.minFitBin, fitProperties.maxFitBin));
+
+    // Set stack y range
+    // Problem: was getting errors when adjusting Y axis of the THStack in log scale.
+    // Error in <THistPainter::PaintInit>: Cannot set Y axis to log scale
+    // Solution: https://root-forum.cern.ch/t/cannot-set-y-axis-to-log-scale/21502/7
+    //           set histogram minimum to 1
+    // tHStack->SetMinimum(1);
+
+    // Similar to TStyle::SetHistogramTopMargin()
+    Double_t topMargin = Constants::histogramTopMargin;
+    tHStack->SetMaximum(logScaleCheckButton->IsOn() ? TMath::Power(10, TMath::Log10(yMax)*(1+topMargin)) : yMax*(1+topMargin));
 }
 
 void SWCalculatorView::setDisplayLimits(Float_t min, Float_t max) {
@@ -633,18 +712,18 @@ void SWCalculatorView::setCanvasMode(CanvasMode mode){
         canvas->SetTopMargin((GraphicsHelper::padMargins).top*3./4.); // weird that margins for rooplot and hist are different
 
         // TODO: create UI checkbox
-		canvas->SetLogy();
+        canvas->SetLogy(logScaleCheckButton->IsOn());
 	}
 	else {
 	    // Initialize two pads on canvas (for fitting)
 		canvas->Divide(1, 2);
 
 	    canvas->cd(1)->SetPad("padData", "Pad for data", 0.0, 1/(1+GraphicsHelper::TOP_TO_BOTTOM_PAD_HEIGHT_RATIO), 1.0, 1.0, kWhite);
-	    gPad->SetMargin((GraphicsHelper::padMargins).left, (GraphicsHelper::padMargins).right, (GraphicsHelper::padMargins).bottom, (GraphicsHelper::padMargins).top);
-		gPad->SetLogy();
+	    canvas->cd(1)->SetMargin((GraphicsHelper::padMargins).left, (GraphicsHelper::padMargins).right, (GraphicsHelper::padMargins).bottom, (GraphicsHelper::padMargins).top);
+        canvas->cd(1)->SetLogy(logScaleCheckButton->IsOn());
 
 	    canvas->cd(2)->SetPad("padChi2", "Pad for chi^2", 0.0, 0.0, 1.0, 1/(1+GraphicsHelper::TOP_TO_BOTTOM_PAD_HEIGHT_RATIO), kWhite);
-	    gPad->SetMargin((GraphicsHelper::padMargins).left, (GraphicsHelper::padMargins).right, (GraphicsHelper::padMargins).bottom, (GraphicsHelper::padMargins).top);
+	    canvas->cd(2)->SetMargin((GraphicsHelper::padMargins).left, (GraphicsHelper::padMargins).right, (GraphicsHelper::padMargins).bottom, (GraphicsHelper::padMargins).top);
 	}
 	currentCanvasMode = mode;
 
@@ -740,6 +819,8 @@ void SWCalculatorView::updateCanvasLimits(Double_t min, Double_t max) {
 }
 
 void SWCalculatorView::drawHistograms(TH1* hist, TH1* sourceHist){
+    // IMPORTANT:
+    // Histograms should not have any error values set because otherwise log canvas will try drawing bottom error bar below zero...
     // Initialize single-pad mode
     setCanvasMode(CanvasMode::onePad);
 
@@ -759,7 +840,6 @@ void SWCalculatorView::drawHistograms(TH1* hist, TH1* sourceHist){
     TH1* histCopy = new TH1F();
     hist->Copy(*histCopy);
     histCopy->SetLineColor(kBlack);
-    // histCopy->SetTitleOffset(offset, "")
     tHStack->Add(histCopy);
 
     // Disable title on the THStack. We draw our own title
@@ -771,6 +851,7 @@ void SWCalculatorView::drawHistograms(TH1* hist, TH1* sourceHist){
         TH1* sourceHistCopy = (TH1*)sourceHist->Clone();
         sourceHistCopy->SetLineColor(EColor::kBlack);
         sourceHistCopy->SetLineStyle(ELineStyle::kDashed);
+        // sourceHistCopy->SetMinimum(1);
         tHStack->Add(sourceHistCopy);
 //        tHStack->SetTitle("");
     }
@@ -783,6 +864,8 @@ void SWCalculatorView::drawHistograms(TH1* hist, TH1* sourceHist){
     tHStack->GetXaxis()->CenterTitle();
     tHStack->GetYaxis()->SetTitle("Counts");
     tHStack->GetYaxis()->CenterTitle();
+
+    updateStackVerticalLimits();
 
 	canvas->BuildLegend();
 	GraphicsHelper::alignPave(canvas, Alignment::TOP_RIGHT, Decoration::DEFAULT, 0.07, 0.35);

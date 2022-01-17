@@ -6,13 +6,14 @@
 
 #include "ImportSpectrumPresenter.h"
 #include "../../util/HistProcessor.h"
+#include "../../util/UiHelper.h"
 #include "../../model/Model.h"
 
 ClassImp(ImportSpectrumPresenter)
 
 ImportSpectrumPresenter::ImportSpectrumPresenter(AbstractImportSpectrumView* view) : AbstractImportSpectrumPresenter(view){
 //	model = instantinateModel();
-    model->Connect("histogramImported(TH1F*)", this->ClassName(), this, "onModelHistogramImported(TH1F*)");
+    // model->Connect("histogramImported(TH1F*)", this->ClassName(), this, "onModelHistogramImported(TH1F*)");
 }
         
 void ImportSpectrumPresenter::setModelFileName(TString* fileName){
@@ -20,14 +21,14 @@ void ImportSpectrumPresenter::setModelFileName(TString* fileName){
 }
 
 void ImportSpectrumPresenter::setModelHist(TH1F* hist){
-	// Save original histogram to Model
+    // Save original histogram to Model
 	model->setHist(hist);
 };
 
 
 // Slots for Model Signals
 
-void ImportSpectrumPresenter::onModelHistogramImported(TH1F* hist){
-    // hist->Print("base");
-    view->drawHistogram(hist);
-}
+//void ImportSpectrumPresenter::onModelHistogramImported(TH1F* hist){
+//    // hist->Print("base");
+//    view->drawHistogram(hist);
+//}

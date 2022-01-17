@@ -129,6 +129,9 @@ void GraphicsHelper::drawSWRegions(RooPlot* frame, Double_t sWidth, Double_t wWi
     wShift = isTwoDetector ? wShift * 2 : wShift;
 
     // yMax = 0.95*yMax;
+//    yMin = frame->GetYaxis()->GetXmin();
+//    yMax = frame->GetYaxis()->GetXmax();
+
     Double_t logYMin = TMath::Log10(yMin);
     Double_t logYMax = TMath::Log10(yMax);  
     Double_t heightCoeff = isTwoDetector ? 0.25 : 0.65;

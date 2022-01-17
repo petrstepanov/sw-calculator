@@ -30,6 +30,8 @@ class Constants {
     static const UInt_t windowHeight = 680;
     static const UInt_t leftPanelWidth = 430;
     
+    static constexpr Double_t histogramTopMargin = 0.1;
+
     static const Double_t sigmaToFwhm;
     static const Double_t fwhmToSigma;
 

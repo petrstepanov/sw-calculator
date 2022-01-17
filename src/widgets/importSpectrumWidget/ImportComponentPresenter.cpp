@@ -12,7 +12,7 @@ ClassImp(ImportComponentPresenter)
 
 ImportComponentPresenter::ImportComponentPresenter(AbstractImportSpectrumView* view) : AbstractImportSpectrumPresenter(view){
 //	model = instantinateModel();
-    model->Connect("componentHistogramImported(TH1F*)", this->ClassName(), this, "onModelComponentHistogramImported(TH1F*)");
+//    model->Connect("componentHistogramImported(TH1F*)", this->ClassName(), this, "onModelComponentHistogramImported(TH1F*)");
 }
         
 void ImportComponentPresenter::setModelFileName(TString* fileName){
@@ -27,7 +27,7 @@ void ImportComponentPresenter::setModelHist(TH1F* hist){
 
 // Slots for Model Signals
 
-void ImportComponentPresenter::onModelComponentHistogramImported(TH1F* hist){
-    hist->Print("base");
-    view->drawHistogram(hist);
-}
+//void ImportComponentPresenter::onModelComponentHistogramImported(TH1F* hist){
+//    hist->Print("base");
+//    view->drawHistogram(hist);
+//}
