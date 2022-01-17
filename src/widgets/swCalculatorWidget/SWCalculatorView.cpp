@@ -50,7 +50,11 @@ SWCalculatorView::SWCalculatorView(const TGWindow* w) : AbstractView<SWCalculato
 
 	// Tweak display styles
 	// Question: Is this same for RooPlot and regular canvas?
-
+	gStyle->SetTitleOffset(1.3, "X");
+    gStyle->SetTitleOffset(1.5, "Y");
+	gStyle->SetLabelOffset(0.015, "XY");
+    gStyle->SetLabelSize(GraphicsHelper::TEXT_SIZE_SMALL, "XY");
+    gStyle->SetTitleSize(GraphicsHelper::TEXT_SIZE_NORMAL, "XY");
 	// currentCanvasMode = CanvasMode::onePad;
 }
 
@@ -170,7 +174,7 @@ void SWCalculatorView::initUI(){
     }
     singleDetectorBackgroundFrame->AddFrame(bgTypeButtonGroup, new TGLayoutHints(kLHintsNormal));
 
-    tabFit->AddFrame(singleDetectorBackgroundFrame, new TGLayoutHints(kLHintsNormal, dx, dx, 0, dy*2));
+    tabFit->AddFrame(singleDetectorBackgroundFrame, new TGLayoutHints(kLHintsNormal, dx, dx, 0, 0));
 
 //    resolutionFwhmFrame = new TGHorizontalFrame(convolutionParamsFrame);
 //    checkboxResFixed = new TGCheckButton(resolutionFwhmFrame, "fixed");
@@ -253,8 +257,7 @@ void SWCalculatorView::initUI(){
     //	hasOrtho = new TGCheckButton(modelParamsFrame, "Ortho Exps", UiHelper::getUId());
     //	modelParamsFrme->AddFrame(hasOrtho, new TGLayoutHints(kLHintsNormal, 0, 20, 4, 0));
     modelComponentsGroupFrame->AddFrame(modelHistogramFrame, new TGLayoutHints(kLHintsNormal | kLHintsExpandX, 0, 0, dy, dy));
-    tabFit->AddFrame(modelComponentsGroupFrame, new TGLayoutHints(kLHintsNormal | kLHintsExpandX, dx, dx, dy, 0));
-
+    tabFit->AddFrame(modelComponentsGroupFrame, new TGLayoutHints(kLHintsNormal | kLHintsExpandX, dx, dx, dy*3, 0));
 
     // Convolution type and resolution function
     TGHorizontalFrame* convolutionParamsFrame = new TGHorizontalFrame(tabFit);
@@ -436,7 +439,7 @@ void SWCalculatorView::connectSignals(){
 
     displayMin->GetNumberEntry()->Connect("TextChanged(char*)", "SWCalculatorView", this, "onDisplayMinChange(char*)");
     displayMax->GetNumberEntry()->Connect("TextChanged(char*)", "SWCalculatorView", this, "onDisplayMaxChange(char*)");
-    zoomSlider->Connect("PositionChanged()", "SWCalculatorView", this, "onSliderChange()");
+    zoomSlider->Connect("PositionChanged()", this->ClassName(), this, "onSliderChange()");
 }
 
 void SWCalculatorView::setTabEnabled(Int_t tabNumber, Bool_t isEnabled){
@@ -445,7 +448,7 @@ void SWCalculatorView::setTabEnabled(Int_t tabNumber, Bool_t isEnabled){
 
 void SWCalculatorView::drawFitResult(RooPlot* spectrumPlot, RooPlot* residualsPlot){
     this->spectrumPlot = spectrumPlot;
-    this->residualsPlot = spectrumPlot;
+    this->residualsPlot = residualsPlot;
 
     // Set two pads mode
     setCanvasMode(CanvasMode::twoPads);
@@ -583,7 +586,7 @@ void SWCalculatorView::setComponentHistogram(TH1F* hist){
 	}
 }
 
-void SWCalculatorView::drawText(const char* heading, const char* caption){
+void SWCalculatorView::drawText(const char* heading, const char* text){
     // Ensure single pad mode
     setCanvasMode(CanvasMode::onePad);
 
@@ -592,21 +595,21 @@ void SWCalculatorView::drawText(const char* heading, const char* caption){
     canvas->Clear();
 
     // Draw heading
-	TText* t = new TText(0.5, caption==0 ? 0.5 : 0.55, heading);
+	TText* t = new TText(0.5, text==0 ? 0.5 : 0.55, heading);
     t->SetTextAlign(ETextAlign::kHAlignCenter + ETextAlign::kVAlignCenter);
     t->SetNDC();
-	t->SetTextFont(42); // non bold
-    t->SetTextSize(0.07);
-    t->SetTextColor(EColor::kGray);
+	t->SetTextFont(GraphicsHelper::getFont(EFontFace::Helvetica));
+    t->SetTextSize(GraphicsHelper::TEXT_SIZE_HUGE);
+    t->SetTextColor(EColor::kGray);\
 	t->Draw();
 
 	// Draw caption
-	if (caption){
-	    TText* t2 = new TText(0.5, 0.45, caption);
+	if (text){
+	    TText* t2 = new TText(0.5, 0.45, text);
 	    t2->SetTextAlign(ETextAlign::kHAlignCenter + ETextAlign::kVAlignCenter);
 	    t2->SetNDC();
-	    t2->SetTextFont(62); // non bold
-	    t2->SetTextSize(0.028);
+	    t2->SetTextFont(GraphicsHelper::getFont(EFontFace::Helvetica));
+	    t2->SetTextSize(GraphicsHelper::TEXT_SIZE_NORMAL);
 	    t2->SetTextColor(EColor::kBlack);
 	    t2->Draw();
 	}
@@ -627,7 +630,9 @@ void SWCalculatorView::setCanvasMode(CanvasMode mode){
 //	    canvas->SetMargin((GraphicsHelper::padMargins).left,
 //	    		(GraphicsHelper::padMargins).right, (GraphicsHelper::padMargins).bottom, (GraphicsHelper::padMargins).top);
 		canvas->SetRightMargin((GraphicsHelper::padMargins).right);
-        canvas->SetTopMargin((GraphicsHelper::padMargins).top);
+        canvas->SetTopMargin((GraphicsHelper::padMargins).top*3./4.); // weird that margins for rooplot and hist are different
+
+        // TODO: create UI checkbox
 		canvas->SetLogy();
 	}
 	else {
@@ -635,8 +640,7 @@ void SWCalculatorView::setCanvasMode(CanvasMode mode){
 		canvas->Divide(1, 2);
 
 	    canvas->cd(1)->SetPad("padData", "Pad for data", 0.0, 1/(1+GraphicsHelper::TOP_TO_BOTTOM_PAD_HEIGHT_RATIO), 1.0, 1.0, kWhite);
-	    gPad->SetMargin((GraphicsHelper::padMargins).left,
-	    		(GraphicsHelper::padMargins).right, (GraphicsHelper::padMargins).bottom, (GraphicsHelper::padMargins).top);
+	    gPad->SetMargin((GraphicsHelper::padMargins).left, (GraphicsHelper::padMargins).right, (GraphicsHelper::padMargins).bottom, (GraphicsHelper::padMargins).top);
 		gPad->SetLogy();
 
 	    canvas->cd(2)->SetPad("padChi2", "Pad for chi^2", 0.0, 0.0, 1.0, 1/(1+GraphicsHelper::TOP_TO_BOTTOM_PAD_HEIGHT_RATIO), kWhite);
@@ -776,7 +780,9 @@ void SWCalculatorView::drawHistograms(TH1* hist, TH1* sourceHist){
 
     // Set THStack axis titles - after Draw() only
     tHStack->GetXaxis()->SetTitle("Energy, keV");
+    tHStack->GetXaxis()->CenterTitle();
     tHStack->GetYaxis()->SetTitle("Counts");
+    tHStack->GetYaxis()->CenterTitle();
 
 	canvas->BuildLegend();
 	GraphicsHelper::alignPave(canvas, Alignment::TOP_RIGHT, Decoration::DEFAULT, 0.07, 0.35);

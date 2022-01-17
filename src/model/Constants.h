@@ -28,7 +28,7 @@ class Constants {
     
     static const UInt_t windowWidth = 1200;
     static const UInt_t windowHeight = 680;
-    static const UInt_t leftPanelWidth = 420;
+    static const UInt_t leftPanelWidth = 430;
     
     static const Double_t sigmaToFwhm;
     static const Double_t fwhmToSigma;

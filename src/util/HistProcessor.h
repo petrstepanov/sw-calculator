@@ -40,7 +40,10 @@ public:
     Double_t getTotalCounts(TH1F*);
     Bool_t hasBackground(TH1F*);
     Bool_t hasAtan(TH1F*);
-    Double_t calcBackgroundFraction(TH1F*);
+    static Double_t calcLeftWing(TH1F*);
+    static Double_t calcRightWing(TH1F*);
+    static Double_t calcRectBackgroundFraction(TH1F*);
+    static Double_t calcAsymBackgroundFraction(TH1F*);
     Chi2Struct getChi2(TH1F*, RooCurve*, RooAbsPdf*);
     std::pair<Double_t, Double_t> calcIntegral(TH1F*, Double_t, Double_t);
     static Bool_t isTwoDetector(TH1* hist);
@@ -54,6 +57,8 @@ private:
     HistProcessor(HistProcessor const&);                  // Copy constructor is private
     HistProcessor& operator=(HistProcessor const&);       // Assignment operator is private
     static HistProcessor* instance;
+
+    static const Int_t wingBins = 10;
 };
 
 #endif /* HISTPROCESSOR_H */

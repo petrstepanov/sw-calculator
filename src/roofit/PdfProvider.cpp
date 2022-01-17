@@ -224,19 +224,13 @@ void PdfProvider::initSingleDetectorBackground(BackgroundType bgType) {
 
 	// Calculate constant background contribution
 	RooPolynomial* flatBackgroundPdf = new RooPolynomial("flatBackgroundPdf", "Flat background", *observable, RooArgSet());
-//	backgroundComponents->add(*flatBackgroundPdf);
-	Double_t rectAreaBelowHistogram = (fitHistogram->GetXaxis()->GetXmax() - fitHistogram->GetXaxis()->GetXmin()) * fitHistogram->GetMinimum();
-    Double_t integral = fitHistogram->Integral("width");
-    Double_t flatBgContribution = rectAreaBelowHistogram/integral*100;
-
-	Double_t flatBackgroundContribution = flatBgContribution/integral;
-	RooRealVar* intFlatBackground = new RooRealVar("intFlatBackground", "Flat background fraction", flatBgContribution, flatBgContribution/1.5, TMath::Min(100., flatBgContribution*1.5), "%");
+    Double_t rectBgFraction = HistProcessor::calcRectBackgroundFraction(fitHistogram)*100.;
+	RooRealVar* intFlatBackground = new RooRealVar("intFlatBackground", "Flat background fraction", rectBgFraction, rectBgFraction/1.5, TMath::Min(100., rectBgFraction*1.5), "%");
     RooFormulaVar* intFlatBackgroundNorm = new RooFormulaVar("intFlatBackgroundNorm", "Constant background fraction normalized", "@0/100", RooArgList(*intFlatBackground));
 
     // Calculate "atan" background contribution
-    Double_t leftWingValue = fitHistogram->GetBinContent(1);
-    Double_t rightWingValue = fitHistogram->GetBinContent(fitHistogram->GetNbinsX());
-    Double_t peakCenter = fitHistogram->GetBinCenter(fitHistogram->GetMaximumBin());
+    Double_t leftWingValue = HistProcessor::calcLeftWing(fitHistogram);
+    Double_t rightWingValue = HistProcessor::calcRightWing(fitHistogram);
 
     RooAbsPdf* asymBackgroundPdf;
     // Should we introduce another mean here?
@@ -258,14 +252,10 @@ void PdfProvider::initSingleDetectorBackground(BackgroundType bgType) {
     }
 
     // Estimate asymmetric background contribution
-    Double_t asymArea = (leftWingValue < rightWingValue) ?
-            (fitHistogram->GetXaxis()->GetXmax()-peakCenter)*TMath::Abs(leftWingValue-rightWingValue): // Background looks like: ____----
-            (peakCenter-fitHistogram->GetXaxis()->GetXmin())*TMath::Abs(leftWingValue-rightWingValue); // Background looks like: ----____
-
-    Double_t asymContribution = asymArea/integral*100;
+    Double_t asymContribution = HistProcessor::calcAsymBackgroundFraction(fitHistogram)*100;
 
 //	backgroundComponents->add(*atanBackgroundPdf);
-	RooRealVar* intAsymBackground = new RooRealVar("intStepBackground", "Intensity of step background", asymContribution, asymContribution/5, asymContribution*5, "%");
+	RooRealVar* intAsymBackground = new RooRealVar("intStepBackground", "Intensity of step background", asymContribution, asymContribution/3, asymContribution*3, "%");
     RooFormulaVar* intAsymBackgroundNorm = new RooFormulaVar("intErfBackgroundNorm", "Intensity of step background normalized", "@0/100", RooArgList(*intAsymBackground));
 
     if (pdfInMaterial){

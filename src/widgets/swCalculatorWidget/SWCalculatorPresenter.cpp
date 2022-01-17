@@ -352,7 +352,7 @@ void SWCalculatorPresenter::onViewFitSpectrumClicked() {
 	TText* text = chiPaveText->AddText(Form("#chi^{2} = %.1f #divide %d = %.3f", chi2Struct.chiSum, chi2Struct.degreesOfFreedom, chi2Struct.chi2));
 	// text->SetTextSize(GraphicsHelper::TEXT_SIZE_SMALL);
 	chiPaveText->SetTextSize(GraphicsHelper::TEXT_SIZE_SMALLER*GraphicsHelper::getFontSizeScale(kFALSE));
-	chiPaveText->SetTextFont(GraphicsHelper::getFontCode(GraphicsHelper::FONT_REGULAR));
+	chiPaveText->SetTextFont(GraphicsHelper::getFont());
 	chiPaveText->SetFillColor(kWhite);
 	chiPaveText->SetBorderSize(0);
 	chiPaveText->SetTextAlign(kHAlignRight + kVAlignCenter);
@@ -436,7 +436,7 @@ void SWCalculatorPresenter::onViewFitSpectrumClicked() {
 
 		TPaveText* paramsPaveText = GraphicsHelper::makeParametersPaveText(*plotParametersList, GraphicsHelper::LEGEND_X1, 1-GraphicsHelper::padMargins.right, 1 - GraphicsHelper::padMargins.top);
 		paramsPaveText->SetTextSize(GraphicsHelper::TEXT_SIZE_SMALLER*GraphicsHelper::getFontSizeScale(kTRUE));
-		paramsPaveText->SetTextFont(GraphicsHelper::getFontCode(GraphicsHelper::FONT_REGULAR));
+		paramsPaveText->SetTextFont(GraphicsHelper::getFont());
 		spectrumPlot->addObject(paramsPaveText);
 	}
 

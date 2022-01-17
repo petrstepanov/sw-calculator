@@ -41,9 +41,34 @@ enum class Decoration {
 	TRANSPARENT
 };
 
+// Info: https://root.cern.ch/doc/master/classTAttText.html
+// Image: https://root.cern.ch/doc/master/pict1_TAttText_004.png
+
+enum EFontFace {
+    TimesItalic = 1,
+    TimesBold = 2,
+    TimesBoldItalic = 3,
+    Helvetica = 4,
+    HelveticaItalic = 5,
+    HelveticaBold = 6,
+    HelveticaBoldItalic = 7,
+    Courier = 8,
+    CourierItalic = 9,
+    CourierBold = 10,
+    CourierBoldItalic = 11,
+    Symbol = 12,
+    Times = 13,
+    Wingdings = 14,
+    SymbolItalic = 15
+};
+
 class GraphicsHelper {
 public:
-	static const Double_t TEXT_SIZE_NORMAL;
+
+    static const Double_t TEXT_SIZE_HUGE;
+    static const Double_t TEXT_SIZE_LARGER;
+    static const Double_t TEXT_SIZE_LARGE;
+    static const Double_t TEXT_SIZE_NORMAL;
 	static const Double_t TEXT_SIZE_SMALL;
 	static const Double_t TEXT_SIZE_SMALLER;
 
@@ -74,7 +99,7 @@ public:
 
 	static GraphicsHelper* getInstance();
 
-	static Style_t getFontCode(Int_t fontSize);
+	static Style_t getFont(EFontFace fontFace = EFontFace::Helvetica);
 	static Double_t getFontSizeScale(Bool_t isTopPad);
 	void styleAxis(TAxis* axis, const char* title, Double_t titleOffset, Double_t labelOffset, Bool_t isTopPad);
 	void drawSWRegions(RooPlot* frame, Double_t sWidth, Double_t wWidth,
@@ -95,6 +120,8 @@ private:
 	static GraphicsHelper* instance;
 
 	static void printVariable(const char* options, Int_t& currentLine, RooAbsArg* rooAbsArg, TPaveText* box);
+    void drawRegion(RooPlot* plot, Double_t x1, Double_t y1, Double_t x2, Double_t y2, const char* text, Double_t textY);
+
 };
 
 #endif /* GRAPHICSHELPER_H */

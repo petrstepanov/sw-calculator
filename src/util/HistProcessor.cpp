@@ -233,17 +233,40 @@ Bool_t HistProcessor::hasAtan(TH1F* hist){
 	return false;
 }
 
-Double_t HistProcessor::calcBackgroundFraction(TH1F* hist){
-	Int_t nBins = hist->GetXaxis()->GetNbins();
-	Int_t maxBin = hist->GetMinimumBin();
-	const Int_t wingBins = 10;
-	Double_t leftWingAverage = (hist->Integral(1, wingBins)) / (Double_t)(wingBins);
-	Double_t rightWingAverage = (hist->Integral(nBins - (wingBins - 1), nBins)) / (Double_t)(wingBins);
-	Double_t backgroundCounts = leftWingAverage*(maxBin) + rightWingAverage*(nBins-maxBin);
-	Double_t fullInt = hist->Integral(1, nBins);
-	Double_t bgFraction = backgroundCounts / fullInt;
-	return bgFraction;
+Double_t HistProcessor::calcLeftWing(TH1F* hist){
+    Double_t leftWingIntegral = hist->Integral(1, wingBins, "width");
+    Double_t leftWingWidth = hist->GetXaxis()->GetBinUpEdge(wingBins) - hist->GetXaxis()->GetBinLowEdge(1);
+    return leftWingIntegral/leftWingWidth;
 }
+
+Double_t HistProcessor::calcRightWing(TH1F* hist){
+    Int_t nBins = hist->GetXaxis()->GetNbins();
+    Double_t rightWingIntegral = hist->Integral(nBins-wingBins+1, nBins, "width");
+    Double_t rightWingWidth = (hist->GetXaxis()->GetBinUpEdge(nBins) - hist->GetXaxis()->GetBinLowEdge(nBins-wingBins+1));
+    return rightWingIntegral/rightWingWidth;
+}
+
+Double_t HistProcessor::calcRectBackgroundFraction(TH1F* hist){
+	Double_t leftWingAverage = calcLeftWing(hist);
+	Double_t rightWingAverage = calcRightWing(hist);
+
+	Double_t histBackgroundRectArea = TMath::Min(leftWingAverage, rightWingAverage) * (hist->GetXaxis()->GetXmax() - hist->GetXaxis()->GetXmin());
+	Double_t histIntegral = hist->Integral("width");
+	return histBackgroundRectArea / histIntegral;
+}
+
+Double_t HistProcessor::calcAsymBackgroundFraction(TH1F* hist){
+    Int_t nBins = hist->GetXaxis()->GetNbins();
+    // Int_t maxBin = hist->GetMinimumBin();
+    const Int_t wingBins = 10;
+    Double_t leftWingAverage = (hist->Integral(1, wingBins, "width")) / (hist->GetXaxis()->GetBinUpEdge(wingBins) - hist->GetXaxis()->GetBinLowEdge(1));
+    Double_t rightWingAverage = (hist->Integral(nBins-wingBins+1, nBins, "width")) / (hist->GetXaxis()->GetBinUpEdge(nBins) - hist->GetXaxis()->GetBinLowEdge(nBins-wingBins+1));
+
+    Double_t histAsymBackgroundRectArea = TMath::Abs(leftWingAverage-rightWingAverage) * (hist->GetXaxis()->GetXmax() - hist->GetXaxis()->GetXmin()) / 2;
+    Double_t histIntegral = hist->Integral("width");
+    return histAsymBackgroundRectArea / histIntegral;
+}
+
 
 Chi2Struct HistProcessor::getChi2(TH1F* hist, RooCurve* curve, RooAbsPdf* model){
 	// https://en.wikipedia.org/wiki/Goodness_of_fit
