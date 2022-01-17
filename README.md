@@ -14,32 +14,43 @@ Currently it is possible to run application either on macOS or Linux. I will try
 
 2. Open _Start → Ubuntu_ to launch linux Terminal. Proceed with Installation on Linux below.
 
-P.S. Running the program on older versions of Windows is currently not possible. If you are familiar with CMAKE please contribute :-) 
+P.S. Running the program on older versions of Windows is currently not possible.
 
 ## Installation on Linux or macOS
 
-1. Install CERN ROOT on your system. Details can be found [here](https://medium.com/@petrstepanov/install-cern-root-roofit-on-macos-and-linux-for-dummies-df787fd41ef4).
+Install CERN ROOT on your system. Refer to [official install page](https://root.cern/install/#linux-package-managers) for more details.
 
-2. Open your Terminal and clone the program folder on your hard drive:
+Open Terminal and clone program source files in your home folder:
 
 ```
-mkdir -p ~/Downloads && cd ~/Downloads
+cd
 git clone https://github.com/petrstepanov/sw-calculator
-cd ./sw-calculator
+cd sw-calculator
 ```
+Check program dependencies and create native makefile with CMake. Finally build and install. System will ask for your password to install the app.
 
-3. Compile the source code and link with ROOT libraries into a binary executable:
 ```
+cmake ./
 make
 make install
 ```
-4. In order to launch the application type `sw-calculator` in Terminal.
+On linux you can install application launcher:
 
-5. Optionally add an application launcher to the list of your system apps. On Linux execute `make install-linux-launcher`. On macOS run `resources/sw-calculator.pkg`.
+```
+make install-launcher
+```
+To install app launcher on macOS run package `resources/sw-calculator.pkg`.
 
-## Users Guide
+Program source files are not needed any more and can be removed from your computer:
 
-Not yet implemented.
+```
+rm -rf ~/sw-calculator
+```
+
+## Running program
+
+Find application in the system menu. Alternatively, open Termnal and type `sw-calculator` to launch the program. 
+
 
 ---
 

@@ -131,3 +131,16 @@ install(FILES ${PROJECT_BINARY_DIR}/libD_${PROJECT_NAME}.rootmap
         DESTINATION $ENV{ROOTSYS}/lib)
 install(FILES ${PROJECT_BINARY_DIR}/libD_${PROJECT_NAME}_rdict.pcm
         DESTINATION /usr/local/bin)
+        
+#----------------------------------------------------------------------------
+# Compose the install target
+add_custom_command(OUTPUT ${INSTALL_LAUNCHER}
+  COMMAND ${CMAKE_COMMAND} -E cp "${CMAKE_CURRENT_SOURCE_DIR}/resources/sw-calculator.png" ~/.local/share/icons/hicolor/scalable/apps/
+  COMMAND ${CMAKE_COMMAND} -E cp "${CMAKE_CURRENT_SOURCE_DIR}/resources/sw-calculator.desktop" ~/.local/share/applications/
+  WORKING_DIRECTORY "${CMAKE_CURRENT_SOURCE_DIR}"
+  DEPENDS ""
+  COMMENT "Installing icon and launcher"
+  VERBATIM
+)
+
+add_custom_target(install-launcher DEPENDS ${INSTALL_LAUNCHER})
