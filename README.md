@@ -54,4 +54,4 @@ Find application in the system menu. Alternatively, open Termnal and type `sw-ca
 
 ---
 
-Shoot me an email with feedback or questions: [petrs@bgsu.edu](mailto:petrs@bgsu.edu)
+Shoot me an email with feedback or questions: [stepanovps@gmail.com](mailto:stepanovps@gmail.com)
