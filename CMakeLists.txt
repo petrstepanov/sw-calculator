@@ -81,14 +81,14 @@ endif()
 
 #----------------------------------------------------------------------------
 # Build list of header files and exclude LinkDef from headers
-  file(GLOB_RECURSE HEADERS ${CMAKE_CURRENT_SOURCE_DIR}/*.hxx ${CMAKE_CURRENT_SOURCE_DIR}/*.hpp ${CMAKE_CURRENT_SOURCE_DIR}/*.hh ${CMAKE_CURRENT_SOURCE_DIR}/*.h)
+  file(GLOB_RECURSE HEADERS ${CMAKE_CURRENT_SOURCE_DIR}/src/*.hxx ${CMAKE_CURRENT_SOURCE_DIR}/src/*.hpp ${CMAKE_CURRENT_SOURCE_DIR}/src/*.hh ${CMAKE_CURRENT_SOURCE_DIR}/src/*.h)
   list(FILTER HEADERS EXCLUDE REGEX "[lL]ink[dD]ef")
 # message(STATUS "Found list of headers:")
 # message(STATUS "${HEADERS}")
 
 #----------------------------------------------------------------------------
 # Find LinkDef.h file
-  file(GLOB_RECURSE LINKDEFH ${CMAKE_CURRENT_SOURCE_DIR}/*.hxx ${CMAKE_CURRENT_SOURCE_DIR}/*.hpp ${CMAKE_CURRENT_SOURCE_DIR}/*.hh ${CMAKE_CURRENT_SOURCE_DIR}/*.h)
+  file(GLOB_RECURSE LINKDEFH ${CMAKE_CURRENT_SOURCE_DIR}/src/*.hxx ${CMAKE_CURRENT_SOURCE_DIR}/src/*.hpp ${CMAKE_CURRENT_SOURCE_DIR}/src/*.hh ${CMAKE_CURRENT_SOURCE_DIR}/src/*.h)
   list(FILTER LINKDEFH INCLUDE REGEX "[lL]ink[dD]ef")
 # message(STATUS "Found LinkDef file: ${LINKDEFH}")
 
@@ -98,7 +98,7 @@ endif()
 
 #----------------------------------------------------------------------------
 # Build list of source files
-  file(GLOB_RECURSE SOURCES ${CMAKE_CURRENT_SOURCE_DIR}/*.cxx ${CMAKE_CURRENT_SOURCE_DIR}/*.cpp ${CMAKE_CURRENT_SOURCE_DIR}/*.cc ${CMAKE_CURRENT_SOURCE_DIR}/*.c)
+  file(GLOB_RECURSE SOURCES ${CMAKE_CURRENT_SOURCE_DIR}/src/*.cxx ${CMAKE_CURRENT_SOURCE_DIR}/src/*.cpp ${CMAKE_CURRENT_SOURCE_DIR}/src/*.cc ${CMAKE_CURRENT_SOURCE_DIR}/src/*.c)
 # message(STATUS "Found list of sources:")
 # message(STATUS "${SOURCES}")
 
@@ -112,7 +112,7 @@ endif()
 
 #----------------------------------------------------------------------------
 # Find location of the enrty point file (main.c*)
-  file(GLOB_RECURSE MAIN ${CMAKE_CURRENT_SOURCE_DIR}/*.cxx ${CMAKE_CURRENT_SOURCE_DIR}/*.cpp ${CMAKE_CURRENT_SOURCE_DIR}/*.cc ${CMAKE_CURRENT_SOURCE_DIR}/*.c)
+  file(GLOB_RECURSE MAIN ${CMAKE_CURRENT_SOURCE_DIR}/src/*.cxx ${CMAKE_CURRENT_SOURCE_DIR}/src/*.cpp ${CMAKE_CURRENT_SOURCE_DIR}/src/*.cc ${CMAKE_CURRENT_SOURCE_DIR}/src/*.c)
   list(FILTER MAIN INCLUDE REGEX "main\\.c")
 # message(STATUS "Found entry point file: ${MAIN}")
 
@@ -133,14 +133,13 @@ install(FILES ${PROJECT_BINARY_DIR}/libD_${PROJECT_NAME}_rdict.pcm
         DESTINATION /usr/local/bin)
         
 #----------------------------------------------------------------------------
-# Compose the install target
-add_custom_command(OUTPUT ${INSTALL_LAUNCHER}
-  COMMAND ${CMAKE_COMMAND} -E cp "${CMAKE_CURRENT_SOURCE_DIR}/resources/sw-calculator.png" ~/.local/share/icons/hicolor/scalable/apps/
-  COMMAND ${CMAKE_COMMAND} -E cp "${CMAKE_CURRENT_SOURCE_DIR}/resources/sw-calculator.desktop" ~/.local/share/applications/
-  WORKING_DIRECTORY "${CMAKE_CURRENT_SOURCE_DIR}"
-  DEPENDS ""
-  COMMENT "Installing icon and launcher"
-  VERBATIM
+# Compose the install launcher phony target
+# https://stackoverflow.com/questions/38079251/get-cmake-to-declare-a-target-phony
+add_custom_target(install-launcher
+  COMMAND ${CMAKE_COMMAND} -E copy ./resources/sw-calculator.svg ~/.local/share/icons/hicolor/scalable/apps/
+  COMMAND ${CMAKE_COMMAND} -E copy ./resources/sw-calculator.desktop ~/.local/share/applications/
+  WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}
+#  DEPENDS "install"
+  COMMENT "Installing icon and launcher (for linux)"
+#  VERBATIM
 )
-
-add_custom_target(install-launcher DEPENDS ${INSTALL_LAUNCHER})

@@ -39,6 +39,8 @@ public:
     void onMinimumChange(Double_t min);
     void onMaximumChange(Double_t max);
     void onSetConstant(Bool_t isConstant);
+
+    ClassDef(RooRealVarPresenter,0)
 };
 
 #endif /* ROOREALVARPRESENTER_H */

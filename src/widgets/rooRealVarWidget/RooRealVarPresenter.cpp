@@ -16,6 +16,8 @@
 #include <TString.h>
 #include <iostream>
 
+ClassImp(RooRealVarPresenter)
+
 RooRealVarPresenter::RooRealVarPresenter(RooRealVarView* view) : 
     AbstractPresenter<RooRealVar, RooRealVarView>(view) {
 }

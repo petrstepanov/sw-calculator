@@ -32,7 +32,7 @@ Check program dependencies and create native makefile with CMake. Finally build 
 ```
 cmake ./
 make
-make install
+sudo make install
 ```
 On linux you can install application launcher:
 
