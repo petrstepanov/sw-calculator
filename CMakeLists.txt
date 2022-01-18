@@ -125,8 +125,8 @@ endif()
 # Compose the install target
 install(TARGETS ${PROJECT_NAME} SO_${PROJECT_NAME} 
         RUNTIME DESTINATION bin
-        LIBRARY DESTINATION ${ROOTSYS}/lib
-        ARCHIVE DESTINATION ${ROOTSYS}/lib)
+        LIBRARY DESTINATION $ENV{ROOTSYS}/lib
+        ARCHIVE DESTINATION $ENV{ROOTSYS}/lib)
 install(FILES ${PROJECT_BINARY_DIR}/libD_${PROJECT_NAME}.rootmap
         DESTINATION $ENV{ROOTSYS}/lib)
 install(FILES ${PROJECT_BINARY_DIR}/libD_${PROJECT_NAME}_rdict.pcm
@@ -136,8 +136,8 @@ install(FILES ${PROJECT_BINARY_DIR}/libD_${PROJECT_NAME}_rdict.pcm
 # Compose the install launcher phony target
 # https://stackoverflow.com/questions/38079251/get-cmake-to-declare-a-target-phony
 add_custom_target(install-launcher
-  COMMAND ${CMAKE_COMMAND} -E copy ${CMAKE_CURRENT_SOURCE_DIR}/resources/sw-calculator.svg ${HOME}/.local/share/icons/hicolor/scalable/apps/
-  COMMAND ${CMAKE_COMMAND} -E copy ${CMAKE_CURRENT_SOURCE_DIR}/resources/sw-calculator.desktop ${HOME}/.local/share/applications/
+  COMMAND ${CMAKE_COMMAND} -E copy ${CMAKE_CURRENT_SOURCE_DIR}/resources/sw-calculator.svg $ENV{HOME}/.local/share/icons/hicolor/scalable/apps/
+  COMMAND ${CMAKE_COMMAND} -E copy ${CMAKE_CURRENT_SOURCE_DIR}/resources/sw-calculator.desktop $ENV{HOME}/.local/share/applications/
   WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}
 #  DEPENDS "install"
   COMMENT "Installing icon and launcher (for linux)"
