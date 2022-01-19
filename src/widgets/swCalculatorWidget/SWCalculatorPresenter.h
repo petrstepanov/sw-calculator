@@ -26,11 +26,10 @@ class SWCalculatorPresenter : public AbstractPresenter<Model, SWCalculatorView> 
 
 private:
     PdfProvider* pdfProvider;
-    void buildFittingModel();
+    void rebuildFitModelIfNeeded();
 
     // Saving a copy of the old fit properties to see if the fitting PDF model should be rebuild or not
     FitProperties oldFitProperties;
-    void rebuildModelIfNeeded();
     // RooPlot* spectrumPlot, residualsPlot;
 
 public:

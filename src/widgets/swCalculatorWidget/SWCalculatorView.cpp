@@ -456,6 +456,9 @@ void SWCalculatorView::connectSignals(){
     zoomSlider->Connect("PositionChanged()", this->ClassName(), this, "onSliderChange()");
 
     logScaleCheckButton->Connect("Toggled(Bool_t)", this->ClassName(), this, "onLogScaleSet(Bool_t)");
+
+    // Notifications to draw text on canvas (like status)
+    Connect("AbstractImportSpectrumPresenter", "notifyUser(const char*)", this->ClassName(), this, "drawText(const char*)");
 }
 
 void SWCalculatorView::onLogScaleSet(Bool_t isLogScale){

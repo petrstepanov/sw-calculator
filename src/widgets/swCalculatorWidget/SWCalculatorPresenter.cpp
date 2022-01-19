@@ -96,7 +96,16 @@ FitProperties SWCalculatorPresenter::getModelFitProperties(){
     return model->getFitProperties();
 }
 
-void SWCalculatorPresenter::buildFittingModel(){
+void SWCalculatorPresenter::rebuildFitModelIfNeeded(){
+    // If fitting properties in the model changed - recompile the fitting PDF
+    // In order to compare of changes we store "old" fit properties struct
+    if (oldFitProperties == model->getFitProperties()) return;
+
+    // Remember new fitting properties
+    oldFitProperties = model->getFitProperties();
+
+    // Notify user
+    view->drawText("Building Fitting Model...");
     // TODO: Check if histogram contains zeros
     // Lift original histogram because ROOT cannot plot zeros in log scale
 //    if (hist->GetMinimum() < 0){
@@ -119,21 +128,14 @@ void SWCalculatorPresenter::buildFittingModel(){
 	RooArgSet* pdfParameters = pdfProvider->getPdf()->getParameters(RooArgSet(*observable));
 
 	model->getParametersPool()->synchronizePdfParameters(pdfParameters);
-}
 
-void SWCalculatorPresenter::rebuildModelIfNeeded(){
-    // If fitting properties in the model changed - recompile the fitting PDF
-    // In order to compare of changes we store "old" fit properties struct
-    if (!(oldFitProperties == model->getFitProperties())){
-        buildFittingModel();
-        oldFitProperties = model->getFitProperties();
-    }
+    view->drawHistograms(model->getFitProperties().hist, model->getFitProperties().sourceHist);
 }
 
 // Slots for View Signals
 void SWCalculatorPresenter::onViewEditParametersClicked() {
     // Check if model needs recompiled
-    rebuildModelIfNeeded();
+    rebuildFitModelIfNeeded();
 
 	ModalDialogFrame* dialog = new ModalDialogFrame(gClient->GetRoot(), view->GetMainFrame(), "Model Parameters");
 	RooRealVar* observable = pdfProvider->getObservable();
@@ -182,11 +184,10 @@ PdfProvider* SWCalculatorPresenter::getPdfProvider(){
 
 void SWCalculatorPresenter::onViewFitSpectrumClicked() {
     // Check if model needs recompiled
-    view->drawText("Building Fit Model...");
-    rebuildModelIfNeeded();
+    rebuildFitModelIfNeeded();
 
     // Draw Text
-	view->drawText("Fitting...");
+	view->drawText("Fitting Spectrum...");
 	gSystem->ProcessEvents();
 
 	// Testing purposes - let model generate data

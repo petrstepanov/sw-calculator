@@ -60,7 +60,6 @@ class AbstractImportSpectrumView : public AbstractView<AbstractImportSpectrumPre
 
     // Calls from Presenter
     void loadFile(TString* fileNamePath);
-    TString* getFileName();
     // Int_t getEnergyColumnNumber();
     // Int_t getCountsColumnNumber();
     void drawHistogram(TH1F* hist);

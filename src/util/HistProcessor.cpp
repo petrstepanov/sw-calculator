@@ -50,19 +50,19 @@ Int_t HistProcessor::getRightNonZeroBin(TH1F* hist){
     }
     return hist->GetNbinsX();
 }
-
-TH1F* HistProcessor::cutHistZeros(TH1F* hist){
-    // Check if histogram needs trimming
-    Int_t newMinBin = HistProcessor::getLeftNonZeroBin(hist);
-    Int_t newMaxBin = HistProcessor::getRightNonZeroBin(hist);
-
-    if (newMinBin == 1 && newMaxBin == hist->GetNbinsX()) return hist;
-
-    // Histogram needs trimming
-    TString newName = hist->GetName();
-    newName += "-trim";
-    return cutHist(newName, hist, newMinBin, newMaxBin);
-}
+//
+//TH1F* HistProcessor::cutHistZeros(TH1F* hist){
+//    // Check if histogram needs trimming
+//    Int_t newMinBin = HistProcessor::getLeftNonZeroBin(hist);
+//    Int_t newMaxBin = HistProcessor::getRightNonZeroBin(hist);
+//
+//    if (newMinBin == 1 && newMaxBin == hist->GetNbinsX()) return hist;
+//
+//    // Histogram needs trimming
+//    TString newName = hist->GetName();
+//    newName += "-trim";
+//    return cutHist(newName, hist, newMinBin, newMaxBin);
+//}
 
 TH1F* HistProcessor::cutHistBasement(const char *newname, TH1F* hist, Int_t xMin, Int_t xMax){
 	Int_t minBin = hist->FindBin(xMin);

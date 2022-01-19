@@ -42,6 +42,9 @@ public:
     virtual void setModelFileName(TString* fileNamePath){};
     virtual void setModelHist(TH1F* hist){};
 
+    // SIGNALS
+    void notifyUser(const char* text);              // *SIGNAL*
+
 private:
     TH1F* currentHist;
 

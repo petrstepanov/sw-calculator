@@ -27,22 +27,23 @@ void AbstractImportSpectrumPresenter::onOpenFileClicked(){
         return;
     }
     TString* fileNamePath = new TString(fileInfo->fFilename);
-    // Update Model with new file name (virtual function)
-    this->setModelFileName(fileNamePath);
-    // Update View to reflect 
-    view->loadFile(fileNamePath);
     
     // Import histogram
-    TString* fileName = view->getFileName();
+    notifyUser("Importing File...");
+    TString* fileName = fileNamePath;
 	FileUtils* fileUtils = FileUtils::getInstance();
 	TH1F* hist = fileUtils->importTH1(fileName->Data());
 	if (!hist){
 		UiHelper::showOkDialog(view->GetMainFrame(), "File type is not supported.", EMsgBoxIcon::kMBIconStop);
 		return;
 	}
+    // Update Model with new file name (virtual function)
+    this->setModelFileName(fileNamePath);
 
+    // Update View to reflect
 	// Display untrimmed histogram in the view's preview
 	view->drawHistogram(hist);
+    view->loadFile(fileNamePath);
 	// hist->Print("base");
 
     // Problem: THStack lags plotting histograms with 0 values in log axis
@@ -53,18 +54,28 @@ void AbstractImportSpectrumPresenter::onOpenFileClicked(){
     // Good solution: cut range from the center that does not contain zeros
 
     if (hist->GetMinimum() <= 0){
+        notifyUser("Processing Histogram...");
         // Notify user
         Int_t newMinBin = HistProcessor::getLeftNonZeroBin(hist);
         Int_t newMaxBin = HistProcessor::getRightNonZeroBin(hist);
-        TString message = TString::Format("Histogram is trimmed to exclude zero and negative bins\nBinning range adjusted to [%d, %d].", newMinBin, newMaxBin);
-        UiHelper::showOkDialog(view->GetMainFrame(), message, EMsgBoxIcon::kMBIconExclamation);
 
         // Trim hist
-        hist = HistProcessor::cutHistZeros(hist);
+        TString newHistName = hist->GetName();
+        newHistName += "trimmed";
+        hist = HistProcessor::cutHist(newHistName.Data(), hist, newMinBin, newMaxBin);
+
+        // Notify user
+        TString message = TString::Format("Histogram is trimmed to exclude zero and negative bins\nBinning range adjusted to [%d, %d].", newMinBin, newMaxBin);
+        UiHelper::showOkDialog(view->GetMainFrame(), message, EMsgBoxIcon::kMBIconExclamation);
     }
 
+    notifyUser("Done!");
 	// Update Model. Corresponding overridden method setModelHist() will be called.
 	setModelHist(hist);
+}
+
+void AbstractImportSpectrumPresenter::notifyUser(const char* text){
+    Emit("notifyUser(const char*)", text);
 }
 
 //void AbstractImportSpectrumPresenter::onImportSpectrumClicked(){

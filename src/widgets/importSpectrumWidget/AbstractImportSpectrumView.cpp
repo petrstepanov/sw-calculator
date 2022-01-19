@@ -176,11 +176,6 @@ void AbstractImportSpectrumView::loadFile(TString* fileNamePath){
 //    return numCountsColumn->GetIntNumber();
 //}
 
-TString* AbstractImportSpectrumView::getFileName(){
-    const char* s = (lblFileName->GetText())->GetString();
-    return new TString(s);
-}
-
 void AbstractImportSpectrumView::drawHistogram(TH1F* h){
 	// Copy histogram so we dont modify original histogram colors in the Model
 	TH1* hist = new TH1F();

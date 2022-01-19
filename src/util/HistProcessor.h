@@ -32,7 +32,7 @@ public:
 //    static Double_t liftHist(TH1F* hist, Double_t lift);
     static Int_t getLeftNonZeroBin(TH1F* hist);
     static Int_t getRightNonZeroBin(TH1F* hist);
-    static TH1F* cutHistZeros(TH1F* hist);
+//    static TH1F* cutHistZeros(TH1F* hist);
     static TH1F* cutHist(const char *newname, TH1F* hist, Int_t minBin, Int_t maxBin, Bool_t setBinErrors = kFALSE);
     TH1F* cutHistBasement(const char *newname, TH1F* hist, Int_t, Int_t);
     RooCurve* subtractCurves(const char *newname, RooCurve*, RooCurve*);
