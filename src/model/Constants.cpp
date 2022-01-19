@@ -18,7 +18,8 @@
 #include <TMath.h>
 
 // Application name
-const char* Constants::applicationName = "SW Calculator";
+const char* Constants::applicationName = "sw-calculator";
+const char* Constants::applicationTitle = "SW Calculator";
 
 // Convolution buffer fraction
 Double_t Constants::bufferFraction = 2;

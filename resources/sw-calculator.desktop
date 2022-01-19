@@ -6,4 +6,6 @@ Comment=Doppler spectra fitting software
 Icon=sw-calculator
 Exec=sw-calculator
 Terminal=true
-Categories=Science
+Categories=Education;Science
+# Windows Manager groups windows with the same WM_CLASS
+StartupWMClass=sw-calculator

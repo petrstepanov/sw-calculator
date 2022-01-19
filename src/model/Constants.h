@@ -38,6 +38,7 @@ class Constants {
     static Double_t bufferFraction;
 
     static const char* applicationName;
+    static const char* applicationTitle;
     static char* applicationIcon[];
 
     static RooConstVar* rooFwhmToSigma;

@@ -22,8 +22,18 @@
 ClassImp(MyMainFrame)
 
 MyMainFrame::MyMainFrame() : TGMainFrame(gClient->GetRoot(), Constants::windowWidth, Constants::windowHeight) {
+    // For the X window system
+    SetWindowName(Constants::applicationTitle);
+
+    // This I am not sure if we need this? Does not seem to do anything, however let it be here.
+    SetIconName(Constants::applicationName);
+
+    // In GNOME, SetClassHints() tells WM to pick application icon installed on the system
+    SetClassHints(Constants::applicationName, Constants::applicationName);
+
+    // Set X11 Pixmap icon. Theoretically a fallback if icon with above name not installed on the system.
+    // However, GNOME does not seem to support this: https://gitlab.gnome.org/GNOME/gnome-shell/-/issues/4953
 	SetIconPixmap(Constants::applicationIcon);
-	SetWindowName(Constants::applicationName);
 	SetCleanup(kDeepCleanup);
 
 	// Exit this application via the Exit button or Window Manager.
