@@ -136,10 +136,11 @@ install(FILES ${PROJECT_BINARY_DIR}/libD_${PROJECT_NAME}_rdict.pcm
 # Compose the install launcher phony target
 # https://stackoverflow.com/questions/38079251/get-cmake-to-declare-a-target-phony
 add_custom_target(install-launcher
-  COMMAND ${CMAKE_COMMAND} -E copy ${CMAKE_CURRENT_SOURCE_DIR}/resources/sw-calculator.svg $ENV{HOME}/.local/share/icons/hicolor/scalable/apps/
-  COMMAND ${CMAKE_COMMAND} -E copy ${CMAKE_CURRENT_SOURCE_DIR}/resources/sw-calculator.desktop $ENV{HOME}/.local/share/applications/
+  # Install icon (SVG support dropped due to slow rendering speeds of some icons)
+  COMMAND bash -c "xdg-icon-resource install --novendor --context apps --size 256 ${CMAKE_CURRENT_SOURCE_DIR}/resources/${CMAKE_PROJECT_NAME}.png ${CMAKE_PROJECT_NAME}"
+  COMMAND bash -c "gtk-update-icon-cache"
+  # Install launcher ("forceupdate" command performed automatically unless "--noupdate" is specified)
+  COMMAND bash -c "xdg-desktop-menu install ${CMAKE_CURRENT_SOURCE_DIR}/resources/${CMAKE_PROJECT_NAME}.desktop"
   WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}
-#  DEPENDS "install"
-  COMMENT "Installing icon and launcher (for linux)"
-#  VERBATIM
+  COMMENT "Installing application icon and launcher (for linux)"
 )
