@@ -31,7 +31,7 @@ void RooRealVarFrame::updateView(){
 	// Set name
 	nameLabel->SetText(rooRealVar->GetName());
 
-	// Append unit to title
+	// Set title
 	if (strlen(rooRealVar->getUnit()) > 0){
 		titleLabel->SetText(TString::Format("%s, %s", rooRealVar->GetTitle(), rooRealVar->getUnit()).Data());
 	} else {
@@ -75,14 +75,14 @@ void RooRealVarFrame::initUI(){
     // Double_t doubleMax = std::numeric_limits<Double_t>::max();
 
     // Value
-    valueNumberEntry = new TGNumberEntry(this, 0, 10, UiHelper::getUId(),
+    valueNumberEntry = new MyTGNumberEntry(this, 0, 10, UiHelper::getUId(),
     			TGNumberFormat::kNESReal,
                 TGNumberFormat::kNEAAnyNumber,
                 TGNumberFormat::kNELNoLimits);
     AddFrame(valueNumberEntry, new TGLayoutHints(kLHintsLeft | kLHintsCenterY, dx, dx));
 
     // Minimum value
-    minValueNumberEntry = new TGNumberEntry(this, 0, 10, UiHelper::getUId(),
+    minValueNumberEntry = new MyTGNumberEntry(this, 0, 10, UiHelper::getUId(),
     			TGNumberFormat::kNESReal,
                 TGNumberFormat::kNEAAnyNumber,
                 TGNumberFormat::kNELNoLimits);
@@ -92,7 +92,7 @@ void RooRealVarFrame::initUI(){
     AddFrame(new TGLabel(this, "-"), new TGLayoutHints(kLHintsLeft | kLHintsCenterY, 0, 0, dy, dy));
 
     // Maximum maximum
-    maxValueNumberEntry = new TGNumberEntry(this, 0, 10, UiHelper::getUId(),
+    maxValueNumberEntry = new MyTGNumberEntry(this, 0, 10, UiHelper::getUId(),
     			TGNumberFormat::kNESReal,
                 TGNumberFormat::kNEAAnyNumber,
                 TGNumberFormat::kNELNoLimits);
@@ -162,4 +162,15 @@ void RooRealVarFrame::onMaxValueSet(){
 void RooRealVarFrame::onFixedSet(Bool_t isFixed){
 	rooRealVar->setConstant(isFixed);
 	updateView();
+}
+
+Bool_t RooRealVarFrame::HandleFocusChange(Event_t * event)
+{
+   if ((event->fCode == kNotifyNormal) &&
+       (event->fState != kNotifyPointer) && (event->fType == kFocusOut)) {
+      // make sure we have a valid number by increasing it by 0
+      std::cout << "yo!" << std::endl;
+   }
+
+   return TGFrame::HandleFocusChange(event);
 }

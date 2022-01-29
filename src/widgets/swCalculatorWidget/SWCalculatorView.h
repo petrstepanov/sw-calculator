@@ -19,7 +19,7 @@
 #include <TGLabel.h>
 #include <TGTab.h>
 #include <TGTextEdit.h>
-#include <TGNumberEntry.h>
+#include "../overrides/MyTGNumberEntry.h"
 #include <TGComboBox.h>
 #include <TGButton.h>
 #include <TGButtonGroup.h>
@@ -39,7 +39,6 @@
 #include <TRootEmbeddedCanvas.h>
 #include "../AbstractView.h"
 #include "SWCalculatorPresenter.h"
-#include "../rooRealVarWidget/RooRealVarView.h"
 #include "../../util/HistProcessor.h"
 
 class SWCalculatorPresenter;

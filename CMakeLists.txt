@@ -79,6 +79,14 @@ else()
 	message(STATUS "CERN ROOT source folder location not provided")
 endif()
 
+#--------------------------------
+# Save project file
+if(EXISTS ${CMAKE_ROOT}./project)
+  message(STATUS "Found Eclipse project configuration: ${CMAKE_ROOT}./project")
+  FILE(READ "${CMAKE_ROOT}./project" OLD_PROJECT_SETTINGS)
+endif()
+
+
 #----------------------------------------------------------------------------
 # Build list of header files and exclude LinkDef from headers
   file(GLOB_RECURSE HEADERS ${CMAKE_CURRENT_SOURCE_DIR}/src/*.hxx ${CMAKE_CURRENT_SOURCE_DIR}/src/*.hpp ${CMAKE_CURRENT_SOURCE_DIR}/src/*.hh ${CMAKE_CURRENT_SOURCE_DIR}/src/*.h)
@@ -131,7 +139,7 @@ install(FILES ${PROJECT_BINARY_DIR}/libD_${PROJECT_NAME}.rootmap
         DESTINATION $ENV{ROOTSYS}/lib)
 install(FILES ${PROJECT_BINARY_DIR}/libD_${PROJECT_NAME}_rdict.pcm
         DESTINATION /usr/local/bin)
-        
+
 #----------------------------------------------------------------------------
 # Compose the install launcher phony target
 # https://stackoverflow.com/questions/38079251/get-cmake-to-declare-a-target-phony
@@ -144,3 +152,91 @@ add_custom_target(install-launcher
   WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}
   COMMENT "Installing application icon and launcher (for linux)"
 )
+
+
+
+#----------------------------------------------------------------------------
+# Try custom post install targets
+
+add_custom_command(
+  TARGET ${PROJECT_NAME}
+  POST_BUILD
+  COMMAND ${CMAKE_COMMAND} -E echo "Running no-byproduct command after 'sw-calculator'"
+  )
+
+#add_custom_command(
+#  TARGET foo
+#  POST_BUILD
+#  COMMAND ${CMAKE_COMMAND} -E echo "Running no-byproduct command after 'rebuild-cache'"
+#  )
+
+#function(test)
+#  message(STATUS "Test")
+#endfunction()
+
+#function(patch_eclipse_makefile)
+#  message(STATUS "Locating Makefile: ${PROJECT_BINARY_DIR}/Makefile")
+#  if(EXISTS ${PROJECT_BINARY_DIR}/Makefile)
+#    message(STATUS "Found Makefile. Pathcing...")
+#    file(READ "${PROJECT_BINARY_DIR}/Makefile" MF)
+#    string(REPLACE "rebuild_cache:" "rebuild_cache\n\tcp $(CMAKE_BINARY_DIR)/.project $(CMAKE_BINARY_DIR)/.project_backup" MF2 ${MF})
+#    string(REPLACE ".PHONY : rebuild_cache" "cp $(CMAKE_BINARY_DIR)/.project_backup $(CMAKE_BINARY_DIR)/.project\n.PHONY : rebuild_cache" MF3 ${MF2})
+#    file(WRITE ${PROJECT_BINARY_DIR}/Makefile ${MF3})
+#  else()
+#    message(STATUS "Makefile not found")
+#  endif()
+#endfunction()
+
+#add_custom_command(
+#    POST_BUILD
+#    COMMAND test()
+#    WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}
+#    OUTPUT  Makefile
+#    COMMENT "Patching Makefile..."
+#)
+
+#add_custom_target(
+#    mmm ALL
+#    DEPENDS Makefile
+#    Makefile
+#) 
+
+
+#-------------------------------------------------------------------------------------------
+#add_executable(lol main.cpp)
+
+# Tweak Eclipse Generator "rebuild_cache" target. Protect from overriding project preferences
+#add_custom_command(TARGET lol PRE_BUILD
+#  COMMAND file(COPY_FILE ${PROJECT_BINARY_DIR}/.cproject ${PROJECT_BINARY_DIR}/.cproject_bak)
+#  COMMENT "Storing '.cproject' before 'rebuild_cache'"
+#)
+
+#add_custom_command(TARGET lol POST_BUILD
+#  COMMAND file(COPY_FILE ${PROJECT_BINARY_DIR}/.cproject_bak ${PROJECT_BINARY_DIR}/.cproject)
+#  COMMENT "Restoring '.cproject' after 'rebuild_cache'"
+#)
+
+
+#add_custom_command(TARGET rebuild_cache PRE_BUILD
+#  COMMAND FILE(READ "${CMAKE_ROOT}./project" OLD_PROJECT_SETTINGS)
+#  COMMENT "Saving Eclipse project"
+#)
+
+#add_custom_command(TARGET all POST_BUILD
+#  COMMAND file(WRITE ${CMAKE_ROOT}./project ${OLD_PROJECT_SETTINGS})
+#  COMMENT "Restoring Eclipse project"
+#  WORKING_DIRECTORY WORKING_DIRECTORY ${CMAKE_ROOT}
+#)
+
+#if(DEFINED PERSIST_ECLIPSE_PROJECT)
+#  if(EXISTS ${CMAKE_ROOT}./project)
+#    message(STATUS "Found Eclipse project configuration: ${CMAKE_ROOT}./project")
+#    FILE(READ "${CMAKE_ROOT}./project" OLD_PROJECT_SETTINGS)
+#    message(STATUS "Saving Eclipse project")		
+#    endif()
+
+#    add_custom_command(OUTPUT ${CMAKE_ROOT}./project
+#                       COMMAND file(WRITE ${CMAKE_ROOT}./project ${OLD_PROJECT_SETTINGS})
+#                       COMMENT "Restoring Eclipse project"
+#                       DEPENDS all)
+#endif()

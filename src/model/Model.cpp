@@ -70,7 +70,7 @@ void Model::setLift(Int_t l){
 }
 
 void Model::setHist(TH1F* hist){
-    if (fitProperties.hist != hist){
+    if (hist && fitProperties.hist != hist){
         fitProperties.hist = hist;
         fitProperties.minFitBin = 1;
         fitProperties.maxFitBin = hist->GetNbinsX();
@@ -80,18 +80,19 @@ void Model::setHist(TH1F* hist){
 
         // Emit signals to presenters
         // fitPropertiesChanged();
+
         histogramImported(hist);
     }
 }
 
 void Model::setSourceHist(TH1F* sourceHist){
-    if (fitProperties.sourceHist != sourceHist){
+//    if (fitProperties.sourceHist != sourceHist){
         fitProperties.sourceHist = sourceHist;
 
         // Emit signals to presenters
         // fitPropertiesChanged();
         sourceHistogramImported(sourceHist);
-    }
+//    }
 }
 
 void Model::setComponentHist(TH1F* componentHist){

@@ -33,6 +33,8 @@ public:
 
 	void updateView();
 
+	virtual Bool_t HandleFocusChange (Event_t* event);
+
 private:
 	void initUI();
 	void connectSlots();
@@ -41,9 +43,9 @@ private:
 
     TGLabel* nameLabel;
     TGLabel* titleLabel;
-    TGNumberEntry* valueNumberEntry;
-    TGNumberEntry* minValueNumberEntry;
-    TGNumberEntry* maxValueNumberEntry;
+    MyTGNumberEntry* valueNumberEntry;
+    MyTGNumberEntry* minValueNumberEntry;
+    MyTGNumberEntry* maxValueNumberEntry;
     TGCheckButton* fixedCheckButton;
 
 	ClassDef(RooRealVarFrame,0)

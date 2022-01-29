@@ -86,12 +86,12 @@ void SWCalculatorView::initUI(){
     // TODO: display real values as labels
     tabFit->AddFrame(new TGLabel(tabFit, "Spectrum fitting range, bins"), new TGLayoutHints(kLHintsNormal, dx, dx, 2*dy, 0));
     TGHorizontalFrame *frameFitRange = new TGHorizontalFrame(tabFit);
-    numFitMin = new TGNumberEntry(frameFitRange, 1, 5, UiHelper::getUId(), TGNumberFormat::kNESInteger,
+    numFitMin = new MyTGNumberEntry(frameFitRange, 1, 5, UiHelper::getUId(), TGNumberFormat::kNESInteger,
             TGNumberFormat::kNEAPositive,
             TGNumberFormat::kNELLimitMinMax,
             1, 9999);
 
-    numFitMax = new TGNumberEntry(frameFitRange, 100, 5, UiHelper::getUId(), TGNumberFormat::kNESInteger,
+    numFitMax = new MyTGNumberEntry(frameFitRange, 100, 5, UiHelper::getUId(), TGNumberFormat::kNESInteger,
             TGNumberFormat::kNEAPositive,
             TGNumberFormat::kNELLimitMinMax,
             1, 9999);
@@ -112,7 +112,7 @@ void SWCalculatorView::initUI(){
     TGHorizontalFrame *frameSWidth = new TGHorizontalFrame(tabFit);
     lblRescale1 = new TGLabel(frameSWidth, "");
     lblRescale1->SetTextJustify(kTextRight);
-    numSWidth = new TGNumberEntry(frameSWidth, 1.60, 4, UiHelper::getUId(), TGNumberFormat::kNESRealTwo,
+    numSWidth = new MyTGNumberEntry(frameSWidth, 1.60, 4, UiHelper::getUId(), TGNumberFormat::kNESRealTwo,
             TGNumberFormat::kNEANonNegative,
             TGNumberFormat::kNELLimitMin,
             0.01, 9.99);
@@ -125,7 +125,7 @@ void SWCalculatorView::initUI(){
     TGHorizontalFrame *frameWWidth = new TGHorizontalFrame(tabFit);
     lblRescale2 = new TGLabel(frameWWidth, "");
     lblRescale2->SetTextJustify(kTextRight);
-    numWWidth = new TGNumberEntry(frameWWidth, 3.00, 4, UiHelper::getUId(), TGNumberFormat::kNESRealTwo,
+    numWWidth = new MyTGNumberEntry(frameWWidth, 3.00, 4, UiHelper::getUId(), TGNumberFormat::kNESRealTwo,
             TGNumberFormat::kNEANonNegative,
             TGNumberFormat::kNELLimitMin,
             0.01, 9.99);
@@ -138,7 +138,7 @@ void SWCalculatorView::initUI(){
     TGHorizontalFrame *frameWShift = new TGHorizontalFrame(tabFit);
     lblRescale3 = new TGLabel(frameWShift, "");
     lblRescale3->SetTextJustify(kTextRight);
-    numWShift = new TGNumberEntry(frameWShift, 2.76, 4, UiHelper::getUId(), TGNumberFormat::kNESRealTwo,
+    numWShift = new MyTGNumberEntry(frameWShift, 2.76, 4, UiHelper::getUId(), TGNumberFormat::kNESRealTwo,
             TGNumberFormat::kNEANonNegative,
             TGNumberFormat::kNELLimitMin,
             0.01, 9.99);
@@ -178,7 +178,7 @@ void SWCalculatorView::initUI(){
 //    resolutionFwhmFrame = new TGHorizontalFrame(convolutionParamsFrame);
 //    checkboxResFixed = new TGCheckButton(resolutionFwhmFrame, "fixed");
 //    checkboxResFixed->SetOn();
-//    numResolutionFWHM = new TGNumberEntry(resolutionFwhmFrame, 2.0, 4, -1, TGNumberFormat::kNESRealTwo,
+//    numResolutionFWHM = new MyTGNumberEntry(resolutionFwhmFrame, 2.0, 4, -1, TGNumberFormat::kNESRealTwo,
 //            TGNumberFormat::kNEANonNegative,
 //            TGNumberFormat::kNELLimitMinMax,
 //            0.5, 4.0);
@@ -215,21 +215,21 @@ void SWCalculatorView::initUI(){
     {
         TGHorizontalFrame* frame = new TGHorizontalFrame(modelParamsFrame);
 
-        numGauss = new TGNumberEntry(frame, 0, 1, UiHelper::getUId(), TGNumberFormat::kNESInteger,
+        numGauss = new MyTGNumberEntry(frame, 0, 1, UiHelper::getUId(), TGNumberFormat::kNESInteger,
                 TGNumberFormat::kNEANonNegative,
                 TGNumberFormat::kNELLimitMinMax,
                 0, 9);
         frame->AddFrame(numGauss, new TGLayoutHints(kLHintsLeft | kLHintsCenterY, 0, dx));
         frame->AddFrame(new TGLabel(frame, "Gauss"), new TGLayoutHints(kLHintsLeft | kLHintsCenterY, 0, 3*dx));
 
-        numExponent = new TGNumberEntry(frame, 0, 1, UiHelper::getUId(), TGNumberFormat::kNESInteger,
+        numExponent = new MyTGNumberEntry(frame, 0, 1, UiHelper::getUId(), TGNumberFormat::kNESInteger,
                 TGNumberFormat::kNEANonNegative,
                 TGNumberFormat::kNELLimitMinMax,
                 0, 9);
         frame->AddFrame(numExponent, new TGLayoutHints(kLHintsLeft | kLHintsCenterY, 0, dx));
         frame->AddFrame(new TGLabel(frame, "Exponent"), new TGLayoutHints(kLHintsLeft | kLHintsCenterY, 0, 3*dx));
 
-        numDampExponent = new TGNumberEntry(frame, 0, 1, UiHelper::getUId(), TGNumberFormat::kNESInteger,
+        numDampExponent = new MyTGNumberEntry(frame, 0, 1, UiHelper::getUId(), TGNumberFormat::kNESInteger,
                 TGNumberFormat::kNEANonNegative,
                 TGNumberFormat::kNELLimitMinMax,
                 0, 9);
@@ -345,11 +345,11 @@ void SWCalculatorView::initUI(){
 
     toolbarFrame = new TGHorizontalFrame(bottomToolbarFrame);
 
-//    numDisplayMin = new TGNumberEntry(toolbarFrame, 0, 6, -1, TGNumberFormat::kNESRealOne,
+//    numDisplayMin = new MyTGNumberEntry(toolbarFrame, 0, 6, -1, TGNumberFormat::kNESRealOne,
 //            TGNumberFormat::kNEAAnyNumber,
 //            TGNumberFormat::kNELLimitMinMax,
 //            -9999, 9999);
-//    numDisplayMax = new TGNumberEntry(toolbarFrame, 0, 6, -1, TGNumberFormat::kNESRealOne,
+//    numDisplayMax = new MyTGNumberEntry(toolbarFrame, 0, 6, -1, TGNumberFormat::kNESRealOne,
 //            TGNumberFormat::kNEAAnyNumber,
 //            TGNumberFormat::kNELLimitMinMax,
 //            -9999, 9999);
@@ -364,7 +364,7 @@ void SWCalculatorView::initUI(){
 //    toolbarFrame->AddFrame(btnApplyZoom, new TGLayoutHints(kLHintsLeft | kLHintsTop, dx, dx, 0, 0));  // left, right, top, bottom
 //    toolbarFrame->AddFrame(btnResetZoom, new TGLayoutHints(kLHintsLeft | kLHintsTop, 0, dx, 0, 0));  // left, right, top, bottom
 
-    displayMin = new TGNumberEntry(toolbarFrame, 0, 6, UiHelper::getUId(), TGNumberFormat::kNESRealOne,
+    displayMin = new MyTGNumberEntry(toolbarFrame, 0, 6, UiHelper::getUId(), TGNumberFormat::kNESRealOne,
         TGNumberFormat::kNEAAnyNumber,
         TGNumberFormat::kNELLimitMinMax,
         -1000, 1000);
@@ -375,7 +375,7 @@ void SWCalculatorView::initUI(){
     zoomSlider->SetPosition(-60,60);
     toolbarFrame->AddFrame(zoomSlider, new TGLayoutHints(kLHintsLeft | kLHintsTop | kLHintsExpandX, dx, dx, 0, 0));
 
-    displayMax = new TGNumberEntry(toolbarFrame, 0, 6, UiHelper::getUId(), TGNumberFormat::kNESRealOne,
+    displayMax = new MyTGNumberEntry(toolbarFrame, 0, 6, UiHelper::getUId(), TGNumberFormat::kNESRealOne,
         TGNumberFormat::kNEAAnyNumber,
         TGNumberFormat::kNELLimitMinMax,
         -1000, 1000);
@@ -411,9 +411,6 @@ void SWCalculatorView::initUI(){
 
     // Disable toolbar on uiReady event
     Connect(this->GetMainFrame()->ClassName(), "uiReady()", this->ClassName(), this, "onUiReady()");
-
-    // Draw welcome text
-    drawText("No Spectra Loaded", "Click 'Open File...' on the left to import a spectrum") ;
 }
 
 void SWCalculatorView::onUiReady(){
@@ -830,7 +827,13 @@ void SWCalculatorView::drawHistograms(TH1* hist, TH1* sourceHist){
     TCanvas* canvas = embedCanvas->GetCanvas();
 	canvas->cd();
 
-	// Make stack of regualr and source histagrams (if set)
+	// If both histograms are empty - display welcome message
+	if (hist == nullptr && sourceHist == nullptr){
+	    drawText("No Spectra Loaded", "Click 'Open File...' on the left to import a spectrum");
+	    return;
+	}
+
+	// Make stack of regular and source histograms (if set)
     // THStack* hStack = new THStack("hs", "");
     // hist->Print("base");
 

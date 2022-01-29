@@ -90,6 +90,7 @@ void SWCalculatorPresenter::onInitModel() {
 	view->numGauss->SetNumber(model->getNumberOfGaussians());
 	view->numExponent->SetNumber(model->getNumberOfExponents());
 	view->numDampExponent->SetNumber(model->getNumberOfDampingExponents());
+	view->drawHistograms(model->getFitProperties().hist, model->getFitProperties().sourceHist);
 }
 
 FitProperties SWCalculatorPresenter::getModelFitProperties(){

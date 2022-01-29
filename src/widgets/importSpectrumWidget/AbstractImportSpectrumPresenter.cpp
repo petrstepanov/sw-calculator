@@ -34,6 +34,7 @@ void AbstractImportSpectrumPresenter::onOpenFileClicked(){
 	FileUtils* fileUtils = FileUtils::getInstance();
 	TH1F* hist = fileUtils->importTH1(fileName->Data());
 	if (!hist){
+	    notifyUser("");
 		UiHelper::showOkDialog(view->GetMainFrame(), "File type is not supported.", EMsgBoxIcon::kMBIconStop);
 		return;
 	}
