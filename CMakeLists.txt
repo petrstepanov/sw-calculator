@@ -7,12 +7,12 @@
   project(sw-calculator)
 
 # Set the minimum required version of cmake for a project
-  cmake_minimum_required(VERSION 3.0 FATAL_ERROR)
+  cmake_minimum_required(VERSION 3.12 FATAL_ERROR)
 
 # Locate the ROOT package and define a number of useful targets and variables (need RIO Net?)
   find_package(ROOT REQUIRED COMPONENTS)
-# message(STATUS "Found ROOT libraries:")
-# message(STATUS "${ROOT_LIBRARIES}")
+  message(STATUS "Found ROOT libraries:")
+  message(STATUS "${ROOT_LIBRARIES}")
 
 # Compose list of ROOT libraries with "ROOT::" prefix
   set(LIB_NAMES "")
@@ -30,8 +30,8 @@
   list(APPEND LIB_NAMES "ROOT::Minuit")
   list(APPEND LIB_NAMES "ROOT::Fumili")
 
-# message(STATUS "Modified ROOT libraries:")
-# message(STATUS "${LIB_NAMES}")
+  message(STATUS "Modified ROOT libraries:")
+  message(STATUS "${LIB_NAMES}")
 
 #----------------------------------------------------------------------------
 # Attach ROOT and Geant Sources
@@ -89,7 +89,11 @@ endif()
 
 #----------------------------------------------------------------------------
 # Build list of header files and exclude LinkDef from headers
-  file(GLOB_RECURSE HEADERS ${CMAKE_CURRENT_SOURCE_DIR}/src/*.hxx ${CMAKE_CURRENT_SOURCE_DIR}/src/*.hpp ${CMAKE_CURRENT_SOURCE_DIR}/src/*.hh ${CMAKE_CURRENT_SOURCE_DIR}/src/*.h)
+  file(GLOB_RECURSE HEADERS CONFIGURE_DEPENDS
+  	${CMAKE_CURRENT_SOURCE_DIR}/src/*.hxx 
+  	${CMAKE_CURRENT_SOURCE_DIR}/src/*.hpp 
+  	${CMAKE_CURRENT_SOURCE_DIR}/src/*.hh 
+  	${CMAKE_CURRENT_SOURCE_DIR}/src/*.h)
   list(FILTER HEADERS EXCLUDE REGEX "[lL]ink[dD]ef")
 # message(STATUS "Found list of headers:")
 # message(STATUS "${HEADERS}")
@@ -106,7 +110,11 @@ endif()
 
 #----------------------------------------------------------------------------
 # Build list of source files
-  file(GLOB_RECURSE SOURCES ${CMAKE_CURRENT_SOURCE_DIR}/src/*.cxx ${CMAKE_CURRENT_SOURCE_DIR}/src/*.cpp ${CMAKE_CURRENT_SOURCE_DIR}/src/*.cc ${CMAKE_CURRENT_SOURCE_DIR}/src/*.c)
+  file(GLOB_RECURSE SOURCES CONFIGURE_DEPENDS
+  	${CMAKE_CURRENT_SOURCE_DIR}/src/*.cxx 
+  	${CMAKE_CURRENT_SOURCE_DIR}/src/*.cpp 
+  	${CMAKE_CURRENT_SOURCE_DIR}/src/*.cc 
+  	${CMAKE_CURRENT_SOURCE_DIR}/src/*.c)
 # message(STATUS "Found list of sources:")
 # message(STATUS "${SOURCES}")
 
