@@ -52,3 +52,4 @@ Debug/
 .DS_store
 
 .vscode
+/_build/

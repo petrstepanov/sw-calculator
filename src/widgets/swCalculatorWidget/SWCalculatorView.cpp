@@ -227,14 +227,14 @@ void SWCalculatorView::initUI(){
                 TGNumberFormat::kNELLimitMinMax,
                 0, 9);
         frame->AddFrame(numExponent, new TGLayoutHints(kLHintsLeft | kLHintsCenterY, 0, dx));
-        frame->AddFrame(new TGLabel(frame, "Exponent"), new TGLayoutHints(kLHintsLeft | kLHintsCenterY, 0, 3*dx));
+        frame->AddFrame(new TGLabel(frame, "Lorentzian"), new TGLayoutHints(kLHintsLeft | kLHintsCenterY, 0, 3*dx));
 
         numDampExponent = new MyTGNumberEntry(frame, 0, 1, UiHelper::getUId(), TGNumberFormat::kNESInteger,
                 TGNumberFormat::kNEANonNegative,
                 TGNumberFormat::kNELLimitMinMax,
                 0, 9);
         frame->AddFrame(numDampExponent, new TGLayoutHints(kLHintsLeft | kLHintsCenterY, 0, dx));
-        frame->AddFrame(new TGLabel(frame, "Damping Exp"), new TGLayoutHints(kLHintsLeft | kLHintsCenterY));
+        frame->AddFrame(new TGLabel(frame, "Damped Lorentzian"), new TGLayoutHints(kLHintsLeft | kLHintsCenterY));
 
         modelParamsFrame->AddFrame(frame, new TGLayoutHints(kLHintsNormal, 0, 0, dy, dx));
     }

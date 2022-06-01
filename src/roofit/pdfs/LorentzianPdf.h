@@ -22,8 +22,8 @@
 
 class LorentzianPdf: public RooAbsPdf, public IndirectParamPdf {
 public:
-	LorentzianPdf(){};
-	LorentzianPdf(const char *name, const char *title, RooAbsReal& _x, RooAbsReal& _mean, RooAbsReal& _a);
+	LorentzianPdf(Bool_t _isTwoDetector) : isTwoDetector(_isTwoDetector){};
+	LorentzianPdf(const char *name, const char *title, RooAbsReal& _x, RooAbsReal& _mean, RooAbsReal& _a, Bool_t isTwoDetector);
 	LorentzianPdf(const LorentzianPdf& other, const char* name = 0);
 	virtual TObject* clone(const char* newname) const {
 		return new LorentzianPdf(*this, newname);
@@ -40,9 +40,14 @@ public:
 	RooRealProxy mean;
 	RooRealProxy a;
 
+	Bool_t isTwoDetector;
+
 protected:
 	Double_t indefiniteIntegral(Double_t _x) const;
 	Double_t evaluate() const;
+
+	Double_t getBindingEnergy() const;
+	Double_t getBindingEnergyError(Double_t da) const;
 
 private:
 ClassDef(LorentzianPdf, 1)

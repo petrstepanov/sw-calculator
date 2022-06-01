@@ -138,8 +138,9 @@ void PdfProvider::initMaterialPdf(Bool_t hasParabola, Bool_t hasDelta, TH1F* com
 	GaussianPdf** gauss = new GaussianPdf*[numGauss];
 	for (int i = 0; i < numGauss; i++) {
 		Double_t aVal = getDefaultAValue(aMin, aMax, i+1, numGauss);
+		Bool_t isTwoDetector = HistProcessor::isTwoDetector(fitProperties.hist);
 		gaussA[i] = new RooRealVar(Form("gaussian%dA", i + 1), StringUtils::ordinal(i+1, "Gaussian w.f. parameter")->Data(), aVal, aMin, aMax, "Angstrom");
-		gauss[i] = new GaussianPdf(Form("Gaussian%d", i + 1), StringUtils::ordinal(i+1, "Gauss")->Data(), *observable, *mean, *gaussA[i]);
+		gauss[i] = new GaussianPdf(Form("Gaussian%d", i + 1), StringUtils::ordinal(i+1, "Gauss")->Data(), *observable, *mean, *gaussA[i], isTwoDetector);
 		pdfsInMaterial->add(*gauss[i]);
 	}
 
@@ -148,8 +149,9 @@ void PdfProvider::initMaterialPdf(Bool_t hasParabola, Bool_t hasDelta, TH1F* com
 	LorentzianPdf** lorentz = new LorentzianPdf*[numLorentz];
 	for (int i = 0; i < numLorentz; i++) {
 		Double_t aVal = getDefaultAValue(aMin, aMax, i+1, numLorentz);
+		Bool_t isTwoDetector = HistProcessor::isTwoDetector(fitProperties.hist);
 		lorentzA[i] = new RooRealVar(Form("lorentzian%dA", i + 1), StringUtils::ordinal(i+1, "Exponential w.f. parameter")->Data(), aVal, aMin, aMax, "Angstrom"); // 5 0.5 10
-		lorentz[i] = new LorentzianPdf(Form("Lorentzian%d", i + 1), StringUtils::ordinal(i+1, "Lorentz")->Data(), *observable, *mean, *lorentzA[i]);
+		lorentz[i] = new LorentzianPdf(Form("Lorentzian%d", i + 1), StringUtils::ordinal(i+1, "Lorentz")->Data(), *observable, *mean, *lorentzA[i], isTwoDetector);
 		pdfsInMaterial->add(*lorentz[i]);
 	}
 

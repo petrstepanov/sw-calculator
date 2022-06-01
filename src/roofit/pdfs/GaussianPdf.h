@@ -22,8 +22,8 @@
 
 class GaussianPdf: public RooAbsPdf, public IndirectParamPdf {
 public:
-	GaussianPdf(){};
-	GaussianPdf(const char *name, const char *title, RooAbsReal& _x, RooAbsReal& _mean, RooAbsReal& _a);
+	GaussianPdf(Bool_t _isTwoDetector) : isTwoDetector(_isTwoDetector){};
+	GaussianPdf(const char *name, const char *title, RooAbsReal& _x, RooAbsReal& _mean, RooAbsReal& _a, Bool_t isTwoDetector);
 	GaussianPdf(const GaussianPdf& other, const char* name = 0);
 	virtual TObject* clone(const char* newname) const {
 		return new GaussianPdf(*this, newname);
@@ -40,9 +40,14 @@ public:
 	RooRealProxy mean;
 	RooRealProxy a;
 
+	Bool_t isTwoDetector;
+
 protected:
 	Double_t indefiniteIntegral(Double_t _x) const;
 	Double_t evaluate() const;
+
+	Double_t getBindingEnergy() const;
+	Double_t getBindingEnergyError(Double_t da) const;
 
 private:
 ClassDef(GaussianPdf, 1)

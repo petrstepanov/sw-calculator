@@ -20,23 +20,30 @@ ClassImp(GaussianPdf);
 GaussianPdf::GaussianPdf(const char *name,
 		const char *title,
 		RooAbsReal& _x,
-		RooAbsReal& _mean, RooAbsReal& _a) :
+		RooAbsReal& _mean, RooAbsReal& _a, Bool_t _isTwoDetector) :
 		RooAbsPdf(name, title),
 		x("x", "x", this, _x),
 		mean("mean", "mean", this, _mean),
-		a("a", "a", this,_a) {
+		a("a", "a", this,_a),
+		isTwoDetector(_isTwoDetector){
 }
 
 GaussianPdf::GaussianPdf(const GaussianPdf& other, const char* name) :
 		RooAbsPdf(other, name),
 		x("x", this, other.x),
 		mean("mean", this, other.mean),
-		a("a", this, other.a) {
+		a("a", this, other.a),
+		isTwoDetector(other.isTwoDetector){
 }
 
 Double_t GaussianPdf::evaluate() const {
 	Double_t k = a / (Constants::chbar / 1E3); // convert chbar to [keV]
-	Double_t _x = (x - mean);
+
+	// Shift exists only in 1D case
+	// 1D spectroscopy: shift = E_b/2
+	// 2D spectroscopy: shift = 0
+	Double_t shift = isTwoDetector ? 0 : getBindingEnergy()/2;
+	Double_t _x = x - (mean - shift);
 	// Without normalization
 	return exp(-0.5 * _x * _x * k * k);
 
@@ -66,19 +73,33 @@ Double_t GaussianPdf::indefiniteIntegral(Double_t _x) const {
 	return TMath::Sqrt(TMath::PiOver2()) * RooMath::erf(k * _x / TMath::Sqrt2()) / k;
 }
 
-RooArgList* GaussianPdf::getParameters(Bool_t isTwoDetector) {
+Double_t GaussianPdf::getBindingEnergy() const {
 	// Energy value
 	Double_t Ry = Constants::Ry; // eV
 	Double_t a_B = Constants::a_B; // A
-	Double_t e = isTwoDetector ? 3 * Ry * pow(a_B / a, 2) : 3 * Ry * pow(a_B / a / 2, 2);
+	// return isTwoDetector ? 3 * Ry * pow(a_B / a, 2) : 3 * Ry * pow(a_B / a / 2, 2);
+	return 3 * Ry * pow(a_B / a, 2);
+}
 
-	// A error
+Double_t GaussianPdf::getBindingEnergyError(Double_t da) const {
+	// Energy value
+	Double_t Ry = Constants::Ry; // eV
+	Double_t a_B = Constants::a_B; // A
+	// return isTwoDetector ? 2 * 3 * Ry * a_B * a_B / a / a / a * da : 3 / 2 * Ry * a_B * a_B / a / a / a * da;
+	return 2 * 3 * Ry * a_B * a_B / a / a / a * da;
+}
+
+
+RooArgList* GaussianPdf::getParameters(Bool_t isTwoDetector) {
+	// A value and error
 	RooRealVar* aReal = dynamic_cast<RooRealVar*>(a.absArg());
 	Double_t da = aReal ? aReal->getError() : 0;
 
-	// Energy error
-	Double_t de = 0;
-	de = isTwoDetector ? 2 * 3 * Ry * a_B * a_B / a / a / a * da : 3 / 2 * Ry * a_B * a_B / a / a / a * da;
+	// Binding Energy value and error
+	Double_t Ry = Constants::Ry; // eV
+	Double_t a_B = Constants::a_B; // A
+	Double_t e = getBindingEnergy();
+	Double_t de = getBindingEnergyError(da);
 
 	// Build list and return vars
 	const char* name = Form("bindE%s", this->GetName());
