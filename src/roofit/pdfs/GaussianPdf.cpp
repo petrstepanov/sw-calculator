@@ -42,7 +42,7 @@ Double_t GaussianPdf::evaluate() const {
 	// Shift exists only in 1D case
 	// 1D spectroscopy: shift = E_b/2
 	// 2D spectroscopy: shift = 0
-	Double_t shift = isTwoDetector ? 0 : getBindingEnergy()/2;
+	Double_t shift = isTwoDetector ? 0 : getBindingEnergy()/2/1000;  // /1000 - x axis in kevs not ev
 	Double_t _x = x - (mean - shift);
 	// Without normalization
 	return exp(-0.5 * _x * _x * k * k);
