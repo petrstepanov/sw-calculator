@@ -22,8 +22,12 @@ class Constants {
 
   public:
     static constexpr Double_t chbar = 0.19732697 * 1E4; // c*hbar, eV*Å
-    static constexpr Double_t mc2 = 0.511E6;            // electron mc^2, eV
+    static constexpr Double_t chbarKeV = 1.9732697;        // c*hbar, KeV*Å
+
+    static constexpr Double_t mc2 = 511E3;              // electron mc^2, eV
+    // static constexpr Double_t mc2KeV = 511;                // electron mc^2, KeV
     static constexpr Double_t Ry = 13.605;              // Rydberg constant, eV
+    // static constexpr Double_t RyKeV = 0.13605;             // Rydberg constant, KeV
     static constexpr Double_t a_B = 0.529177;           // Bohr radius, Å
     
     static const UInt_t windowWidth = 1200;
