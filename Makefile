@@ -8,10 +8,26 @@ ifeq ($(OS),Darwin)
 endif
 
 # Variables for compiling and linking
-CXXFLAGS=`root-config --cflags` -fPIC
-LDFLAGS=`root-config --ldflags`
-LIBS=`root-config --glibs` -lRooFit -lRooFitCore -lHtml -lMinuit -lFumili
-INCDIR=`root-config --incdir`
+# Remove the "" in ROOT's `root-config -cflags`
+# TODO: hack - report to ROOT devs to exclude "" from -I"<inc-path>"
+CXXFLAGS_ROOT=$(shell root-config --cflags) -fPIC
+$(info CXXFLAGS_ROOT=$(CXXFLAGS_ROOT))
+FIND:="
+REPLACE:= 
+CXXFLAGS=$(subst $(FIND),$(REPLACE),$(CXXFLAGS_ROOT))
+$(info CXXFLAGS=$(CXXFLAGS))
+
+LDFLAGS=$(shell root-config --ldflags) --verbose
+#LDFLAGS=$(shell root-config --ldflags) --verbose
+$(info LDFLAGS=$(LDFLAGS))
+
+# Pass SONAMES of the libraries:
+# Maybe: readelf -d <lib_file_path> | grep SONAME
+LIBS=$(shell root-config --glibs) -lRooFit -lRooFitCore -lHtml -lMinuit -lFumili
+$(info LIBS=$(LIBS))
+
+INCDIR=$(shell root-config --incdir)
+$(info INCDIR=$(INCDIR))
 
 # Define variables for directories
 SRC_DIR=src
@@ -21,7 +37,7 @@ BIN_DIR=dist
 # Set the name of your executable
 APP_NAME=sw-calculator
 
-# Set variables with dictionary .cxx and .pcm filenames 
+# Set variables with dictionary .cxx and .pcm filenames
 DICT_CXX_FILENAME=$(APP_NAME)-dictionary.cxx        # app-dictionary.cxx
 DICT_PCM_FILENAME=$(APP_NAME)-dictionary_rdict.pcm  # app-dictionary_rdict.pcm
 
