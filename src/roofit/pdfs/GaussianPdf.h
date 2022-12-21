@@ -22,9 +22,7 @@
 
 class GaussianPdf: public RooAbsPdf, public IndirectParamPdf {
   public:
-    GaussianPdf(Bool_t _isTwoDetector) : isTwoDetector(_isTwoDetector) {
-    }
-    ;
+    GaussianPdf(Bool_t _isTwoDetector);
     GaussianPdf(const char *name, const char *title, RooAbsReal &_x, RooAbsReal &_mean, RooAbsReal &_a,
       Bool_t isTwoDetector);
     GaussianPdf(const GaussianPdf &other, const char *name = 0);
@@ -50,8 +48,8 @@ class GaussianPdf: public RooAbsPdf, public IndirectParamPdf {
     Double_t indefiniteIntegral(Double_t _x) const;
     Double_t evaluate() const;
 
-    Double_t getBindingEnergyEv() const;
-    Double_t getBindingEnergyError(Double_t da) const;
+    std::pair<double, double> getBindingEnergy() const;
+    std::pair<double, double> getSTD(Bool_t isTwoDetector) const;
 
   private:ClassDef(GaussianPdf, 1)
 };

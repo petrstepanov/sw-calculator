@@ -19,30 +19,40 @@
 #include <RooRealProxy.h>
 #include "../IndirectParamPdf.h"
 
-class ParabolaPdf: public RooAbsPdf, public IndirectParamPdf {
-public:
-	ParabolaPdf() {};
-	ParabolaPdf(const char *name, const char *title, RooAbsReal& _x, RooAbsReal& _mean, RooAbsReal& _r);
-	ParabolaPdf(const ParabolaPdf& other, const char* name = 0);
-	virtual TObject* clone(const char* newname) const {
-		return new ParabolaPdf(*this, newname);
-	}
-	inline virtual ~ParabolaPdf() {}
+class ParabolaPdf: public RooAbsPdf/*, public IndirectParamPdf*/ {
+  public:
+    ParabolaPdf(Bool_t _isTwoDetector);
+    ParabolaPdf(const char *name, const char *title, RooAbsReal &_x, RooAbsReal &_mean, RooAbsReal &_Ef,
+      Bool_t isTwoDetector);
+    ParabolaPdf(const ParabolaPdf &other, const char *name = 0);
+    virtual TObject* clone(const char *newname) const {
+      return new ParabolaPdf(*this, newname);
+    }
+    inline virtual ~ParabolaPdf() {
+    }
 
-	Int_t getAnalyticalIntegral(RooArgSet& allVars, RooArgSet& analVars, const char* rangeName = 0) const;
-	Double_t analyticalIntegral(Int_t code, const char* rangeName = 0) const;
+    Int_t getAnalyticalIntegral(RooArgSet &allVars, RooArgSet &analVars, const char *rangeName = 0) const;
+    Double_t analyticalIntegral(Int_t code, const char *rangeName = 0) const;
 
-	RooArgList* getParameters(Bool_t isTwoDetector);
+//    RooArgList* getParameters(Bool_t isTwoDetector);
 
-protected:
-	RooRealProxy x;
-	RooRealProxy mean;
-	RooRealProxy r;
+  protected:
+    RooRealProxy x;
+    RooRealProxy mean;
+    RooRealProxy Ef;
 
-	Double_t evaluate() const;
+    Bool_t isTwoDetector;
 
-private:
-ClassDef(ParabolaPdf, 1)
+    Double_t evaluate() const;
+
+    Double_t getMean() const;
+
+    Double_t indefiniteIntegral(Double_t _x) const;
+
+    std::pair<double, double> getFermiEnergy() const;
+    std::pair<double,double> getBindingEnergy() const;
+
+  private:ClassDef(ParabolaPdf, 1)
 };
 
 #endif /* PARABOLAPDF_H */
