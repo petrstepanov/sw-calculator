@@ -138,15 +138,15 @@ RooArgList* GaussianPdf::getParameters(Bool_t isTwoDetector) {
   RooArgList *list = new RooArgList();
 
   // Binding Energy value and error can only be calculated in 1D case
-  if (!isTwoDetector) {
-    std::pair<double, double> Eb = getBindingEnergy();
-    // Compose RooRealVar
-    const char *name = Form("bindE%s", this->GetName());
-    const char *title = Form("Binding E %s", this->GetTitle());
-    RooRealVar *EbRealVar = new RooRealVar(name, title, Eb.first, "eV");
-    EbRealVar->setError(Eb.second);
-    list->add(*EbRealVar);
-  }
+  // if (!isTwoDetector) {
+  std::pair<double, double> Eb = getBindingEnergy();
+  // Compose RooRealVar
+  const char *name = Form("bindE%s", this->GetName());
+  const char *title = Form("Binding E %s", this->GetTitle());
+  RooRealVar *EbRealVar = new RooRealVar(name, title, Eb.first, "eV");
+  EbRealVar->setError(Eb.second);
+  list->add(*EbRealVar);
+  // }
 
   // Add FWHM
   std::pair<double, double> std = getSTD(isTwoDetector);

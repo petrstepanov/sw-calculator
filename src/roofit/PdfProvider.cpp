@@ -94,7 +94,7 @@ void PdfProvider::initObservableAndMean() {
   Double_t m = fitHistogram->GetBinCenter(fitHistogram->GetMaximumBin());
   Double_t mMin = fitHistogram->GetXaxis()->GetBinLowEdge(fitHistogram->GetMaximumBin() - 2);
   Double_t mMax = fitHistogram->GetXaxis()->GetBinUpEdge(fitHistogram->GetMaximumBin() + 2);
-  mean = new RooRealVar("mean", "Spectrum peak position", m, mMin, mMax);
+  mean = new RooRealVar("mean", "Spectrum peak position (1D - 511 keV, 2D - 0 keV)", m, mMin, mMax, "keV");
 }
 
 void PdfProvider::initMaterialPdf(Bool_t hasParabola, Bool_t hasDelta, TH1F *componentHist, const Int_t numGauss,
@@ -105,7 +105,7 @@ void PdfProvider::initMaterialPdf(Bool_t hasParabola, Bool_t hasDelta, TH1F *com
 
   // Parabola PDF
   if (hasParabola) {
-    RooRealVar *Ef = new RooRealVar("Ef", "Fermi energy", 10, 3, 30, "eV"); // 3.4579 = Al (11.7)
+    RooRealVar *Ef = new RooRealVar("eFermi", "Fermi energy", 10, 3, 30, "eV"); // 3.4579 = Al (11.7)
     ParabolaPdf *parabolaPdf = new ParabolaPdf("Parabola", "Parabola", *observable, *mean, *Ef, isTwoDetector);
     pdfsInMaterial->add(*parabolaPdf);
   }
@@ -150,7 +150,7 @@ void PdfProvider::initMaterialPdf(Bool_t hasParabola, Bool_t hasDelta, TH1F *com
     Double_t aVal = getDefaultAValue(aMin, aMax, i + 1, numGauss);
     gaussA[i] = new RooRealVar(Form("gaussian%dA", i + 1),
                                StringUtils::ordinal(i + 1, "Gaussian w.f. parameter")->Data(), aVal, aMin, aMax,
-                               "Angstrom");
+                               "#AA");
     gauss[i] = new GaussianPdf(Form("Gaussian%d", i + 1), StringUtils::ordinal(i + 1, "Gauss")->Data(), *observable,
                                *mean, *gaussA[i], isTwoDetector);
     pdfsInMaterial->add(*gauss[i]);
@@ -164,7 +164,7 @@ void PdfProvider::initMaterialPdf(Bool_t hasParabola, Bool_t hasDelta, TH1F *com
     Bool_t isTwoDetector = HistProcessor::isTwoDetector(fitProperties.hist);
     lorentzA[i] = new RooRealVar(Form("lorentzian%dA", i + 1),
                                  StringUtils::ordinal(i + 1, "Exponential w.f. parameter")->Data(), aVal, aMin, aMax,
-                                 "Angstrom"); // 5 0.5 10
+                                 "#AA"); // 5 0.5 10
     lorentz[i] = new LorentzianPdf(Form("Lorentzian%d", i + 1), StringUtils::ordinal(i + 1, "Lorentz")->Data(),
                                    *observable, *mean, *lorentzA[i], isTwoDetector);
     pdfsInMaterial->add(*lorentz[i]);
@@ -177,7 +177,7 @@ void PdfProvider::initMaterialPdf(Bool_t hasParabola, Bool_t hasDelta, TH1F *com
     Double_t aVal = getDefaultAValue(aMin, aMax, i + 1, numLorentzSum);
     dampLorentzA[i] = new RooRealVar(Form("dampLorentz%dA", i + 1),
                                      StringUtils::ordinal(i + 1, "Damping exponential w.f. parameter")->Data(), aVal,
-                                     aMin, aMax, "Angstrom"); // 5 0.5 10
+                                     aMin, aMax, "#AA"); // 5 0.5 10
     dampLorentz[i] = new DampLorentzPdf(Form("DampLorentz%d", i + 1),
                                         StringUtils::ordinal(i + 1, "Damp lorentz")->Data(), *observable, *mean,
                                         *dampLorentzA[i]);
