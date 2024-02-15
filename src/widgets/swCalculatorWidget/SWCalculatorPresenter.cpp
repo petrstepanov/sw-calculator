@@ -28,6 +28,7 @@
 #include "../importSpectrumWidget/ImportComponentView.h"
 #include <RooFit.h>
 #include <RooAbsArg.h>
+// #include <RooAbsReal.h>
 #include <RooStringVar.h>
 #include <RooDataHist.h>
 #include <RooDataHist.h>
@@ -224,7 +225,7 @@ void SWCalculatorPresenter::onViewFitSpectrumClicked() {
 
 	// Chi2 fit
 	RootHelper::startTimer();  // Start tracking Time
-	RooChi2Var* chi2 = new RooChi2Var("chi2", "chi2", *(pdfProvider->getPdf()), *data);
+	RooChi2Var* chi2 = new RooChi2Var("chi2", "chi2", *(pdfProvider->getPdf()), *data, kTRUE, RooDataHist::ErrorType::Poisson);
 	// RooChi2Var* chi2 = new RooChi2Var("chi2", "chi2", *(pdfProvider->getPdf()), *data, RooFit::NumCPU(RootHelper::getNumCpu()));
 	RooMinimizer* m = new RooMinimizer(*chi2);
 	// m->setMinimizerType("Minuit2");

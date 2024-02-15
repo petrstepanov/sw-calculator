@@ -4,133 +4,87 @@
 # 1. Put this CMakeLists.txt in the program directory containing project files: source files, header files and LinkDef.h
 # 2. C++ file containing main() function must be named main.c (or .cc, .cpp etc...)
 # 3. Specify the name of your executable below (stored it CMake PROJECT_NAME variable):
-  project(sw-calculator)
 
-# Set the minimum required version of cmake for a project
-  cmake_minimum_required(VERSION 3.0 FATAL_ERROR)
+# Assert CMake version
+cmake_minimum_required(VERSION 3.5 FATAL_ERROR)
 
-# Locate the ROOT package and define a number of useful targets and variables (need RIO Net?)
-  find_package(ROOT REQUIRED COMPONENTS)
-# message(STATUS "Found ROOT libraries:")
-# message(STATUS "${ROOT_LIBRARIES}")
+# This is your project statement. You should always list languages
+project(swcalculator LANGUAGES CXX)
 
-# Compose list of ROOT libraries with "ROOT::" prefix
-  set(LIB_NAMES "")
-  FOREACH(X IN LISTS ROOT_LIBRARIES)
-    get_filename_component(FILENAME ${X} NAME)
-    string(REGEX REPLACE "lib([a-zA-Z0-9]+).so" "ROOT::\\1" FILENAME2 ${FILENAME})
-    list(APPEND LIB_NAMES "${FILENAME2}")
-  ENDFOREACH()
+# ROOT 6.10+ supports config file discovery
+# REQUIRED ensures ROOT_FOUND is set
+find_package(ROOT REQUIRED COMPONENTS RooFit RooFitCore Gui Html Minuit Fumili)
 
-# Manually append extra ROOT libraries (why missing?)
-  list(APPEND LIB_NAMES "ROOT::Gui")
-  list(APPEND LIB_NAMES "ROOT::RooFit")
-  list(APPEND LIB_NAMES "ROOT::RooFitCore")
-  list(APPEND LIB_NAMES "ROOT::Html")
-  list(APPEND LIB_NAMES "ROOT::Minuit")
-  list(APPEND LIB_NAMES "ROOT::Fumili")
+# For setting project in IDE via CMake generators
+include_directories(${ROOT_INCLUDE_DIRS})
 
-# message(STATUS "Modified ROOT libraries:")
-# message(STATUS "${LIB_NAMES}")
-
-#----------------------------------------------------------------------------
-# Attach ROOT and Geant Sources
-# https://stackoverflow.com/questions/9581358/using-cmake-to-index-source-files-of-an-external-library-with-eclipse
-
-# Function searches for the C++ source files in the given folder
-# Next creates a subfolder in the project source folder and symlinks there all found sources
-function(attachExternalSources librarySourceLocation folderName)
-	# Create folder for Geant4 sources
-	file(MAKE_DIRECTORY ${CMAKE_SOURCE_DIR}/${folderName})
-
-	message(STATUS "Searching for C++ sources in\n   \"${librarySourceLocation}\"")
-	FILE(GLOB_RECURSE libSources
-		${librarySourceLocation}/*.c
-		${librarySourceLocation}/*.cpp
-		${librarySourceLocation}/*.cxx
-		${librarySourceLocation}/*.cc
-	)
-
-	message(STATUS "Symlinking sources into\n   \"${CMAKE_SOURCE_DIR}/${folderName}\"\n   Please wait...")
-	foreach(source ${libSources})
-		# Obtain source filename
-		get_filename_component(source_filename ${source} NAME)
-
-		# Create symlink unless it already exists
-		set(symlink "${CMAKE_SOURCE_DIR}/${folderName}/${source_filename}")
-		if(NOT EXISTS ${symlink})
-			execute_process(COMMAND ${CMAKE_COMMAND} -E create_symlink ${source} ${symlink})
-		endif()
-	endforeach()
-
-	# Scan all the symlinks created under the project folder and disable their compilation
-	FILE(GLOB sources_symlinks ${CMAKE_SOURCE_DIR}/${folderName}/*)
-	SET_SOURCE_FILES_PROPERTIES(${sources_symlinks} PROPERTIES HEADER_FILE_ONLY TRUE)
-endfunction()
-
-if(DEFINED ROOT_SOURCE_LOCATION)
-	# Expand ROOT source path variables (wildcard)
-	FILE(GLOB ROOT_SOURCE_LOCATIONS_EXPAND "${ROOT_SOURCE_LOCATION}")
-	# Get last GLOB element
-	list(GET ROOT_SOURCE_LOCATIONS_EXPAND -1 ROOT_SOURCE_LOCATION_EXPAND)
-	message(STATUS "Found CERN ROOT source code folder:\n   \"${ROOT_SOURCE_LOCATION_EXPAND}\"")
-	attachExternalSources(${ROOT_SOURCE_LOCATION_EXPAND} "root-sources")
-else()
-	message(STATUS "CERN ROOT source folder location not provided")
-endif()
-
-#----------------------------------------------------------------------------
 # Build list of header files and exclude LinkDef from headers
-  file(GLOB_RECURSE HEADERS ${CMAKE_CURRENT_SOURCE_DIR}/src/*.hxx ${CMAKE_CURRENT_SOURCE_DIR}/src/*.hpp ${CMAKE_CURRENT_SOURCE_DIR}/src/*.hh ${CMAKE_CURRENT_SOURCE_DIR}/src/*.h)
-  list(FILTER HEADERS EXCLUDE REGEX "[lL]ink[dD]ef")
-# message(STATUS "Found list of headers:")
-# message(STATUS "${HEADERS}")
+file(GLOB_RECURSE HEADERS CONFIGURE_DEPENDS 
+                          ${CMAKE_CURRENT_SOURCE_DIR}/src/*.hxx 
+                          ${CMAKE_CURRENT_SOURCE_DIR}/src/*.hpp 
+                          ${CMAKE_CURRENT_SOURCE_DIR}/src/*.hh 
+                          ${CMAKE_CURRENT_SOURCE_DIR}/src/*.h)
+list(FILTER HEADERS EXCLUDE REGEX "[lL]ink[dD]ef")
+message(STATUS "Found list of headers:")
+message(STATUS "${HEADERS}")
 
-#----------------------------------------------------------------------------
 # Find LinkDef.h file
-  file(GLOB_RECURSE LINKDEFH ${CMAKE_CURRENT_SOURCE_DIR}/src/*.hxx ${CMAKE_CURRENT_SOURCE_DIR}/src/*.hpp ${CMAKE_CURRENT_SOURCE_DIR}/src/*.hh ${CMAKE_CURRENT_SOURCE_DIR}/src/*.h)
-  list(FILTER LINKDEFH INCLUDE REGEX "[lL]ink[dD]ef")
-# message(STATUS "Found LinkDef file: ${LINKDEFH}")
+file(GLOB_RECURSE LINKDEFH CONFIGURE_DEPENDS 
+                           ${CMAKE_CURRENT_SOURCE_DIR}/src/*.hxx 
+                           ${CMAKE_CURRENT_SOURCE_DIR}/src/*.hpp 
+                           ${CMAKE_CURRENT_SOURCE_DIR}/src/*.hh 
+                           ${CMAKE_CURRENT_SOURCE_DIR}/src/*.h)
+list(FILTER LINKDEFH INCLUDE REGEX "[lL]ink[dD]ef")
+message(STATUS "Found LinkDef file: ${LINKDEFH}")
 
-#----------------------------------------------------------------------------
 # Generate dictionary
-  ROOT_GENERATE_DICTIONARY(D_${PROJECT_NAME} ${HEADERS} LINKDEF ${LINKDEFH})
+ROOT_GENERATE_DICTIONARY(D_${PROJECT_NAME} ${HEADERS} LINKDEF ${LINKDEFH})
 
-#----------------------------------------------------------------------------
 # Build list of source files
-  file(GLOB_RECURSE SOURCES ${CMAKE_CURRENT_SOURCE_DIR}/src/*.cxx ${CMAKE_CURRENT_SOURCE_DIR}/src/*.cpp ${CMAKE_CURRENT_SOURCE_DIR}/src/*.cc ${CMAKE_CURRENT_SOURCE_DIR}/src/*.c)
-# message(STATUS "Found list of sources:")
-# message(STATUS "${SOURCES}")
+file(GLOB_RECURSE SOURCES CONFIGURE_DEPENDS 
+                          ${CMAKE_CURRENT_SOURCE_DIR}/src/*.cxx 
+                          ${CMAKE_CURRENT_SOURCE_DIR}/src/*.cpp 
+                          ${CMAKE_CURRENT_SOURCE_DIR}/src/*.cc 
+                          ${CMAKE_CURRENT_SOURCE_DIR}/src/*.c)
+message(STATUS "Found list of sources:")
+message(STATUS "${SOURCES}")
 
-#----------------------------------------------------------------------------
-# Create shared library with a generated dictionary.
-  add_library(SO_${PROJECT_NAME} ${SOURCES} D_${PROJECT_NAME}.cxx)
+# Create target that generates shared library from provided source files and dictionary
+add_library(SO_${PROJECT_NAME} SHARED ${SOURCES} D_${PROJECT_NAME}.cxx)
 
-#----------------------------------------------------------------------------
 # Link against shared library and list of ROOT libraries
-  target_link_libraries(SO_${PROJECT_NAME} PUBLIC ${LIB_NAMES})
+# Manually add specific libraries with ${ROOT_Hist_LIBRARY} etc.. here adding all
+target_link_libraries(SO_${PROJECT_NAME} ${ROOT_LIBRARIES})
 
-#----------------------------------------------------------------------------
+# Mark .rootmap (contains shares library dependencies) and .pcm (data to serialize classes)
+# shared library target RESOURCES for easier installation
+set_target_properties(SO_${PROJECT_NAME} PROPERTIES
+                      RESOURCE "${CMAKE_BINARY_DIR}/libD_${PROJECT_NAME}.rootmap;${CMAKE_BINARY_DIR}/libD_${PROJECT_NAME}_rdict.pcm")
+
 # Find location of the enrty point file (main.c*)
-  file(GLOB_RECURSE MAIN ${CMAKE_CURRENT_SOURCE_DIR}/src/*.cxx ${CMAKE_CURRENT_SOURCE_DIR}/src/*.cpp ${CMAKE_CURRENT_SOURCE_DIR}/src/*.cc ${CMAKE_CURRENT_SOURCE_DIR}/src/*.c)
-  list(FILTER MAIN INCLUDE REGEX "main\\.c")
-# message(STATUS "Found entry point file: ${MAIN}")
+file(GLOB_RECURSE MAIN ${CMAKE_CURRENT_SOURCE_DIR}/src/*.cxx 
+                       ${CMAKE_CURRENT_SOURCE_DIR}/src/*.cpp 
+                       ${CMAKE_CURRENT_SOURCE_DIR}/src/*.cc 
+                       ${CMAKE_CURRENT_SOURCE_DIR}/src/*.c)
+list(FILTER MAIN INCLUDE REGEX "main\\.c")
+message(STATUS "Found entry point file: ${MAIN}")
 
-#----------------------------------------------------------------------------
 # Create the main program using the library.
-  add_executable(${PROJECT_NAME} ${MAIN})
-  target_link_libraries(${PROJECT_NAME} SO_${PROJECT_NAME})
+add_executable(${PROJECT_NAME} ${MAIN})
+target_link_libraries(${PROJECT_NAME} SO_${PROJECT_NAME})
 
-#----------------------------------------------------------------------------
+# Print all variables
+# get_cmake_property(_variableNames VARIABLES)
+# list (SORT _variableNames)
+# foreach (_variableName ${_variableNames})
+#     message(STATUS "${_variableName}=${${_variableName}}")
+# endforeach()
+
 # Compose the install target
-install(TARGETS ${PROJECT_NAME} SO_${PROJECT_NAME} 
-        RUNTIME DESTINATION bin
-        LIBRARY DESTINATION $ENV{ROOTSYS}/lib
-        ARCHIVE DESTINATION $ENV{ROOTSYS}/lib)
-install(FILES ${PROJECT_BINARY_DIR}/libD_${PROJECT_NAME}.rootmap
-        DESTINATION $ENV{ROOTSYS}/lib)
-install(FILES ${PROJECT_BINARY_DIR}/libD_${PROJECT_NAME}_rdict.pcm
-        DESTINATION /usr/local/bin)
+install(TARGETS ${PROJECT_NAME} SO_${PROJECT_NAME}
+        RUNTIME DESTINATION ${ROOT_BINARY_DIR}
+        LIBRARY DESTINATION ${ROOT_LIBRARY_DIR}
+        RESOURCE DESTINATION ${ROOT_LIBRARY_DIR})
 
 #----------------------------------------------------------------------------
 # Compose the install launcher phony target

@@ -45,8 +45,8 @@ Int_t StepPdf::getAnalyticalIntegral(RooArgSet& allVars, RooArgSet& analVars, co
 Double_t StepPdf::analyticalIntegral(Int_t code, const char* rangeName) const {
 	switch (code) {
         case 1: {
-            Double_t xMin = x.min(rangeName) - mean;
-            Double_t xMax = x.max(rangeName) - mean;
+            Double_t xMin = x.min(rangeName);
+            Double_t xMax = x.max(rangeName);
 
             // ____----
             if (!isInverted){
