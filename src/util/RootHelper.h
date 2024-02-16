@@ -26,7 +26,7 @@ class RootHelper {
 public:
     static void deleteObject(const char* name);
     static void deleteObject(TObject* obj);
-    static Int_t getNumCpu();
+    // static Int_t getNumCpu();
     static void startTimer(void);
     static void stopAndPrintTimer();
     static TGNumberFormat::EStyle getNumberFormatStyle(Double_t value);

@@ -225,7 +225,11 @@ void SWCalculatorPresenter::onViewFitSpectrumClicked() {
 
 	// Chi2 fit
 	RootHelper::startTimer();  // Start tracking Time
-	RooChi2Var* chi2 = new RooChi2Var("chi2", "chi2", *(pdfProvider->getPdf()), *data, kTRUE, RooDataHist::ErrorType::Poisson);
+	#ifdef _WIN32
+		RooChi2Var* chi2 = new RooChi2Var("chi2", "chi2", *(pdfProvider->getPdf()), *data);
+	#else
+		RooChi2Var* chi2 = new RooChi2Var("chi2", "chi2", *(pdfProvider->getPdf()), *data, kTRUE, RooDataHist::ErrorType::Poisson);
+	#endif
 	// RooChi2Var* chi2 = new RooChi2Var("chi2", "chi2", *(pdfProvider->getPdf()), *data, RooFit::NumCPU(RootHelper::getNumCpu()));
 	RooMinimizer* m = new RooMinimizer(*chi2);
 	// m->setMinimizerType("Minuit2");
@@ -233,7 +237,7 @@ void SWCalculatorPresenter::onViewFitSpectrumClicked() {
 	// Print Chi2 fit results
 	Int_t resultMigrad = m->migrad();
 	Int_t resultHesse = m->hesse();
-	Debug("SWCalculatorPresenter::onFitSpectrumClicked", "RooMinimizer: migrad=" << resultMigrad << ", hesse=" << resultHesse);
+	// Debug("SWCalculatorPresenter::onFitSpectrumClicked", "RooMinimizer: migrad=" << resultMigrad << ", hesse=" << resultHesse);
 
 	RooFitResult* fitResult = m->save();
 

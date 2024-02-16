@@ -1,8 +1,8 @@
 #ifdef __CINT__
+
 #pragma link off all globals;
 #pragma link off all classes;
 #pragma link off all functions;
-#pragma link C++ nestedclasses;
 
 // Generally speaking we list all the classes that take advantage of the ClassDef() and ClassImp() here
 
@@ -66,6 +66,5 @@
 
 // Why this?
 #pragma link C++ class DoublePair+;
-
 
 #endif

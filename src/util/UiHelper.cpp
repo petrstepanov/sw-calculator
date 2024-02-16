@@ -39,7 +39,7 @@ TGFileInfo* UiHelper::getFileFromDialog(const TGWindow* mainFrame){
 
 int UiHelper::showOkDialog(const TGWindow* mainFrame, const char* message, EMsgBoxIcon icon){
     int retval;
-    new TGMsgBox(gClient->GetRoot(), mainFrame ? mainFrame : gClient->GetRoot(), Constants::applicationName, message, icon, kMBOk, &retval);
+    new TGMsgBox(gClient->GetRoot(), mainFrame ? mainFrame : gClient->GetRoot(), Constants::applicationTitle, message, icon, kMBOk, &retval);
     return retval;
 }
 

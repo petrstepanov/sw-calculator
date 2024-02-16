@@ -348,8 +348,8 @@ void GraphicsHelper::alignPave(TPave* pave, TVirtualPad* pad, Alignment alignmen
   Double_t legendWidth = statsWidth == 0 ? (pave->GetX2NDC() - pave->GetX1NDC()): statsWidth;
   // std::cout << legendWidth << "x" << legendHeight << std::endl;
 
-  Double_t dx = (decoration == Decoration::TRANSPARENT) ? 0.04 : 0;
-  Double_t dy = (decoration == Decoration::TRANSPARENT) ? 0.04 : 0;
+  Double_t dx = (decoration == Decoration::TRANSPAREN) ? 0.04 : 0;
+  Double_t dy = (decoration == Decoration::TRANSPAREN) ? 0.04 : 0;
   if (alignment == Alignment::TOP_LEFT){
     pave->SetX1NDC(pad->GetLeftMargin() + dx);
     pave->SetY1NDC(1 - pad->GetTopMargin() - legendHeight - dy);
@@ -369,7 +369,7 @@ void GraphicsHelper::alignPave(TPave* pave, TVirtualPad* pad, Alignment alignmen
     pave->SetY2NDC(1 - pad->GetTopMargin() - dy);
   }
 
-  if (decoration == Decoration::TRANSPARENT){
+  if (decoration == Decoration::TRANSPAREN){
     pave->SetLineWidth(0);
     pave->SetFillStyle(0);
   }
