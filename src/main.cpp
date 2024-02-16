@@ -7,7 +7,7 @@
 
 int main(int argc, char **argv) {
     TApplication* app = new TApplication(Constants::applicationName, &argc, argv);
-
+    
     // Main frame sets icon, title, resizes and maps the window
     MyMainFrame* myMainFrame = new MyMainFrame();
 

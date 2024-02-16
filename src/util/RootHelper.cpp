@@ -17,7 +17,7 @@
 #include "StringUtils.h"
 #include "../model/Constants.h"
 
-#include <TUnixSystem.h>
+// #include <TUnixSystem.h>
 #include <TGFrame.h>
 #include <TObject.h>
 #include <TMatrixD.h>
@@ -43,12 +43,14 @@ void RootHelper::deleteObject(TObject* obj){
     }
 }
 
+/*
 Int_t RootHelper::getNumCpu(){
     SysInfo_t sysInfo;
     gSystem->GetSysInfo(&sysInfo);
     std::cout << "RootHelper::getNumCpu: sysInfo.fCpus = " << sysInfo.fCpus << std::endl;
     return (sysInfo.fCpus >= 0) ? sysInfo.fCpus : 1;
 }
+*/
 
 TStopwatch* RootHelper::watch = new TStopwatch();
 TRandom* RootHelper::random = new TRandom(0);

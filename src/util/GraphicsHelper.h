@@ -38,7 +38,7 @@ enum class Alignment {
 
 enum class Decoration {
 	DEFAULT,
-	TRANSPARENT
+	TRANSPAREN
 };
 
 // Info: https://root.cern.ch/doc/master/classTAttText.html

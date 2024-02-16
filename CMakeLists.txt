@@ -11,12 +11,19 @@ cmake_minimum_required(VERSION 3.5 FATAL_ERROR)
 # This is your project statement. You should always list languages
 project(swcalculator LANGUAGES CXX)
 
+SET(CMAKE_CXX_STANDARD 17)
+set(CMAKE_CXX_STANDARD_REQUIRED YES)
+set(CMAKE_CXX_EXTENSIONS OFF)
+
 # ROOT 6.10+ supports config file discovery
 # REQUIRED ensures ROOT_FOUND is set
 find_package(ROOT REQUIRED COMPONENTS RooFit RooFitCore Gui Html Minuit Fumili)
 
+# Define useful ROOT functions and macros ()
+include(${ROOT_USE_FILE})
+
 # For setting project in IDE via CMake generators
-include_directories(${ROOT_INCLUDE_DIRS})
+include_directories(${ROOT_INCLUDE_DIRS} ${CMAKE_CURRENT_SOURCE_DIR}/src/)
 
 # Build list of header files and exclude LinkDef from headers
 file(GLOB_RECURSE HEADERS CONFIGURE_DEPENDS 
@@ -38,7 +45,7 @@ list(FILTER LINKDEFH INCLUDE REGEX "[lL]ink[dD]ef")
 message(STATUS "Found LinkDef file: ${LINKDEFH}")
 
 # Generate dictionary
-ROOT_GENERATE_DICTIONARY(D_${PROJECT_NAME} ${HEADERS} LINKDEF ${LINKDEFH})
+ROOT_GENERATE_DICTIONARY(G__${PROJECT_NAME} ${HEADERS} LINKDEF ${LINKDEFH})
 
 # Build list of source files
 file(GLOB_RECURSE SOURCES CONFIGURE_DEPENDS 
@@ -50,16 +57,25 @@ message(STATUS "Found list of sources:")
 message(STATUS "${SOURCES}")
 
 # Create target that generates shared library from provided source files and dictionary
-add_library(SO_${PROJECT_NAME} SHARED ${SOURCES} D_${PROJECT_NAME}.cxx)
+add_library(lib${PROJECT_NAME} SHARED ${SOURCES} G__${PROJECT_NAME}.cxx)
 
 # Link against shared library and list of ROOT libraries
-# Manually add specific libraries with ${ROOT_Hist_LIBRARY} etc.. here adding all
-target_link_libraries(SO_${PROJECT_NAME} ${ROOT_LIBRARIES})
+# Manually add specific libraries with ${ROOT_Hist_LIBRARY} etc.. here simply adding all
+target_link_libraries(lib${PROJECT_NAME} ${ROOT_LIBRARIES})
+
+# Mark dictionary generation as a shared library target dependency
+add_dependencies(lib${PROJECT_NAME} G__${PROJECT_NAME})
+
+if(MSVC)
+  set_target_properties(lib${PROJECT_NAME} PROPERTIES WINDOWS_EXPORT_ALL_SYMBOLS TRUE)
+endif()
+
+# Move .rootmap and .rdict files to 
 
 # Mark .rootmap (contains shares library dependencies) and .pcm (data to serialize classes)
 # shared library target RESOURCES for easier installation
-set_target_properties(SO_${PROJECT_NAME} PROPERTIES
-                      RESOURCE "${CMAKE_BINARY_DIR}/libD_${PROJECT_NAME}.rootmap;${CMAKE_BINARY_DIR}/libD_${PROJECT_NAME}_rdict.pcm")
+set_target_properties(lib${PROJECT_NAME} PROPERTIES
+                      RESOURCE "${CMAKE_BINARY_DIR}/lib${PROJECT_NAME}.rootmap;${CMAKE_BINARY_DIR}/lib${PROJECT_NAME}_rdict.pcm")
 
 # Find location of the enrty point file (main.c*)
 file(GLOB_RECURSE MAIN ${CMAKE_CURRENT_SOURCE_DIR}/src/*.cxx 
@@ -71,9 +87,9 @@ message(STATUS "Found entry point file: ${MAIN}")
 
 # Create the main program using the library.
 add_executable(${PROJECT_NAME} ${MAIN})
-target_link_libraries(${PROJECT_NAME} SO_${PROJECT_NAME})
+target_link_libraries(${PROJECT_NAME} lib${PROJECT_NAME})
 
-# Print all variables
+# Debug: Print all variables
 # get_cmake_property(_variableNames VARIABLES)
 # list (SORT _variableNames)
 # foreach (_variableName ${_variableNames})
@@ -81,10 +97,17 @@ target_link_libraries(${PROJECT_NAME} SO_${PROJECT_NAME})
 # endforeach()
 
 # Compose the install target
-install(TARGETS ${PROJECT_NAME} SO_${PROJECT_NAME}
-        RUNTIME DESTINATION ${ROOT_BINARY_DIR}
-        LIBRARY DESTINATION ${ROOT_LIBRARY_DIR}
-        RESOURCE DESTINATION ${ROOT_LIBRARY_DIR})
+if(MSVC)
+    install(TARGETS ${PROJECT_NAME} lib${PROJECT_NAME}
+            RUNTIME DESTINATION ${ROOT_BINARY_DIR}
+            LIBRARY DESTINATION ${ROOT_BINARY_DIR}
+            RESOURCE DESTINATION ${ROOT_BINARY_DIR})
+else ()
+    install(TARGETS ${PROJECT_NAME} lib${PROJECT_NAME}
+            RUNTIME DESTINATION ${ROOT_BINARY_DIR}
+            LIBRARY DESTINATION ${ROOT_LIBRARY_DIR}
+            RESOURCE DESTINATION ${ROOT_LIBRARY_DIR})
+endif()
 
 #----------------------------------------------------------------------------
 # Compose the install launcher phony target

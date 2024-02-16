@@ -13,12 +13,12 @@
 
 // Disable warnings for -Wwrite-strings
 // https://stackoverflow.com/questions/925179/selectively-remove-warning-message-gcc
-#pragma GCC diagnostic ignored "-Wwrite-strings"
+// #pragma GCC diagnostic ignored "-Wwrite-strings"
 #include "Constants.h"
 #include <TMath.h>
 
 // Application name
-const char* Constants::applicationName = "sw-calculator";
+const char* Constants::applicationName = "swcalculator";
 const char* Constants::applicationTitle = "SW Calculator";
 
 // Convolution buffer fraction

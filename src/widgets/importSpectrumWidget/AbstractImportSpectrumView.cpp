@@ -202,10 +202,10 @@ void AbstractImportSpectrumView::drawHistogram(TH1F* h){
     hist->GetYaxis()->SetTitleOffset(0.85);
     hist->GetYaxis()->SetTitleSize(0.06);
 
-    gStyle->SetOptStat("in");
+    // gStyle->SetOptStat("in");
     hist->Draw();
 
-    GraphicsHelper::alignStats(embedCanvas->GetCanvas(), Alignment::TOP_RIGHT, Decoration::TRANSPARENT, 0.07, 0.35);
+    GraphicsHelper::alignStats(embedCanvas->GetCanvas(), Alignment::TOP_RIGHT, Decoration::TRANSPAREN, 0.07, 0.35);
 }
 
 Int_t AbstractImportSpectrumView::getHistogramColor(){
