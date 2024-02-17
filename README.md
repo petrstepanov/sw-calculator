@@ -24,8 +24,6 @@ Currently it is possible to run application either on macOS or Linux. I will try
 1. Install Ubuntu linux inside Windows Subsystem for Linux (WSL) as described [here](https://medium.com/@petrstepanov/installing-cern-root-in-windows-subsystem-for-linux-wsl-e83533a10a18).
 2. Open _Start → Ubuntu_ to launch linux Terminal. Proceed with Installation on Linux below.
 
-P.S. Running the program on older versions of Windows is currently not possible.
-
 ## Installation on Linux or macOS
 
 Install CERN ROOT on your system. Refer to [official install page](https://root.cern/install/#linux-package-managers) for more details.
