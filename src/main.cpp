@@ -6,7 +6,8 @@
 #include "model/Constants.h"
 
 int main(int argc, char **argv) {
-    TApplication* app = new TApplication(Constants::applicationName, &argc, argv);
+    // TApplication* app = new TApplication(Constants::applicationName, &argc, argv);
+    TApplication* app = new TApplication("swcalculator", &argc, argv);
     
     // Main frame sets icon, title, resizes and maps the window
     MyMainFrame* myMainFrame = new MyMainFrame();
