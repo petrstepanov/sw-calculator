@@ -35,17 +35,37 @@ list(FILTER HEADERS EXCLUDE REGEX "[lL]ink[dD]ef")
 message(STATUS "Found list of headers:")
 message(STATUS "${HEADERS}")
 
+# Copy Program Header Files to ROOT_INCLUDE DIR
+# Because ROOT heeds headers at run time (why? - looks up info)
+foreach(HEADER_PATH IN LISTS HEADERS)
+    # Copy header to ${ROOT_INCLUDE_DIRS}
+    cmake_path(RELATIVE_PATH HEADER_PATH BASE_DIRECTORY ${CMAKE_SOURCE_DIR}/src OUTPUT_VARIABLE RELATIVE_HEADER_PATH)
+    cmake_path(REMOVE_FILENAME RELATIVE_HEADER_PATH)
+    file(COPY ${HEADER_PATH} DESTINATION  ${ROOT_INCLUDE_DIRS}/${PROJECT_NAME}/${RELATIVE_HEADER_PATH})
+endforeach()
+
 # Find LinkDef.h file
 file(GLOB_RECURSE LINKDEFH CONFIGURE_DEPENDS 
                            ${CMAKE_CURRENT_SOURCE_DIR}/src/*.hxx 
                            ${CMAKE_CURRENT_SOURCE_DIR}/src/*.hpp 
-                           ${CMAKE_CURRENT_SOURCE_DIR}/src/*.hh 
+                           ${CMAKE_CURRENT_SOURCE_DIR}/src/*.hh
                            ${CMAKE_CURRENT_SOURCE_DIR}/src/*.h)
 list(FILTER LINKDEFH INCLUDE REGEX "[lL]ink[dD]ef")
 message(STATUS "Found LinkDef file: ${LINKDEFH}")
 
-# Generate dictionary
-ROOT_GENERATE_DICTIONARY(G__${PROJECT_NAME} ${HEADERS} LINKDEF ${LINKDEFH})
+# Create list of header paths for Dictionary - relative not absolute
+# So ROOT can later find them in its include path, not absolute of the machine program was compiled on
+foreach(HEADER_PATH IN LISTS HEADERS)
+    cmake_path(RELATIVE_PATH HEADER_PATH BASE_DIRECTORY ${CMAKE_SOURCE_DIR}/src OUTPUT_VARIABLE RELATIVE_HEADER_PATH)
+    list(APPEND H_FILENAMES ${RELATIVE_HEADER_PATH})
+endforeach()
+
+# Begin Approach 1.
+# Generate dictionary from relative header paths
+# OPTIONS -I<path> is the headers lookup path. We moved headers to ROOT header folder
+ROOT_GENERATE_DICTIONARY(G__${PROJECT_NAME} ${H_FILENAMES} LINKDEF ${LINKDEFH} MODULE ${PROJECT_NAME} OPTIONS -I${ROOT_INCLUDE_DIRS}/${PROJECT_NAME})
+# End Approach 1.
+
 
 # Build list of source files
 file(GLOB_RECURSE SOURCES CONFIGURE_DEPENDS 
@@ -88,6 +108,13 @@ message(STATUS "Found entry point file: ${MAIN}")
 # Create the main program using the library.
 add_executable(${PROJECT_NAME} ${MAIN})
 target_link_libraries(${PROJECT_NAME} lib${PROJECT_NAME})
+
+# Begin Approach 2.
+# Generate dictionary and specify all headers copied into ROOT headers in directory
+# https://root.cern/manual/io_custom_classes/#using-rootcling
+# target_include_directories(${PROJECT_NAME} PRIVATE ${ROOT_INCLUDE_DIRS}/${PROJECT_NAME})
+# ROOT_GENERATE_DICTIONARY(G__${PROJECT_NAME} ${H_FILENAMES} LINKDEF ${LINKDEFH} MODULE ${PROJECT_NAME})
+# End Approach 2.
 
 # Debug: Print all variables
 # get_cmake_property(_variableNames VARIABLES)
