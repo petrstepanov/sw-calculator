@@ -8,10 +8,20 @@ Application is written in C++ with CERN ROOT libraries and GUI. In order to run 
 
 Currently it is possible to run application either on macOS or Linux. I will try to compile the windows binary whenever the native Windows ROOT 6 build will be released.
 
-## Installation on Windows 10
+## Installation on Windows
+
+1. Download and install [Visual Studio Build Tools](https://aka.ms/vs/17/release/vs_BuildTools.exe).
+2. Download and install ROOT release for Windows. Use `Windows Visual Studio 2022 64-bit x64` executable from the [latest release page](https://root.cern/install/all_releases/).
+3. During the installation ensure ROOT environment is added to the system PATH.
+4. Download and extract the program source code (green button on the top of this page).
+5. Open Developer Command Prompt from the Start menu.
+6. In the Command Prompt navigate to extracted program folder, e.g. `cd C:\Users\<your-user>\Downloads\sw-calculator`.
+7. Run `.\install.bat`.
+8. Find and run `swcalculator.exe` in your ROOT bin folder, e.g. `C:\root-v.6.##.##\bin\swcalculator.exe`.
+
+## Installation on Windows 10 with WSL
 
 1. Install Ubuntu linux inside Windows Subsystem for Linux (WSL) as described [here](https://medium.com/@petrstepanov/installing-cern-root-in-windows-subsystem-for-linux-wsl-e83533a10a18).
-
 2. Open _Start → Ubuntu_ to launch linux Terminal. Proceed with Installation on Linux below.
 
 P.S. Running the program on older versions of Windows is currently not possible.
