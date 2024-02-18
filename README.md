@@ -27,7 +27,10 @@ Currently it is possible to run application either on macOS or Linux. I will try
 
 ### Execution
 
-8. Find and run `swcalculator.exe` in your ROOT bin folder, e.g. `C:\root-v.6.##.##\bin\swcalculator.exe`.
+Find and run `swcalculator.exe` in your ROOT bin folder, e.g. `C:\root-v.6.##.##\bin\swcalculator.exe`.
+
+### Technical Note
+FFTW library can always be compiled and installed manually with `CMake` and `MSBuild`.
 
 ## Installation on Windows 10 with WSL
 
