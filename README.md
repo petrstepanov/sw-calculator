@@ -12,11 +12,12 @@ Currently it is possible to run application either on macOS or Linux. I will try
 
 ### Prerequisites
 
-1. Download and install [Visual Studio Build Tools](https://aka.ms/vs/17/release/vs_BuildTools.exe).
-2. Download and install ROOT release for Windows. Use `Windows Visual Studio 2022 64-bit x64` executable from the [latest release page](https://root.cern/install/all_releases/). During the installation ensure ROOT environment is added to the system PATH.
-3. ROOT releases not necessarily includes the Fourier Transform library (FFTW). [Download it here](http://www.fftw.org/install/windows.html). Use x64 version. Unpack and copy the `libfftw3-3.dll` to ROOT's `bin` folder, e.g. `C:\root_v6.##.##\bin`.
-4. Above FFTW library is linked to ROOT's `libFFTW.dll` and should be renamed correctly. Rename `libfftw3-3.dll` to `fftw3-3.dll`.
-5. **Optional**. To ensure the correct name for the FFTW library, open ROOT's `libFFTW.dll` in [Dependency Walker](https://dependencywalker.com/) program. The correct name for the FFTW library will be listed as a missing dependency in the top-right panel.
+1. Download and run [Visual Studio Build Tools](https://aka.ms/vs/17/release/vs_BuildTools.exe).
+2. Install the "Desktop development with C++" package and install it with default components.
+3. Download and install ROOT release for Windows. Use `Windows Visual Studio 2022 64-bit x64` executable from the [latest release page](https://root.cern/install/all_releases/). During the installation ensure ROOT environment is added to the system PATH.
+4. ROOT releases not necessarily includes the Fourier Transform library (FFTW). [Download it here](http://www.fftw.org/install/windows.html). Use x64 version. Unpack and copy the `libfftw3-3.dll` to ROOT's `bin` folder, e.g. `C:\root_v6.##.##\bin`.
+5. Above FFTW library is linked to ROOT's `libFFTW.dll` and should be renamed correctly. Rename `libfftw3-3.dll` to `fftw3-3.dll`.
+6. **Optional**. To ensure the correct name for the FFTW library, open ROOT's `libFFTW.dll` in [Dependency Walker](https://dependencywalker.com/) program. The correct name for the FFTW library will be listed as a missing dependency in the top-right panel.
 
 ### Compilation
 
@@ -70,7 +71,7 @@ rm -rf ~/sw-calculator
 
 ## Running program
 
-Find application in the system menu. Alternatively, open Termnal and type `sw-calculator` to launch the program. 
+Find application in the system menu. Alternatively, open Termnal and type `sw-calculator` to launch the program.
 
 
 ---
