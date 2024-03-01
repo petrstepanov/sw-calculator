@@ -89,7 +89,7 @@ void AbstractImportSpectrumView::initUI(){
     AddFrame(new TGLabel(this, "Spectrum plot:"), new TGLayoutHints(kLHintsLeft, 0, 0, dy*2, 0));
 
     // Histogram canvas
-    embedCanvas = new TRootEmbeddedCanvas("embedHist", this, 10, 10, EFrameType::kTransientFrame); // EFrameType::kTransientFrame - no border
+    embedCanvas = new TRootEmbeddedCanvas("embedHist", this, 10, 10, EFrameType::kChildFrame); // EFrameType::kChildFrame - no border
     embedCanvas->SetHeight(210);
     AddFrame(embedCanvas, new TGLayoutHints(kLHintsExpandX | kLHintsBottom, 0, 0, dy, 0));
 
@@ -205,7 +205,9 @@ void AbstractImportSpectrumView::drawHistogram(TH1F* h){
     // gStyle->SetOptStat("in");
     hist->Draw();
 
+    embedCanvas->GetCanvas()->SetEditable(kTRUE);
     GraphicsHelper::alignStats(embedCanvas->GetCanvas(), Alignment::TOP_RIGHT, Decoration::TRANSPAREN, 0.07, 0.35);
+    embedCanvas->GetCanvas()->SetEditable(kFALSE);
 }
 
 Int_t AbstractImportSpectrumView::getHistogramColor(){
