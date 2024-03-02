@@ -36,6 +36,8 @@
 // for fonts just read this https://root.cern.ch/doc/master/classTAttText.html
 // tip: don't use font sizes in pixels; they are not relative to the canvas size
 
+//ClassImp(GraphicsHelper);
+
 const Double_t GraphicsHelper::TEXT_SIZE_NORMAL = 0.03;
 const Double_t GraphicsHelper::TEXT_SIZE_SMALL = TEXT_SIZE_NORMAL*3./4.;
 const Double_t GraphicsHelper::TEXT_SIZE_SMALLER = TEXT_SIZE_SMALL*3./4.;
@@ -69,6 +71,10 @@ TColor* GraphicsHelper::colorAppWindow = new TColor(0.906, 0.906, 0.906);
 
 // Private Singleton Members
 GraphicsHelper::GraphicsHelper(){};
+
+GraphicsHelper::~GraphicsHelper() {
+  delete instance;
+}
 
 GraphicsHelper* GraphicsHelper::instance = NULL;
 
@@ -278,47 +284,50 @@ TLegend* GraphicsHelper::getPadLegend(TVirtualPad* pad){
   return legend;
 }
 
-TPaveStats* GraphicsHelper::getPadStats(TVirtualPad* pad){
-  // Update Pad - in case the histogram was just drawn - need to update
-  pad->Update();
-
-  // By default ROOT names the statistics box "stats". So we just find and return this object.
-  TPaveStats *pave = (TPaveStats*)pad->GetPrimitive("stats");
-
-  // SCENARIO 1: If statistics box was found and not produced for histogram (say, made for TGraph) - we just return it
-  if (pave && !pave->GetParent()->InheritsFrom("TH1")){
-    return pave;
+TObject* GraphicsHelper::findObjectOnPad(TClass *c, TVirtualPad *pad) {
+  for (TObject *object : *(pad->GetListOfPrimitives())) {
+    if (object->InheritsFrom(c))
+      return object;
   }
-
-  // SCENARIO 2: If statistics box was drawn for a histogram then it is not a direct primitive of a canvas.
-  //             Stats is a primitive of a histogram. pad->getPrimitive() searches across primitives recursively.
-  //             Therefore we need to "disconnect it" from the histogram, rename it to "mystats" and add to canvas with different name.
-
-  // If previously renamed PaveStats, detached it from histogram and added to the pad primitives - simply return it
-  TPaveStats *paveDetachedFromHistAndRenamed = (TPaveStats*)pad->GetPrimitive("mystats");
-  if (paveDetachedFromHistAndRenamed) return paveDetachedFromHistAndRenamed;
-
-  // Otherwise perform this trick:
-  // Remove PaveText from histogram primitives, rename it and add to the list of Pad primitives
-  if (!pave) return NULL;
-
-  pave->SetName("mystats");                     // rename
-  ((TH1*) pave->GetParent())->SetStats(kFALSE); // disconnect from the histogram.
-  pad->GetListOfPrimitives()->Add(pave);        // attach to pad primitives
-
-  return pave;
-
-  // If not found search object by file type
-  // for (TObject* object : *(pad->GetListOfPrimitives())){
-  //  std::cout << object->GetName() << std::endl;
-  //  if (object->InheritsFrom(TPaveStats::Class())){
-  //    return (TPaveStats*) object;
-  //  }
-  // }
-
-  // return NULL;
+  return NULL;
 }
 
+TPaveStats* GraphicsHelper::getPadStats(TVirtualPad* pad){
+	  // Update Pad - in case the histogram was just drawn - need to update otherwise no primitives
+	  if (pad->IsModified()) {
+	    pad->Update();
+	  }
+
+	  // SCENARIO 1: Statistics box is produced by histogram. See line THistPainter.cxx:8628 "stats->SetParent(fH);"
+	  // https://root.cern.ch/doc/master/classTPaveStats.html#autotoc_md223
+	  // TObject* o = pad->GetPrimitive("stats");
+	  // TPaveStats* ps = (TPaveStats*)o;
+	  // TObject* par = ps->GetParent();
+	  if (pad->GetPrimitive("stats") && ((TPaveStats*)(pad->GetPrimitive("stats")))->GetParent() && ((TPaveStats*)(pad->GetPrimitive("stats")))->GetParent()->InheritsFrom("TH1")) {
+	    TClass * th1_class = TClass::GetClass("TH1");
+	    TH1 *hist = (TH1*) findObjectOnPad(th1_class, pad);
+	    TPaveStats *pave = (TPaveStats*) (pad->GetPrimitive("stats"));
+	    pave->SetName("mystats");                     // rename to "mystats"
+	    hist->GetListOfFunctions()->Remove(pave);    // disconnect from the graph
+	    hist->SetStats(kFALSE); // disconnect from the histogram.
+	    pad->GetListOfPrimitives()->Add(pave);        // attach to pad primitives
+	    pave->SetParent(pad);
+	    return pave;
+	  }
+
+	  // SCENARIO 3: Return stats box previously detached
+	  if (pad->GetPrimitive("mystats") != NULL) {
+	    TPaveStats *pave = (TPaveStats*) pad->GetPrimitive("mystats");
+	    return pave;
+	  }
+
+	  // Return random stats found
+	  TPaveStats *pave = (TPaveStats*) findObjectOnPad(TClass::GetClass("TPaveStats"), pad);
+	  if (pave != NULL)
+	    return pave;
+
+	  return NULL;
+	}
 void GraphicsHelper::alignPave(TVirtualPad* pad, Alignment alignment, Decoration decoration, Double_t statsLineHeight, Double_t statsWidth){
 	// Try finding Legend first
 	TPave* pave = getPadLegend(pad);

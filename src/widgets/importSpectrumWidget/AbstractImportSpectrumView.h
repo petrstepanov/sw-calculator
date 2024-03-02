@@ -27,6 +27,7 @@
 #include <iostream>
 #include <TGDoubleSlider.h>
 #include <TGFrame.h>
+#include <TPaveStats.h>
 //#include "AbstractImportSpectrumPresenter.h"
 
 // Omit circular dependency
@@ -39,14 +40,16 @@ class AbstractImportSpectrumView : public AbstractView<AbstractImportSpectrumPre
     TGTextButton* btnOpenFile;
     TGLabel* lblFileName;
     TGTextView* txtFileBrowser;
-//    TGNumberEntry* numEnergyColumn;
-//    TGNumberEntry* numCountsColumn;
     TGTextButton* btnImportSpectrum;
-    // TGDoubleHSlider* rangeSlider;
-
-    // Hack temporary
-    TGTextButton* btnSetRange;
     TRootEmbeddedCanvas* embedCanvas;
+    // TGDoubleHSlider* rangeSlider;
+    // TGNumberEntry* numEnergyColumn;
+    // TGNumberEntry* numCountsColumn;
+
+
+    // Mini histogram preview
+    TH1F* miniHist;
+    TPaveStats* miniStats;
 
   public:
     AbstractImportSpectrumView(const TGWindow *w);

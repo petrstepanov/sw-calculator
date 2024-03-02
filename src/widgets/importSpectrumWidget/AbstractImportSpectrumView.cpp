@@ -20,9 +20,17 @@ ClassImpQ(AbstractImportSpectrumView);
 
 AbstractImportSpectrumView::AbstractImportSpectrumView(const TGWindow* w) : AbstractView<AbstractImportSpectrumPresenter>(w){
     initUI();
+    miniHist = NULL;
+    miniStats = NULL;
 }
 
 AbstractImportSpectrumView::~AbstractImportSpectrumView() {
+    delete btnOpenFile;
+    delete lblFileName;
+    delete txtFileBrowser;
+    delete btnImportSpectrum;
+    delete embedCanvas;
+    delete miniHist;
 }
 
 void AbstractImportSpectrumView::initUI(){
@@ -93,15 +101,7 @@ void AbstractImportSpectrumView::initUI(){
     embedCanvas->SetHeight(210);
     AddFrame(embedCanvas, new TGLayoutHints(kLHintsExpandX | kLHintsBottom, 0, 0, dy, 0));
 
-    // TGCanvas* canvas = new TGCanvas(this);
-
-    // Bitwise calculator https://bitwisecmd.com/
-    // embedHist->ChangeOptions(kFixedHeight);
-
     TCanvas* canvas = embedCanvas->GetCanvas();
-//    canvas->SetEditable(0);
-//    canvas->SetBorderMode(0);
-//    canvas->SetBorderSize(0);
 
     // Make canvas same color as the UI panels
     Pixel_t bgColor = TColor::GetColor(232, 232, 232);
@@ -111,14 +111,8 @@ void AbstractImportSpectrumView::initUI(){
     canvas->SetTopMargin(0.05); // 0.1
     canvas->SetBottomMargin(0.15);
     canvas->SetLeftMargin(0.1);
-    canvas->SetRightMargin(0.01); // 0.05
+    canvas->SetRightMargin(0.05); // 0.05
     canvas->SetLogy();
-//    canvas->SetBorderMode(0);
-//    canvas->SetBorderSize(0);
-//    canvas->SetFrameBorderMode(0);
-//    canvas->SetFrameBorderSize(0);
-//    canvas->Modified();
-//    canvas->Update();
 
     // Map windows so we can get the real pixel width of the embedded canvas
 //    MapSubwindows();
@@ -176,37 +170,73 @@ void AbstractImportSpectrumView::loadFile(TString* fileNamePath){
 //    return numCountsColumn->GetIntNumber();
 //}
 
-void AbstractImportSpectrumView::drawHistogram(TH1F* h){
-	// Copy histogram so we dont modify original histogram colors in the Model
-	TH1* hist = new TH1F();
-	h->Print("base");
+void AbstractImportSpectrumView::drawHistogram(TH1F* importedHist){
 
-	h->Copy(*hist); // Copy h into hist
-	hist->Print("base");
-	hist->SetTitle("");
-	hist->GetXaxis()->SetTitle("Energy, keV");
-	hist->GetYaxis()->SetTitle("Counts");
+	// Reset histogram because of the issues with stat box
+	// miniHist->Reset("ICESM"); // https://root-forum.cern.ch/t/how-to-clear-the-histograms/23697/3
+	// Or simply delete the object and re-create
+	if (miniHist != NULL){
+		delete miniHist;
+	}
+	if (miniStats != NULL){
+		delete miniStats;
+	}
+
+	// Use Clone(), Copy() does not create full copy!
+	miniHist = (TH1F*)(importedHist->Clone());
+
+    // Set Canvas editable just in case it affects something
+	embedCanvas->GetCanvas()->SetEditable(kTRUE);
+
+	// Copy histogram so we dont modify original histogram colors in the Model
+
+	miniHist->Print("base");
+	miniHist->SetTitle("");
+	miniHist->GetXaxis()->SetTitle("Energy, keV");
+	miniHist->GetYaxis()->SetTitle("Counts");
 
     embedCanvas->GetCanvas()->cd();
 
     // hist->SetLineColor(getHistogramColor());
-    hist->SetLineColor(kGray+1);
-    hist->GetXaxis()->SetLabelOffset(0.02);
-    hist->GetYaxis()->SetLabelOffset(0.01);
+    miniHist->SetLineColor(kGray+1);
+    miniHist->GetXaxis()->SetLabelOffset(0.02);
+    miniHist->GetYaxis()->SetLabelOffset(0.01);
 
-    hist->GetXaxis()->SetLabelSize(0.06);
-    hist->GetYaxis()->SetLabelSize(0.06);
+    miniHist->GetXaxis()->SetLabelSize(0.06);
+    miniHist->GetYaxis()->SetLabelSize(0.06);
 
-    hist->GetXaxis()->SetTitleOffset(1.2);
-    hist->GetXaxis()->SetTitleSize(0.06);
-    hist->GetYaxis()->SetTitleOffset(0.85);
-    hist->GetYaxis()->SetTitleSize(0.06);
+    miniHist->GetXaxis()->CenterTitle(true);
+    miniHist->GetYaxis()->CenterTitle(true);
 
-    // gStyle->SetOptStat("in");
-    hist->Draw();
+    miniHist->GetXaxis()->SetTitleOffset(1.2);
+    miniHist->GetXaxis()->SetTitleSize(0.06);
+    miniHist->GetYaxis()->SetTitleOffset(0.85);
+    miniHist->GetYaxis()->SetTitleSize(0.06);
 
-    embedCanvas->GetCanvas()->SetEditable(kTRUE);
-    GraphicsHelper::alignStats(embedCanvas->GetCanvas(), Alignment::TOP_RIGHT, Decoration::TRANSPAREN, 0.07, 0.35);
+//    gStyle->SetOptStat(10);
+    miniHist->SetFillStyle(EFillStyle::kFDotted1);
+    miniHist->SetFillColor(kGray);
+    miniHist->SetStats(kFALSE);
+
+    embedCanvas->GetCanvas()->Clear();
+    miniHist->Draw();
+
+
+    // Add custom Statistic Box (modifying default is pain)
+    miniStats = new TPaveStats();
+    miniStats->SetBorderSize(0);
+    miniStats->SetOptStat(10); // Disable name line - see TPaveStats::Paint()
+	TString labelBins = TString::Format("Bins =  %d", miniHist->GetNbinsX());
+	std::cout << (int)miniHist->Integral() << " " << (int)importedHist->Integral() << std::endl;
+	TString labelEntries = TString::Format("Entries =  %d", (int)miniHist->Integral());
+	miniStats->AddText(labelBins.Data());
+	miniStats->AddText(labelEntries.Data());
+	miniStats->Draw();
+
+    // Align Statistic Box
+    GraphicsHelper::alignStats(embedCanvas->GetCanvas(), Alignment::TOP_RIGHT, Decoration::TRANSPAREN, 0.08, 0.27);
+
+    // Set Canvas not editable by user
     embedCanvas->GetCanvas()->SetEditable(kFALSE);
 }
 

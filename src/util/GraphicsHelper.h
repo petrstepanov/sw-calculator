@@ -15,6 +15,7 @@
 #define GRAPHICSHELPER_H
 
 #include <TStyle.h>
+#include <TClass.h>
 #include <RooPlot.h>
 #include <TPaveText.h>
 #include <RooArgList.h>
@@ -98,6 +99,7 @@ public:
 	static const Double_t TOP_TO_BOTTOM_PAD_HEIGHT_RATIO;
 
 	static GraphicsHelper* getInstance();
+	virtual ~GraphicsHelper();
 
 	static Style_t getFont(EFontFace fontFace = EFontFace::Helvetica);
 	static Double_t getFontSizeScale(Bool_t isTopPad);
@@ -108,6 +110,7 @@ public:
 	static TPaveText* makeParametersPaveText(const RooArgList& params, Double_t xmin, Double_t xmax, Double_t ymax);
 
 	static Int_t getNumberOfLines(TPave* pave);
+    static TObject* findObjectOnPad(TClass *c, TVirtualPad *pad);
 	static TLegend* getPadLegend(TVirtualPad* pad);
 	static TPaveStats* getPadStats(TVirtualPad* pad);
 	static void alignPave(TPave* pave, TVirtualPad* pad, Alignment alignment = Alignment::TOP_RIGHT, Decoration decoration = Decoration::DEFAULT, Double_t statsLineHeight = 0.07, Double_t statsWidth = 0);
@@ -122,6 +125,7 @@ private:
 	static void printVariable(const char* options, Int_t& currentLine, RooAbsArg* rooAbsArg, TPaveText* box);
     void drawRegion(RooPlot* plot, Double_t x1, Double_t y1, Double_t x2, Double_t y2, const char* text, Double_t textY);
 
+//    ClassDef(GraphicsHelper, 0)
 };
 
 #endif /* GRAPHICSHELPER_H */

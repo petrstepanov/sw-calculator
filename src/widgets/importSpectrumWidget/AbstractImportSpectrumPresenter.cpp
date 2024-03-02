@@ -38,14 +38,16 @@ void AbstractImportSpectrumPresenter::onOpenFileClicked(){
 		UiHelper::showOkDialog(view->GetMainFrame(), "File type is not supported.", EMsgBoxIcon::kMBIconStop);
 		return;
 	}
+
+	// Debug
+	hist->Print("base");
+
     // Update Model with new file name (virtual function)
     this->setModelFileName(fileNamePath);
 
     // Update View to reflect
-	// Display untrimmed histogram in the view's preview
 	view->drawHistogram(hist);
     view->loadFile(fileNamePath);
-	// hist->Print("base");
 
     // Problem: THStack lags plotting histograms with 0 values in log axis
     //          Error in <THistPainter::PaintInit>: Cannot set Y axis to log scale
