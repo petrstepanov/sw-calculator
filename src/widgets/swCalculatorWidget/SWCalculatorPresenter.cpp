@@ -225,10 +225,10 @@ void SWCalculatorPresenter::onViewFitSpectrumClicked() {
 
 	// Chi2 fit
 	RootHelper::startTimer();  // Start tracking Time
-	#ifdef _WIN32
-		RooChi2Var* chi2 = new RooChi2Var("chi2", "chi2", *(pdfProvider->getPdf()), *data);
-	#else
+	#if ROOT_VERSION_CODE >= ROOT_VERSION(6,31,0)
 		RooChi2Var* chi2 = new RooChi2Var("chi2", "chi2", *(pdfProvider->getPdf()), *data, kTRUE, RooDataHist::ErrorType::Poisson);
+	#else
+		RooChi2Var* chi2 = new RooChi2Var("chi2", "chi2", *(pdfProvider->getPdf()), *data);
 	#endif
 	// RooChi2Var* chi2 = new RooChi2Var("chi2", "chi2", *(pdfProvider->getPdf()), *data, RooFit::NumCPU(RootHelper::getNumCpu()));
 	RooMinimizer* m = new RooMinimizer(*chi2);

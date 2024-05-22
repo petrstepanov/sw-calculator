@@ -227,7 +227,6 @@ void AbstractImportSpectrumView::drawHistogram(TH1F* importedHist){
     miniStats->SetBorderSize(0);
     miniStats->SetOptStat(10); // Disable name line - see TPaveStats::Paint()
 	TString labelBins = TString::Format("Bins =  %d", miniHist->GetNbinsX());
-	std::cout << (int)miniHist->Integral() << " " << (int)importedHist->Integral() << std::endl;
 	TString labelEntries = TString::Format("Entries =  %d", (int)miniHist->Integral());
 	miniStats->AddText(labelBins.Data());
 	miniStats->AddText(labelEntries.Data());
