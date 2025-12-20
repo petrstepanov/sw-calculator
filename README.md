@@ -17,7 +17,7 @@ Currently it is possible to run application either on macOS or Linux. I will try
 3. Download and install ROOT release for Windows. Use `Windows Visual Studio 2022 64-bit x64` executable from the [latest release page](https://root.cern/install/all_releases/). During the installation ensure ROOT environment is added to the system PATH.
 4. ROOT releases not necessarily includes the Fourier Transform library (FFTW). [Download it here](http://www.fftw.org/install/windows.html). Use x64 version. Unpack and copy the `libfftw3-3.dll` to ROOT's `bin` folder, e.g. `C:\root_v6.##.##\bin`.
 5. Above FFTW library is linked to ROOT's `libFFTW.dll` and should be renamed correctly. Rename `libfftw3-3.dll` to `fftw3-3.dll`.
-6. **Optional**. To ensure the correct name for the FFTW library, open ROOT's `libFFTW.dll` in [Dependency Walker](https://dependencywalker.com/) program. The correct name for the FFTW library will be listed as a missing dependency in the top-right panel.
+6. **Optional**. To ensure the correct name for the FFTW library, open ROOT's `libFFTW.dll` in [Dependencies](https://github.com/lucasg/Dependencies) (former [Dependency Walker](https://dependencywalker.com/)) program. The correct name for the FFTW library will be listed as a missing dependency in the top-right panel.
 
 ### Compilation
 
